@@ -1,0 +1,16 @@
+/* DashboardLayout.scss */
+
+.app-layout {
+    display: flex;
+  }
+  
+  .main-content {
+    margin-left: 260px;
+    padding: 2rem;
+    transition: margin-left 0.3s ease;
+  }
+  
+  .app-layout.collapsed .main-content {
+    margin-left: 72px;
+  }
+  
