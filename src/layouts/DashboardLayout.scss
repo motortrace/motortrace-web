@@ -1,3 +1,6 @@
+
+@import '../styles/variables.scss';
+
 .dashboard-layout {
   display: flex;
   height: 100vh;
@@ -32,5 +35,36 @@
   
   .dashboard-layout {
     flex-direction: column;
+  }
+}
+
+/* Add this to your Dashboard.css or create a new file */
+
+.dashboard-content {
+  padding: 24px;
+}
+
+.metric-cards-row {
+  padding: 16px 24px; // Same padding as dashboard-header
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .metric-cards-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .metric-cards-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-content {
+    padding: 16px;
   }
 }

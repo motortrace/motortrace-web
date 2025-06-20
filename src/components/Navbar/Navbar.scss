@@ -17,11 +17,11 @@
 
 .page-title {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.65rem;
+  font-weight: 700;
   color: #1a1a1a;
   line-height: 1.2;
-  font-family: 'Lato';
+  font-family: 'Poppins';
 }
 
 .page-description {
@@ -42,7 +42,7 @@
   background: none;
   width: 38px;
   height: 38px;
-  border: 1px solid #F0EFF2;
+  border: 2px solid #e5e7eb;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -100,7 +100,7 @@
   cursor: pointer;
   padding: 0.35rem;
   border-radius: 32px;
-  border: 1px solid #F0EFF2;
+  border: 2px solid #e5e7eb;
   transition: background-color 0.2s ease;
   
   &:hover {

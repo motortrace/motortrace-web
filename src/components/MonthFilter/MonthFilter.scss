@@ -1,0 +1,73 @@
+/* src/components/MonthFilter/MonthFilter.css */
+@use '../../styles/variables' as *;
+
+.month-filter {
+    position: relative;
+  }
+  
+  .month-filter__button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .month-filter__button:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .month-filter__icon,
+  .month-filter__chevron {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .month-filter__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+  }
+  
+  .month-filter__dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 192px;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 20;
+  }
+  
+  .month-filter__options {
+    padding: 8px;
+  }
+  
+  .month-filter__option {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #374151;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .month-filter__option:hover {
+    background-color: #f9fafb;
+  }

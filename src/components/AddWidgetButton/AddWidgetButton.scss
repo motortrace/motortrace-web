@@ -1,0 +1,26 @@
+/* src/components/AddWidgetButton/AddWidgetButton.css */
+@use '../../styles/variables' as *;
+
+.add-widget-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--color-carbon);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .add-widget-button:hover {
+    background-color: var(--color-carbon);
+  }
+  
+  .add-widget-button__icon {
+    width: 16px;
+    height: 16px;
+  }
