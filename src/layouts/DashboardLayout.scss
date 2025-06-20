@@ -6,8 +6,8 @@
 }
 
 .main-content {
-  margin-left: 260px; // Same as sidebar width
-  width: calc(100% - 260px);
+  margin-left: 240px; // Match the new sidebar width
+  width: calc(100% - 240px);
   display: flex;
   flex-direction: column;
   height: 100vh;
