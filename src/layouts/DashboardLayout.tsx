@@ -1,12 +1,19 @@
+import React from 'react';  
 import Sidebar from '../components/Sidebar/sidebar';
-import './DashboardLayout.scss'; 
+import Navbar from '../components/Navbar/Navbar';
+import './DashboardLayout.scss'; // Add styles if needed
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const DashboardLayout: React.FC<Props> = ({ children }) => {
   return (
-    <div className="app-layout">
+    <div className="dashboard-layout">
       <Sidebar />
       <main className="main-content">
-        {children}
+        <Navbar />
+        <div className="page-content">{children}</div>
       </main>
     </div>
   );

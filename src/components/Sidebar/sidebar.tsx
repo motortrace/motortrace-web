@@ -11,7 +11,7 @@ interface MenuItem {
 }
 
 const Sidebar: React.FC = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Remove isExpanded state
   const [activeItem, setActiveItem] = useState('dashboard');
 
   const mainMenuItems: MenuItem[] = [
@@ -24,11 +24,10 @@ const Sidebar: React.FC = () => {
     { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card' },
     { id: 'inventory', label: 'Inventory', icon: 'bx bx-box' },
     { id: 'settings', label: 'Settings', icon: 'bx bx-cog' },
-
   ];
 
   const bottomMenuItems: MenuItem[] = [
-    { id: 'help', label: 'Help', icon: 'bx bx-help-circle' },
+    // { id: 'help', label: 'Help', icon: 'bx bx-help-circle' },
     { id: 'logout', label: 'Log out', icon: 'bx bx-log-out' },
   ];
 
@@ -36,27 +35,17 @@ const Sidebar: React.FC = () => {
     setActiveItem(itemId);
   };
 
-  const toggleSidebar = () => {
-    setIsExpanded(!isExpanded);
-  };
-
   return (
-    <div className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <div className="sidebar expanded"> {/* Always expanded */}
       {/* Header */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <div className="logo-icon">
             <img src={logo} alt="MotorTrace Logo" />
           </div>
-          {isExpanded && <span className="logo-text">MotorTrace</span>}
+          <span className="logo-text">MotorTrace</span> {/* Always show */}
         </div>
-        <button 
-          className="sidebar-toggle"
-          onClick={toggleSidebar}
-          aria-label="Toggle sidebar"
-        >
-          <i className={`bx ${isExpanded ? 'bx-chevron-left' : 'bx-chevron-right'}`}></i>
-        </button>
+        {/* Removed toggle button */}
       </div>
 
       {/* Main Menu */}
@@ -71,9 +60,7 @@ const Sidebar: React.FC = () => {
                 <span className="sidebar-menu-icon">
                   <i className={item.icon}></i>
                 </span>
-                {isExpanded && (
-                  <span className="sidebar-menu-label">{item.label}</span>
-                )}
+                <span className="sidebar-menu-label">{item.label}</span> {/* Always show */}
               </button>
             </li>
           ))}
@@ -89,18 +76,14 @@ const Sidebar: React.FC = () => {
                 className={`sidebar-menu-link ${activeItem === item.id ? 'active' : ''}`}
                 onClick={() => handleMenuClick(item.id)}
               >
-                <span className="sidebar-menu-icon">
+                <span className="sidebar-menu-icon-2">
                   <i className={item.icon}></i>
                 </span>
-                {isExpanded && (
-                  <span className="sidebar-menu-label">{item.label}</span>
-                )}
+                <span className="sidebar-menu-label-2">{item.label}</span> {/* Always show */}
               </button>
             </li>
           ))}
         </ul>
-
-
       </div>
     </div>
   );
