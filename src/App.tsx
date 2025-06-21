@@ -1,13 +1,15 @@
 
 import DashboardLayout from './layouts/DashboardLayout';
 
-import Dashboard from './pages/ServiceCenter/Dashboard';
+// import Dashboard from './pages/ServiceCenter/Dashboard';
+import KanbanPage from './pages/ServiceCenter/KanbanPage';
 
 function App() {
   return (
 
         <DashboardLayout>
-          <Dashboard />
+          {/* <Dashboard /> */}
+          <KanbanPage />
         </DashboardLayout>
 
   );
