@@ -4,6 +4,9 @@ import Navbar from '../components/Navbar/Navbar';
 import './DashboardLayout.scss';
 import DashboardHeader from './DashboardHeader/DashboardHeader';
 import MetricCard from '../components/MetricCard/MetricCard';
+import MoneyFlow from '../components/MoneyFlow/MoneyFlow';
+import Budget from '../components/Budget/Budget';
+import RecentTransactions from '../components/RecentTransactions/RecentTransactions';
 
 interface Props {
   children: React.ReactNode;
@@ -53,6 +56,11 @@ const DashboardLayout: React.FC<Props> = ({ children }) => {
             change="12.1%"
             changeType="positive"
           />
+        </div>
+
+        <div className="dashboard-charts-row">
+          <MoneyFlow />
+          <RecentTransactions />
         </div>
 
         <div className="page-content">{children}</div>

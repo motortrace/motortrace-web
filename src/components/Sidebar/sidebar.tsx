@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import './Sidebar.scss';
 import logo from '../../assets/images/motortraceLogo.png';
@@ -6,13 +6,21 @@ import logo from '../../assets/images/motortraceLogo.png';
 interface MenuItem {
   id: string;
   label: string;
-  icon: string; // Boxicon class name
+  icon: string;
   isActive?: boolean;
+  onClick?: () => void;
 }
 
-const Sidebar: React.FC = () => {
-  // Remove isExpanded state
-  const [activeItem, setActiveItem] = useState('dashboard');
+interface SidebarProps {
+  onMenuItemClick?: (itemId: string) => void;
+  defaultActiveItem?: string;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ 
+  onMenuItemClick,
+  defaultActiveItem = 'dashboard'
+}) => {
+  const [activeItem, setActiveItem] = useState(defaultActiveItem);
 
   const mainMenuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt' },
@@ -27,65 +35,71 @@ const Sidebar: React.FC = () => {
   ];
 
   const bottomMenuItems: MenuItem[] = [
-    // { id: 'help', label: 'Help', icon: 'bx bx-help-circle' },
-    { id: 'logout', label: 'Log out', icon: 'bx bx-log-out' },
+    { 
+      id: 'logout', 
+      label: 'Log out', 
+      icon: 'bx bx-log-out',
+      onClick: () => {
+        // Handle logout logic here
+        console.log('Logout clicked');
+      }
+    },
   ];
 
-  const handleMenuClick = (itemId: string) => {
+  const handleMenuClick = useCallback((itemId: string, customOnClick?: () => void) => {
     setActiveItem(itemId);
-  };
+    
+    if (customOnClick) {
+      customOnClick();
+    } else {
+      onMenuItemClick?.(itemId);
+    }
+  }, [onMenuItemClick]);
+
+  const renderMenuItem = (item: MenuItem, isBottomMenu = false) => (
+    <li key={item.id} className="sidebar-menu-item">
+      <button
+        className={`sidebar-menu-link ${activeItem === item.id ? 'active' : ''} ${isBottomMenu ? 'sidebar-menu-link--bottom' : ''}`}
+        onClick={() => handleMenuClick(item.id, item.onClick)}
+        aria-label={item.label}
+        type="button"
+      >
+        <span className={`sidebar-menu-icon ${isBottomMenu ? 'sidebar-menu-icon--bottom' : ''}`}>
+          <i className={item.icon} aria-hidden="true"></i>
+        </span>
+        <span className={`sidebar-menu-label ${isBottomMenu ? 'sidebar-menu-label--bottom' : ''}`}>
+          {item.label}
+        </span>
+      </button>
+    </li>
+  );
 
   return (
-    <div className="sidebar expanded"> {/* Always expanded */}
+    <aside className="sidebar" role="navigation" aria-label="Main navigation">
       {/* Header */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <div className="logo-icon">
             <img src={logo} alt="MotorTrace Logo" />
           </div>
-          <span className="logo-text">MotorTrace</span> {/* Always show */}
+          <span className="logo-text">MotorTrace</span>
         </div>
-        {/* Removed toggle button */}
       </div>
 
       {/* Main Menu */}
       <nav className="sidebar-nav">
-        <ul className="sidebar-menu">
-          {mainMenuItems.map((item) => (
-            <li key={item.id} className="sidebar-menu-item">
-              <button
-                className={`sidebar-menu-link ${activeItem === item.id ? 'active' : ''}`}
-                onClick={() => handleMenuClick(item.id)}
-              >
-                <span className="sidebar-menu-icon">
-                  <i className={item.icon}></i>
-                </span>
-                <span className="sidebar-menu-label">{item.label}</span> {/* Always show */}
-              </button>
-            </li>
-          ))}
+        <ul className="sidebar-menu" role="menu">
+          {mainMenuItems.map((item) => renderMenuItem(item))}
         </ul>
       </nav>
 
       {/* Bottom Menu */}
       <div className="sidebar-bottom">
-        <ul className="sidebar-menu">
-          {bottomMenuItems.map((item) => (
-            <li key={item.id} className="sidebar-menu-item">
-              <button
-                className={`sidebar-menu-link ${activeItem === item.id ? 'active' : ''}`}
-                onClick={() => handleMenuClick(item.id)}
-              >
-                <span className="sidebar-menu-icon-2">
-                  <i className={item.icon}></i>
-                </span>
-                <span className="sidebar-menu-label-2">{item.label}</span> {/* Always show */}
-              </button>
-            </li>
-          ))}
+        <ul className="sidebar-menu" role="menu">
+          {bottomMenuItems.map((item) => renderMenuItem(item, true))}
         </ul>
       </div>
-    </div>
+    </aside>
   );
 };
 

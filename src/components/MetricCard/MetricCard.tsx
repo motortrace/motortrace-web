@@ -24,7 +24,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
         <h3 className="metric-card__title">{title}</h3>
         <button className="metric-card__arrow">
           <div className='metric-card__arrow-icon'>          
-            <i className='bx bxs-right-top-arrow-circle' ></i>
+            <i className='bx bx-right-top-arrow-circle' ></i>
           </div>
 
 
