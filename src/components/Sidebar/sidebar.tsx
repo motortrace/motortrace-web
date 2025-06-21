@@ -11,6 +11,11 @@ interface MenuItem {
   onClick?: () => void;
 }
 
+interface MenuGroup {
+  title?: string;
+  items: MenuItem[];
+}
+
 interface SidebarProps {
   onMenuItemClick?: (itemId: string) => void;
   defaultActiveItem?: string;
@@ -22,29 +27,48 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [activeItem, setActiveItem] = useState(defaultActiveItem);
 
-  const mainMenuItems: MenuItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt' },
-    { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar' },
-    { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator' },
-    { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt' },
-    { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check' },
-    { id: 'invoices', label: 'Invoices', icon: 'bx bx-file' },
-    { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card' },
-    { id: 'inventory', label: 'Inventory', icon: 'bx bx-box' },
-    { id: 'settings', label: 'Settings', icon: 'bx bx-cog' },
+  const menuGroups: MenuGroup[] = [
+    {
+      title: 'Overview',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt' },
+      ]
+    },
+    {
+      title: 'Operations',
+      items: [
+        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar' },
+        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check' },
+        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt' },
+      ]
+    },
+    {
+      title: 'Business',
+      items: [
+        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator' },
+        { id: 'invoices', label: 'Invoices', icon: 'bx bx-file' },
+        { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card' },
+      ]
+    },
+    {
+      title: 'Management',
+      items: [
+        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box' },
+        { id: 'settings', label: 'Settings', icon: 'bx bx-cog' },
+      ]
+    }
   ];
 
-  const bottomMenuItems: MenuItem[] = [
-    { 
-      id: 'logout', 
-      label: 'Log out', 
-      icon: 'bx bx-log-out',
-      onClick: () => {
-        // Handle logout logic here
-        console.log('Logout clicked');
-      }
-    },
-  ];
+  // const bottomMenuItems: MenuItem[] = [
+  //   { 
+  //     id: 'logout', 
+  //     label: 'Log out', 
+  //     icon: 'bx bx-log-out',
+  //     onClick: () => {
+  //       console.log('Logout clicked');
+  //     }
+  //   },
+  // ];
 
   const handleMenuClick = useCallback((itemId: string, customOnClick?: () => void) => {
     setActiveItem(itemId);
@@ -64,10 +88,10 @@ const Sidebar: React.FC<SidebarProps> = ({
         aria-label={item.label}
         type="button"
       >
-        <span className={`sidebar-menu-icon ${isBottomMenu ? 'sidebar-menu-icon--bottom' : ''}`}>
+        <span className={`sidebar-menu-icon ${isBottomMenu ? 'sidebar-menu-icon--danger' : ''}`}>
           <i className={item.icon} aria-hidden="true"></i>
         </span>
-        <span className={`sidebar-menu-label ${isBottomMenu ? 'sidebar-menu-label--bottom' : ''}`}>
+        <span className={`sidebar-menu-label ${isBottomMenu ? 'sidebar-menu-label--danger' : ''}`}>
           {item.label}
         </span>
       </button>
@@ -86,19 +110,28 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Main Menu */}
+      {/* Main Menu with Groups */}
       <nav className="sidebar-nav">
-        <ul className="sidebar-menu" role="menu">
-          {mainMenuItems.map((item) => renderMenuItem(item))}
-        </ul>
+        {menuGroups.map((group, groupIndex) => (
+          <div key={groupIndex} className="sidebar-menu-group">
+            {group.title && (
+              <div className="sidebar-menu-group-title">
+                {group.title}
+              </div>
+            )}
+            <ul className="sidebar-menu" role="menu">
+              {group.items.map((item) => renderMenuItem(item))}
+            </ul>
+          </div>
+        ))}
       </nav>
 
-      {/* Bottom Menu */}
-      <div className="sidebar-bottom">
+      {/* Bottom Menu, ill add later ok */}
+      {/* <div className="sidebar-bottom">
         <ul className="sidebar-menu" role="menu">
           {bottomMenuItems.map((item) => renderMenuItem(item, true))}
         </ul>
-      </div>
+      </div> */}
     </aside>
   );
 };
