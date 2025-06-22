@@ -6,7 +6,7 @@ const KanbanPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 
-  // Sample data based on your screenshot
+  // Sample data 
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([
     {
       id: 'EST-1037',
@@ -18,7 +18,7 @@ const KanbanPage: React.FC = () => {
       amount: 1095.84,
       hours: { left: 0, billed: 0 },
       tags: ['Follow Up'],
-      image: '/api/placeholder/280/160',
+      image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg',
       status: 'estimates'
     },
     {
@@ -31,7 +31,7 @@ const KanbanPage: React.FC = () => {
       amount: 147.80,
       hours: { left: 0.4, billed: 0.4 },
       tags: ['New Client', 'Friends & Family'],
-      image: '/api/placeholder/280/160',
+      image: 'https://images.pexels.com/photos/14038622/pexels-photo-14038622.jpeg',
       status: 'approved'
     },
     {
@@ -44,7 +44,7 @@ const KanbanPage: React.FC = () => {
       amount: 322.09,
       hours: { left: 0.75, billed: 0.92 },
       tags: ['Buy 2 Get 1'],
-      image: '/api/placeholder/280/160',
+      image: 'https://images.pexels.com/photos/810357/pexels-photo-810357.jpeg',
       status: 'in-progress'
     },
     {
@@ -57,7 +57,7 @@ const KanbanPage: React.FC = () => {
       amount: 419.24,
       hours: { left: 0, billed: 2 },
       tags: ['Same Day Pick Up'],
-      image: '/api/placeholder/280/160',
+      image: 'https://images.pexels.com/photos/977003/pexels-photo-977003.jpeg',
       status: 'completed'
     },
     {
@@ -70,7 +70,7 @@ const KanbanPage: React.FC = () => {
       amount: 0,
       hours: { left: 0, billed: 0 },
       tags: ['Waiting on Approval', 'New Client'],
-      image: '/api/placeholder/280/160',
+      image: 'https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg',
       status: 'estimates'
     },
     {
@@ -83,7 +83,7 @@ const KanbanPage: React.FC = () => {
       amount: 0,
       hours: { left: 0, billed: 0 },
       tags: [],
-      image: '/api/placeholder/280/160',
+      image: 'https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg',
       status: 'completed'
     }
   ]);
@@ -115,23 +115,10 @@ const KanbanPage: React.FC = () => {
       {/* Page Header - this replaces your DashboardHeader */}
       <div className="page-header">
         <div className="page-title">
-          <h1>Workflow</h1>
+          <h1>Kanban board</h1>
         </div>
         <div className="page-controls">
-          <div className="view-toggles">
-            <button className="view-toggle active">
-              <span className="icon">⋮⋮</span>
-              Columns
-            </button>
-            <button className="view-toggle">
-              <span className="icon">☰</span>
-              List
-            </button>
-            <button className="view-toggle">
-              <span className="icon">🌳</span>
-              Parts & Trees
-            </button>
-          </div>
+
           <div className="search-and-filters">
             <input
               type="text"

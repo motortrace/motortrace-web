@@ -1,20 +1,21 @@
-// KanbanColumn.scss
+@import '../../styles/variables.scss';
+
 .kanban-column {
     flex: 0 0 320px;
     display: flex;
     flex-direction: column;
     background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
     height: fit-content;
-    max-height: calc(100vh - 200px);
+    border: 2px solid #e5e7eb;
     
     .column-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid #f1f5f9;
+      padding: 20px 24px 16px 24px;
+      border-bottom: 1px solid rgba(241, 245, 249, 0.8);
       
       .column-title-row {
         display: flex;
@@ -22,98 +23,81 @@
         gap: 12px;
         
         .column-indicator {
-          width: 8px;
-          height: 8px;
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
           flex-shrink: 0;
         }
         
         .column-title {
-          font-size: 16px;
-          font-weight: 600;
-          color: #1e293b;
+          font-size: 15px;
+          font-weight: 500;
+          color: #1a202c;
           margin: 0;
+          letter-spacing: -0.01em;
+          font-family: var(--font-primary);
         }
         
         .column-count {
-          background: #f1f5f9;
-          color: #64748b;
-          font-size: 12px;
-          font-weight: 500;
-          padding: 4px 8px;
-          border-radius: 12px;
-          min-width: 20px;
+          background: var(--color-carbon);
+          color: white;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 3px 7px;
+          border-radius: 8px;
+          min-width: 18px;
           text-align: center;
+          border: 1px solid rgba(241, 245, 249, 0.6);
         }
       }
       
       .column-menu-button {
         background: none;
         border: none;
-        color: #94a3b8;
-        font-size: 16px;
+        color: #cbd5e1;
+        font-size: 14px;
         cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        transition: all 0.2s;
+        padding: 6px;
+        border-radius: 6px;
+        transition: all 0.15s ease;
         
         &:hover {
-          background: #f1f5f9;
-          color: #64748b;
+          background: rgba(248, 250, 252, 0.8);
+          color: #94a3b8;
         }
       }
     }
     
     .column-content {
-      flex: 1;
-      padding: 16px;
+      padding: 20px 24px 24px 24px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      overflow-y: auto;
-      
-      // Custom scrollbar
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-      
-      &::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      
-      &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 3px;
-        
-        &:hover {
-          background: #94a3b8;
-        }
-      }
+      gap: 14px;
       
       .empty-column {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 40px 20px;
-        color: #94a3b8;
-        font-size: 14px;
+        padding: 48px 20px;
+        color: #a1a1aa;
+        font-size: 13px;
         text-align: center;
-        border: 2px dashed #e2e8f0;
-        border-radius: 8px;
-        background: #fafbfc;
+        border: 1px dashed rgba(226, 232, 240, 0.6);
+        border-radius: 12px;
+        background: rgba(249, 250, 251, 0.3);
         
         p {
           margin: 0;
+          font-weight: 500;
         }
       }
     }
     
-    // Drag and drop states
     &.drag-over {
       .column-content {
-        background: #f0f9ff;
-        border: 2px dashed #3b82f6;
-        border-radius: 8px;
+        background: rgba(239, 246, 255, 0.4);
+        border: 1px dashed rgba(59, 130, 246, 0.3);
+        border-radius: 12px;
       }
     }
   }

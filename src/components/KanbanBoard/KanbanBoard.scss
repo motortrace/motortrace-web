@@ -1,8 +1,10 @@
 // KanbanBoard.scss
+@import '../../styles/variables.scss';
+
 .kanban-board {
     flex: 1;
     overflow: hidden;
-    background-color: #f8fafc;
+    // background-color: #f8fafc;
     padding: 20px;
     
     .kanban-columns {
@@ -134,10 +136,10 @@
       
       .new-estimate-button {
         padding: 8px 16px;
-        background: #3b82f6;
+        background: var(--color-carbon);
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 20px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
