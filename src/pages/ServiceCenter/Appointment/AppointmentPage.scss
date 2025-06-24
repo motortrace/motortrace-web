@@ -4,8 +4,8 @@
 .appointment-page {
   min-height: 100vh;
   font-family: var(--font-secondary);
-  padding: 24px;
-  background-color: #f8fafc;
+  padding: 0px;
+  // background-color: #f8fafc;
 
   // Page Header
   .page-header {
@@ -134,6 +134,7 @@
   // Main Content Layout
   .appointment-content {
     display: flex;
+    padding: 20px;
     gap: 24px;
     min-height: calc(100vh - 300px);
   }
@@ -795,6 +796,51 @@
           width: 100%;
         }
       }
+    }
+  }
+}
+
+// Action buttons for Accept/Reschedule/View
+.action-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+  margin-right: 4px;
+  background: var(--color-carbon);
+  color: #fff;
+  &:hover {
+    filter: brightness(0.92);
+  }
+  &.view {
+    background: #fff;
+    color: var(--color-carbon);
+    border: 1.5px solid var(--color-carbon);
+    &:hover {
+      background: #f3f4f6;
+      filter: none;
+    }
+  }
+}
+
+.action-btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .action-btn-group {
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+    width: 100%;
+    .action-btn {
+      width: 100%;
+      margin-right: 0;
     }
   }
 }

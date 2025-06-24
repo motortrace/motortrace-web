@@ -1,0 +1,331 @@
+// components/AppointmentCalendar/AppointmentCalendar.scss
+
+.appointment-calendar {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  .calendar-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    padding: 20px;
+
+    // FullCalendar base styles
+    .fc {
+      .fc-theme-standard {
+        .fc-scrollgrid {
+          border-color: #e5e7eb;
+        }
+      }
+
+      // Header and navigation
+      .fc-header-toolbar {
+        display: none; // We use custom toolbar
+      }
+
+      // Day/Week/Month views
+      .fc-view-harness {
+        .fc-view {
+          background: #ffffff;
+        }
+      }
+
+      // Grid lines
+      .fc-scrollgrid-section table,
+      .fc-col-header,
+      .fc-daygrid-body,
+      .fc-timegrid-body {
+        border-color: #f3f4f6;
+      }
+
+      .fc-scrollgrid td,
+      .fc-scrollgrid th {
+        border-color: #f3f4f6;
+      }
+
+      // Time slots
+      .fc-timegrid-slot {
+        height: 40px;
+        border-color: #f3f4f6;
+      }
+
+      .fc-timegrid-slot-minor {
+        border-color: #f9fafb;
+      }
+
+      // Events - This is where the magic happens for overlapping
+      .fc-event {
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 2px 6px;
+        margin: 1px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        
+        // Prevent text overflow
+        .fc-event-title {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .fc-event-time {
+          font-weight: 600;
+        }
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          z-index: 10;
+        }
+      }
+
+      // Priority-based styling
+      .fc-event.priority-urgent {
+        background-color: #ef4444 !important;
+        border-color: #dc2626 !important;
+        color: #ffffff !important;
+      }
+
+      .fc-event.priority-moderate {
+        background-color: #f59e0b !important;
+        border-color: #d97706 !important;
+        color: #ffffff !important;
+      }
+
+      .fc-event.priority-normal {
+        background-color: #10b981 !important;
+        border-color: #059669 !important;
+        color: #ffffff !important;
+      }
+
+      // Status-based styling
+      .fc-event.status-pending {
+        opacity: 0.8;
+        border-style: dashed;
+      }
+
+      .fc-event.status-completed {
+        opacity: 0.6;
+        text-decoration: line-through;
+      }
+
+      .fc-event.status-cancelled {
+        opacity: 0.4;
+        background-color: #6b7280 !important;
+        border-color: #4b5563 !important;
+      }
+
+      // Today highlighting
+      .fc-day-today {
+        background-color: #f9fafb !important;
+      }
+
+      // Current time indicator
+      .fc-timegrid-now-indicator-line {
+        border-color: #ef4444;
+        border-width: 2px;
+      }
+
+      .fc-timegrid-now-indicator-arrow {
+        border-color: #ef4444;
+      }
+
+      // Month view specific
+      .fc-daygrid-day {
+        min-height: 100px;
+        
+        .fc-daygrid-day-events {
+          margin: 2px;
+        }
+
+        .fc-daygrid-event {
+          margin-bottom: 1px;
+          font-size: 11px;
+        }
+      }
+
+      // Week/Day view specific
+      .fc-timegrid-event {
+        border-left: 3px solid;
+        padding-left: 4px;
+        
+        // Handle overlapping events - FullCalendar does this automatically
+        .fc-event-main {
+          padding: 1px 2px;
+        }
+      }
+
+      // More events popover
+      .fc-more-popover {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        
+        .fc-popover-header {
+          background: #f9fafb;
+          border-bottom: 1px solid #e5e7eb;
+          padding: 8px 12px;
+          font-weight: 600;
+        }
+
+        .fc-popover-body {
+          padding: 8px;
+          
+          .fc-daygrid-event {
+            margin-bottom: 4px;
+          }
+        }
+      }
+
+      // "More" link styling
+      .fc-daygrid-more-link {
+        background: #6b7280;
+        color: #ffffff;
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background 0.15s;
+
+        &:hover {
+          background: #4b5563;
+        }
+      }
+
+      // Selection highlighting
+      .fc-highlight {
+        background: rgba(59, 130, 246, 0.1);
+      }
+
+      // Day/time labels
+      .fc-col-header-cell {
+        background: #f9fafb;
+        font-weight: 600;
+        color: #374151;
+        padding: 8px 4px;
+      }
+
+      .fc-timegrid-axis {
+        .fc-timegrid-axis-cushion {
+          color: #6b7280;
+          font-size: 11px;
+        }
+      }
+
+      // Scrollbars
+      .fc-scroller {
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f3f4f6;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #d1d5db;
+          border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+          background: #9ca3af;
+        }
+      }
+    }
+  }
+}
+
+/* Custom Toolbar */
+.calendar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0 4px;
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .nav-btn {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 6px 10px;
+      color: #374151;
+      transition: all 0.15s;
+
+      &:hover {
+        background: #e5e7eb;
+        color: #111827;
+      }
+    }
+
+    .today-btn {
+      background: #3b82f6;
+      border: 1px solid #2563eb;
+      border-radius: 6px;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 6px 12px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+
+      &:hover {
+        background: #2563eb;
+      }
+    }
+
+    .calendar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 15px;
+      min-width: 200px;
+    }
+  }
+
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .view-switcher {
+      display: flex;
+      gap: 2px;
+      background: #f3f4f6;
+      padding: 2px;
+      border-radius: 8px;
+      
+      .view-btn {
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.15s;
+        color: #6b7280;
+        font-weight: 500;
+
+        &.active {
+          background-color: #ffffff;
+          color: #111827;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        &:hover:not(.active) {
+          color: #374151;
+        }
+      }
+    }
+  }
+}
