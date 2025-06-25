@@ -21,6 +21,18 @@ export interface Appointment {
   notes?: string;
   dropOff: boolean;
   technician: string;
+  // Extended fields for modal
+  source?: string;
+  year?: number;
+  license?: string;
+  mileage?: number;
+  duration?: string;
+  bay?: string;
+  pickupDate?: Date;
+  preferredContact?: string;
+  reminder?: string;
+  createdOn?: Date;
+  bookedBy?: string;
 }
 
 interface AppointmentCalendarProps {
@@ -52,29 +64,12 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     end: appointment.end,
     extendedProps: appointment,
     classNames: [
-      `priority-${appointment.priority}`,
       `status-${appointment.status}`
     ],
-    backgroundColor: getPriorityColor(appointment.priority),
-    borderColor: getPriorityBorderColor(appointment.priority),
-    textColor: '#ffffff'
+    backgroundColor: '#F0EFF2',
+    borderColor: '#343438',
+    textColor: '#343438'
   }));
-
-  function getPriorityColor(priority: string) {
-    switch (priority) {
-      case 'urgent': return '#ef4444';
-      case 'moderate': return '#f59e0b';
-      default: return '#10b981';
-    }
-  }
-
-  function getPriorityBorderColor(priority: string) {
-    switch (priority) {
-      case 'urgent': return '#dc2626';
-      case 'moderate': return '#d97706';
-      default: return '#059669';
-    }
-  }
 
   const handleEventClick = (clickInfo: any) => {
     onSelectEvent(clickInfo.event.extendedProps);
@@ -117,7 +112,8 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
             ›
           </button>
           <button 
-            className="today-btn" 
+            className="today-btn custom-today-btn" 
+            style={{ background: '#343438', color: '#fff' }}
             onClick={() => calendar?.today()}
           >
             Today
@@ -157,7 +153,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={false} // We use custom toolbar
-          initialView={currentView}
+          initialView={'timeGridWeek'}
           initialDate={currentDate}
           events={events}
           selectable={true}

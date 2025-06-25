@@ -7,26 +7,15 @@ import Table from '../../../components/Table/Table';
 import type { TableColumn } from '../../../components/Table/Table';
 import moment from 'moment';
 import './AppointmentPage.scss';
-
-interface PendingRequest {
-  id: string;
-  customer: string;
-  phone: string;
-  vehicle: string;
-  requestedDate: string;
-  requestedTime: string;
-  services: string[];
-  priority: 'normal' | 'urgent' | 'moderate';
-  createdAt: string;
-}
+import AppointmentModal from '../../../components/AppointmentModel/AppointmentModal';
+import type { PendingRequest } from '../../../types/PendingRequest';
 
 const AppointmentPage: React.FC = () => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date(2024, 3, 15));
   const [currentView, setCurrentView] = useState<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('timeGridDay');
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [viewedRequest, setViewedRequest] = useState<PendingRequest | null>(null);
 
-  const [appointments] = useState<Appointment[]>([
+  const [appointments, setAppointments] = useState<Appointment[]>([
     {
       id: 'APR#10001',
       title: 'Jack Martin - Oil Change, Brake Service',
@@ -157,7 +146,7 @@ const AppointmentPage: React.FC = () => {
     },
   ]);
 
-  const pendingRequests: PendingRequest[] = [
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([
     {
       id: 'REQ#001',
       customer: 'Emma Watson',
@@ -180,14 +169,17 @@ const AppointmentPage: React.FC = () => {
       priority: 'urgent',
       createdAt: '30 minutes ago',
     },
-  ];
-
-  const handleSelectEvent = (event: Appointment) => {
-    setSelectedAppointment(event);
-  };
+  ]);
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     console.log('Selected slot:', start, end);
+  };
+
+  const handleConfirmAppointment = (confirmedRequest: any) => {
+    console.log('Confirmed request:', confirmedRequest);
+    // Note: In a real app, you would have more robust logic here,
+    // like creating a new appointment and removing the pending request.
+    setViewedRequest(null);
   };
 
   const incomingColumns: TableColumn<PendingRequest>[] = [
@@ -236,63 +228,17 @@ const AppointmentPage: React.FC = () => {
             onDateChange={setCurrentDate}
             currentView={currentView}
             onViewChange={setCurrentView}
-            onSelectEvent={handleSelectEvent}
+            onSelectEvent={() => {}}
             onSelectSlot={handleSelectSlot}
           />
         </div>
       </div>
-
-      {selectedAppointment && (
-        <div className="modal-overlay" onClick={() => setSelectedAppointment(null)}>
-          <div className="appointment-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{selectedAppointment.id}: {selectedAppointment.customer}</h3>
-              <button className="close-btn" onClick={() => setSelectedAppointment(null)}>×</button>
-            </div>
-            <div className="modal-content">
-              <div className="appointment-info">
-                <div className="info-section">
-                  <h4>Customer Details</h4>
-                  <div className="info-grid">
-                    <div className="info-item"><span className="label">Phone:</span><span className="value">{selectedAppointment.phone}</span></div>
-                    <div className="info-item"><span className="label">Email:</span><span className="value">{selectedAppointment.email}</span></div>
-                    <div className="info-item"><span className="label">Vehicle:</span><span className="value">{selectedAppointment.vehicle}</span></div>
-                    <div className="info-item"><span className="label">Technician:</span><span className="value">{selectedAppointment.technician}</span></div>
-                  </div>
-                </div>
-                <div className="info-section">
-                  <h4>Appointment Details</h4>
-                  <div className="info-grid">
-                    <div className="info-item"><span className="label">Date & Time:</span><span className="value">{moment(selectedAppointment.start).format('MMMM DD, YYYY at h:mm A')}</span></div>
-                    <div className="info-item"><span className="label">Duration:</span><span className="value">{moment(selectedAppointment.end).diff(moment(selectedAppointment.start), 'hours')} hour(s)</span></div>
-                    <div className="info-item"><span className="label">Drop-off:</span><span className="value">{selectedAppointment.dropOff ? 'Yes' : 'No'}</span></div>
-                    <div className="info-item"><span className="label">Priority:</span><span className={`priority-badge ${selectedAppointment.priority}`}>{selectedAppointment.priority}</span></div>
-                  </div>
-                </div>
-                <div className="info-section">
-                  <h4>Services</h4>
-                  <div className="services-grid">
-                    {selectedAppointment.services.map((service, idx) => (
-                      <span key={idx} className="service-badge">{service}</span>
-                    ))}
-                  </div>
-                </div>
-                {selectedAppointment.notes && (
-                  <div className="info-section">
-                    <h4>Notes</h4>
-                    <p className="notes">{selectedAppointment.notes}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="action-btn confirm">Mark Complete</button>
-              <button className="action-btn reschedule">Reschedule</button>
-              <button className="action-btn cancel">Cancel Appointment</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AppointmentModal
+        isOpen={viewedRequest !== null}
+        request={viewedRequest}
+        onClose={() => setViewedRequest(null)}
+        onConfirm={handleConfirmAppointment}
+      />
     </div>
   );
 };
