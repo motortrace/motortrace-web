@@ -5,6 +5,7 @@ import Dashboard from './pages/ServiceCenter/Dashboard';
 import KanbanPage from './pages/ServiceCenter/KanbanPage';
 import AppointmentPage from './pages/ServiceCenter/Appointment/AppointmentPage';
 import TestTablePage from './pages/ServiceCenter/TestTablePage';
+import JobCard from './pages/ServiceCenter/JobCard/JobCard';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="kanban" element={<KanbanPage />} />
           <Route path="appointments" element={<AppointmentPage />} />
           <Route path="table" element={<TestTablePage />} />
+          <Route path="jobcard" element={<JobCard />} />
         </Route>
       </Routes>
     </BrowserRouter>
