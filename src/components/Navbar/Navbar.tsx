@@ -1,12 +1,42 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import './Navbar.scss';
 
+const pageInfo: Record<string, { title: string; description: string }> = {
+  '/servicecenter/dashboard': {
+    title: 'Welcome back, John!',
+    description: 'Overview of your balance and accounts',
+  },
+  '/servicecenter/jobs': {
+    title: 'Job Board',
+    description: 'Manage your work orders and tasks',
+  },
+  '/servicecenter/appointments': {
+    title: 'Appointments',
+    description: 'View and manage your appointments',
+  },
+  '/servicecenter/table': {
+    title: 'Data Table',
+    description: 'Detailed data and analytics',
+  },
+  '/servicecenter/jobcard': {
+    title: 'Job Card',
+    description: 'Details for the selected job card',
+  },
+};
+
 const Navbar: React.FC = () => {
+  const location = useLocation();
+  const info = pageInfo[location.pathname] || {
+    title: 'Welcome!',
+    description: 'Select a page to get started',
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <h2 className="page-title">Welcome back, John!</h2>
-        <p className="page-description">Overview of your balance and accounts</p>
+        <h2 className="page-title">{info.title}</h2>
+        <p className="page-description">{info.description}</p>
       </div>
 
       <div className="navbar-right">

@@ -15,7 +15,7 @@ function App() {
         <Route path="/servicecenter" element={<DashboardLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="kanban" element={<KanbanPage />} />
+          <Route path="jobs" element={<KanbanPage />} />
           <Route path="appointments" element={<AppointmentPage />} />
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />

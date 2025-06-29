@@ -5,9 +5,9 @@
   top: 0;
   left: 0;
   height: 100vh;
-  width: 240px;
+  width: 200px;
   background: #F0EFF2;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   display: flex;
@@ -19,9 +19,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  min-height: 72px;
+  min-height: 60px;
   background: #F0EFF2;
   backdrop-filter: blur(10px);
 }
@@ -29,18 +29,18 @@
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   
   img {
     width: 100%;
@@ -50,7 +50,7 @@
 }
 
 .logo-text {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-neutral-900, #1a1a2e);
   letter-spacing: -0.025em;
@@ -58,14 +58,14 @@
 
 .sidebar-nav {
   flex: 1;
-  padding: 1.5rem 0 2rem 0;
+  padding: 1rem 0 1.5rem 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.375rem;
   overflow-y: auto;
   
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 3px;
   }
   
   &::-webkit-scrollbar-track {
@@ -80,15 +80,15 @@
 
 .sidebar-menu-group {
   &:not(:last-child) {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     position: relative;
     
     &::after {
       content: '';
       position: absolute;
-      bottom: -0.75rem;
-      left: 1.25rem;
-      right: 1.25rem;
+      bottom: -0.5rem;
+      left: 1rem;
+      right: 1rem;
       height: 1px;
       background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.08) 50%, rgba(0, 0, 0, 0) 100%);
     }
@@ -96,12 +96,12 @@
 }
 
 .sidebar-menu-group-title {
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: var(--color-neutral-500, #8b8b9a);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0 1.25rem 0.75rem 1.25rem;
+  padding: 0 1rem 0.5rem 1rem;
   margin-bottom: 0.25rem;
 }
 
@@ -116,39 +116,39 @@
 
 .sidebar-menu-item {
   width: 100%;
-  padding: 0 1rem;
+  padding: 0 0.75rem;
 }
 
 // Remove all bottom menu styles since we removed the logout section
 .sidebar-menu-link {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
-  padding: 0.75rem 1rem;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
   border: none;
   background: transparent;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   text-align: left;
   color: var(--color-neutral-700, #4a4a5a);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  min-height: 44px;
+  min-height: 36px;
   position: relative;
   
   &:hover {
     background: rgba(255, 255, 255, 0.7);
     color: var(--color-primary, #6366f1);
     transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   }
   
   &.active {
     background: var(--color-carbon, #6366f1);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 3px 8px rgba(99, 102, 241, 0.15);
     transform: translateX(2px);
     
     .sidebar-menu-icon {
@@ -158,20 +158,20 @@
     &::before {
       content: '';
       position: absolute;
-      left: -1rem;
+      left: -0.75rem;
       top: 50%;
       transform: translateY(-50%);
-      width: 3px;
-      height: 20px;
+      width: 2px;
+      height: 16px;
       background: var(--color-primary, #6366f1);
-      border-radius: 0 2px 2px 0;
+      border-radius: 0 1px 1px 0;
     }
   }
 }
 
 .sidebar-menu-icon {
-  font-size: 1.125rem;
-  min-width: 20px;
+  font-size: 1rem;
+  min-width: 16px;
   text-align: center;
   color: var(--color-neutral-600, #6b7280);
   display: flex;
@@ -182,8 +182,8 @@
 .sidebar-menu-label {
   opacity: 1; 
   white-space: nowrap;
-  font-size: 0.875rem;
-  line-height: 1.25;
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
 // Remove sidebar-bottom styles since logout section is removed
@@ -203,7 +203,7 @@
 
 // Custom scrollbar styles
 .sidebar::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 .sidebar::-webkit-scrollbar-track {

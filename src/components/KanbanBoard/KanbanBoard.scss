@@ -5,19 +5,19 @@
     flex: 1;
     overflow: hidden;
     // background-color: #f8fafc;
-    padding: 20px;
+    padding: 12px;
     
     .kanban-columns {
       display: flex;
-      gap: 20px;
+      gap: 12px;
       height: 100%;
       overflow-x: auto;
       overflow-y: hidden;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       
       // Custom scrollbar
       &::-webkit-scrollbar {
-        height: 8px;
+        height: 6px;
       }
       
       &::-webkit-scrollbar-track {
@@ -41,13 +41,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
+    padding: 16px 20px;
     background: white;
     border-bottom: 1px solid #e2e8f0;
     
     .page-title {
       h1 {
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 600;
         color: #1e293b;
         margin: 0;
@@ -57,24 +57,24 @@
     .page-controls {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       
       .view-toggles {
         display: flex;
         background: #f1f5f9;
-        border-radius: 8px;
-        padding: 4px;
-        gap: 2px;
+        border-radius: 6px;
+        padding: 3px;
+        gap: 1px;
         
         .view-toggle {
           display: flex;
           align-items: center;
-          gap: 6px;
-          padding: 8px 12px;
+          gap: 4px;
+          padding: 6px 10px;
           border: none;
           background: transparent;
-          border-radius: 6px;
-          font-size: 14px;
+          border-radius: 4px;
+          font-size: 13px;
           color: #64748b;
           cursor: pointer;
           transition: all 0.2s;
@@ -90,26 +90,26 @@
           }
           
           .icon {
-            font-size: 16px;
+            font-size: 14px;
           }
         }
       }
       
       .search-and-filters {
         display: flex;
-        gap: 8px;
+        gap: 6px;
         
         .search-input {
-          padding: 8px 12px;
+          padding: 6px 10px;
           border: 1px solid #d1d5db;
-          border-radius: 6px;
-          font-size: 14px;
-          width: 200px;
+          border-radius: 4px;
+          font-size: 13px;
+          width: 180px;
           
           &:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
           }
           
           &::placeholder {
@@ -118,12 +118,12 @@
         }
         
         .filters-button {
-          padding: 8px 16px;
+          padding: 6px 12px;
           border: 1px solid #d1d5db;
-          border-radius: 6px;
+          border-radius: 4px;
           background: white;
           color: #374151;
-          font-size: 14px;
+          font-size: 13px;
           cursor: pointer;
           transition: all 0.2s;
           
@@ -135,12 +135,12 @@
       }
       
       .new-estimate-button {
-        padding: 8px 16px;
+        padding: 6px 12px;
         background: var(--color-carbon);
         color: white;
         border: none;
-        border-radius: 20px;
-        font-size: 14px;
+        border-radius: 16px;
+        font-size: 13px;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;

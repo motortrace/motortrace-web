@@ -19,7 +19,6 @@ export const ServiceItemsTable: React.FC<ServiceItemsTableProps> = ({ service })
           <th>Amount</th>
           <th>Disc</th>
           <th>Net Amount</th>
-          <th>Tax</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -38,9 +37,6 @@ export const ServiceItemsTable: React.FC<ServiceItemsTableProps> = ({ service })
             <td>${item.amount.toFixed(2)}</td>
             <td>${item.discount.toFixed(2)}</td>
             <td>${item.netAmount.toFixed(2)}</td>
-            <td>
-              <input type="checkbox" checked={item.taxable} readOnly />
-            </td>
             <td><span className={`badge badge--${item.status.toLowerCase()}`}>{item.status}</span></td>
             <td>
               <div className="parts-table__actions">

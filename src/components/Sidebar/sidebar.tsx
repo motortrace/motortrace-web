@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'boxicons/css/boxicons.min.css';
 import './Sidebar.scss';
 import logo from '../../assets/images/motortraceLogo.png';
@@ -7,8 +8,7 @@ interface MenuItem {
   id: string;
   label: string;
   icon: string;
-  isActive?: boolean;
-  onClick?: () => void;
+  route: string;
 }
 
 interface MenuGroup {
@@ -16,84 +16,60 @@ interface MenuGroup {
   items: MenuItem[];
 }
 
-interface SidebarProps {
-  onMenuItemClick?: (itemId: string) => void;
-  defaultActiveItem?: string;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ 
-  onMenuItemClick,
-  defaultActiveItem = 'dashboard'
-}) => {
-  const [activeItem, setActiveItem] = useState(defaultActiveItem);
+const Sidebar: React.FC = () => {
+  const [activeItem, setActiveItem] = useState('dashboard');
+  const navigate = useNavigate();
 
   const menuGroups: MenuGroup[] = [
     {
       title: 'Overview',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt' },
+        { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: '/servicecenter/dashboard' },
       ]
     },
     {
       title: 'Operations',
       items: [
-        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar' },
-        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check' },
-        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt' },
+        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar', route: '/servicecenter/appointments' },
+        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
+        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
+        { id: 'jobs', label: 'Jobs', icon: 'bx bx-briefcase', route: '/servicecenter/jobs' },
       ]
     },
     {
       title: 'Business',
       items: [
-        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator' },
-        { id: 'invoices', label: 'Invoices', icon: 'bx bx-file' },
-        { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card' },
+        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: '/servicecenter/estimates' },
+        { id: 'invoices', label: 'Invoices', icon: 'bx bx-file', route: '/servicecenter/invoices' },
+        { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: '/servicecenter/payments' },
       ]
     },
     {
       title: 'Management',
       items: [
-        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box' },
-        { id: 'settings', label: 'Settings', icon: 'bx bx-cog' },
+        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
+        { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/servicecenter/settings' },
       ]
     }
   ];
 
-  // const bottomMenuItems: MenuItem[] = [
-  //   { 
-  //     id: 'logout', 
-  //     label: 'Log out', 
-  //     icon: 'bx bx-log-out',
-  //     onClick: () => {
-  //       console.log('Logout clicked');
-  //     }
-  //   },
-  // ];
-
-  const handleMenuClick = useCallback((itemId: string, customOnClick?: () => void) => {
-    setActiveItem(itemId);
-    
-    if (customOnClick) {
-      customOnClick();
-    } else {
-      onMenuItemClick?.(itemId);
-    }
-  }, [onMenuItemClick]);
+  const handleMenuClick = useCallback((item: MenuItem) => {
+    setActiveItem(item.id);
+    navigate(item.route);
+  }, [navigate]);
 
   const renderMenuItem = (item: MenuItem, isBottomMenu = false) => (
     <li key={item.id} className="sidebar-menu-item">
       <button
         className={`sidebar-menu-link ${activeItem === item.id ? 'active' : ''} ${isBottomMenu ? 'sidebar-menu-link--bottom' : ''}`}
-        onClick={() => handleMenuClick(item.id, item.onClick)}
+        onClick={() => handleMenuClick(item)}
         aria-label={item.label}
         type="button"
       >
         <span className={`sidebar-menu-icon ${isBottomMenu ? 'sidebar-menu-icon--danger' : ''}`}>
           <i className={item.icon} aria-hidden="true"></i>
         </span>
-        <span className={`sidebar-menu-label ${isBottomMenu ? 'sidebar-menu-label--danger' : ''}`}>
-          {item.label}
-        </span>
+        <span className={`sidebar-menu-label ${isBottomMenu ? 'sidebar-menu-label--danger' : ''}`}>{item.label}</span>
       </button>
     </li>
   );
@@ -125,13 +101,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         ))}
       </nav>
-
-      {/* Bottom Menu, ill add later ok */}
-      {/* <div className="sidebar-bottom">
-        <ul className="sidebar-menu" role="menu">
-          {bottomMenuItems.map((item) => renderMenuItem(item, true))}
-        </ul>
-      </div> */}
     </aside>
   );
 };

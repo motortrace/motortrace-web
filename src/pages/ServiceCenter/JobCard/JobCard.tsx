@@ -3,7 +3,6 @@ import './JobCard.scss';
 import { JobCardHeader } from './JobCardHeader';
 import { JobCardInfo } from './JobCardInfo';
 import { JobCardTabs } from './JobCardTabs';
-import { JobCardSidebar } from './JobCardSidebar';
 import { initialServices, partItems, customerComplaint, vehicleImageUrl, customerImageUrl, vehicleArrival, personalItems } from './data/initialData';
 import type { ServicePackage, PartItem } from './types/jobCard.types';
 import { useJobCardCalculations } from './hooks/useJobCardCalculations';
@@ -73,18 +72,6 @@ const JobCard: React.FC = () => {
             />
           </div>
         </div>
-        <JobCardSidebar
-          calculateAuthorizedLabor={calculateAuthorizedLabor}
-          calculateAuthorizedParts={calculateAuthorizedParts}
-          calculateTax={calculateTax}
-          calculateTotal={calculateTotal}
-          paymentStatus={paymentStatus}
-          setPaymentStatus={setPaymentStatus}
-          paymentProof={paymentProof}
-          setPaymentProof={setPaymentProof}
-          services={services}
-          sendAuthorizationRequest={sendAuthorizationRequest}
-        />
       </div>
     </div>
   );

@@ -1,8 +1,6 @@
 // components/JobCard/JobCardInfo.tsx
 import React from 'react';
-import { CustomerInfoCard } from './CustomerInfoCard';
-import VehicleInfoCard from './VehicleInfoCard';
-import JobDetailsCard from './JobDetailsCard';
+import JobSummaryCard from './JobSummaryCard';
 
 interface JobCardInfoProps {
   customerImageUrl: string;
@@ -23,20 +21,7 @@ interface JobCardInfoProps {
 export const JobCardInfo: React.FC<JobCardInfoProps> = (props) => {
   return (
     <div className="job-card__info-section">
-      <CustomerInfoCard />
-      <VehicleInfoCard
-        vehicleImageUrl={props.vehicleImageUrl}
-        model={props.model}
-        vin={props.vin}
-        mileage={props.mileage}
-        personalItems={props.personalItems}
-      />
-      <JobDetailsCard
-        createdBy={props.createdBy}
-        assignedTech={props.assignedTech}
-        vehicleArrival={props.vehicleArrival}
-        customerComplaint={props.customerComplaint}
-      />
+      <JobSummaryCard {...props} />
     </div>
   );
 };
