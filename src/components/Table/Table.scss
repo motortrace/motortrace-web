@@ -3,23 +3,23 @@
 .table-container {
     background: white;
     border: 2px solid #e5e7eb;
-    border-radius: 20px;
-    padding: 20px;
-    margin: 20px;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 12px;
     font-family: 'Lufga', sans-serif;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
   
     .table-header {
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
   
       .table-title {
-        font-size: 22px;
+        font-size: 16px;
         font-weight: 600;
         color: #111827;
         margin: 0;
@@ -27,13 +27,13 @@
   
       .table-actions {
         display: flex;
-        gap: 12px;
+        gap: 8px;
   
         .btn {
-          padding: 6px 12px;
-          min-width: 80px;
-          font-size: 12px;
-          border-radius: 20px;
+          padding: 4px 10px;
+          min-width: 60px;
+          font-size: 11px;
+          border-radius: 10px;
           cursor: pointer;
   
           &.btn-primary {
@@ -60,14 +60,14 @@
   
     .table-grid-header {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 8px;
       background: #f0eff2;
-      padding: 12px 16px;
-      border-radius: 20px;
+      padding: 8px 10px;
+      border-radius: 10px;
   
       .table-header-cell {
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 500;
         color: var(--color-carbon);
         text-transform: uppercase;
@@ -75,10 +75,10 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
   
         .sort-icon {
-          font-size: 10px;
+          font-size: 9px;
           color: #9ca3af;
         }
       }
@@ -87,15 +87,15 @@
     .table-grid-body {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 4px;
     }
   
     .table-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 16px;
-      padding: 12px 16px;
-      border-radius: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
       transition: background-color 0.2s ease;
       position: relative;
 
@@ -121,7 +121,7 @@
   
     .table-cell {
       font-weight: 500;
-      font-size: 14px;
+      font-size: 12px;
       font-family: 'Poppins';
       color: var(--color-carbon);
   
@@ -132,20 +132,27 @@
       &.align-center {
         text-align: center;
       }
+  
+      // Center action buttons in the last cell (actions column)
+      &:last-child {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     }
   
     .empty-state {
-      padding: 40px;
+      padding: 20px;
       text-align: center;
       color: #6b7280;
-      font-size: 14px;
+      font-size: 12px;
     }
   }
   
   // Optional responsive tweaks
   @media (max-width: 768px) {
     .table-container {
-      padding: 16px;
+      padding: 8px;
   
       .table-grid-header,
       .table-row {
@@ -155,7 +162,7 @@
       .table-cell {
         &::before {
           content: attr(data-label);
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 600;
           color: #9ca3af;
           display: block;

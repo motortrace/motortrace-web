@@ -23,6 +23,22 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Job Card',
     description: 'Details for the selected job card',
   },
+  '/servicecenter/scheduling': {
+    title: 'Technician Scheduling',
+    description: 'Schedule tasks for your technicians',
+  },
+  '/servicecenter/inventory': {
+    title: 'Parts Inventory',
+    description: 'Manage your vehicle parts',
+  },
+  '/servicecenter/suppliers': {
+    title: 'Supplier Connection',
+    description: 'Manage your suppliers',
+  },
+  '/servicecenter/parts-order': {
+    title: 'Order Parts',
+    description: 'Manage your parts',
+  },
 };
 
 const Navbar: React.FC = () => {

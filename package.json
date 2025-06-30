@@ -13,6 +13,7 @@
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/react": "^6.1.17",
+    "@fullcalendar/resource-timeline": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
     "@tailwindcss/vite": "^4.1.10",
     "boxicons": "^2.1.4",

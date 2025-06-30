@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'boxicons/css/boxicons.min.css';
 import './Sidebar.scss';
 import logo from '../../assets/images/motortraceLogo.png';
@@ -17,8 +17,8 @@ interface MenuGroup {
 }
 
 const Sidebar: React.FC = () => {
-  const [activeItem, setActiveItem] = useState('dashboard');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const menuGroups: MenuGroup[] = [
     {
@@ -32,6 +32,7 @@ const Sidebar: React.FC = () => {
       items: [
         { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar', route: '/servicecenter/appointments' },
         { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
+        { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
         { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
         { id: 'jobs', label: 'Jobs', icon: 'bx bx-briefcase', route: '/servicecenter/jobs' },
       ]
@@ -39,6 +40,7 @@ const Sidebar: React.FC = () => {
     {
       title: 'Business',
       items: [
+        { id: 'suppliers', label: 'Suppliers', icon: 'bx bx-user', route: '/servicecenter/suppliers' },
         { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: '/servicecenter/estimates' },
         { id: 'invoices', label: 'Invoices', icon: 'bx bx-file', route: '/servicecenter/invoices' },
         { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: '/servicecenter/payments' },
@@ -54,25 +56,27 @@ const Sidebar: React.FC = () => {
   ];
 
   const handleMenuClick = useCallback((item: MenuItem) => {
-    setActiveItem(item.id);
     navigate(item.route);
   }, [navigate]);
 
-  const renderMenuItem = (item: MenuItem, isBottomMenu = false) => (
-    <li key={item.id} className="sidebar-menu-item">
-      <button
-        className={`sidebar-menu-link ${activeItem === item.id ? 'active' : ''} ${isBottomMenu ? 'sidebar-menu-link--bottom' : ''}`}
-        onClick={() => handleMenuClick(item)}
-        aria-label={item.label}
-        type="button"
-      >
-        <span className={`sidebar-menu-icon ${isBottomMenu ? 'sidebar-menu-icon--danger' : ''}`}>
-          <i className={item.icon} aria-hidden="true"></i>
-        </span>
-        <span className={`sidebar-menu-label ${isBottomMenu ? 'sidebar-menu-label--danger' : ''}`}>{item.label}</span>
-      </button>
-    </li>
-  );
+  const renderMenuItem = (item: MenuItem, isBottomMenu = false) => {
+    const isActive = location.pathname === item.route;
+    return (
+      <li key={item.id} className="sidebar-menu-item">
+        <button
+          className={`sidebar-menu-link ${isActive ? 'active' : ''} ${isBottomMenu ? 'sidebar-menu-link--bottom' : ''}`}
+          onClick={() => handleMenuClick(item)}
+          aria-label={item.label}
+          type="button"
+        >
+          <span className={`sidebar-menu-icon ${isBottomMenu ? 'sidebar-menu-icon--danger' : ''}`}>
+            <i className={item.icon} aria-hidden="true"></i>
+          </span>
+          <span className={`sidebar-menu-label ${isBottomMenu ? 'sidebar-menu-label--danger' : ''}`}>{item.label}</span>
+        </button>
+      </li>
+    );
+  };
 
   return (
     <aside className="sidebar" role="navigation" aria-label="Main navigation">

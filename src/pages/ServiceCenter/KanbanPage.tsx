@@ -51,7 +51,7 @@ const KanbanPage: React.FC = () => {
       hours: { left: 0, billed: 0 },
       tags: ['Follow Up'],
       image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg',
-      status: 'estimates'
+      status: 'opened'
     },
     {
       id: 'RO-1002',
@@ -103,7 +103,7 @@ const KanbanPage: React.FC = () => {
       hours: { left: 0, billed: 0 },
       tags: ['Waiting on Approval', 'New Client'],
       image: 'https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg',
-      status: 'estimates'
+      status: 'estimate-sent'
     },
     {
       id: 'INV-1004',
@@ -117,6 +117,48 @@ const KanbanPage: React.FC = () => {
       tags: [],
       image: 'https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg',
       status: 'completed'
+    },
+    {
+      id: 'RO-1014',
+      title: 'Check Engine Light Diagnosis',
+      customer: 'Olivia Martinez',
+      vehicle: '2019 Honda CR-V',
+      year: 2019,
+      estimateNumber: 'RO-1014',
+      amount: 85.00,
+      hours: { left: 1, billed: 0 },
+      tags: ['Diagnostics'],
+      image: 'https://images.pexels.com/photos/4488636/pexels-photo-4488636.jpeg',
+      status: 'in-progress',
+      assignedPeople: [{ id: 'tech1', name: 'Mike Johnson', profilePhoto: 'https://i.pravatar.cc/' }]
+    },
+    {
+      id: 'RO-1015',
+      title: 'Brake Pad Replacement',
+      customer: 'Liam Garcia',
+      vehicle: '2017 Chevrolet Malibu',
+      year: 2017,
+      estimateNumber: 'RO-1015',
+      amount: 350.50,
+      hours: { left: 2.5, billed: 1 },
+      tags: ['Brakes', 'Maintenance'],
+      image: 'https://images.pexels.com/photos/8986161/pexels-photo-8986161.jpeg',
+      status: 'in-progress',
+      assignedPeople: [{ id: 'tech2', name: 'Sarah Lee', profilePhoto: 'https://i.pravatar.cc/' }]
+    },
+    {
+      id: 'EST-1038',
+      title: 'Full Vehicle Inspection',
+      customer: 'Sophia Rodriguez',
+      vehicle: '2022 Hyundai Palisade',
+      year: 2022,
+      estimateNumber: 'EST-1038',
+      amount: 150.00,
+      hours: { left: 2, billed: 0 },
+      tags: ['Inspection', 'New Client'],
+      image: 'https://images.pexels.com/photos/16383245/pexels-photo-16383245.jpeg',
+      status: 'opened',
+      assignedPeople: [{ id: 'tech3', name: 'John Smith', profilePhoto: 'https://i.pravatar.cc/' }, { id: 'tech2', name: 'Sarah Lee', profilePhoto: 'https://i.pravatar.cc/' }]
     }
   ]);
 
@@ -192,7 +234,7 @@ const KanbanPage: React.FC = () => {
       {/* Page Header */}
       <div className="page-header">
         <div className="page-title">
-          <h1>Workflow</h1>
+
         </div>
         <div className="page-controls">
           <div className="search-and-filters">
