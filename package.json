@@ -15,12 +15,14 @@
     "chart.js": "^4.5.0",
     "lucide-react": "^0.517.0",
     "react": "^19.1.0",
+    "react-big-calendar": "^1.19.4",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
     "sass": "^1.89.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/google.maps": "^3.58.1",
     "@types/node": "^24.0.3",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
