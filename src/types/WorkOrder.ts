@@ -12,6 +12,11 @@ export interface WorkOrder {
       billed: number;
     };
     tags: string[];
-    image: string;
-    status: 'estimates' | 'approved' | 'in-progress' | 'completed';
+    status: 'opened' | 'estimate-sent' | 'in-progress' | 'invoiced' | 'closed' | 'estimates' | 'approved' | 'completed';
+    image?: string;
+    assignedPeople?: {
+      id: string;
+      name: string;
+      profilePhoto: string;
+    }[];
   }

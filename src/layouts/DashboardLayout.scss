@@ -1,4 +1,3 @@
-
 @import '../styles/variables.scss';
 
 .dashboard-layout {
@@ -9,8 +8,8 @@
 }
 
 .main-content {
-  margin-left: 240px; // Match the new sidebar width
-  width: calc(100% - 240px);
+  margin-left: 200px; // Updated to match the new sidebar width (was 240px)
+  width: calc(100% - 200px); // Updated to match the new sidebar width (was 240px)
   display: flex;
   flex-direction: column;
   height: 100vh;

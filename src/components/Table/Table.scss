@@ -1,0 +1,174 @@
+@import '../../styles/variables.scss';
+
+.table-container {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 12px;
+    font-family: 'Lufga', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+  
+      .table-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+      }
+  
+      .table-actions {
+        display: flex;
+        gap: 8px;
+  
+        .btn {
+          padding: 4px 10px;
+          min-width: 60px;
+          font-size: 11px;
+          border-radius: 10px;
+          cursor: pointer;
+  
+          &.btn-primary {
+            background: var(--color-carbon);
+            color: white;
+  
+            &:hover {
+              background: #111827;
+            }
+          }
+  
+          &.btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+  
+            &:hover {
+              background: #e5e7eb;
+            }
+          }
+        }
+      }
+    }
+  
+    .table-grid-header {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 8px;
+      background: #f0eff2;
+      padding: 8px 10px;
+      border-radius: 10px;
+  
+      .table-header-cell {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-carbon);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+  
+        .sort-icon {
+          font-size: 9px;
+          color: #9ca3af;
+        }
+      }
+    }
+  
+    .table-grid-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  
+    .table-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+      position: relative;
+
+  
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 16px;
+        right: 16px;
+        height: 1px;
+        background-color: #f0eff2;
+      }
+  
+      &:hover {
+        background: #f9fafb;
+      }
+  
+      &.clickable {
+        cursor: pointer;
+      }
+    }
+  
+    .table-cell {
+      font-weight: 500;
+      font-size: 12px;
+      font-family: 'Poppins';
+      color: var(--color-carbon);
+  
+      &.align-right {
+        text-align: right;
+      }
+  
+      &.align-center {
+        text-align: center;
+      }
+  
+      // Center action buttons in the last cell (actions column)
+      &:last-child {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 12px;
+    }
+  }
+  
+  // Optional responsive tweaks
+  @media (max-width: 768px) {
+    .table-container {
+      padding: 8px;
+  
+      .table-grid-header,
+      .table-row {
+        grid-template-columns: 1fr;
+      }
+  
+      .table-cell {
+        &::before {
+          content: attr(data-label);
+          font-size: 10px;
+          font-weight: 600;
+          color: #9ca3af;
+          display: block;
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+  
