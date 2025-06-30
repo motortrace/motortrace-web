@@ -5,13 +5,21 @@ import './MonthFilter.scss';
 
 const MonthFilter: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('This month');
+  const [selectedMonth, setSelectedMonth] = useState('Today');
+
+  // const months = [
+  //   'This month',
+  //   'Last month', 
+  //   'Last 3 months',
+  //   'Last 6 months',
+  //   'This year'
+  // ];
 
   const months = [
-    'This month',
-    'Last month', 
-    'Last 3 months',
-    'Last 6 months',
+    'Today',
+    'This Week',
+    'This Month',
+    'Last Month',
     'This year'
   ];
 
@@ -25,10 +33,10 @@ const MonthFilter: React.FC = () => {
         {selectedMonth}
         <ChevronDown className="month-filter__chevron" />
       </button>
-      
+
       {isOpen && (
         <>
-          <div 
+          <div
             className="month-filter__overlay"
             onClick={() => setIsOpen(false)}
           />
