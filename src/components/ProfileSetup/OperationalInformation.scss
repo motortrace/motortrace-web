@@ -1,0 +1,384 @@
+.operational-info {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 20px;
+    flex: 1;
+    min-width: 0;
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    &__title {
+        font-size: 18px;
+        font-weight: 600;
+        font-family: 'Poppins';
+        color: #111827;
+        margin: 0;
+    }
+}
+
+.operating-hours {
+
+    // Days grid
+    &__days-grid {
+        display: grid; // grid
+        gap: 1rem; // gap-4
+    }
+
+    // Individual day card
+    &__day-card {
+        position: relative; // relative
+        border: 1px solid; // border-2
+        border-radius: 0.75rem; // rounded-xl
+        padding: 1.5rem; // p-6
+        transition: all 0.3s ease; // transition-all duration-300
+
+        // Open day styling
+        &--open {
+            // background: linear-gradient(90deg, white 0%, #eff6ff 100%); // from-white to-blue-50 #f8f9fa
+            background: linear-gradient(90deg, white 0%, #f8f9fa 100%);
+            // border-color: #bfdbfe; // border-blue-200
+            border-color: #ccc;
+        }
+
+        // Closed day styling
+        &--closed {
+            background: linear-gradient(90deg, #f9fafb 0%, #f3f4f6 100%); // from-gray-50 to-gray-100
+            border-color: #d1d5db; // border-gray-200
+        }
+
+        // Copied state
+        &--copied {
+            box-shadow: 0 0 0 4px #86efac; // ring-4 ring-green-300
+            background: #f0fdf4; // bg-green-50
+        }
+
+        &:hover {
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); // hover:shadow-lg
+        }
+    }
+
+    // Day header (day info and controls)
+    &__day-header {
+        display: flex; // flex
+        align-items: center; // items-center
+        justify-content: space-between; // justify-between
+        margin-bottom: 1rem; // mb-4
+
+        &-info {
+            display: flex; // flex
+            align-items: center; // items-center
+            gap: 1rem; // gap-4
+        }
+
+        &-controls {
+            display: flex; // flex
+            align-items: center; // items-center
+            gap: 0.75rem; // gap-3
+        }
+    }
+
+    // Day indicator badge
+    &__day-badge {
+        width: 3rem; // w-12
+        height: 3rem; // h-12
+        border-radius: 0.75rem; // rounded-xl
+        display: flex; // flex
+        align-items: center; // items-center
+        justify-content: center; // justify-center
+        font-weight: 700; // font-bold
+        font-size: 14px; // text-sm
+
+        &--open {
+            // background: #2563eb; // bg-blue-600
+            background: #333; 
+            color: white; // text-white
+        }
+
+        &--closed {
+            background: #ddd; // bg-gray-200
+            color: #777; // text-gray-600
+        }
+    }
+
+    // Day title and hours display
+    &__day-title {
+
+        margin-top: 17.5px;
+
+        h3 {
+            font-size: 15px; // text-xl
+            font-weight: 600; // font-semibold
+            color: #111827; // text-gray-900
+        }
+
+        p {
+            font-size: 0.875rem; // text-sm
+            color: #6b7280; // text-gray-500
+        }
+    }
+
+    // Closed checkbox
+    &__closed-checkbox {
+        display: flex; // flex
+        align-items: center; // items-center
+        gap: 0.5rem; // gap-2
+        cursor: pointer; // cursor-pointer
+
+        input {
+            width: 1.25rem; // w-5
+            height: 1.25rem; // h-5
+            accent-color: #dc2626; // text-red-600
+            border-radius: 0.25rem; // rounded
+
+            &:focus {
+                box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); // focus:ring-red-500
+            }
+        }
+
+        span {
+            font-size: 0.875rem; // text-sm
+            font-weight: 500; // font-medium
+            color: #374151; // text-gray-700
+        }
+    }
+
+    // Copy button
+    &__copy-button {
+        padding: 0.5rem; // p-2
+        border-radius: 0.5rem; // rounded-lg
+        background: #dbeafe; // bg-blue-100
+        color: #2563eb; // text-blue-600
+        transition: background-color 0.15s ease; // transition-colors
+        border: none;
+        cursor: pointer;
+
+        &:hover {
+            background: #bfdbfe; // hover:bg-blue-200
+        }
+
+        svg {
+            width: 1rem; // w-4
+            height: 1rem; // h-4
+        }
+    }
+
+    // Time inputs grid
+    &__time-inputs {
+        display: grid; // grid
+        grid-template-columns: repeat(2, 1fr); // grid-cols-2
+        gap: 1rem; // gap-4
+        margin-bottom: 1rem; // mb-4
+
+        &-group {
+            label {
+                display: block; // block
+                font-size: 0.875rem; // text-sm
+                font-weight: 500; // font-medium
+                color: #374151; // text-gray-700
+                margin-bottom: 0.5rem; // mb-2
+            }
+
+            input {
+                width: 100%; // w-full
+                padding: 0.75rem 1rem; // px-4 py-3
+                border: 1px solid #d1d5db; // border border-gray-300
+                border-radius: 0.5rem; // rounded-lg
+                transition: all 0.15s ease; // transition-all
+
+                &:focus {
+                    outline: none;
+                    box-shadow: 0 0 0 1px #bfdbfe; // focus:ring-2 focus:ring-blue-500
+                    border-color: transparent; // focus:border-transparent
+                }
+            }
+        }
+    }
+
+    // Copy section (expandable)
+    &__copy-section {
+        border-top: 1px solid #e5e7eb; // border-t
+        padding-top: 1rem; // pt-4
+        animation: slideInFromTop 0.3s ease; // animate-in slide-in-from-top-2 duration-300
+
+        &-title {
+            font-size: 0.875rem; // text-sm
+            font-weight: 500; // font-medium
+            color: #374151; // text-gray-700
+            margin-bottom: 0.75rem; // mb-3
+        }
+    }
+
+    // Copy target grid
+    &__copy-targets {
+        display: grid; // grid
+        grid-template-columns: repeat(2, 1fr); // grid-cols-2
+        gap: 0.5rem; // gap-2
+        margin-bottom: 1rem; // mb-4
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(3, 1fr); // md:grid-cols-3
+        }
+
+        &-button {
+            display: flex; // flex
+            align-items: center; // items-center
+            justify-content: space-between; // justify-between
+            padding: 0.75rem; // p-3
+            font-size: 0.875rem; // text-sm
+            background: #f1f5f9; // bg-gray-50
+            border-radius: 0.5rem; // rounded-lg
+            transition: background-color 0.15s ease; // transition-colors
+            border: none;
+            cursor: pointer;
+
+            &:hover {
+                background: #dbeafe; // hover:bg-blue-100
+            }
+
+            span {
+                font-weight: 500; // font-medium
+                color: #666;
+            }
+
+            svg {
+                width: 1rem; // w-4
+                height: 1rem; // h-4
+                opacity: 0; // opacity-0
+                color: #2563eb; // text-blue-600
+                transition: opacity 0.15s ease; // transition-opacity
+            }
+
+            &:hover svg {
+                opacity: 1; // group-hover:opacity-100
+            }
+        }
+    }
+
+    // Quick copy buttons
+    &__quick-copy {
+        display: flex; // flex
+        gap: 0.25rem; // gap-1
+        margin-top: 0.5rem; // mt-2
+
+        &-button {
+            padding: 0.25rem 0.5rem; // px-2 py-1
+            font-size: 0.75rem; // text-xs
+            border-radius: 0.375rem; // rounded-md
+            transition: background-color 0.15s ease; // transition-colors
+            border: none;
+            cursor: pointer;
+
+            &--weekdays {
+                background: #dbeafe; // bg-blue-100
+                color: #1d4ed8; // text-blue-700
+
+                &:hover {
+                    background: #bfdbfe; // hover:bg-blue-200
+                }
+            }
+
+            &--weekend {
+                background: #e9d5ff; // bg-purple-100
+                color: #7c3aed; // text-purple-700
+
+                &:hover {
+                    background: #d8b4fe; // hover:bg-purple-200
+                }
+            }
+
+            &--all {
+                background: #dcfce7; // bg-green-100
+                color: #16a34a; // text-green-700
+
+                &:hover {
+                    background: #bbf7d0; // hover:bg-green-200
+                }
+            }
+        }
+    }
+
+    // Copied notification badge
+    &__copied-badge {
+        position: absolute; // absolute
+        top: 0.5rem; // top-2
+        right: 0.5rem; // right-2
+        background: #22c55e; // bg-green-500
+        color: white; // text-white
+        padding: 0.25rem 0.75rem; // px-3 py-1
+        border-radius: 9999px; // rounded-full
+        font-size: 0.75rem; // text-xs
+        font-weight: 500; // font-medium
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; // animate-pulse
+    }
+
+    // Quick tips section
+    &__tips {
+        margin-top: 2rem; // mt-8
+        padding: 1.5rem; // p-6
+        background: linear-gradient(90deg, #eff6ff 0%, #eef2ff 100%); // bg-gradient-to-r from-blue-50 to-indigo-50
+        border-radius: 0.75rem; // rounded-xl
+        border: 1px solid #bfdbfe; // border border-blue-200
+
+        &-content {
+            display: flex; // flex
+            align-items: flex-start; // items-start
+            gap: 0.75rem; // gap-3
+
+            svg {
+                width: 1.25rem; // w-5
+                height: 1.25rem; // h-5
+                color: #2563eb; // text-blue-600
+                margin-top: 0.25rem; // mt-1
+            }
+
+            h4 {
+                font-weight: 600; // font-semibold
+                color: #1e3a8a; // text-blue-900
+                margin-bottom: 0.5rem; // mb-2
+            }
+
+            ul {
+                font-size: 0.875rem; // text-sm
+                color: #1e40af; // text-blue-800
+
+                li {
+                    margin-bottom: 0.25rem; // space-y-1
+                }
+            }
+        }
+    }
+
+    
+}
+
+// Keyframe animations
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}

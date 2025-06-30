@@ -1,0 +1,220 @@
+@import '../../styles/variables.scss';
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 240px;
+  background: #F0EFF2;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  min-height: 72px;
+  background: #F0EFF2;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-neutral-900, #1a1a2e);
+  letter-spacing: -0.025em;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+  }
+}
+
+.sidebar-menu-group {
+  &:not(:last-child) {
+    margin-bottom: 1.5rem;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -0.75rem;
+      left: 1.25rem;
+      right: 1.25rem;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.08) 50%, rgba(0, 0, 0, 0) 100%);
+    }
+  }
+}
+
+.sidebar-menu-group-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-neutral-500, #8b8b9a);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 1.25rem 0.75rem 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.sidebar-menu-item {
+  width: 100%;
+  padding: 0 1rem;
+}
+
+// Remove all bottom menu styles since we removed the logout section
+.sidebar-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  text-align: left;
+  color: var(--color-neutral-700, #4a4a5a);
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-height: 44px;
+  position: relative;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-primary, #6366f1);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  
+  &.active {
+    background: var(--color-carbon, #6366f1);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    transform: translateX(2px);
+    
+    .sidebar-menu-icon {
+      color: #fff;
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: -1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      background: var(--color-primary, #6366f1);
+      border-radius: 0 2px 2px 0;
+    }
+  }
+}
+
+.sidebar-menu-icon {
+  font-size: 1.125rem;
+  min-width: 20px;
+  text-align: center;
+  color: var(--color-neutral-600, #6b7280);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-menu-label {
+  opacity: 1; 
+  white-space: nowrap;
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+// Remove sidebar-bottom styles since logout section is removed
+
+// Responsive design
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    border-radius: 0;
+    
+    &.expanded {
+      width: 100%;
+      border-radius: 0;
+    }
+  }
+}
+
+// Custom scrollbar styles
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}

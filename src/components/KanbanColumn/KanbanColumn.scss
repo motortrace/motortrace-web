@@ -1,0 +1,103 @@
+@import '../../styles/variables.scss';
+
+.kanban-column {
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 16px;
+    // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+    height: fit-content;
+    border: 2px solid #e5e7eb;
+    
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px 16px 24px;
+      border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+      
+      .column-title-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        .column-indicator {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+        
+        .column-title {
+          font-size: 15px;
+          font-weight: 500;
+          color: #1a202c;
+          margin: 0;
+          letter-spacing: -0.01em;
+          font-family: var(--font-primary);
+        }
+        
+        .column-count {
+          background: var(--color-carbon);
+          color: white;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 3px 7px;
+          border-radius: 8px;
+          min-width: 18px;
+          text-align: center;
+          border: 1px solid rgba(241, 245, 249, 0.6);
+        }
+      }
+      
+      .column-menu-button {
+        background: none;
+        border: none;
+        color: #cbd5e1;
+        font-size: 14px;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+        
+        &:hover {
+          background: rgba(248, 250, 252, 0.8);
+          color: #94a3b8;
+        }
+      }
+    }
+    
+    .column-content {
+      padding: 20px 24px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      
+      .empty-column {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 20px;
+        color: #a1a1aa;
+        font-size: 13px;
+        text-align: center;
+        border: 1px dashed rgba(226, 232, 240, 0.6);
+        border-radius: 12px;
+        background: rgba(249, 250, 251, 0.3);
+        
+        p {
+          margin: 0;
+          font-weight: 500;
+        }
+      }
+    }
+    
+    &.drag-over {
+      .column-content {
+        background: rgba(239, 246, 255, 0.4);
+        border: 1px dashed rgba(59, 130, 246, 0.3);
+        border-radius: 12px;
+      }
+    }
+  }
