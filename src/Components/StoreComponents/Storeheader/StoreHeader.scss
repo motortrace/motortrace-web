@@ -1,0 +1,40 @@
+.store-header__container {
+  position: relative;
+}
+
+.store-header__banner {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.store-header__info {
+  position: absolute;
+  bottom: -40px;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.store-header__logo {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: white;
+}
+
+.store-header__text {
+  .store-header__name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .store-header__desc {
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+}

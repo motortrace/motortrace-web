@@ -1,0 +1,33 @@
+.store-stats {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+  gap: 2rem;
+
+  .stat-box {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    .icon {
+      font-size: 1.6rem;
+      color: var(--color-primary);
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #111827;
+      margin: 0;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+  }
+}

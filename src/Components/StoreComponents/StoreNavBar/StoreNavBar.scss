@@ -1,0 +1,28 @@
+.store-nav {
+  margin-top: 4rem;
+  display: flex;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  .store-nav__item {
+    cursor: pointer;
+    font-weight: 500;
+    color: #4b5563;
+    padding-bottom: 0.5rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+
+    &.active {
+      color: var(--color-primary);
+      border-bottom: 2px solid var(--color-primary);
+    }
+  }
+}
