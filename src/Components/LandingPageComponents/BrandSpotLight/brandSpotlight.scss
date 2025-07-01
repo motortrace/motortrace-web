@@ -1,0 +1,117 @@
+.brand-deal-section {
+  padding: 3rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+
+  .swiper {
+    width: 100%;
+  }
+
+  .swiper-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .brand-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+}
+.swiper-pagination-bullet {
+  background-color: #d1d5db; // light gray (default state)
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px;
+  transition: background-color 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #111827; // ✅ match your button color
+}
+.brand-deal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  color: #1f2937;
+  border-radius: 8px;
+  padding: 2.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  gap: 2rem;
+  flex-wrap: wrap;
+  transition: transform 0.3s ease;
+  min-height: 300px; // Ensures all boxes are same height
+  height: 100%;
+
+  &__content {
+    flex: 1;
+
+    h3 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-family: 'Poppins', sans-serif;
+      color: #111827;
+    }
+
+    p {
+      font-size: 1.05rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      color: #4b5563;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      background-color: #111827;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #1f2937;
+      }
+    }
+  }
+
+  &__image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      max-height: 120px; // ✅ Uniform image height
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@media (max-width: 768px) {
+  .brand-deal {
+    flex-direction: column;
+    text-align: center;
+
+    &__content {
+      align-items: center;
+    }
+
+    &__image {
+      margin-top: 1.5rem;
+    }
+  }
+}

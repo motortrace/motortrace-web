@@ -1,0 +1,57 @@
+.featured-brands {
+  padding: 2.5rem 3rem;
+  background-color: #f9fafb;
+  
+
+  h2 {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+
+  .brand-logos {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 1rem;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .brand-logo {
+      flex: 0 0 auto;
+      height: 200px;
+      width: 200px;
+      background: rgb(255, 255, 255);
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: start;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+      img {
+        max-width: 80%;
+        max-height: 60%;
+        object-fit: contain;
+      }
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 2rem;
+
+    .brand-logo {
+      width: 100px;
+      height: 70px;
+    }
+  }
+}

@@ -1,0 +1,129 @@
+.offers-section {
+  display: flex;
+  gap: 2rem;
+  padding: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+
+  .offer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    gap: 2rem;
+
+    &__content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      h3 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: inherit; // Inherit from parent
+      }
+
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+        color: inherit; // Inherit from parent
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+    }
+
+    &__image {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        max-width: 125%;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+
+  .offer--dark {
+    background-color: var(--color-primary-dark);
+    color: #fff;
+
+    .offer__content {
+      h3,
+      p {
+        color: #fff;
+      }
+
+      button {
+        background-color: white;
+        color: var(--color-primary-dark);
+
+        &:hover {
+          background-color: var(--color-primary);
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .offer--light {
+    background-color: #fff;
+    color: #1f2937;
+
+    .offer__content {
+      h3,
+      p {
+        color: #1f2937;
+      }
+
+      button {
+        background-color: var(--color-primary-dark);
+        color: #fff;
+
+        &:hover {
+          background-color: var(--color-primary);
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 2rem;
+
+    .offer {
+      flex-direction: column;
+      text-align: center;
+
+      .offer__image {
+        margin-top: 1rem;
+      }
+
+      .offer__content {
+        align-items: center;
+      }
+    }
+  }
+}
