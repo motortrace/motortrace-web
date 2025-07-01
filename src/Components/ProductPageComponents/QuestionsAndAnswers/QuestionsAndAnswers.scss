@@ -1,0 +1,105 @@
+.qa-section {
+  background-color: #f9fafb; // very light gray
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+
+  h3 {
+    margin-bottom: 1rem;
+    color: #1f2937; // dark gray
+  }
+
+  .ask-question-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    textarea {
+      resize: vertical;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #d1d5db; // medium light gray border
+      font-size: 1rem;
+      color: #374151; // dark gray text
+      font-family: inherit;
+      min-height: 60px;
+
+      &:focus {
+        outline: none;
+        border-color: #6b7280; // medium gray on focus
+        box-shadow: 0 0 5px rgba(107, 114, 128, 0.5);
+      }
+    }
+
+  button {
+    /* Use same button styles as .add-to-cart and .buy-now, but sized to text */
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.5rem 1rem; // smaller padding to fit text nicely
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+    align-self: flex-start; // so button shrinks to fit text, aligned left
+
+    &:hover {
+      background-color: var(--color-primary-dark);
+      transform: scale(1.05);
+    }
+  }
+  }
+
+  .reply-time-note {
+    font-size: 0.875rem;
+    color: #6b7280; // medium gray text
+    margin-bottom: 1rem;
+  }
+
+  .qa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .qa-item {
+      background-color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+      .question {
+        color: #111827; // near black
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+
+        .meta {
+          font-size: 0.8rem;
+          color: #6b7280; // medium gray
+          margin-top: 0.25rem;
+        }
+      }
+
+      .answer {
+        background-color: #f3f4f6; // very light gray
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        color: #374151; // dark gray
+        font-weight: 500;
+
+        .meta {
+          font-size: 0.75rem;
+          color: #4b5563; // medium dark gray
+          margin-top: 0.25rem;
+        }
+      }
+
+      .answer.pending {
+        background-color: #fef3c7; // light amber-ish, just a bit of contrast for pending
+        color: #92400e; // keep this dark amber for pending emphasis
+        font-style: italic;
+      }
+    }
+  }
+}
