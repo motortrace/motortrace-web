@@ -7,7 +7,6 @@ import BrakePad from '../../assets/images/brakePads.png' ;
 import light from '../../assets/images/light.png' ;
 import radiator from '../../assets/images/radiator.png' ;
 import Navbar from '../../components/Navbar/Navbar';
-import CartHeader from '../../components/CartPageComponents/CartHeaderComponent/CartHeader';
 import Footer from '../../components/Footer/Footer';
 
 
