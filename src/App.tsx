@@ -1,4 +1,6 @@
 import DashboardLayout from './layouts/DashboardLayout';
+import PartVendorDashboardLayout from './layouts/PartVendorLayout/PartVendorLayout';
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Dashboard from './pages/ServiceCenter/Dashboard';
@@ -11,13 +13,18 @@ import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
 import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConnectionPage';
 import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 
+import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Root Redirect */}
         <Route path="/" element={<Navigate to="/servicecenter/dashboard" replace />} />
+
+        {/* Service Center */}
         <Route path="/servicecenter" element={<DashboardLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route index element={<Navigate to="/servicecenter/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="jobs" element={<KanbanPage />} />
           <Route path="appointments" element={<AppointmentPage />} />
@@ -27,6 +34,12 @@ function App() {
           <Route path="inventory" element={<PartsInventory />} />
           <Route path="suppliers" element={<SupplierConnectionPage />} />
           <Route path="parts-order" element={<PartsSearch />} />
+        </Route>
+
+        {/* Part Vendor */}
+        <Route path="/partvendor" element={<PartVendorDashboardLayout />}>
+          <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
+          <Route path="dashboard" element={<PartVendorDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>
