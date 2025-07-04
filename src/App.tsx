@@ -10,6 +10,7 @@ import TechnicianSchedulingPage from './pages/ServiceCenter/TechnicianScheduling
 import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
 import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConnectionPage';
 import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
+import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
 
 function App() {
   return (
@@ -20,7 +21,10 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="jobs" element={<KanbanPage />} />
-          <Route path="appointments" element={<AppointmentPage />} />
+          <Route path="appointments">
+            <Route index element={<AppointmentPage />} />
+            <Route path="details" element={<AppointmentDetails />} />
+          </Route>
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
           <Route path="scheduling" element={<TechnicianSchedulingPage />} />

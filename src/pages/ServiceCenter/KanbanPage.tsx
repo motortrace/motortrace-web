@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import KanbanBoard from '../../components/KanbanBoard/KanbanBoard';
 import type { WorkOrder } from '../../types/WorkOrder';
-import { FileText, Calendar } from 'lucide-react';
+import { FileText, Calendar, Search, Users, Clock, Star, Bookmark } from 'lucide-react';
 import './KanbanPage.scss';
 
 interface JobCardFormData {
@@ -24,6 +24,10 @@ const KanbanPage: React.FC = () => {
   const [showJobCardModal, setShowJobCardModal] = useState(false);
   const [jobCardOption, setJobCardOption] = useState<'new' | 'existing' | null>(null);
   const [appointmentNumber, setAppointmentNumber] = useState('');
+  const [assignedFilter, setAssignedFilter] = useState<string>('');
+  const [dateFilter, setDateFilter] = useState<string>('');
+  const [priorityFilter, setPriorityFilter] = useState<string>('');
+  const [showBookmarked, setShowBookmarked] = useState(false);
   const [jobCardForm, setJobCardForm] = useState<JobCardFormData>({
     title: '',
     customerName: '',
@@ -64,7 +68,7 @@ const KanbanPage: React.FC = () => {
       hours: { left: 0.4, billed: 0.4 },
       tags: ['New Client', 'Friends & Family'],
       image: 'https://images.pexels.com/photos/14038622/pexels-photo-14038622.jpeg',
-      status: 'approved'
+      status: 'in-progress'
     },
     {
       id: 'RO-1003',
@@ -77,7 +81,7 @@ const KanbanPage: React.FC = () => {
       hours: { left: 0.75, billed: 0.92 },
       tags: ['Buy 2 Get 1'],
       image: 'https://images.pexels.com/photos/810357/pexels-photo-810357.jpeg',
-      status: 'in-progress'
+      status: 'on-hold'
     },
     {
       id: 'INV-1005',
@@ -103,7 +107,7 @@ const KanbanPage: React.FC = () => {
       hours: { left: 0, billed: 0 },
       tags: ['Waiting on Approval', 'New Client'],
       image: 'https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg',
-      status: 'estimate-sent'
+      status: 'opened'
     },
     {
       id: 'INV-1004',
@@ -238,16 +242,49 @@ const KanbanPage: React.FC = () => {
         </div>
         <div className="page-controls">
           <div className="search-and-filters">
-            <input
-              type="text"
-              placeholder="Search orders..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="search-input"
-            />
-            <button className="filters-button">
-              Filters
-            </button>
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search orders..."
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="search-input"
+              />
+            </div>
+            
+            <div className="filter-buttons">
+              <button 
+                className={`filter-button ${assignedFilter ? 'active' : ''}`}
+                onClick={() => setAssignedFilter(assignedFilter ? '' : 'assigned')}
+              >
+                <Users size={16} />
+                <span>Assigned to</span>
+              </button>
+              
+              <button 
+                className={`filter-button ${dateFilter ? 'active' : ''}`}
+                onClick={() => setDateFilter(dateFilter ? '' : 'date')}
+              >
+                <Clock size={16} />
+                <span>Date</span>
+              </button>
+              
+              <button 
+                className={`filter-button ${priorityFilter ? 'active' : ''}`}
+                onClick={() => setPriorityFilter(priorityFilter ? '' : 'priority')}
+              >
+                <Star size={16} />
+                <span>Priority</span>
+              </button>
+              
+              <button 
+                className={`filter-button ${showBookmarked ? 'active' : ''}`}
+                onClick={() => setShowBookmarked(!showBookmarked)}
+              >
+                <Bookmark size={16} />
+                <span>Bookmarked</span>
+              </button>
+            </div>
           </div>
           <button className="create-job-card-button" onClick={handleCreateJobCard}>
             + Create a Job Card

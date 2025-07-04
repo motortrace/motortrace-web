@@ -19,15 +19,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const columns = [
     {
       id: 'opened',
-      title: 'Opened',
+      title: 'Open',
       color: '#6B7280',
       count: workOrders.filter(order => order.status === 'opened').length
-    },
-    {
-      id: 'estimate-sent',
-      title: 'Estimate Sent',
-      color: '#F59E0B',
-      count: workOrders.filter(order => order.status === 'estimate-sent').length
     },
     {
       id: 'in-progress',
@@ -36,10 +30,16 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       count: workOrders.filter(order => order.status === 'in-progress').length
     },
     {
-      id: 'invoiced',
-      title: 'Invoiced',
-      color: '#8B5CF6',
-      count: workOrders.filter(order => order.status === 'invoiced').length
+      id: 'on-hold',
+      title: 'On Hold',
+      color: '#F59E0B',
+      count: workOrders.filter(order => order.status === 'on-hold').length
+    },
+    {
+      id: 'completed',
+      title: 'Completed',
+      color: '#10B981',
+      count: workOrders.filter(order => order.status === 'completed').length
     }
   ];
 

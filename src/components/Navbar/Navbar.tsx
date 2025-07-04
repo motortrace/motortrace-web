@@ -8,7 +8,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     description: 'Overview of your balance and accounts',
   },
   '/servicecenter/jobs': {
-    title: 'Job Board',
+    title: 'Work order',
     description: 'Manage your work orders and tasks',
   },
   '/servicecenter/appointments': {
@@ -39,6 +39,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
+  '/servicecenter/appointments/details': {
+    title: 'Appointment Details',
+    description: 'View details about the appointment request',
+  },
 };
 
 const Navbar: React.FC = () => {
@@ -67,13 +71,13 @@ const Navbar: React.FC = () => {
 
         <div className="user-profile">
           <img
-            src="https://i.pravatar.cc/40?img=1"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8cUiQAZ26gJeXbeZOoLvnX77pZiZqPWaDNgZ6yFwGERlhsHKYzjsXl7EPGp5YUmItuKk&usqp=CAU"
             alt="User Profile"
             className="user-photo"
           />
           <div className="user-info">
-            <div className="user-name">Adaline Lively</div>
-            <div className="user-email">adaline@example.com</div>
+            <div className="user-name">Mag City</div>
+            <div className="user-email">magcity@gmail.com</div>
           </div>
         </div>
       </div>

@@ -635,3 +635,77 @@
     height: 48px;
   }
   
+  .product-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+  
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .detail-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .detail-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .services-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .service-tag {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid #bbdefb;
+  }
+  
+  .license-plate {
+    background: #fff3cd;
+    color: #856404;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    border: 1px solid #ffeaa7;
+    text-align: center;
+    display: inline-block;
+    min-width: 80px;
+  }
+  
+  .cost {
+    color: var(--color-carbon);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  
+  @media (max-width: 768px) {
+    .product-details-grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 12px;
+    }
+  }
+  
