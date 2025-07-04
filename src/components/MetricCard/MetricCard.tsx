@@ -32,7 +32,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       </div>
       
       <div className="metric-card__amount">
-        {amount}<span className="metric-card__decimal">.00</span>
+        {amount}<span className="metric-card__decimal"></span>
       </div>
       
       <div className="metric-card__footer">
