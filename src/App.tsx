@@ -11,6 +11,7 @@ import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
 import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConnectionPage';
 import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
+import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="inventory" element={<PartsInventory />} />
           <Route path="suppliers" element={<SupplierConnectionPage />} />
           <Route path="parts-order" element={<PartsSearch />} />
+          <Route path="reports" element={<EstimatesInvoices />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -287,7 +287,7 @@ const KanbanPage: React.FC = () => {
             </div>
           </div>
           <button className="create-job-card-button" onClick={handleCreateJobCard}>
-            + Create a Job Card
+            + Create a Work Order
           </button>
         </div>
       </div>
@@ -503,7 +503,7 @@ const KanbanPage: React.FC = () => {
                     Cancel
                   </button>
                   <button className="create-button" onClick={handleCreateNewJobCard}>
-                    Create Job Card
+                    Create Work Order
                   </button>
                 </div>
               </div>
@@ -535,7 +535,7 @@ const KanbanPage: React.FC = () => {
                     onClick={handleCreateFromAppointment}
                     disabled={!appointmentNumber.trim()}
                   >
-                    Create Job Card
+                    Create Work Order
                   </button>
                 </div>
               </div>

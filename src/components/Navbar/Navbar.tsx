@@ -43,8 +43,11 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Appointment Details',
     description: 'View details about the appointment request',
   },
-};
-
+  '/servicecenter/reports': {
+    title: 'Reports',
+    description: 'Manage your estimates and invoices',
+  },
+}
 const Navbar: React.FC = () => {
   const location = useLocation();
   const info = pageInfo[location.pathname] || {
