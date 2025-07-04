@@ -1,0 +1,44 @@
+@import '../../../styles/variables.scss';
+
+.inventory-overview {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+
+  &__title {
+    font-family: var(--font-primary);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-carbon);
+    margin-bottom: 20px;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .inventory-overview__item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e7eb;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      span {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      strong {
+        font-size: 14px;
+        color: #111827;
+        font-weight: 700;
+      }
+    }
+  }
+}
