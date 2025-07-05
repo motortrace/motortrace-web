@@ -1,0 +1,133 @@
+.service-item-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid;
+  cursor: grab;
+  transition: all 0.2s ease;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .type-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .priority-badge {
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .card-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #6b7280;
+
+      svg {
+        color: #9ca3af;
+        flex-shrink: 0;
+      }
+
+      .separator {
+        color: #d1d5db;
+        margin: 0 2px;
+      }
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .customer-info {
+    border-top: 1px solid #f3f4f6;
+    padding-top: 6px;
+
+    .customer-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: #374151;
+    }
+  }
+}
+
+// Status-specific styling
+.service-item-card[style*="border-left-color: #3b82f6"] {
+  .type-icon {
+    background: rgba(59, 130, 246, 0.1);
+  }
+}
+
+.service-item-card[style*="border-left-color: #10b981"] {
+  .type-icon {
+    background: rgba(16, 185, 129, 0.1);
+  }
+}
+
+.service-item-card[style*="border-left-color: #8b5cf6"] {
+  .type-icon {
+    background: rgba(139, 92, 246, 0.1);
+  }
+}
+
+.technician-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+} 

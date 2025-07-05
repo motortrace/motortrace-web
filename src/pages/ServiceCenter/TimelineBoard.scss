@@ -1,0 +1,91 @@
+.timeline-board {
+  /* inject the number of hours as a CSS variable: */
+  /* --hours is set via inline style in React (see TimelineBoard.tsx) */
+  font-family: sans-serif;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow-x: auto;
+  background: #fafafa;
+
+  .timeline-header {
+    display: grid;
+    /* first col is 150px, the rest are equally sized via repeat(var(--hours), 1fr) */
+    grid-template-columns: 150px repeat(var(--hours), 1fr);
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+
+    .timeline-header-cell {
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+      border-right: 1px solid #eee;
+      &.label-cell { border-right: none; }
+    }
+  }
+
+  .timeline-body {
+    .timeline-row {
+      display: grid;
+      align-items: center;
+      min-height: 50px;
+      /* same columns as header */
+      grid-template-columns: 150px repeat(var(--hours), 1fr);
+      border-bottom: 1px solid #f0f0f0;
+
+      &:last-child { border-bottom: none; }
+
+      .timeline-row-label {
+        padding: 8px;
+        background: #fff;
+        border-right: 1px solid #eee;
+        font-weight: 500;
+      }
+
+      .timeline-row-cells {
+        position: relative;
+
+        /* vertical grid lines every hour */
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0; bottom: 0; left: 0; right: 0;
+          background-image:
+            linear-gradient(
+              to right,
+              transparent 0,
+              transparent calc((100% / var(--hours)) - 1px),
+              #eee        calc((100% / var(--hours)) - 1px),
+              #eee        calc(100% / var(--hours))
+            );
+          background-size: calc(100% / var(--hours)) 100%;
+          pointer-events: none;
+        }
+
+        .timeline-task {
+          position: absolute;
+          top: 8px;
+          height: 34px;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.875rem;
+          color: #333;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .appointment {
+          background-color: #aedff7;
+          border: 1px solid #8ccae1;
+        }
+        .service {
+          background-color: #c3f7a7;
+          border: 1px solid #a7d68c;
+        }
+        .inspection {
+          background-color: #f7f1a7;
+          border: 1px solid #e1d48c;
+        }
+      }
+    }
+  }
+}

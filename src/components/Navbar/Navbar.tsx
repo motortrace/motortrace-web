@@ -8,8 +8,8 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     description: 'Overview of your balance and accounts',
   },
   '/servicecenter/jobs': {
-    title: 'Work order',
-    description: 'Manage your work orders and tasks',
+    title: 'Job board',
+    description: 'Manage your services, inspections and appointments',
   },
   '/servicecenter/appointments': {
     title: 'Appointments',
