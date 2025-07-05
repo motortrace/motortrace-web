@@ -6,7 +6,6 @@ const OrderSummary = () => {
         <div>
             <OrderMetricCard/>
             <OrderDetails/>
-
         </div>
     )
 }

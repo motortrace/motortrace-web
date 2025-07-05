@@ -15,6 +15,7 @@ import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 
 import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
 import OrderSummary from './pages/PartVendor/OrderPages/OrderSummary';
+import OderDetailsPage from './pages/PartVendor/OrderPages/OderDetailsPage';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
           <Route path="dashboard" element={<PartVendorDashboard />} />
           <Route path="OrderSummary" element={<OrderSummary />} />
+          <Route path="OrderDetails" element={<OderDetailsPage/>} />
         </Route>
       </Routes>
     </BrowserRouter>
