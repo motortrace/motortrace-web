@@ -1,0 +1,108 @@
+@use '../../../../styles/variables' as *;
+
+.order-header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  &__back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: #f3f4f6; // Light gray background for back button
+    color: #111827; // Dark text
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #e5e7eb;
+    }
+  }
+
+  &__details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    & .order-header-actions__order-number {
+      font-size: 20px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0;
+      font-family: 'Poppins';
+    }
+
+    & .order-header-actions__status {
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      text-align: center;
+
+      &--paid {
+        background-color: #d1fae5;
+        color: var(--color-success);
+      }
+
+      &--pending {
+        background-color: #fef9c3;
+        color: var(--color-warning);
+      }
+
+      &--failed {
+        background-color: #fee2e2;
+        color: #dc2626;
+      }
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--color-carbon);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--color-carbon);
+    }
+
+    &-icon {
+      background-color: white;
+      color: var(--color-carbon);
+      border-radius: 50%;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
