@@ -1,59 +1,67 @@
-import React from 'react'
-import PartVendorSideBar from '../../../components/PartVendorComponents/SideBar/partVendorSidebar'
-import SalesOverviewChart from '../../../components/PartVendorComponents/SalesOverviewChart/SalesOverviewChart'
-import InventoryOverview from '../../../components/PartVendorComponents/InventoryOverview/InventoryOverview'
-import InventoryMetricCard from '../../../components/PartVendorComponents/InventoryMetricCard/InventoryMetricCard'
-import SalesMetricCard from '../../../components/PartVendorComponents/SalesMetricCard/SalesMetricCard'
-
+import React from 'react';
+import PartVendorSideBar from '../../../components/PartVendorComponents/SideBar/partVendorSidebar';
+import SalesOverviewChart from '../../../components/PartVendorComponents/DashboardComponents/SalesOverviewChart/SalesOverviewChart';
+import InventoryOverview from '../../../components/PartVendorComponents/DashboardComponents/InventoryOverview/InventoryOverview';
+import InventoryMetricCard from '../../../components/PartVendorComponents/DashboardComponents/InventoryMetricCard/InventoryMetricCard';
+import SalesMetricCard from '../../../components/PartVendorComponents/DashboardComponents/SalesMetricCard/SalesMetricCard';
+import DashboardMetricCard from '../../../components/PartVendorComponents/DashboardComponents/DashboardMetricCard/DashboardMetricCard';
+import SalesByItemChart from '../../../components/PartVendorComponents/DashboardComponents/SalesByItemChart/SalesByItemChart';
+import OrdersOverview from '../../../components/PartVendorComponents/DashboardComponents/OrdersOverview/OrdersOverview';
+import SalesOverview from '../../../components/PartVendorComponents/DashboardComponents/SalesOverview/SalesOverview';
+import DashboardCharts from '../../../components/PartVendorComponents/DashboardComponents/DashboardCharts/DashboardCharts';
 
 const PartVendorDashboard = () => {
   return (
     <div>
-      {/* <PartVendorSideBar/> */}
-      <SalesOverviewChart/>
-      {/* <InventoryOverview/> */}
-<div className="metric-cards-row">
-  <InventoryMetricCard
-    title="Low Stock Items"
-    description="Items below minimum stock level"
-    total={7}
-    items={[
-      { name: 'Brake Pads', count: 2 },
-      { name: 'Oil Filters', count: 3 },
-      { name: 'Spark Plugs', count: 2 },
-    ]}
-  />
-  <InventoryMetricCard
-    title="Out of Stock Items"
-    description="Currently unavailable items"
-    total={3}
-    items={[
-      { name: 'Air Filters', count: 0 },
-      { name: 'Timing Belts', count: 0 },
-      { name: 'Radiator Caps', count: 0 },
-    ]}
-  />
-  <InventoryMetricCard
-    title="Fast-Moving Items"
-    description="Top-selling items this month"
-    total={5}
-    items={[
-      { name: 'Wiper Blades', count: 20 },
-      { name: 'Engine Oil', count: 15 },
-      { name: 'Coolant', count: 10 },
-    ]}
-  />
-  <SalesMetricCard
-    title="Total Sales"
-    amount="LKR 150,000"
-    change="8.5%"
-    changeType="positive"
-  />
-</div>
+      {/* <PartVendorSideBar /> */}
+      {/* <SalesOverviewChart /> */}
+      {/* <InventoryOverview /> */}
 
+      <div className="dashboard-cards-row">
+        <DashboardMetricCard
+          title="New Orders"
+          count={6}
+          items={[
+            { id: '#10458', value: '4850', itemCount: 5 },
+            { id: '#10459', value: '3990' , itemCount: 2},
+            { id: '#10460', value: '5120' , itemCount: 3},
+          ]}
+        />
 
+        <DashboardMetricCard
+          title="Low Stock"
+          count={3}
+          items={[
+            { id: 'Air Filter', stockCount: 1 },
+            { id: 'Brake Pads', stockCount: 3 },
+            { id: 'Spark Plug', stockCount: 2 },
+          ]}
+        />
+
+        <DashboardMetricCard
+          title="Pending Orders"
+          count={2}
+          items={[
+            { id: '#20345', daysAgo: 7, value: '6300' },
+            { id: '#20346', daysAgo: 3, value: '2750' },
+          ]}
+        />
+
+        <DashboardMetricCard
+          title="Delivered Orders"
+          count={5}
+          items={[
+            { id: '#50231', status: 'delivered' },
+            { id: '#50232', status: 'dispatched' },
+            { id: '#50233', status: 'delivered' },
+          ]}
+        />
+      </div>
+      <SalesByItemChart />
+      <OrdersOverview/>
+      <DashboardCharts/>
     </div>
-  )
-}
+  );
+};
 
-export default PartVendorDashboard
+export default PartVendorDashboard;
