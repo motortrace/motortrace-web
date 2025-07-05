@@ -12,6 +12,8 @@ import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConn
 import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
 import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
+import DigitalInspections from './pages/ServiceCenter/DigitalInspections';
+import Calendar from './pages/ServiceCenter/Calendar';
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
           <Route path="suppliers" element={<SupplierConnectionPage />} />
           <Route path="parts-order" element={<PartsSearch />} />
           <Route path="reports" element={<EstimatesInvoices />} />
+          <Route path="inspections" element={<DigitalInspections />} />
+          <Route path="calendar" element={<Calendar />} />
         </Route>
       </Routes>
     </BrowserRouter>

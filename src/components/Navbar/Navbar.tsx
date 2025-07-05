@@ -47,6 +47,14 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Reports',
     description: 'Manage your estimates and invoices',
   },
+  '/servicecenter/inspections': {
+    title: 'Digital Inspections',
+    description: 'Manage vehicle inspections and checklists',
+  },
+  '/servicecenter/calendar': {
+    title: 'Calendar',
+    description: 'Manage your appointments',
+  },
 }
 const Navbar: React.FC = () => {
   const location = useLocation();
@@ -70,6 +78,11 @@ const Navbar: React.FC = () => {
         <button aria-label="Notifications" className="icon-btn notification-btn">
           <i className="bx bx-bell"></i>
           <span className="notification-badge">3</span>
+        </button>
+
+        <button aria-label="Cart" className="icon-btn notification-btn">
+          <i className="bx bx-cart"></i>
+          <span className="notification-badge">1</span>
         </button>
 
         <div className="user-profile">
