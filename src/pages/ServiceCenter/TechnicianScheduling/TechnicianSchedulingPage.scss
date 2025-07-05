@@ -14,9 +14,8 @@
   }
 
   .technician-scheduling-content {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
     padding: 0 1.5rem 1.5rem;
     height: calc(100vh - 200px);
   }
@@ -165,6 +164,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    flex: 1;
+    width: 100%;
   }
 
   // Calendar Toolbar
