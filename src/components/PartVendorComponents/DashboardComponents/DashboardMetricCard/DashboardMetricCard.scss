@@ -1,0 +1,129 @@
+@import '../../../../styles/variables.scss';
+
+.dashboard-cards-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .dashboard-metric-card {
+    flex: 1;
+    min-width: 250px;
+    margin-bottom: 20px;
+  }
+}
+
+.dashboard-metric-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    &-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  &__title {
+    font-family: var(--font-primary);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-carbon);
+    margin: 0;
+  }
+
+  &__count {
+    font-size: 29px;
+    font-weight: 800;
+    color: #111827;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .dashboard-metric-card__item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dashed #e5e7eb;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &-id {
+        font-size: 12px;
+        font-weight: 500;
+        color: #9ca3af;
+      }
+
+      &-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .badge {
+          font-size: 12px;
+          font-weight: 600;
+          
+          border-radius: 16px;
+          white-space: nowrap;
+          background-color: #f3f4f6;
+          color: #374151;
+
+          &--low {
+            color: var(--color-warning);
+            background-color: rgba(227, 155, 31, 0.12);
+          }
+
+          &--high {
+            color: var(--color-danger);
+            background-color: rgba(202, 55, 55, 0.12);
+          }
+
+          &--delivered {
+            color: var(--color-success);
+            background-color: rgba(22, 163, 74, 0.12);
+          }
+
+          &--dispatched {
+            color: var(--color-info);
+            background-color: rgba(14, 165, 233, 0.12);
+          }
+
+          &--pending {
+            color: var(--color-warning);
+            background-color: rgba(245, 158, 11, 0.12);
+          }
+        }
+      }
+    }
+  }
+}
+.dashboard-metric-card__item-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .dashboard-metric-card__icon {
+    cursor: pointer;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--color-carbon);
+    }
+  }
+}
+

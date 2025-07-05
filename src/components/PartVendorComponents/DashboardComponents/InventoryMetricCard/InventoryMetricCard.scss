@@ -1,5 +1,5 @@
 // src/components/InventoryMetricCard/InventoryMetricCard.scss
-@import '../../../styles/variables.scss';
+@import '../../../../styles/variables.scss';
 
 .inventory-metric-card {
   background: white;
@@ -7,7 +7,6 @@
   border-radius: 16px;
   padding: 20px;
   flex: 1;
-  min-width: 0;
 
   &__header {
     margin-bottom: 16px;
