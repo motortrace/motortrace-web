@@ -10,12 +10,20 @@ import TechnicianSchedulingPage from './pages/ServiceCenter/TechnicianScheduling
 import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
 import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConnectionPage';
 import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
+import LandingPage from './pages/LandingPage/LandingPage';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/servicecenter/dashboard" replace />} />
+        {/* <Route path="/" element={<Navigate to="/servicecenter/dashboard" replace />} /> */}
+        <Route path="/" element={<Navigate to = "/index" replace />} />
+        
+        <Route path="/" >
+           <Route index element={<Navigate to="index" replace />} />
+           <Route path="index" element={<LandingPage />} />
+        </Route>
+
         <Route path="/servicecenter" element={<DashboardLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -28,6 +36,7 @@ function App() {
           <Route path="suppliers" element={<SupplierConnectionPage />} />
           <Route path="parts-order" element={<PartsSearch />} />
         </Route>
+        
       </Routes>
     </BrowserRouter>
   );
