@@ -285,7 +285,6 @@ const Calendar = () => {
 
   return (
     <div className="calendar-page">
-      <DashboardHeader />
 
       <div className="calendar-container">
         {/* Left Panel - Calendar and Incoming Requests */}

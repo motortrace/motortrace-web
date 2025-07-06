@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Play } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -9,6 +10,7 @@ import type { JobCard, JobService, Technician, Service } from '../../../types/Jo
 import './TechnicianSchedulingPage.scss';
 
 const TechnicianSchedulingPage: React.FC = () => {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedTechnician, setSelectedTechnician] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
@@ -499,6 +501,11 @@ const TechnicianSchedulingPage: React.FC = () => {
     setCurrentDate(dateInfo.view.currentStart);
   };
 
+  // Handle navigation to job card
+  const handleNavigateToJobCard = () => {
+    navigate('/servicecenter/jobcard');
+  };
+
   // Custom toolbar component
   const CustomToolbar = () => {
     const calendar = calendarRef.current?.getApi();
@@ -568,7 +575,7 @@ const TechnicianSchedulingPage: React.FC = () => {
   }, [currentDate]);
 
   return (
-    <div className="technician-scheduling-page">
+    <div className="technician-scheduling-page" onClick={handleNavigateToJobCard}>
 
       {/* Metrics */}
       <div className="metric-cards-row">
@@ -615,14 +622,14 @@ const TechnicianSchedulingPage: React.FC = () => {
               eventResize={handleEventResize}
               datesSet={handleDatesSet}
               height="600px"
-              slotMinTime="07:00:00"
-              slotMaxTime="20:00:00"
+              slotMinTime="09:00:00"
+              slotMaxTime="17:00:00"
               slotDuration="00:30:00"
               resourceAreaHeaderContent="Technicians"
               resourceAreaWidth="200px"
               resourceOrder="title"
               nowIndicator={true}
-              scrollTime="08:00:00"
+              scrollTime="09:00:00"
               eventOverlap={false}
               slotEventOverlap={false}
               eventDisplay="block"

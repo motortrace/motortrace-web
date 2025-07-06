@@ -30,11 +30,11 @@ const Sidebar: React.FC = () => {
     {
       title: 'Operations',
       items: [
-        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar', route: '/servicecenter/appointments' },
-        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
         { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
-        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
         { id: 'Work order', label: 'Work order', icon: 'bx bx-briefcase', route: '/servicecenter/jobs' },
+        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
+        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
+
       ]
     },
     {
@@ -49,7 +49,7 @@ const Sidebar: React.FC = () => {
       title: 'Management',
       items: [
         { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
-        { id: 'Order', label: 'Order', icon: 'bx bx-box', route: '/servicecenter/parts-order' },
+        { id: 'Order', label: 'Order', icon: 'bx bx-cube', route: '/servicecenter/parts-order' },
         { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/servicecenter/settings' },
       ]
     }

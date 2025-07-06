@@ -261,19 +261,6 @@ const AppointmentPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="appointment-content">
-        <div className="calendar-container">
-          <AppointmentCalendar
-            appointments={appointments}
-            currentDate={currentDate}
-            onDateChange={setCurrentDate}
-            currentView={currentView}
-            onViewChange={setCurrentView}
-            onSelectEvent={() => {}}
-            onSelectSlot={handleSelectSlot}
-          />
-        </div>
-      </div>
     </div>
   );
 };
