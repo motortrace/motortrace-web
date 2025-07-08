@@ -34,6 +34,7 @@ const Sidebar: React.FC = () => {
         { id: 'Work order', label: 'Work order', icon: 'bx bx-briefcase', route: '/servicecenter/jobs' },
         { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
         { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
+        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
 
       ]
     },
