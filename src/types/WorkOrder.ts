@@ -5,7 +5,7 @@ export interface WorkOrder {
     customer: string;
     vehicle: string;
     year: number;
-    estimateNumber: string;
+    estimateNumber?: string;
     amount: number;
     hours: {
       left: number;

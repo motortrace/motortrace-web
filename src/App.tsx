@@ -16,6 +16,7 @@ import DigitalInspections from './pages/ServiceCenter/DigitalInspections';
 import Calendar from './pages/ServiceCenter/Calendar';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
+import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="jobs" element={<KanbanPage />} />
+          <Route path="workorders" element={<WorkOrdersPage />} />
           <Route path="appointments">
             <Route index element={<AppointmentPage />} />
             <Route path="details" element={<AppointmentDetails />} />
@@ -41,6 +43,7 @@ function App() {
           <Route path="calendar" element={<Calendar />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<CannedServices />} />
+          <Route path="work-order" element={<WorkOrdersPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

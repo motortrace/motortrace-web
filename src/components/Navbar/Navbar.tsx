@@ -59,6 +59,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Services',
     description: 'Manage your services',
   },
+  '/servicecenter/work-order': {
+    title: 'Work Orders',
+    description: 'Manage your work orders',
+  },
 }
 const Navbar: React.FC = () => {
   const location = useLocation();
