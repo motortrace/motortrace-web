@@ -151,14 +151,14 @@
     gap: 0.5rem;
   }
   &__action-btn {
-    padding: 0.5rem;
-    border-radius: 8px;
-    min-width: 32px;
-    min-height: 32px;
+    padding: 0.25rem 0.4rem;
+    border-radius: 6px;
+    // min-width: 24px;
+    min-height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 14px;
     background: none;
     border: none;
     color: var(--color-neutral-600);
@@ -169,10 +169,10 @@
       color: var(--color-carbon);
     }
     &--menu {
-      padding: 0.25rem;
+      padding: 0.15rem 0.3rem;
       border: none;
       background: var(--color-neutral-50);
-      border-radius: 6px;
+      border-radius: 5px;
     }
   }
 
@@ -292,7 +292,7 @@
     padding: 0.75rem 1rem; // was 1.25rem 1.5rem
     border-bottom: 2px solid var(--color-neutral-200);
     background: var(--color-neutral-50);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--color-neutral-700);
     text-transform: uppercase;
@@ -365,7 +365,7 @@
     gap: 0.25rem;
   }
   &__client-name {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--color-carbon);
   }
@@ -380,7 +380,7 @@
     gap: 0.25rem;
   }
   &__appointment-date {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     color: var(--color-carbon);
     font-weight: 600;
   }
@@ -390,7 +390,7 @@
     font-weight: 500;
   }
   &__license-plate {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--color-carbon);
     background: var(--color-neutral-100);
@@ -439,13 +439,13 @@
     margin-bottom: 1.5rem;
   }
   &__payment-amount {
-    font-size: 1.3rem; // was 2rem
+    font-size: 1rem; // was 2rem
     font-weight: 800;
     color: var(--color-carbon);
     margin-bottom: 0.5rem;
   }
   &__payment-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--color-neutral-600);
     font-weight: 500;
     text-transform: uppercase;
@@ -468,7 +468,7 @@
     }
   }
   &__payment-stat-number {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--color-carbon);
     margin-bottom: 0.25rem;

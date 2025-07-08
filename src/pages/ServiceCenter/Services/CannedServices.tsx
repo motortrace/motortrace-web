@@ -12,6 +12,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import PackageModal from '../../../components/PackageModal/PackageModal';
+import AddServiceModal from '../../../components/AddServiceModal/AddServiceModal';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -159,15 +161,46 @@ const CannedServices = () => {
       isActive: true
     }
   ]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newService, setNewService] = useState<Omit<CannedService, 'id'>>({
-    name: '',
-    description: '',
-    category: '',
-    laborHours: 0,
-    laborCharge: 0,
-    isActive: true
-  });
+  const [showPackageModal, setShowPackageModal] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [showAddServiceModal, setShowAddServiceModal] = useState(false);
+  const [selectedService, setSelectedService] = useState<undefined | {
+    id?: string;
+    name: string;
+    description: string;
+    category: string;
+    laborHours: number;
+    laborCharge: number;
+    tax: number;
+    isActive: boolean;
+  }>(undefined);
+  // const [showAddModal, setShowAddModal] = useState(false);
+  // const [newService, setNewService] = useState<Omit<CannedService, 'id'>>({
+  //   name: '',
+  //   description: '',
+  //   category: '',
+  //   laborHours: 0,
+  //   laborCharge: 0,
+  //   isActive: true
+  // });
+  // const [showServiceModal, setShowServiceModal] = useState(false);
+  // const [serviceForm, setServiceForm] = useState<Omit<CannedService, 'id'>>({
+  //   name: '',
+  //   description: '',
+  //   category: '',
+  //   laborHours: 0,
+  //   laborCharge: 0,
+  //   isActive: true
+  // });
+  // const [packageForm, setPackageForm] = useState({
+  //   name: '',
+  //   description: '',
+  //   category: '',
+  //   laborHours: 0,
+  //   laborCharge: 0,
+  //   isActive: true,
+  //   selectedServiceIds: [] as string[],
+  // });
 
   // Metrics
   const totalServices = services.length;
@@ -388,7 +421,11 @@ const CannedServices = () => {
     <div className="canned-services-page">
       <div className="page-header">
         <div className="page-actions">
-          <button className="btn btn--primary" onClick={() => setShowAddModal(true)}>
+          <button className="btn btn--primary" onClick={() => setShowPackageModal(true)}>
+            <i className='bx bx-package'></i>
+            Add New Package
+          </button>
+          <button className="btn btn--primary" onClick={() => setShowAddServiceModal(true)}>
             <i className='bx bx-plus'></i>
             Add New Service
           </button>
@@ -496,6 +533,29 @@ const CannedServices = () => {
           emptyMessage="No individual services found."
         />
       </div>
+
+      {/* Remove all modal JSX blocks for New Service and New Canned Service Package */}
+      {showAddServiceModal && (
+        <AddServiceModal
+          service={selectedService}
+          onClose={() => setShowAddServiceModal(false)}
+          onSave={(service) => {
+            // TODO: handle save logic
+            setShowAddServiceModal(false);
+          }}
+        />
+      )}
+      {showPackageModal && (
+        <PackageModal
+          packageData={selectedPackage}
+          individualServices={individualServices}
+          onClose={() => setShowPackageModal(false)}
+          onSave={(pkg) => {
+            // TODO: handle save logic
+            setShowPackageModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

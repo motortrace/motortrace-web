@@ -145,11 +145,11 @@
     }
   }
 
-  // Modal styles
+  // Modal styles for Canned Services
   .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.18);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -157,44 +157,112 @@
   }
   .modal {
     background: white;
-    border-radius: var(--border-radius);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    padding: 32px 24px 24px 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+    padding: 0 0 24px 0;
     min-width: 340px;
     max-width: 95vw;
     width: 400px;
-    .modal-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      input, textarea {
-        padding: 10px 12px;
-        border: 1px solid var(--color-neutral-300);
-        border-radius: var(--border-radius);
-        font-size: 14px;
-        &:focus {
-          outline: none;
-          border-color: var(--color-primary);
-        }
-      }
-      textarea {
-        min-height: 60px;
-        resize: vertical;
-      }
-      label {
-        font-size: 14px;
-        color: var(--color-neutral-700);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .modal-actions {
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-        margin-top: 8px;
-      }
-    }
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 0 24px;
+    border-radius: 16px 16px 0 0;
+  }
+  .modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-carbon, #22223b);
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s;
+    border-radius: 6px;
+    padding: 2px 6px;
+  }
+  .modal-close:hover {
+    color: #22223b;
+    background: #f3f4f6;
+  }
+  .modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+  }
+  .modal-form input,
+  .modal-form textarea,
+  .modal-form select {
+    padding: 10px 12px;
+    border: 1px solid var(--color-neutral-300);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    transition: border-color 0.2s;
+  }
+  .modal-form input:focus,
+  .modal-form textarea:focus,
+  .modal-form select:focus {
+    outline: none;
+    border-color: var(--color-primary, #38bdf8);
+  }
+  .modal-form textarea {
+    min-height: 60px;
+    resize: vertical;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+  .package-services-select {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .selected-services-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .selected-service-pill {
+    display: flex;
+    align-items: center;
+    background: #e0f2fe;
+    color: #2563eb;
+    border-radius: 16px;
+    padding: 6px 14px 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    gap: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .remove-pill-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.1em;
+    margin-left: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 2px 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .remove-pill-btn:hover {
+    background: #f87171;
+    color: #fff;
   }
 
   // Responsive
