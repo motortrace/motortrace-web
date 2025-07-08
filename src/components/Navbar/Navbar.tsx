@@ -4,8 +4,8 @@ import './Navbar.scss';
 
 const pageInfo: Record<string, { title: string; description: string }> = {
   '/servicecenter/dashboard': {
-    title: 'Welcome back, John!',
-    description: 'Overview of your balance and accounts',
+    title: 'Dashboard',
+    description: 'Overview of your service center',
   },
   '/servicecenter/jobs': {
     title: 'Job board',
