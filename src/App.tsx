@@ -15,6 +15,7 @@ import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
 import DigitalInspections from './pages/ServiceCenter/DigitalInspections';
 import Calendar from './pages/ServiceCenter/Calendar';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
+import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="inspections" element={<DigitalInspections />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
+          <Route path="services" element={<CannedServices />} />
         </Route>
       </Routes>
     </BrowserRouter>
