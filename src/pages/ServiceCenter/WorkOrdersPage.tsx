@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import type { WorkOrder } from '../../types/WorkOrder';
 import './WorkOrdersPage.scss';
+import ManageWorkOrderModal from '../../components/WorkOrderModal/ManageWorkOrderModal';
 
 const getStatusBadge = (status: WorkOrder['status']) => {
   const badgeClass = {
@@ -26,6 +27,10 @@ const WorkOrdersPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCustomer, setFilterCustomer] = useState('all');
   const [filterVehicle, setFilterVehicle] = useState('all');
+
+  // Modal state
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
 
   // Sample work orders data
   const [workOrders] = useState<WorkOrder[]>([
@@ -102,7 +107,9 @@ const WorkOrdersPage = () => {
   });
 
   const handleView = (id: string) => {
-    console.log('View work order', id);
+    const wo = workOrders.find(w => w.id === id) || null;
+    setSelectedWorkOrder(wo);
+    setViewModalOpen(true);
   };
   const handleEdit = (id: string) => {
     console.log('Edit work order', id);
@@ -268,6 +275,8 @@ const WorkOrdersPage = () => {
           emptyMessage="No work orders found matching your search criteria."
         />
       </div>
+
+      <ManageWorkOrderModal open={viewModalOpen} onClose={() => setViewModalOpen(false)} />
     </div>
   );
 };
