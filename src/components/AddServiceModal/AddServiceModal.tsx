@@ -81,7 +81,7 @@ const AddServiceModal: React.FC<AddServiceModalProps> = ({ service, onClose, onS
               <input type="number" value={form.laborHours} onChange={e => handleInputChange('laborHours', parseFloat(e.target.value))} disabled={!isEditing} min="0" step="0.1" />
             </div>
             <div className="form-group">
-              <label>Labor Charge ($)</label>
+              <label>Labor Charge (LKR)</label>
               <input type="number" value={form.laborCharge} onChange={e => handleInputChange('laborCharge', parseFloat(e.target.value))} disabled={!isEditing} min="0" step="0.01" />
             </div>
             <div className="form-group">
