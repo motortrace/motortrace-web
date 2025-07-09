@@ -154,6 +154,10 @@ const Dashboard: React.FC = () => {
 
   const totalTasks = Object.values(taskProgress).reduce((sum, count) => sum + count, 0);
 
+  // Mock values for new metric cards
+  const reviewsReceived = 42;
+  const workOrdersInProgress = 5;
+
   const handleAddWidget = () => {
     console.log('Add widget clicked');
   };
@@ -216,16 +220,16 @@ const Dashboard: React.FC = () => {
           changeType="positive"
         />
         <MetricCard
-          title="New Requests"
-          amount="7"
-          change="6.3%"
+          title="Reviews Received"
+          amount={reviewsReceived.toString()}
+          change="4.5%"
           changeType="positive"
         />
         <MetricCard
-          title="Pending Requests"
-          amount="19"
-          change="2.4%"
-          changeType="negative"
+          title="Work Orders In Progress"
+          amount={workOrdersInProgress.toString()}
+          change="2.1%"
+          changeType="positive"
         />
         <MetricCard
           title="Total Earnings"

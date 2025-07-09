@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import DashboardHeader from '../../layouts/DashboardHeader/DashboardHeader';
 import './Calendar.scss';
+import WalkInAppointmentModal from '../../components/WalkInAppointmentModel/WalkInAppointmentModel';
+import ViewRequestModal from '../../components/WalkInAppointmentModel/ViewRequestModal';
 
 interface IncomingRequest {
   id: string;
@@ -41,6 +43,8 @@ interface Appointment {
 const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showWalkInModal, setShowWalkInModal] = useState(false);
+  const [viewRequest, setViewRequest] = useState<IncomingRequest | null>(null);
 
   // Sample incoming requests data
   const [incomingRequests] = useState<IncomingRequest[]>([
@@ -385,10 +389,10 @@ const Calendar = () => {
                   <div className="request-actions">
                     <button 
                       className="btn btn--success"
-                      onClick={() => handleScheduleAppointment(request.id)}
+                      onClick={() => setViewRequest(request)}
                     >
-                      <i className='bx bx-calendar-plus'></i>
-                      Schedule
+                      <i className='bx bx-show'></i>
+                      View
                     </button>
                     <button 
                       className="btn btn--secondary"
@@ -424,7 +428,7 @@ const Calendar = () => {
               })}
             </h2>
             <div className="schedule-actions">
-              <button className="btn btn--primary">
+              <button className="btn btn--primary" onClick={() => setShowWalkInModal(true)}>
                 <i className='bx bx-plus'></i>
                 New Appointment
               </button>
@@ -532,6 +536,22 @@ const Calendar = () => {
           </div>
         </div>
       </div>
+      {showWalkInModal && (
+        <WalkInAppointmentModal
+          onClose={() => setShowWalkInModal(false)}
+          onSave={(data) => {
+            setShowWalkInModal(false);
+            // handle the saved data here
+            console.log('Saved appointment:', data);
+          }}
+        />
+      )}
+      {viewRequest && (
+        <ViewRequestModal
+          request={viewRequest}
+          onClose={() => setViewRequest(null)}
+        />
+      )}
     </div>
   );
 };
