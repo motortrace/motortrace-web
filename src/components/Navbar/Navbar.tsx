@@ -67,6 +67,14 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Reviews and Ratings',
     description: 'View your reviews and ratings',
   },
+  '/servicecenter/chat': {
+    title: 'Client Chat',
+    description: 'Message your clients',
+  },
+  '/servicecenter/profile': {
+    title: 'Profile',
+    description: 'Manage your profile',
+  },
 }
 const Navbar: React.FC = () => {
   const location = useLocation();

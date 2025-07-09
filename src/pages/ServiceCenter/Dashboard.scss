@@ -1,7 +1,6 @@
 @import '../../styles/variables.scss';
 
 .dashboard {
-  padding: 1.5rem;
   background-color: var(--color-neutral-50);
   min-height: 100vh;
   font-family: var(--font-primary);
@@ -9,8 +8,8 @@
   &__content {
     max-width: 1400px;
     margin: 0 auto;
-    padding-left: 16px; // was 24px
-    padding-right: 16px; // was 24px
+    padding-left: 24px; // was 24px
+    padding-right: 24px; // was 24px
   }
 
   &__row {
@@ -130,8 +129,9 @@
   }
   &__card-title {
     font-size: 1rem; // was 1.1rem
-    font-weight: 700;
-    font-family: 'Poppins', var(--font-primary), sans-serif;
+    font-family: 'Coinbase_Display-Regular';
+    font-weight: 500;
+    font-size: 18px;
     color: var(--color-carbon);
     margin: 0;
     line-height: 1.1; // was 1.2
@@ -184,7 +184,8 @@
   &__metric-number {
     display: block;
     font-size: 2rem; // was 2.5rem
-    font-weight: 800;
+    font-family: 'Coinbase_Display-Medium';
+    font-weight: 500;
     color: var(--color-carbon);
     line-height: 1;
     margin-bottom: 0.5rem;
@@ -209,8 +210,8 @@
     text-align: center;
     padding: 0.75rem; // was 1.25rem
     background-color: var(--color-neutral-50);
-    border-radius: 8px; // was 12px
-    border: 1px solid var(--color-neutral-100);
+    border-radius: 16px; // was 12px
+    border: 2px solid #e5e7eb;
     transition: box-shadow 0.2s, background 0.2s;
     &:hover {
       background-color: white;

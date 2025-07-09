@@ -19,6 +19,7 @@ import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import AutoRepairReviews from './pages/ServiceCenter/Reviews/AutoRepairReviews';
 import AutoRepairChat from './pages/ServiceCenter/AutoRepairChat/AutoRepairChat';
+import EditProfile from './pages/ServiceCenter/EditProfile';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="reviews" element={<AutoRepairReviews />} />
           <Route path="chat" element={<AutoRepairChat />} />
+          <Route path="profile" element={<EditProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>

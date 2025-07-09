@@ -137,13 +137,48 @@ function getServiceTypeIcon(service: string) {
   return '🔧';
 }
 
-function getStatusColor(status: string) {
+function getStatusBadgeProps(status: string) {
   switch (status) {
-    case 'In Progress': return '#f59e0b';
-    case 'Completed': return '#10b981';
-    case 'Waiting for Parts': return '#ef4444';
-    case 'Scheduled': return '#3b82f6';
-    default: return '#6b7280';
+    case 'In Progress':
+      return {
+        icon: 'bx-loader-circle',
+        label: 'In Progress',
+        color: '#f59e0b',
+        bg: 'rgba(245, 158, 11, 0.12)',
+        aria: 'In Progress',
+      };
+    case 'Completed':
+      return {
+        icon: 'bx-check-circle',
+        label: 'Completed',
+        color: '#10b981',
+        bg: 'rgba(16, 185, 129, 0.12)',
+        aria: 'Completed',
+      };
+    case 'Waiting for Parts':
+      return {
+        icon: 'bx-time-five',
+        label: 'Waiting for Parts',
+        color: '#ef4444',
+        bg: 'rgba(239, 68, 68, 0.12)',
+        aria: 'Waiting for Parts',
+      };
+    case 'Scheduled':
+      return {
+        icon: 'bx-calendar',
+        label: 'Scheduled',
+        color: '#3b82f6',
+        bg: 'rgba(59, 130, 246, 0.12)',
+        aria: 'Scheduled',
+      };
+    default:
+      return {
+        icon: 'bx-info-circle',
+        label: status,
+        color: '#6b7280',
+        bg: 'rgba(107, 114, 128, 0.12)',
+        aria: status,
+      };
   }
 }
 
@@ -172,18 +207,21 @@ const AutoRepairChat = () => {
 
   return (
     <div style={{
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      backgroundColor: '#f8fafc',
-      minHeight: '100vh',
-      padding: '24px'
+      fontFamily: 'Poppins',
+      height: '82vh',
+      padding: 0,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
     }}>
       <div style={{
         display: 'flex',
-        height: 'calc(100vh - 48px)',
+        height: '100%',
         backgroundColor: 'white',
         borderRadius: '16px',
         border: '2px solid #e5e7eb',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        margin: 24
       }}>
         {/* Client List Panel */}
         <div style={{
@@ -271,129 +309,55 @@ const AutoRepairChat = () => {
               >
                 <div style={{
                   display: 'flex',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                   gap: '12px'
                 }}>
-                  <div style={{
-                    position: 'relative'
-                  }}>
-                    <img 
-                      src={client.avatar} 
-                      alt={client.name}
-                      style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        border: '2px solid #e2e8f0'
-                      }}
-                    />
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '2px',
-                      right: '2px',
-                      width: '12px',
-                      height: '12px',
+                  <img 
+                    src={client.avatar} 
+                    alt={client.name}
+                    style={{
+                      width: '48px',
+                      height: '48px',
                       borderRadius: '50%',
-                      backgroundColor: client.isOnline ? '#10b981' : '#6b7280',
-                      border: '2px solid white'
-                    }}></div>
-                  </div>
-                  
-                  <div style={{
-                    flex: 1,
-                    minWidth: 0
-                  }}>
+                      objectFit: 'cover',
+                      border: '2px solid #e2e8f0'
+                    }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '4px'
-                    }}>
-                      <span style={{
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#1e293b'
-                      }}>{client.name}</span>
-                      <span style={{
-                        fontSize: '12px',
-                        color: '#64748b'
-                      }}>{client.lastMessageTime}</span>
-                    </div>
-                    
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      color: '#1e293b',
+                      marginBottom: '2px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>{client.name}</div>
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      marginBottom: '6px'
-                    }}>
-                      <span style={{
-                        fontSize: '14px'
-                      }}>{getServiceTypeIcon(client.service)}</span>
-                      <span style={{
-                        fontSize: '12px',
-                        color: '#64748b',
-                        fontFamily: 'monospace'
-                      }}>{client.workOrder}</span>
-                      <div style={{
-                        fontSize: '10px',
-                        color: 'white',
-                        backgroundColor: getStatusColor(client.status),
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                        fontWeight: '500'
-                      }}>
-                        {client.status}
-                      </div>
-                    </div>
-                    
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '8px'
-                    }}>
-                      <span style={{
-                        fontSize: '12px',
-                        color: '#475569',
-                        fontWeight: '500'
-                      }}>{client.vehicleModel}</span>
-                      <span style={{
-                        fontSize: '10px',
-                        color: '#64748b',
-                        backgroundColor: '#f1f5f9',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                        border: '1px solid #e2e8f0'
-                      }}>{client.location}</span>
-                    </div>
-                    
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
+                      gap: '8px'
                     }}>
                       <span style={{
                         fontSize: '13px',
                         color: '#64748b',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        flex: 1
-                      }}>{client.lastMessage}</span>
-                      {client.unreadCount > 0 && (
-                        <div style={{
-                          backgroundColor: '#ef4444',
-                          color: 'white',
-                          fontSize: '11px',
-                          fontWeight: '600',
-                          padding: '2px 6px',
-                          borderRadius: '10px',
-                          minWidth: '18px',
-                          textAlign: 'center',
-                          marginLeft: '8px'
-                        }}>{client.unreadCount}</div>
-                      )}
+                        fontFamily: 'monospace'
+                      }}>{client.workOrder}</span>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        backgroundColor: getStatusBadgeProps(client.status).bg,
+                        color: getStatusBadgeProps(client.status).color,
+                        padding: '2px 10px',
+                        borderRadius: '999px',
+                        fontWeight: 600,
+                        fontSize: '13px',
+                        minWidth: 0,
+                      }} aria-label={getStatusBadgeProps(client.status).aria}>
+                        <i className={`bx ${getStatusBadgeProps(client.status).icon}`} style={{fontSize: '16px'}} aria-hidden="true"></i>
+                        <span style={{color: '#222', fontWeight: 700, letterSpacing: 0.1}}>{getStatusBadgeProps(client.status).label}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -452,12 +416,21 @@ const AutoRepairChat = () => {
                   <span>•</span>
                   <span>{selectedClient.vehicleModel}</span>
                   <span>•</span>
-                  <span style={{
-                    color: getStatusColor(selectedClient.status),
-                    fontWeight: '500'
-                  }}>
-                    {selectedClient.status}
-                  </span>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: getStatusBadgeProps(selectedClient.status).bg,
+                    color: getStatusBadgeProps(selectedClient.status).color,
+                    padding: '2px 10px',
+                    borderRadius: '999px',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    minWidth: 0,
+                  }} aria-label={getStatusBadgeProps(selectedClient.status).aria}>
+                    <i className={`bx ${getStatusBadgeProps(selectedClient.status).icon}`} style={{fontSize: '16px'}} aria-hidden="true"></i>
+                    <span style={{color: '#222', fontWeight: 700, letterSpacing: 0.1}}>{getStatusBadgeProps(selectedClient.status).label}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -466,7 +439,7 @@ const AutoRepairChat = () => {
               display: 'flex',
               gap: '8px'
             }}>
-              {['📞', '📧', '📋', '⚙️'].map((icon, index) => (
+              {['bx-phone', 'bx-envelope', 'bx-clipboard', 'bx-cog'].map((icon, index) => (
                 <button key={index} style={{
                   width: '40px',
                   height: '40px',
@@ -474,13 +447,13 @@ const AutoRepairChat = () => {
                   backgroundColor: 'white',
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  fontSize: '16px',
+                  fontSize: '20px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'all 0.2s ease'
                 }}>
-                  {icon}
+                  <i className={`bx ${icon}`} style={{ color: '#1e293b' }}></i>
                 </button>
               ))}
             </div>

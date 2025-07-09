@@ -301,15 +301,15 @@ const Dashboard: React.FC = () => {
               <div className="dashboard__metrics-row">
                 <div className="dashboard__metric-small">
                   <span className="dashboard__metric-number">{estimateVsInvoice.estimatesSent}</span>
-                  <span className="dashboard__metric-label">Estimates Sent</span>
+                  <span className="dashboard__metric-label">Estimates</span>
                 </div>
                 <div className="dashboard__metric-small">
                   <span className="dashboard__metric-number">{estimateVsInvoice.invoicesGenerated}</span>
-                  <span className="dashboard__metric-label">Invoices Generated</span>
+                  <span className="dashboard__metric-label">Invoices</span>
                 </div>
                 <div className="dashboard__metric-small">
                   <span className="dashboard__metric-number">{estimateVsInvoice.pendingApproval}</span>
-                  <span className="dashboard__metric-label">Pending Approval</span>
+                  <span className="dashboard__metric-label">Pending</span>
                 </div>
               </div>
             </div>
