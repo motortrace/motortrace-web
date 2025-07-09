@@ -1,0 +1,13 @@
+@import '../../../../styles/variables.scss';
+
+.reviews-card {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  flex-wrap: wrap; // For smaller screens
+
+  > * {
+    flex: 1 1 0;  // Grow & shrink equally, no minimum width
+    min-width: 0; // Prevent overflow due to content
+  }
+}
