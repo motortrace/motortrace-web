@@ -1,0 +1,69 @@
+@import '../../../../styles/variables.scss';
+
+.customer-metrics-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 8px; // Smaller gap between cards
+}
+
+.metric-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 12px; // Reduced padding
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.metric-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-card__title {
+  font-family: var(--font-primary, 'Poppins');
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-carbon, #111827);
+}
+
+.metric-card__amount {
+  font-size: 28px; // Smaller amount text
+  font-weight: 700;
+  color: #111827;
+  
+  align-self: flex-end;
+}
+
+.metric-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.metric-card__change {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 16px;
+}
+
+.metric-card__change--positive {
+  color: #059669;
+  background-color: #d1fae5;
+}
+
+.metric-card__change--negative {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.metric-card__period {
+  font-size: 10px;
+  color: #9ca3af;
+}
