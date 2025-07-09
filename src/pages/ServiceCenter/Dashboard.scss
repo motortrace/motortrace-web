@@ -1,0 +1,557 @@
+@import '../../styles/variables.scss';
+
+.dashboard {
+  padding: 1.5rem;
+  background-color: var(--color-neutral-50);
+  min-height: 100vh;
+  font-family: var(--font-primary);
+
+  &__content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-left: 16px; // was 24px
+    padding-right: 16px; // was 24px
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    &--bottom {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(2, 1fr);
+      &--bottom {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Card Styles
+  &__card {
+    background: white;
+    border-radius: 12px; // was 16px
+    border: 2px solid #e5e7eb;
+    padding: 1rem; // was 1.5rem
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    &--appointments,
+    &--payments {
+      padding: 0;
+    }
+  }
+
+  &__card--appointments {
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &__card-main--centered {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 180px;
+  }
+  &__task-progress--horizontal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  &__task-item--horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    min-height: 48px;
+    width: 100%;
+    padding: 0.25rem 0.75rem;
+    background: none;
+    border-radius: 16px;
+    box-shadow: none;
+    transition: background 0.2s, border-color 0.2s;
+    border: 2px solid #e5e7eb;
+    &:hover {
+      background: var(--color-neutral-50);
+      border-color: var(--color-neutral-300);
+    }
+  }
+  &__task-bar--horizontal {
+    width: 120px;
+    height: 10px;
+    margin: 0;
+    background-color: var(--color-neutral-200);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    border: 1.5px solid var(--color-neutral-300);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  &__task-info--horizontal {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 70px;
+    margin-left: 0.5rem;
+  }
+
+  // Card Header
+  &__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem; // was 1.5rem
+    .dashboard__card--appointments &,
+    .dashboard__card--payments & {
+      padding: 1.5rem 1.5rem 0;
+      margin-bottom: 0;
+    }
+  }
+  &__card-title {
+    font-size: 1rem; // was 1.1rem
+    font-weight: 700;
+    font-family: 'Poppins', var(--font-primary), sans-serif;
+    color: var(--color-carbon);
+    margin: 0;
+    line-height: 1.1; // was 1.2
+    letter-spacing: -0.01em;
+  }
+  &__card-icon {
+    color: var(--color-carbon);
+    opacity: 0.7;
+    transition: all 0.3s;
+    .dashboard__card:hover & {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+  &__card-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  &__action-btn {
+    padding: 0.25rem 0.4rem;
+    border-radius: 6px;
+    // min-width: 24px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: none;
+    border: none;
+    color: var(--color-neutral-600);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    &:hover {
+      background: var(--color-neutral-100);
+      color: var(--color-carbon);
+    }
+    &--menu {
+      padding: 0.15rem 0.3rem;
+      border: none;
+      background: var(--color-neutral-50);
+      border-radius: 5px;
+    }
+  }
+
+  // Card Metrics
+  &__metric-large {
+    text-align: center;
+    margin-bottom: 1.2rem; // was 2rem
+  }
+  &__metric-number {
+    display: block;
+    font-size: 2rem; // was 2.5rem
+    font-weight: 800;
+    color: var(--color-carbon);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    &--pending { color: var(--color-warning); }
+    &--approved { color: var(--color-success); }
+    &--declined { color: var(--color-danger); }
+  }
+  &__metric-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--color-neutral-600);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  &__metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem; // was 1rem
+  }
+  &__metric-small {
+    text-align: center;
+    padding: 0.75rem; // was 1.25rem
+    background-color: var(--color-neutral-50);
+    border-radius: 8px; // was 12px
+    border: 1px solid var(--color-neutral-100);
+    transition: box-shadow 0.2s, background 0.2s;
+    &:hover {
+      background-color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    .dashboard__metric-number {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .dashboard__metric-label {
+      font-size: 0.8rem;
+    }
+  }
+
+  // Task Progress
+  &__task-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  &__task-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--color-neutral-50);
+    border-radius: 10px;
+    transition: background 0.2s, transform 0.2s;
+    &:hover {
+      background: white;
+      transform: translateX(4px);
+    }
+  }
+  &__task-bar {
+    flex: 1;
+    height: 10px;
+    background-color: var(--color-neutral-200);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  &__task-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    &--created { background: var(--color-primary); }
+    &--todo { background: var(--color-info); }
+    &--progress { background: var(--color-warning); }
+    &--done { background: var(--color-success); }
+    &--notdone { background: var(--color-danger); }
+  }
+  &__task-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 70px;
+  }
+  &__task-count {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-carbon);
+  }
+  &__task-label {
+    font-size: 0.75rem;
+    color: var(--color-neutral-600);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  // Appointments Card
+  &__appointments-header {
+    display: grid;
+    grid-template-columns: minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) min-content;
+    gap: 1rem;
+    padding: 0.75rem 1rem; // was 1.25rem 1.5rem
+    border-bottom: 2px solid var(--color-neutral-200);
+    background: var(--color-neutral-50);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-neutral-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 100%;
+    box-sizing: border-box;
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 1rem;
+    }
+  }
+  &__appointments-list {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-track { background: var(--color-neutral-50); }
+    &::-webkit-scrollbar-thumb { background: var(--color-neutral-200); border-radius: 3px; }
+  }
+  &__appointment-row {
+    display: grid;
+    grid-template-columns: minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) min-content;
+    gap: 0.75rem; // was 1rem
+    padding: 0.75rem 1rem; // was 1.25rem 1.5rem
+    border-bottom: 1px solid var(--color-neutral-100);
+    transition: background 0.2s, transform 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+    &:hover {
+      background: var(--color-neutral-50);
+      transform: translateX(4px);
+    }
+    &:last-child { border-bottom: none; }
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
+  }
+  &__appointment-col {
+    display: flex;
+    align-items: center;
+  }
+  &__appointment-client {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  &__client-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-carbon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+    transition: transform 0.2s;
+    .dashboard__appointment-row:hover & {
+      transform: scale(1.1);
+    }
+  }
+  &__client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  &__client-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-carbon);
+  }
+  &__client-service {
+    font-size: 0.8rem;
+    color: var(--color-neutral-600);
+    font-weight: 500;
+  }
+  &__appointment-time {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  &__appointment-date {
+    font-size: 0.8rem;
+    color: var(--color-carbon);
+    font-weight: 600;
+  }
+  &__appointment-hour {
+    font-size: 0.8rem;
+    color: var(--color-neutral-600);
+    font-weight: 500;
+  }
+  &__license-plate {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-carbon);
+    background: var(--color-neutral-100);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-neutral-200);
+    text-align: center;
+    transition: background 0.2s, color 0.2s;
+    .dashboard__appointment-row:hover & {
+      background: var(--color-carbon);
+      color: white;
+    }
+  }
+
+  // Status Badges (flat style)
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: transform 0.2s;
+    &--confirmed { background: #dcfce7; color: #16a34a; }
+    &--pending { background: #fef3c7; color: #d97706; }
+    &--completed { background: #dbeafe; color: #1d4ed8; }
+    &--approved { background: #dcfce7; color: #16a34a; }
+    &--declined { background: #fee2e2; color: #dc2626; }
+    &--notdone { background: #fee2e2; color: #dc2626; }
+    &--done { background: #dcfce7; color: #16a34a; }
+    &:hover { transform: scale(1.05); }
+  }
+
+  // Payments Card
+  &__payments-summary {
+    padding: 1.5rem;
+    background: var(--color-neutral-50);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-neutral-100);
+  }
+  &__payment-total {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  &__payment-amount {
+    font-size: 1rem; // was 2rem
+    font-weight: 800;
+    color: var(--color-carbon);
+    margin-bottom: 0.5rem;
+  }
+  &__payment-label {
+    font-size: 0.8rem;
+    color: var(--color-neutral-600);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  &__payment-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  &__payment-stat {
+    text-align: center;
+    padding: 1rem;
+    background: var(--color-neutral-50);
+    border-radius: 10px;
+    transition: background 0.2s, transform 0.2s;
+    &:hover {
+      background: white;
+      transform: translateY(-2px);
+    }
+  }
+  &__payment-stat-number {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-carbon);
+    margin-bottom: 0.25rem;
+  }
+  &__payment-stat-label {
+    font-size: 0.75rem;
+    color: var(--color-neutral-600);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  &__payments-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0 1.5rem 1.5rem;
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-track { background: var(--color-neutral-50); }
+    &::-webkit-scrollbar-thumb { background: var(--color-neutral-200); border-radius: 3px; }
+  }
+  &__payment-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-neutral-100);
+    transition: background 0.2s, transform 0.2s;
+    align-items: center;
+    &:hover {
+      background: var(--color-neutral-50);
+      border-radius: 8px;
+      transform: translateX(4px);
+    }
+    &:last-child { border-bottom: none; }
+  }
+  &__payment-client {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  &__payment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-end;
+  }
+  &__payment-amount {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-carbon);
+  }
+  &__payment-date {
+    font-size: 0.8rem;
+    color: var(--color-neutral-600);
+    font-weight: 500;
+  }
+  &__payment-status {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__card-main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+  }
+  &__conversion-rate {
+    margin-bottom: 1.5rem;
+  }
+  &__metrics-row--centered {
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 1rem;
+    &__card { padding: 1rem; }
+    &__metrics-row { grid-template-columns: 1fr; }
+    &__metric-number { font-size: 1.5rem; }
+  }
+}

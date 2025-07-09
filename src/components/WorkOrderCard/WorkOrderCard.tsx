@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { WorkOrder } from '../../types/WorkOrder';
 import './WorkOrderCard.scss';
 
@@ -8,8 +9,20 @@ interface WorkOrderCardProps {
 }
 
 const WorkOrderCard: React.FC<WorkOrderCardProps> = ({ workOrder, onMove }) => {
+  const navigate = useNavigate();
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('text/plain', workOrder.id);
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent navigation when clicking on interactive elements
+    if ((e.target as HTMLElement).closest('.card-menu') || 
+        (e.target as HTMLElement).closest('.profile-photo')) {
+      return;
+    }
+    
+    navigate('/servicecenter/jobcard');
   };
 
   const formatAmount = (amount: number) => {
@@ -41,6 +54,7 @@ const WorkOrderCard: React.FC<WorkOrderCardProps> = ({ workOrder, onMove }) => {
       className="work-order-card"
       draggable
       onDragStart={handleDragStart}
+      onClick={handleCardClick}
     >
       <div className="card-header">
         <span className="estimate-number" title={workOrder.title}>

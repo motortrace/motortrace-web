@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { CheckCircle, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -9,10 +10,10 @@ import type { JobCard, JobService, Technician, Service } from '../../../types/Jo
 import './TechnicianSchedulingPage.scss';
 
 const TechnicianSchedulingPage: React.FC = () => {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedTechnician, setSelectedTechnician] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
-  const [showUnassignedJobs, setShowUnassignedJobs] = useState(true);
   const calendarRef = useRef<FullCalendar>(null);
   const [jobCards, setJobCards] = useState<JobCard[]>([]);
   const [calendarKey, setCalendarKey] = useState(0);
@@ -106,6 +107,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 30, 0),
             status: 'assigned',
+            taskType: 'service',
           },
           {
             id: 'js2',
@@ -118,6 +120,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0),
             status: 'assigned',
+            taskType: 'service',
           },
         ],
       },
@@ -140,6 +143,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 45, 0),
             status: 'assigned',
+            taskType: 'inspection',
           },
           {
             id: 'js4',
@@ -152,6 +156,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 15, 30, 0),
             status: 'assigned',
+            taskType: 'service',
           },
         ],
       },
@@ -174,6 +179,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 30, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 30, 0),
             status: 'assigned',
+            taskType: 'service',
           },
           {
             id: 'js6',
@@ -186,6 +192,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 8, 30, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 30, 0),
             status: 'assigned',
+            taskType: 'service',
           },
         ],
       },
@@ -208,6 +215,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: null,
             scheduledEnd: null,
             status: 'pending',
+            taskType: 'service',
           },
           {
             id: 'js8',
@@ -220,6 +228,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: null,
             scheduledEnd: null,
             status: 'pending',
+            taskType: 'service',
           },
         ],
       },
@@ -242,6 +251,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 45, 0),
             status: 'assigned',
+            taskType: 'inspection',
           },
         ],
       },
@@ -264,6 +274,7 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 16, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 30, 0),
             status: 'assigned',
+            taskType: 'service',
           },
           {
             id: 'js11',
@@ -276,6 +287,43 @@ const TechnicianSchedulingPage: React.FC = () => {
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 16, 30, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 0, 0),
             status: 'assigned',
+            taskType: 'service',
+          },
+        ],
+      },
+      {
+        id: 'JC007',
+        customer: 'Maria Garcia',
+        vehicle: '2021 Audi A4',
+        status: 'approved',
+        createdAt: today,
+        updatedAt: today,
+        jobServices: [
+          {
+            id: 'js12',
+            jobCardId: 'JC007',
+            serviceId: 'app1',
+            serviceName: 'Customer Consultation',
+            estimatedDuration: 60,
+            requiredSkill: 'diagnostics',
+            technicianId: 'tech1',
+            scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 0, 0),
+            scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0),
+            status: 'assigned',
+            taskType: 'appointment',
+          },
+          {
+            id: 'js13',
+            jobCardId: 'JC007',
+            serviceId: 'app2',
+            serviceName: 'Vehicle Assessment',
+            estimatedDuration: 45,
+            requiredSkill: 'diagnostics',
+            technicianId: 'tech2',
+            scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 15, 0, 0),
+            scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 15, 45, 0),
+            status: 'assigned',
+            taskType: 'appointment',
           },
         ],
       },
@@ -291,15 +339,12 @@ const TechnicianSchedulingPage: React.FC = () => {
     );
   };
 
-  // Get status color
-  const getStatusColor = (status: JobCard['status']) => {
-    switch (status) {
-      case 'opened': return '#6b7280';
-      case 'estimate_sent': return '#f59e0b';
-      case 'approved': return '#3b82f6';
-      case 'in_progress': return '#10b981';
-      case 'completed': return '#059669';
-      case 'cancelled': return '#ef4444';
+  // Get task type color
+  const getTaskTypeColor = (taskType: 'appointment' | 'service' | 'inspection') => {
+    switch (taskType) {
+      case 'appointment': return '#8b5cf6'; // Purple
+      case 'service': return '#3b82f6';     // Blue
+      case 'inspection': return '#10b981';  // Green
       default: return '#6b7280';
     }
   };
@@ -309,10 +354,7 @@ const TechnicianSchedulingPage: React.FC = () => {
     return jobCards.flatMap(jobCard => jobCard.jobServices);
   }, [jobCards]);
 
-  // Get unassigned job services
-  const unassignedServices = useMemo(() => {
-    return allJobServices.filter(service => service.technicianId === null);
-  }, [allJobServices]);
+
 
   // Get assigned job services for today
   const todayAssignedServices = useMemo(() => {
@@ -363,10 +405,10 @@ const TechnicianSchedulingPage: React.FC = () => {
             jobCard,
             technician
           },
-          backgroundColor: getStatusColor(jobCard?.status || 'opened'),
-          borderColor: getStatusColor(jobCard?.status || 'opened'),
+          backgroundColor: getTaskTypeColor(service.taskType),
+          borderColor: getTaskTypeColor(service.taskType),
           textColor: '#ffffff',
-          classNames: [`status-${jobCard?.status || 'opened'}`]
+          classNames: [`task-type-${service.taskType}`]
         };
       });
   }, [todayAssignedServices, technicians]);
@@ -459,6 +501,11 @@ const TechnicianSchedulingPage: React.FC = () => {
     setCurrentDate(dateInfo.view.currentStart);
   };
 
+  // Handle navigation to job card
+  const handleNavigateToJobCard = () => {
+    navigate('/servicecenter/jobcard');
+  };
+
   // Custom toolbar component
   const CustomToolbar = () => {
     const calendar = calendarRef.current?.getApi();
@@ -528,11 +575,7 @@ const TechnicianSchedulingPage: React.FC = () => {
   }, [currentDate]);
 
   return (
-    <div className="technician-scheduling-page">
-      <DashboardHeader 
-        onAddWidget={() => console.log('Add widget clicked')}
-        onManageWidgets={() => console.log('Manage widgets clicked')}
-      />
+    <div className="technician-scheduling-page" onClick={handleNavigateToJobCard}>
 
       {/* Metrics */}
       <div className="metric-cards-row">
@@ -548,12 +591,7 @@ const TechnicianSchedulingPage: React.FC = () => {
           change="12%"
           changeType="positive"
         />
-        <MetricCard
-          title="Unassigned Services"
-          amount={unassignedServices.length.toString()}
-          change="5%"
-          changeType="negative"
-        />
+
         <MetricCard
           title="Completed Today"
           amount={todayAssignedServices.filter(s => s.status === 'completed').length.toString()}
@@ -563,58 +601,6 @@ const TechnicianSchedulingPage: React.FC = () => {
       </div>
 
       <div className="technician-scheduling-content">
-        {/* Unassigned Jobs Panel */}
-        <div className="unassigned-panel">
-          <div className="unassigned-panel__header">
-            <h3 className="unassigned-panel__title">Unassigned Services</h3>
-            <button 
-              className={`unassigned-panel__toggle ${showUnassignedJobs ? 'active' : ''}`}
-              onClick={() => setShowUnassignedJobs(!showUnassignedJobs)}
-            >
-              {showUnassignedJobs ? 'Hide' : 'Show'}
-            </button>
-          </div>
-          
-          {showUnassignedJobs && (
-            <div className="unassigned-panel__content">
-              {unassignedServices.length === 0 ? (
-                <div className="unassigned-panel__empty">
-                  <CheckCircle size={24} />
-                  <p>All services are assigned!</p>
-                </div>
-              ) : (
-                unassignedServices.map(service => {
-                  const jobCard = getJobCardByService(service.id);
-                  return (
-                    <div 
-                      key={service.id} 
-                      className="unassigned-service"
-                      draggable
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData('text/plain', service.id);
-                        e.dataTransfer.effectAllowed = 'move';
-                      }}
-                    >
-                      <div className="unassigned-service__info">
-                        <div className="unassigned-service__name">{service.serviceName}</div>
-                        <div className="unassigned-service__details">
-                          {jobCard?.customer} - {jobCard?.vehicle}
-                        </div>
-                        <div className="unassigned-service__meta">
-                          {service.estimatedDuration} min • {service.requiredSkill}
-                        </div>
-                      </div>
-                      <div className="unassigned-service__actions">
-                        <button className="unassigned-service__assign">Assign</button>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          )}
-        </div>
-
         {/* Calendar View */}
         <div className="calendar-view">
           <CustomToolbar />
@@ -636,14 +622,14 @@ const TechnicianSchedulingPage: React.FC = () => {
               eventResize={handleEventResize}
               datesSet={handleDatesSet}
               height="600px"
-              slotMinTime="07:00:00"
-              slotMaxTime="20:00:00"
+              slotMinTime="09:00:00"
+              slotMaxTime="17:00:00"
               slotDuration="00:30:00"
               resourceAreaHeaderContent="Technicians"
               resourceAreaWidth="200px"
               resourceOrder="title"
               nowIndicator={true}
-              scrollTime="08:00:00"
+              scrollTime="09:00:00"
               eventOverlap={false}
               slotEventOverlap={false}
               eventDisplay="block"

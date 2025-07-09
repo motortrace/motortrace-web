@@ -1,24 +1,45 @@
 import React from 'react';
-import WorkOrderCard from '../WorkOrderCard/WorkOrderCard';
-import type { WorkOrder } from '../../types/WorkOrder';
+import ServiceItemCard from '../ServiceItemCard/ServiceItemCard';
 import './KanbanColumn.scss';
+
+interface ServiceItem {
+  id: string;
+  type: 'service' | 'inspection' | 'appointment';
+  title: string;
+  workOrderId: string;
+  workOrderNumber: string;
+  customer: string;
+  vehicle: string;
+  estimatedDuration: number;
+  assignedTechnician: string;
+  priority: 'high' | 'medium' | 'low';
+  status: 'created' | 'to-do' | 'in-progress' | 'done' | 'not-done';
+  description?: string;
+  notes?: string;
+}
 
 interface KanbanColumnProps {
   title: string;
   color: string;
   count: number;
-  workOrders: WorkOrder[];
-  onCardMove: (cardId: string, newStatus: WorkOrder['status']) => void;
-  columnId: WorkOrder['status'];
+  serviceItems: ServiceItem[];
+  onCardMove: (cardId: string, newStatus: ServiceItem['status']) => void;
+  columnId: ServiceItem['status'];
+  getTypeIcon: (type: ServiceItem['type']) => React.ReactNode;
+  getTypeColor: (type: ServiceItem['type']) => string;
+  getPriorityColor: (priority: ServiceItem['priority']) => string;
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
   title,
   color,
   count,
-  workOrders,
+  serviceItems,
   onCardMove,
-  columnId
+  columnId,
+  getTypeIcon,
+  getTypeColor,
+  getPriorityColor
 }) => {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -48,15 +69,18 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        {workOrders.map((workOrder) => (
-          <WorkOrderCard
-            key={workOrder.id}
-            workOrder={workOrder}
+        {serviceItems.map((serviceItem) => (
+          <ServiceItemCard
+            key={serviceItem.id}
+            serviceItem={serviceItem}
             onMove={onCardMove}
+            getTypeIcon={getTypeIcon}
+            getTypeColor={getTypeColor}
+            getPriorityColor={getPriorityColor}
           />
         ))}
         
-        {workOrders.length === 0 && (
+        {serviceItems.length === 0 && (
           <div className="empty-column">
             <p>No items in this column</p>
           </div>

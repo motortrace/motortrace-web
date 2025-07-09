@@ -1,58 +1,96 @@
 import React from 'react';
 import KanbanColumn from '../KanbanColumn/KanbanColumn';
-import type { WorkOrder } from '../../types/WorkOrder';
 import './KanbanBoard.scss';
 
+interface ServiceItem {
+  id: string;
+  type: 'service' | 'inspection' | 'appointment';
+  title: string;
+  workOrderId: string;
+  workOrderNumber: string;
+  customer: string;
+  vehicle: string;
+  estimatedDuration: number;
+  assignedTechnician: string;
+  priority: 'high' | 'medium' | 'low';
+  status: 'created' | 'to-do' | 'in-progress' | 'done' | 'not-done';
+  description?: string;
+  notes?: string;
+}
+
 interface KanbanBoardProps {
-  workOrders: WorkOrder[];
-  onCardMove: (cardId: string, newStatus: WorkOrder['status']) => void;
+  serviceItems: ServiceItem[];
+  onCardMove: (cardId: string, newStatus: ServiceItem['status']) => void;
   searchTerm: string;
   selectedFilters: string[];
+  typeFilter: string;
+  priorityFilter: string;
+  technicianFilter: string;
+  getTypeIcon: (type: ServiceItem['type']) => React.ReactNode;
+  getTypeColor: (type: ServiceItem['type']) => string;
+  getPriorityColor: (priority: ServiceItem['priority']) => string;
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
-  workOrders,
+  serviceItems,
   onCardMove,
   searchTerm,
-  selectedFilters
+  selectedFilters,
+  typeFilter,
+  priorityFilter,
+  technicianFilter,
+  getTypeIcon,
+  getTypeColor,
+  getPriorityColor
 }) => {
   const columns = [
     {
-      id: 'opened',
-      title: 'Opened',
+      id: 'created',
+      title: 'Created',
       color: '#6B7280',
-      count: workOrders.filter(order => order.status === 'opened').length
+      count: serviceItems.filter(item => item.status === 'created').length
     },
     {
-      id: 'estimate-sent',
-      title: 'Estimate Sent',
+      id: 'to-do',
+      title: 'To Do',
       color: '#F59E0B',
-      count: workOrders.filter(order => order.status === 'estimate-sent').length
+      count: serviceItems.filter(item => item.status === 'to-do').length
     },
     {
       id: 'in-progress',
       title: 'In Progress',
       color: '#3B82F6',
-      count: workOrders.filter(order => order.status === 'in-progress').length
+      count: serviceItems.filter(item => item.status === 'in-progress').length
     },
     {
-      id: 'invoiced',
-      title: 'Invoiced',
-      color: '#8B5CF6',
-      count: workOrders.filter(order => order.status === 'invoiced').length
+      id: 'done',
+      title: 'Done',
+      color: '#10B981',
+      count: serviceItems.filter(item => item.status === 'done').length
+    },
+    {
+      id: 'not-done',
+      title: 'Not Done',
+      color: '#EF4444',
+      count: serviceItems.filter(item => item.status === 'not-done').length
     }
   ];
 
-  const filterWorkOrders = (orders: WorkOrder[], status: WorkOrder['status']) => {
-    return orders.filter(order => {
-      const matchesStatus = order.status === status;
+  const filterServiceItems = (items: ServiceItem[], status: ServiceItem['status']) => {
+    return items.filter(item => {
+      const matchesStatus = item.status === status;
       const matchesSearch = searchTerm === '' || 
-        order.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.estimateNumber.toLowerCase().includes(searchTerm.toLowerCase());
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.workOrderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.assignedTechnician.toLowerCase().includes(searchTerm.toLowerCase());
       
-      return matchesStatus && matchesSearch;
+      const matchesType = typeFilter === '' || item.type === typeFilter;
+      const matchesPriority = priorityFilter === '' || item.priority === priorityFilter;
+      const matchesTechnician = technicianFilter === '' || item.assignedTechnician.toLowerCase().includes(technicianFilter.toLowerCase());
+      
+      return matchesStatus && matchesSearch && matchesType && matchesPriority && matchesTechnician;
     });
   };
 
@@ -65,9 +103,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             title={column.title}
             color={column.color}
             count={column.count}
-            workOrders={filterWorkOrders(workOrders, column.id as WorkOrder['status'])}
+            serviceItems={filterServiceItems(serviceItems, column.id as ServiceItem['status'])}
             onCardMove={onCardMove}
-            columnId={column.id as WorkOrder['status']}
+            columnId={column.id as ServiceItem['status']}
+            getTypeIcon={getTypeIcon}
+            getTypeColor={getTypeColor}
+            getPriorityColor={getPriorityColor}
           />
         ))}
       </div>
