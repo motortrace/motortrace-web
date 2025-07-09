@@ -63,6 +63,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Work Orders',
     description: 'Manage your work orders',
   },
+  '/servicecenter/reviews': {
+    title: 'Reviews and Ratings',
+    description: 'View your reviews and ratings',
+  },
 }
 const Navbar: React.FC = () => {
   const location = useLocation();

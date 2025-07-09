@@ -17,6 +17,7 @@ import Calendar from './pages/ServiceCenter/Calendar';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
+import AutoRepairReviews from './pages/ServiceCenter/Reviews/AutoRepairReviews';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<CannedServices />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
+          <Route path="reviews" element={<AutoRepairReviews />} />
         </Route>
       </Routes>
     </BrowserRouter>
