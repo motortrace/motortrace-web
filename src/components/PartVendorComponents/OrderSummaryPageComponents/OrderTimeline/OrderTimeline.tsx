@@ -4,37 +4,38 @@ import './OrderTimeline.scss';
 interface TimelineEvent {
   message: string;
   time: string;
-  hasButton?: boolean;
-  buttonText?: string;
+  buttonLabel?: string;
   onButtonClick?: () => void;
 }
 
-interface OrderTimelineProps {
+interface VendorOrderTimelineProps {
   events: TimelineEvent[];
 }
 
-const OrderTimeline: React.FC<OrderTimelineProps> = ({ events }) => {
+const VendorOrderTimeline: React.FC<VendorOrderTimelineProps> = ({ events }) => {
   return (
-    <div className="order-timeline">
+    <div className="vendor-order-timeline">
       {events.map((event, index) => (
-        <div key={index} className="order-timeline__event">
-          <div className="order-timeline__dot" />
-          <div className="order-timeline__details">
-            <div className="order-timeline__message">{event.message}</div>
-            {event.hasButton && (
+        <div className="vendor-order-timeline__event" key={index}>
+          <div className="vendor-order-timeline__indicator" />
+          <div className="vendor-order-timeline__content">
+            <div className="vendor-order-timeline__message">
+              {event.message}
+            </div>
+            {event.buttonLabel && (
               <button
-                className="order-timeline__button"
+                className="vendor-order-timeline__button"
                 onClick={event.onButtonClick}
               >
-                {event.buttonText}
+                {event.buttonLabel}
               </button>
             )}
           </div>
-          <div className="order-timeline__time">{event.time}</div>
+          <div className="vendor-order-timeline__time">{event.time}</div>
         </div>
       ))}
     </div>
   );
 };
 
-export default OrderTimeline;
+export default VendorOrderTimeline;
