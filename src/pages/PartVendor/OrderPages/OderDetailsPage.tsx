@@ -9,6 +9,8 @@ import brakepad from '../../../assets/images/brakePads.png';
 import ProductDetailsSection from '../../../components/PartVendorComponents/OrderSummaryPageComponents/ProductDetailsSection/ProductDetailsSection';
 import OrderTimeline from '../../../components/PartVendorComponents/OrderSummaryPageComponents/OrderTimeline/OrderTimeline';
 import OrderProgressTracker from '../../../components/PartVendorComponents/OrderSummaryPageComponents/OrderProgressTracker/OrderProgressTracker';
+import VendorOrderTimeline from '../../../components/PartVendorComponents/OrderSummaryPageComponents/OrderTimeline/OrderTimeline';
+import OrderStatusCard from '../../../components/PartVendorComponents/OrderSummaryPageComponents/OrderStatusCard/OrderStatusCard';
 
 const OderDetailsPage = () => {
     const handleBack = () => {
@@ -48,14 +50,37 @@ const OderDetailsPage = () => {
                         estimatedDelivery="July 13 2025"
                     />
                     <ProductDetailsSection />
-<OrderProgressTracker
+<OrderStatusCard
   steps={[
-    { label: 'Order Received', status: 'completed' },
-    { label: 'Order Confirmed', status: 'completed' },
-    { label: 'Order Ready', status: 'current' },
-    { label: 'Shipped', status: 'pending' },
+    {
+      status: 'Order Received',
+      date: 'July 6, 2025',
+      time: '10:15 AM',
+      details: 'Order placed successfully',
+    },
+    {
+      status: 'Order Confirmed',
+      date: 'July 6, 2025',
+      time: '10:45 AM',
+    },
+    {
+      status: 'Packed',
+      date: 'July 7, 2025',
+      time: '9:00 AM',
+      details: 'Ready for dispatch',
+    },
+    {
+      status: 'Dispatched',
+      date: 'July 7, 2025',
+      time: '2:30 PM',
+      details: 'Shipped via ABC Logistics',
+    },
   ]}
 />
+
+
+
+
 
 
 

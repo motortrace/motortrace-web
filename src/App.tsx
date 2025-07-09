@@ -16,6 +16,9 @@ import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
 import OrderSummary from './pages/PartVendor/OrderPages/OrderSummary';
 import OderDetailsPage from './pages/PartVendor/OrderPages/OderDetailsPage';
+import IncomeSummaryPage from './pages/PartVendor/IncomePages/IncomeSummaryPage';
+import CustomerSummaryPage from './pages/PartVendor/CustomerPages/CustomerSummaryPage';
+import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
 
 function App() {
   return (
@@ -44,6 +47,9 @@ function App() {
           <Route path="dashboard" element={<PartVendorDashboard />} />
           <Route path="OrderSummary" element={<OrderSummary />} />
           <Route path="OrderDetails" element={<OderDetailsPage/>} />
+          <Route path="IncomeSummary" element={<IncomeSummaryPage/>} />
+          <Route path="CustomerSummary" element={<CustomerSummaryPage/>} />
+          <Route path="ReviewPage" element={<ReviewPage/>} />
         </Route>
       </Routes>
     </BrowserRouter>
