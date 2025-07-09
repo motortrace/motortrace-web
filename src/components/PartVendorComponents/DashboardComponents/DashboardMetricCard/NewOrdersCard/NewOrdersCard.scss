@@ -1,0 +1,93 @@
+.new-orders-card {
+  @import '../../../../../styles/variables.scss';
+
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  //   max-height: 250px; /* Adjust as needed for exactly 3 lines */
+  // overflow-y: auto;
+
+  // /* Optional: For a better scrollbar look */
+  // scrollbar-width: thin;
+  // scrollbar-color: #d1d5db transparent;
+
+  // &::-webkit-scrollbar {
+  //   width: 6px;
+  // }
+
+  // &::-webkit-scrollbar-thumb {
+  //   background-color: #d1d5db;
+  //   border-radius: 8px;
+  // }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  &__count {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+&__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Align vertically */
+  padding: 10px 0;
+  border-bottom: 1px dashed #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+&__order-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+&__amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap; /* Prevent line break */
+}
+
+  &__order-id {
+    font-size: 12px;
+    font-weight: 500;
+    color: #9ca3af;
+  }
+
+
+  .badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 16px;
+    background-color: #f3f4f6;
+    color: #374151;
+    align-items: center;
+  }
+}
+
