@@ -11,6 +11,12 @@ import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
 import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConnectionPage';
 import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 
+import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
+import AdminDashboard from './pages/Admin/Dashboard';
+import UserManagement from './pages/Admin/UserManagement';
+import BookingOversight from './pages/Admin/BookingOversight';
+import RefundManagement from './pages/Admin/RefundManagement';
+
 function App() {
   return (
     <BrowserRouter>
@@ -28,6 +34,16 @@ function App() {
           <Route path="suppliers" element={<SupplierConnectionPage />} />
           <Route path="parts-order" element={<PartsSearch />} />
         </Route>
+
+        <Route path="/admin" element={<AdminDashboardLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="userManagement" element={<Navigate to="userManagement/carUsers" replace />} />
+          <Route path="userManagement/:userType" element={<UserManagement />} />
+          <Route path = "bookingOversight" element = {<BookingOversight />} />
+          <Route path = "refundManagement" element = {<RefundManagement />} />
+        </Route>
+
       </Routes>
     </BrowserRouter>
   );

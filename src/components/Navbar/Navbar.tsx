@@ -39,6 +39,31 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
+
+  '/admin/dashboard': {
+    title: 'Welcome back, Admin!',
+    description: 'Overview of your platform and activities',
+  },
+  '/admin/userManagement/carUsers': {
+    title: 'Car Users Management',
+    description: 'Manage and support your platform’s car users with ease.',
+  },
+  '/admin/userManagement/serviceCenters': {
+    title: 'Service Centers Management',
+    description: 'Oversee service centers and maintain service quality.',
+  },
+  '/admin/userManagement/sparePartsSellers': {
+    title: 'Spare Parts Sellers Management',
+    description: 'Manage seller accounts and monitor spare parts listings efficiently.',
+  },
+  '/admin/bookingOversight': {
+    title: 'Booking Oversight',
+    description: 'Track and manage all service bookings across the platform.',
+  },
+  '/admin/refundManagement': {
+    title: 'Refund Management',
+    description: 'Manage cancellation refunds based on your refund policy',
+  }
 };
 
 const Navbar: React.FC = () => {
