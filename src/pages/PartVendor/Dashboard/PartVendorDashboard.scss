@@ -1,0 +1,9 @@
+.dashboard-cards-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap; // In case of smaller screens, allows wrapping.
+
+  > * {
+    flex-shrink: 0;
+  }
+}

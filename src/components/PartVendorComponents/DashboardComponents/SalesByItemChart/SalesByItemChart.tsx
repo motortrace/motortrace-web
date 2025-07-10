@@ -36,43 +36,44 @@ const SalesByItemChart: React.FC = () => {
       </div>
 
       <div className="sales-by-item-chart__chart">
-<ResponsiveContainer width="100%" height={300}>
-  <BarChart data={data} barGap={2} barCategoryGap={10}>
+<ResponsiveContainer width="100%" height="100%">
+  <BarChart data={data} barGap={4} barCategoryGap={20}>
     <XAxis 
       dataKey="item" 
-      tick={{ fill: '#9ca3af', fontSize: 10, fontFamily: 'Poppins' }} 
+      tick={{ fill: '#9ca3af', fontSize: 10 }}
       axisLine={false}
       tickLine={false}
     />
     <YAxis
-      tick={{ fill: '#9ca3af', fontSize: 10, fontFamily: 'Poppins' }}
+      tick={{ fill: '#9ca3af', fontSize: 10}}
       axisLine={false}
       tickLine={false}
       tickCount={6}
       allowDecimals={false}
     />
     <Tooltip 
-      contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', borderColor: '#374151', borderWidth: 1 }}
-      itemStyle={{ color: '#fff' }}
-      labelStyle={{ color: '#fff' }}
+      contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', border: 'none' }}
+      itemStyle={{ color: '#f9fafb' }}
+      labelStyle={{ color: '#f9fafb' }}
     />
-    <Legend wrapperStyle={{ color: '#9ca3af', fontSize: 12, fontFamily: 'Poppins' }} />
+    <Legend wrapperStyle={{ color: '#6b7280', fontSize: 11, fontFamily: 'Poppins' }} />
     <Bar 
       dataKey="retailSales" 
-      fill="#313133" 
-      name="Retail Customer Sales" 
-      radius={[20, 20, 0, 0]} 
-      barSize={40} 
+      fill="#374151" 
+      name="Retail Sales" 
+      radius={[10, 10, 0, 0]} 
+      barSize={28} 
     />
     <Bar 
       dataKey="serviceSales" 
-      fill="#C7C7C7" 
-      name="Service Center Sales" 
-      radius={[20, 20, 0, 0]} 
-      barSize={40} 
+      fill="#9ca3af" 
+      name="Service Sales" 
+      radius={[10, 10, 0, 0]} 
+      barSize={28} 
     />
   </BarChart>
 </ResponsiveContainer>
+
 
 
       </div>

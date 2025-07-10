@@ -1,0 +1,69 @@
+@import '../../../../styles/variables.scss';
+
+.profit-overview-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  &__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 20px;
+  }
+
+  &__profit {
+    font-size: 36px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-size: 14px;
+    color: #374151;
+
+    .label {
+      color: #6b7280;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    &__item {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  &__trend {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    gap: 10px;
+    font-size: 16px;
+
+    svg {
+      font-size: 18px;
+    }
+
+    &.positive {
+      color: #047857;
+    }
+
+    &.negative {
+      color: #b91c1c;
+    }
+  }
+}
