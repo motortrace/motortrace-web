@@ -46,15 +46,22 @@ const Sidebar: React.FC = () => {
     {
       title: ' Content Moderation',
       items: [
-        { id: 'reviewManagement', label: 'Review Management', icon: 'bx bx-star', route: '/servicecenter/inventory' },
-        { id: 'forumPosts', label: 'Forum Management', icon: 'bx bx-chat', route: '/servicecenter/settings' },
+        // { id: 'reviewManagement', label: 'Review Management', icon: 'bx bx-star', route: '/admin/viewThread' },
+        { id: 'forumPosts', label: 'Forum Management', icon: 'bx bx-chat', route: '/admin/contentModeration' },
       ]
     },
     {
       title: ' Revenue Management',
       items: [
-        { id: 'subscriptionEarnings', label: 'Subscription Earnings', icon: 'bx bx-receipt', route: '/servicecenter/inventory' },
-        { id: 'commissionEarnings', label: 'Commission Earnings', icon: 'bx bx-line-chart', route: '/servicecenter/settings' },
+        // { id: 'subscriptionEarnings', label: 'Subscription Earnings', icon: 'bx bx-receipt', route: '/servicecenter/inventory' },
+        { id: 'commissionEarnings', label: 'Commission Earnings', icon: 'bx bx-line-chart', route: '/admin/commissions' },
+      ]
+    },
+    {
+      title: ' System Management',
+      items: [
+        { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/admin/settings' }
+        
       ]
     }
   ];

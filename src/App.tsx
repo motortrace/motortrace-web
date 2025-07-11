@@ -16,6 +16,8 @@ import AdminDashboard from './pages/Admin/Dashboard';
 import UserManagement from './pages/Admin/UserManagement';
 import BookingOversight from './pages/Admin/BookingOversight';
 import RefundManagement from './pages/Admin/RefundManagement';
+import ContentModeration from './pages/Admin/ContentModeration';
+
 
 function App() {
   return (
@@ -36,12 +38,13 @@ function App() {
         </Route>
 
         <Route path="/admin" element={<AdminDashboardLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
+          {/* <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} /> */}
           <Route path="userManagement" element={<Navigate to="userManagement/carUsers" replace />} />
           <Route path="userManagement/:userType" element={<UserManagement />} />
           <Route path = "bookingOversight" element = {<BookingOversight />} />
           <Route path = "refundManagement" element = {<RefundManagement />} />
+          <Route path = "contentModeration" element = {<ContentModeration />} />
         </Route>
 
       </Routes>

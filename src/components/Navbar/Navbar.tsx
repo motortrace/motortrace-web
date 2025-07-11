@@ -63,6 +63,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
   '/admin/refundManagement': {
     title: 'Refund Management',
     description: 'Manage cancellation refunds based on your refund policy',
+  },
+  '/admin/contentModeration': {
+    title: 'Content Moderation',
+    description: 'Handle reported posts and comments to maintain a respectful community environment.',
   }
 };
 
