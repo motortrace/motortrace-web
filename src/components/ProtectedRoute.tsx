@@ -4,12 +4,18 @@ import { fetchUserStatus } from '../utils/fetchUserStatus';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [checking, setChecking] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [redirect, setRedirect] = useState<string | null>(null);
 
   useEffect(() => {
     const check = async () => {
       const status = await fetchUserStatus();
-      setIsAuthenticated(!!status);
+      if (!status) {
+        setRedirect('/login');
+      } else if (!status.isSetupComplete) {
+        setRedirect('/setup/details');
+      } else if (!status.hasActiveSubscription) {
+        setRedirect('/setup/payment');
+      }
       setChecking(false);
     };
     check();
@@ -34,7 +40,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
       `}</style>
     </div>
   );
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (redirect) return <Navigate to={redirect} replace />;
   return <>{children}</>;
 };
 
