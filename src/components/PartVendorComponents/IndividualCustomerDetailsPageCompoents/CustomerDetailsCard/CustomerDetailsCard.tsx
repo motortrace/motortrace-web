@@ -1,79 +1,65 @@
 import React from 'react';
+import {Calendar, DollarSign } from 'lucide-react';
 import './CustomerDetailsCard.scss';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa';
 
-interface CustomerDetailsProps {
-  profileImage?: string;
-  name: string;
-  email: string;
-  phone: string;
-  billingAddress: string;
-  shippingAddress: string;
-  joinedDate: string;
-}
+const CustomerDetailsCard = () => {
+  const customer = {
+    profilePic: 'https://i.pravatar.cc/100?img=12',
+    name: 'Nimal Perera',
+    email: 'nimalp@example.lk',
+    phone: '077-1234567',
+    billingAddress: {
+      number: '45',
+      street: 'Temple Road',
+      city: 'Colombo',
+      province: 'Western Province',
+      postalCode: '00700'
+    },
+    shippingAddress: {
+      number: '45',
+      street: 'Temple Road',
+      city: 'Colombo',
+      province: 'Western Province',
+      postalCode: '00700'
+    },
+    joinedDate: '2023-02-12',
+    spending: 'LKR 45,000'
+  };
 
-const CustomerDetailsCard: React.FC<CustomerDetailsProps> = ({
-  profileImage,
-  name,
-  email,
-  phone,
-  billingAddress,
-  shippingAddress,
-  joinedDate,
-}) => {
   return (
     <div className="customer-details-card">
-      <div className="customer-details-card__avatar">
-        {profileImage ? (
-          <img src={profileImage} alt={name} />
-        ) : (
-          <div className="customer-details-card__initials">
-            {name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')
-              .substring(0, 2)
-              .toUpperCase()}
-          </div>
-        )}
+      <div className="customer-details-card__avatar-section">
+        <img src={customer.profilePic} alt={customer.name} className="customer-details-card__avatar" />
       </div>
-
-      <div className="customer-details-card__info">
-        <div className="customer-details-card__row">
-          <span className="customer-details-card__label">Name</span>
-          <span className="customer-details-card__value">{name}</span>
+      <div className="customer-details-card__info-section">
+        <div className="customer-details-card__column">
+          <h3>Customer Info</h3>
+          <p><strong>{customer.name}</strong></p>
+          <p>{customer.email}</p>
+          <p>{customer.phone}</p>
         </div>
-
-        <div className="customer-details-card__row">
-          <FaEnvelope className="customer-details-card__icon" />
-          <span className="customer-details-card__label">Email</span>
-          <span className="customer-details-card__value">{email}</span>
+        <div className="customer-details-card__column">
+          <h3>Billing Address</h3>
+          <p>{customer.billingAddress.number} {customer.billingAddress.street}</p>
+          <p>{customer.billingAddress.city}, {customer.billingAddress.province}</p>
+          <p>{customer.billingAddress.postalCode}</p>
         </div>
-
-        <div className="customer-details-card__row">
-          <FaPhone className="customer-details-card__icon" />
-          <span className="customer-details-card__label">Phone</span>
-          <span className="customer-details-card__value">{phone}</span>
-        </div>
-
-        <div className="customer-details-card__row">
-          <FaMapMarkerAlt className="customer-details-card__icon" />
-          <span className="customer-details-card__label">Billing Address</span>
-          <span className="customer-details-card__value">{billingAddress}</span>
-        </div>
-
-        <div className="customer-details-card__row">
-          <FaMapMarkerAlt className="customer-details-card__icon" />
-          <span className="customer-details-card__label">Shipping Address</span>
-          <span className="customer-details-card__value">{shippingAddress}</span>
-        </div>
-
-        <div className="customer-details-card__row">
-          <FaCalendarAlt className="customer-details-card__icon" />
-          <span className="customer-details-card__label">Joined Date</span>
-          <span className="customer-details-card__value">{joinedDate}</span>
+        <div className="customer-details-card__column">
+          <h3>Shipping Address</h3>
+          <p>{customer.shippingAddress.number} {customer.shippingAddress.street}</p>
+          <p>{customer.shippingAddress.city}, {customer.shippingAddress.province}</p>
+          <p>{customer.shippingAddress.postalCode}</p>
         </div>
       </div>
+<div className="customer-details-card__footer">
+  <span className="customer-details-card__badge">
+    <Calendar size={14} /> Joined: {customer.joinedDate}
+  </span>
+  <span className="customer-details-card__badge">
+    <DollarSign size={14} /> Spending: {customer.spending}
+  </span>
+</div>
+
     </div>
   );
 };

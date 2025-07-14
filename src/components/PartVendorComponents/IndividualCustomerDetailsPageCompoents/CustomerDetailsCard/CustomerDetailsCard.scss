@@ -1,67 +1,97 @@
+@import '../../../../styles/variables.scss';
+
 .customer-details-card {
   background: #ffffff;
-  border: 2px solid #e5e7eb;
   border-radius: 16px;
-  padding: 24px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 75%;
+  
+  margin: 0 auto;
+
+  &__avatar-section {
+    display: flex;
+    justify-content: center;
+  }
 
   &__avatar {
-    width: 96px;
-    height: 96px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    overflow: hidden;
-    background: #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    font-weight: 700;
-    color: #4b5563;
+    object-fit: cover;
+    border: 3px solid #e5e7eb;
+  }
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+  &__info-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 24px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
   }
 
-  &__info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px 32px;
-    width: 100%;
-  }
-
-  &__row {
+  &__column {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 10px;
+    color: #374151;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+    //   border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #4b5563;
+      margin: 0;
+    }
   }
 
-  &__label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6b7280;
-    display: flex;
+&__footer {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .customer-details-card__badge {
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-  }
-
-  &__value {
-    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    background-color: #f3f4f6; // soft gray background
+    font-size: 13px;
+    font-weight: 500;
     color: #111827;
-    word-break: break-word;
-  }
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: background 0.2s ease;
 
-  &__icon {
-    color: #9ca3af;
-    font-size: 12px;
-  }
+    &:hover {
+      background-color: #e5e7eb;
+    }
 
-  &__initials {
-    text-transform: uppercase;
+    svg {
+      color: #6b7280;
+    }
   }
+}
+
 }
