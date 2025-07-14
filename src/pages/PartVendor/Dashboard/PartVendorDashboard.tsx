@@ -16,10 +16,12 @@ import './PartVendorDashboard.scss'
 import ProfitOverviewCard from '../../../components/PartVendorComponents/DashboardComponents/ProfitOverviewCard/ProfitOverviewCard';
 import SubscriptionPlanCard from '../../../components/PartVendorComponents/DashboardComponents/SubscriptionPlanCard/SubscriptionPlanCard';
 import SalesOverviewCard from '../../../components/PartVendorComponents/DashboardComponents/SalesOverview/SalesOverviewCard';
+import MonthFilter from '../../../components/MonthFilter/MonthFilter';
 
 const PartVendorDashboard = () => {
   return (
     <div>
+      <MonthFilter/>
       {/* <PartVendorSideBar /> */}
       {/* <SalesOverviewChart /> */}
       {/* <InventoryOverview /> */}

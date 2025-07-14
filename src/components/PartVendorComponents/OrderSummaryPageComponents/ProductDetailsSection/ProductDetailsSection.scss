@@ -20,3 +20,43 @@
     gap: 16px;
   }
 }
+
+.product-details-section__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  gap: 12px;
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &.btn-outline {
+      background: transparent;
+      border: 1px solid #999;
+      color: #333;
+
+      &:hover {
+        background: #f1f1f1;
+      }
+    }
+
+    &.btn-primary {
+      background: #111;
+      color: white;
+      border: none;
+
+      &:hover {
+        background: #333;
+      }
+
+      &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

@@ -15,11 +15,12 @@ import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 
 import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
 import OrderSummary from './pages/PartVendor/OrderPages/OrderSummary';
-import OderDetailsPage from './pages/PartVendor/OrderPages/OderDetailsPage';
+import PendingOrderDetailsPage from './pages/PartVendor/OrderPages/PendingOrderDetailsPage';
 import IncomeSummaryPage from './pages/PartVendor/IncomePages/IncomeSummaryPage';
 import CustomerSummaryPage from './pages/PartVendor/CustomerPages/CustomerSummaryPage';
 import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
 import CustomerDetailsPage from './pages/PartVendor/CustomerPages/CustomerDetailsPage';
+import AcceptedOrderDetailsPage from './pages/PartVendor/OrderPages/AcceptedOrderDetailsPage';
 
 function App() {
   return (
@@ -47,11 +48,12 @@ function App() {
           <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
           <Route path="dashboard" element={<PartVendorDashboard />} />
           <Route path="OrderSummary" element={<OrderSummary />} />
-          <Route path="OrderDetails" element={<OderDetailsPage/>} />
+          <Route path="PendingOrderDetails" element={<PendingOrderDetailsPage/>} />
           <Route path="IncomeSummary" element={<IncomeSummaryPage/>} />
           <Route path="CustomerSummary" element={<CustomerSummaryPage/>} />
           <Route path="ReviewPage" element={<ReviewPage/>} />
           <Route path="CustomerDetails" element={<CustomerDetailsPage/>} />
+          <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage/>} />
         </Route>
       </Routes>
     </BrowserRouter>

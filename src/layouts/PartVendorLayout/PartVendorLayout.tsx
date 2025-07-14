@@ -1,9 +1,10 @@
 import React from 'react';  
 import { Outlet, useLocation } from 'react-router-dom';
 // import Sidebar from '../components/Sidebar/sidebar';
-import Navbar from '../../components/Navbar/Navbar';
+
 import './PartVendorLayout.scss';
 import PartVendorSideBar from '../../components/PartVendorComponents/SideBar/partVendorSidebar';
+import Navbar from '../../components/PartVendorComponents/Navbar/Navbar';
 
 const PartVendorDashboardLayout: React.FC = () => {
   const location = useLocation();

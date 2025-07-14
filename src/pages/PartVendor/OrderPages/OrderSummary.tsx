@@ -1,4 +1,4 @@
-import OrderDetails from '../../../components/PartVendorComponents/OrderSummaryPageComponents/OrderDetails/OrderDetails'
+import OrderDetails from '../../../components/PartVendorComponents/OrderSummaryPageComponents/PendingOrderDetails/OrderDetails'
 import OrderMetricCard from '../../../components/PartVendorComponents/OrderSummaryPageComponents/OrderMetricCard/OrderMetricCard'
 
 const OrderSummary = () => {

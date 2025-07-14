@@ -4,7 +4,7 @@ import { ChevronLeft, Check, X } from 'lucide-react';
 
 interface OrderHeaderActionsProps {
   orderNumber: string;
-  status: 'Paid' | 'Pending' | 'Failed';
+  status: 'Paid' | 'Pending' | 'Failed' | 'Accepted';
   onBack: () => void;
   onAccept: () => void;
   onDecline: () => void;
@@ -33,20 +33,22 @@ const OrderHeaderActions: React.FC<OrderHeaderActionsProps> = ({
           </span>
         </div>
 
-        <div className="order-header-actions__buttons">
-          <button className="order-header-actions__button" onClick={onAccept}>
-            <span className="order-header-actions__button-icon">
-              <Check size={12} />
-            </span>
-            Accept
-          </button>
-          <button className="order-header-actions__button" onClick={onDecline}>
-            <span className="order-header-actions__button-icon">
-              <X size={12} />
-            </span>
-            Decline
-          </button>
-        </div>
+        {status === 'Pending' && (
+          <div className="order-header-actions__buttons">
+            <button className="order-header-actions__button" onClick={onAccept}>
+              <span className="order-header-actions__button-icon">
+                <Check size={12} />
+              </span>
+              Accept
+            </button>
+            <button className="order-header-actions__button" onClick={onDecline}>
+              <span className="order-header-actions__button-icon">
+                <X size={12} />
+              </span>
+              Decline
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

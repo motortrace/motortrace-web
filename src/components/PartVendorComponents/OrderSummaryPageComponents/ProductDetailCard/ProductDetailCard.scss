@@ -94,3 +94,26 @@
     }
   }
 }
+
+.product-detail-card__tag {
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  margin-top: 12px;
+
+  &--shippable {
+    background-color: #e6f6e6;
+    color: #1a7f37;
+    border: 1px solid #b6e2b6;
+  }
+
+  &--not-shippable {
+    background-color: #fceaea;
+    color: #c53e3e;
+    border: 1px solid #e4a9a9;
+  }
+}
