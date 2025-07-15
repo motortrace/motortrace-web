@@ -2,6 +2,7 @@ import React from 'react'
 import CustomerDetailsCard from '../../../components/PartVendorComponents/IndividualCustomerDetailsPageCompoents/CustomerDetailsCard/CustomerDetailsCard'
 import CustomerOrderStats from '../../../components/PartVendorComponents/IndividualCustomerDetailsPageCompoents/CustomerOrderStats/CustomerOrderStats'
 import CustomerOrdersTable from '../../../components/PartVendorComponents/IndividualCustomerDetailsPageCompoents/CustomerOrdersTable/CustomerOrdersTable';
+import CustomerSpendingSummary from '../../../components/PartVendorComponents/IndividualCustomerDetailsPageCompoents/CustomerSpendingSummary/CustomerSpendingSummary';
 const sampleOrders = [
     {
       id: '1',
@@ -47,7 +48,10 @@ const sampleOrders = [
       // Not rated
     },
   ];
+
+  
 const CustomerDetailsPage = () => {
+
   return (
     <div>
 <CustomerDetailsCard
@@ -72,6 +76,7 @@ const CustomerDetailsPage = () => {
   joinedDate="2023-02-12"
   totalSpending="LKR 45,000"
 />
+<CustomerSpendingSummary/>
 <CustomerOrderStats
   totalSpendings="LKR 45,000"
   totalOrders={8}

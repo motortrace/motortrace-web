@@ -6,15 +6,13 @@ import CustomerDetailsTable from '../../../components/PartVendorComponents/Custo
 const CustomerSummaryPage = () => {
   return (
     <div>
-<div style={{ display: 'flex', gap: '24px' }}>
-  <CustomerActivityChart />
-      <div style={{ flex: '1' }}>
-    <CustomerMetricsPanel />
-  </div>
-</div>
-<CustomerDetailsTable/>
-
-
+      <div style={{ display: 'flex', gap: '24px' }}>
+        <CustomerActivityChart />
+        <div style={{ flex: '1' }}>
+          <CustomerMetricsPanel />
+        </div>
+      </div>
+      <CustomerDetailsTable />
     </div>
   )
 }
