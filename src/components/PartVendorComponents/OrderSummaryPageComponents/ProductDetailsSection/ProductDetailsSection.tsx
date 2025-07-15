@@ -3,8 +3,9 @@ import ProductDetailCard from '../ProductDetailCard/ProductDetailCard';
 import './ProductDetailsSection.scss';
 import brakePadSet from '../../../../assets/images/brakePad.png';
 import oilFilter from '../../../../assets/images/airFilter.png';
-import InvoiceModal from '../OrderInvoiceModal/OrderInvoiceModal';
 import OrderInvoiceModal from '../OrderInvoiceModal/OrderInvoiceModal';
+import ShippingConfirmationModal from '../ShippingConfirmationModal/ShippingConfirmationModal';
+import ShippingStatus from '../ShippingConfirmationModal/ShippingStatus';
 
 interface ProductDetailsSectionProps {
   orderStatus: 'Pending' | 'Accepted' | 'Declined';
@@ -50,6 +51,8 @@ const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({ orderStat
   >({});
 
   const [showInvoice, setShowInvoice] = useState(false);
+  const [showShipModal, setShowShipModal] = useState(false);
+  const [showShippingStatus, setShowShippingStatus] = useState(false);
 
   const handleMarkStatus = (
     id: number,
@@ -63,15 +66,12 @@ const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({ orderStat
   };
 
   const allMarked = initialProducts.every(p => productStatuses[p.id]?.status);
-  const hasUnshippables = Object.values(productStatuses).some(p => p.status === 'not-shippable');
-
-  const handlePrintInvoice = () => {
-    setShowInvoice(true);
-  };
-
-  const handleReadyForShipping = () => {
-    console.log('✅ Order marked as ready for shipping.');
-    // Call your backend update function here
+  const handlePrintInvoice = () => setShowInvoice(true);
+  const handleReadyForShipping = () => setShowShipModal(true);
+  const handleShipNow = () => {
+    setShowShipModal(false);
+    setShowShippingStatus(true);
+    console.log('🚚 Order will be assigned to a driver shortly.');
   };
 
   const invoiceProducts = initialProducts.map(product => {
@@ -103,22 +103,18 @@ const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({ orderStat
 
       {orderStatus === 'Accepted' && allMarked && (
         <div className="product-details-section__actions">
-          <button className="btn btn-outline" onClick={handlePrintInvoice}>
-            Print Invoice
-          </button>
-          {!hasUnshippables && (
-            <button className="btn btn-primary" onClick={handleReadyForShipping}>
-              Ready for Shipping
-            </button>
-          )}
+          <button className="btn btn-outline" onClick={handlePrintInvoice}>Print Invoice</button>
+          <button className="btn btn-primary" onClick={handleReadyForShipping}>Ready for Shipping</button>
         </div>
       )}
 
-      <OrderInvoiceModal
-        visible={showInvoice}
-        onClose={() => setShowInvoice(false)}
-        products={invoiceProducts}
-      />
+      {/* <ShippingConfirmationModal
+        visible={showShipModal}
+        onClose={() => setShowShipModal(false)}
+        onShipNow={handleShipNow}
+      /> */}
+
+      {showShippingStatus && <ShippingStatus />}
     </div>
   );
 };
