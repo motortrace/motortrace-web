@@ -60,14 +60,14 @@ const customers = [
 
 const CustomerDetailsTable: React.FC = () => {
   return (
-<div className="customer-details-card">
-  <div className="customer-details-card__header">
-    <h3 className="customer-details-card__title">Customer Details</h3>
-    <div className="customer-details-card__controls">
-      <div className="customer-details-card__search">
+<div className="customerSummary-details-card">
+  <div className="customerSummary-details-card__header">
+    <h3 className="customerSummary-details-card__title">Customer Details</h3>
+    <div className="customerSummary-details-card__controls">
+      <div className="customerSummary-details-card__search">
         <input type="text" placeholder="Search customers..." />
       </div>
-      <select className="customer-details-card__dropdown">
+      <select className="customerSummary-details-card__dropdown">
         <option value="">All Types</option>
         <option value="customer">Customer</option>
         <option value="service-center">Service Center</option>
