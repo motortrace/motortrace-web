@@ -1,10 +1,16 @@
 import React from 'react';
 import './CustomerOrdersTable.scss';
+import { Star } from 'lucide-react';
+
+interface Product {
+  name: string;
+  imageUrl: string;
+}
 
 interface CustomerOrder {
   id: string;
   orderNumber: string;
-  itemsCount: number;
+  products: Product[];
   amount: number;
   status: 'Completed' | 'Pending' | 'Cancelled' | 'In Progress';
   deliveryStatus: 'Delivered' | 'Not Delivered';
@@ -31,20 +37,53 @@ const CustomerOrdersTable: React.FC<CustomerOrdersTableProps> = ({ orders }) => 
         <div className="customer-orders-table__body">
           {orders.map((order) => (
             <div key={order.id} className="customer-orders-table__row">
-              <div>{order.orderNumber}</div>
-              <div>{order.itemsCount}</div>
-              <div>LKR {order.amount.toLocaleString()}</div>
-              <div>
+              <div className="cell">{order.orderNumber}</div>
+
+              {/* Items with preview */}
+              <div className="cell order-details__product">
+                <img src={order.products[0].imageUrl} alt={order.products[0].name} />
+                <div className="order-details__product-info">
+                  <span className="order-details__product-name">{order.products[0].name}</span>
+                  {order.products.length > 1 && (
+                    <span className="order-details__other-products">
+                      +{order.products.length - 1} other product{order.products.length - 1 > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Amount */}
+              <div className="cell">
+                <span className="order-amount">LKR {order.amount.toLocaleString()}</span>
+              </div>
+
+              {/* Status */}
+              <div className="cell">
                 <span className={`customer-orders-table__status customer-orders-table__status--${order.status.replace(/\s+/g, '-').toLowerCase()}`}>
                   {order.status}
                 </span>
               </div>
-              <div>{order.deliveryStatus}</div>
-              <div>
-                {order.deliveryStatus === 'Not Delivered' ? '—' : order.rating ? (
-                  '⭐'.repeat(order.rating)
+
+              {/* Delivery */}
+              <div className="cell">{order.deliveryStatus}</div>
+
+              {/* Rating */}
+              <div className="cell">
+                {order.deliveryStatus === 'Not Delivered' ? (
+                  '—'
+                ) : order.rating ? (
+                  <div className="customer-orders-table__stars">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={14}
+                        fill={i < order.rating ? '#facc15' : 'none'}
+                        stroke="#facc15"
+                      />
+                    ))}
+                  </div>
                 ) : (
-                  'Not Rated'
+                  <span className="not-rated">Not Rated</span>
                 )}
               </div>
             </div>
