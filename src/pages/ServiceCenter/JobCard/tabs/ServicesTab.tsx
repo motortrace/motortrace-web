@@ -12,7 +12,7 @@ interface ServicesTabProps {
 const ServicesTab: React.FC<ServicesTabProps> = ({ services, setServices, calculateGrandTotal }) => {
   return (
     <div>
-      <div className="services-header"><h3 className="services-header__title">Services</h3><div className="services-header__stats"><div className="stat-box"><span className="stat-box__label">Total Charge</span><span className="stat-box__value">${calculateGrandTotal()}</span></div></div></div>
+      <div className="services-header"><h3 className="services-header__title">Services</h3><div className="services-header__stats"><div className="stat-box"><span className="stat-box__label">Total Charge</span><span className="stat-box__value">{calculateGrandTotal()} LKR</span></div></div></div>
       <div className="job-card__services-list">
         {services.map((service) => (
           <ServicePackageComponent 

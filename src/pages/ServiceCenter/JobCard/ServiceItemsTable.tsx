@@ -31,12 +31,12 @@ export const ServiceItemsTable: React.FC<ServiceItemsTableProps> = ({ service })
               <div className="parts-table__part-name">{item.name}</div>
               <div className="parts-table__part-number">{item.description}</div>
             </td>
-            <td>${item.cost.toFixed(2)}</td>
-            <td>${item.price.toFixed(2)}</td>
+            <td>{item.cost.toFixed(2)} LKR</td>
+            <td>{item.price.toFixed(2)} LKR</td>
             <td>{item.quantity}</td>
-            <td>${item.amount.toFixed(2)}</td>
-            <td>${item.discount.toFixed(2)}</td>
-            <td>${item.netAmount.toFixed(2)}</td>
+            <td>{item.amount.toFixed(2)} LKR</td>
+            <td>{item.discount.toFixed(2)} LKR</td>
+            <td>{item.netAmount.toFixed(2)} LKR</td>
             <td><span className={`badge badge--${item.status.toLowerCase()}`}>{item.status}</span></td>
             <td>
               <div className="parts-table__actions">

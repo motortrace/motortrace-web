@@ -17,6 +17,16 @@ import RegisterPage from './pages/RegisterPage/RegisterPage';
 import SetupDetailsPage from './pages/SetupDetailsPage/SetupDetailsPage';
 import SetupPaymentPage from './pages/SetupPaymentPage/SetupPaymentPage';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
+import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
+import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
+import DigitalInspections from './pages/ServiceCenter/DigitalInspections';
+import Calendar from './pages/ServiceCenter/Calendar';
+import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
+import CannedServices from './pages/ServiceCenter/Services/CannedServices';
+import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
+import AutoRepairReviews from './pages/ServiceCenter/Reviews/AutoRepairReviews';
+import AutoRepairChat from './pages/ServiceCenter/AutoRepairChat/AutoRepairChat';
+import EditProfile from './pages/ServiceCenter/EditProfile';
 
 function App() {
   return (
@@ -50,13 +60,26 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="jobs" element={<KanbanPage />} />
-          <Route path="appointments" element={<AppointmentPage />} />
+          <Route path="workorders" element={<WorkOrdersPage />} />
+          <Route path="appointments">
+            <Route index element={<AppointmentPage />} />
+            <Route path="details" element={<AppointmentDetails />} />
+          </Route>
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
           <Route path="scheduling" element={<TechnicianSchedulingPage />} />
           <Route path="inventory" element={<PartsInventory />} />
           <Route path="suppliers" element={<SupplierConnectionPage />} />
           <Route path="parts-order" element={<PartsSearch />} />
+          <Route path="reports" element={<EstimatesInvoices />} />
+          <Route path="inspections" element={<DigitalInspections />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="timeline-board" element={<TimelineBoardPage />} />
+          <Route path="services" element={<CannedServices />} />
+          <Route path="work-order" element={<WorkOrdersPage />} />
+          <Route path="reviews" element={<AutoRepairReviews />} />
+          <Route path="chat" element={<AutoRepairChat />} />
+          <Route path="profile" element={<EditProfile />} />
         </Route>
 
         {/* Redirect dashboard to service center dashboard for now */}
