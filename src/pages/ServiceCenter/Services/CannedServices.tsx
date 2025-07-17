@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MetricCard from '../../../components/MetricCard/MetricCard';
 import Table, { type TableColumn } from '../../../components/Table/Table';
 import './CannedServices.scss';
@@ -14,6 +14,9 @@ import {
 } from 'chart.js';
 import PackageModal from '../../../components/PackageModal/PackageModal';
 import AddServiceModal from '../../../components/AddServiceModal/AddServiceModal';
+import * as servicesApi from '../../../utils/servicesApi';
+import * as packagesApi from '../../../utils/packagesApi';
+import { fetchUserStatus } from '../../../utils/fetchUserStatus';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -26,154 +29,21 @@ interface CannedService {
   laborCharge: number;
   isActive: boolean;
   groupId?: string;
-  serviceCount?: number; // Number of services in the package
-  packageServices?: string[]; // List of services in the package
+  serviceCount?: number;
+  packageServices?: string[];
 }
 
 const CannedServices = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
-  const [services, setServices] = useState<CannedService[]>([
-    // Canned Service Packages
-    {
-      id: '1',
-      name: 'Basic Maintenance Package',
-      description: 'Essential maintenance services for regular upkeep',
-      category: 'Maintenance',
-      laborHours: 2.0,
-      laborCharge: 149.99,
-      isActive: true,
-      groupId: 'package1',
-      serviceCount: 3,
-      packageServices: ['Oil Change', 'Tire Rotation', 'Fluid Top-up']
-    },
-    {
-      id: '2',
-      name: 'Brake Service Package',
-      description: 'Complete brake system maintenance',
-      category: 'Brakes',
-      laborHours: 2.5,
-      laborCharge: 249.99,
-      isActive: true,
-      groupId: 'package2',
-      serviceCount: 4,
-      packageServices: ['Brake Pad Replacement', 'Brake Fluid Change', 'Brake Inspection', 'Rotor Resurfacing']
-    },
-    {
-      id: '3',
-      name: 'Seasonal Prep Package',
-      description: 'Prepare your vehicle for seasonal changes',
-      category: 'Maintenance',
-      laborHours: 1.8,
-      laborCharge: 199.99,
-      isActive: true,
-      groupId: 'package3',
-      serviceCount: 5,
-      packageServices: ['Battery Test', 'AC Check', 'Coolant System Check', 'Belt Inspection', 'Wiper Blade Replacement']
-    },
-    {
-      id: '4',
-      name: 'Premium Service Package',
-      description: 'Comprehensive vehicle service package',
-      category: 'Maintenance',
-      laborHours: 4.0,
-      laborCharge: 399.99,
-      isActive: false,
-      groupId: 'package4',
-      serviceCount: 8,
-      packageServices: ['Oil Change', 'Brake Inspection', 'Tire Rotation', 'Battery Test', 'AC Service', 'Transmission Check', 'Engine Diagnostic', 'Exhaust Inspection']
-    },
-    {
-      id: '5',
-      name: 'Electrical System Package',
-      description: 'Complete electrical system diagnostics and service',
-      category: 'Electrical',
-      laborHours: 3.2,
-      laborCharge: 299.99,
-      isActive: true,
-      groupId: 'package5',
-      serviceCount: 6,
-      packageServices: ['Battery Replacement', 'Alternator Test', 'Starter Check', 'Wiring Inspection', 'Fuse Box Check', 'Headlight Alignment']
-    },
-    
-    // Individual Services
-    {
-      id: '6',
-      name: 'Oil Change',
-      description: 'Replace engine oil and filter',
-      category: 'Maintenance',
-      laborHours: 0.5,
-      laborCharge: 49.99,
-      isActive: true
-    },
-    {
-      id: '7',
-      name: 'Brake Pad Replacement',
-      description: 'Replace front brake pads',
-      category: 'Brakes',
-      laborHours: 1.2,
-      laborCharge: 129.99,
-      isActive: true
-    },
-    {
-      id: '8',
-      name: 'Tire Rotation',
-      description: 'Rotate all four tires',
-      category: 'Tires',
-      laborHours: 0.4,
-      laborCharge: 29.99,
-      isActive: true
-    },
-    {
-      id: '9',
-      name: 'Battery Replacement',
-      description: 'Replace car battery',
-      category: 'Electrical',
-      laborHours: 0.3,
-      laborCharge: 39.99,
-      isActive: false
-    },
-    {
-      id: '10',
-      name: 'AC Recharge',
-      description: 'Recharge air conditioning system',
-      category: 'HVAC',
-      laborHours: 1.0,
-      laborCharge: 99.99,
-      isActive: true
-    },
-    {
-      id: '11',
-      name: 'Transmission Service',
-      description: 'Change transmission fluid and filter',
-      category: 'Transmission',
-      laborHours: 1.5,
-      laborCharge: 159.99,
-      isActive: true
-    },
-    {
-      id: '12',
-      name: 'Engine Diagnostic',
-      description: 'Comprehensive engine diagnostic scan',
-      category: 'Diagnostic',
-      laborHours: 1.0,
-      laborCharge: 89.99,
-      isActive: true
-    }
-  ]);
+  const [services, setServices] = useState<CannedService[]>([]);
+  const [centerId, setCenterId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [showPackageModal, setShowPackageModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
-  const [selectedService, setSelectedService] = useState<undefined | {
-    id?: string;
-    name: string;
-    description: string;
-    category: string;
-    laborHours: number;
-    laborCharge: number;
-    tax: number;
-    isActive: boolean;
-  }>(undefined);
+  const [selectedService, setSelectedService] = useState<any>(undefined);
   // const [showAddModal, setShowAddModal] = useState(false);
   // const [newService, setNewService] = useState<Omit<CannedService, 'id'>>({
   //   name: '',
@@ -202,6 +72,31 @@ const CannedServices = () => {
   //   selectedServiceIds: [] as string[],
   // });
 
+  // Fetch centerId from user status on mount
+  useEffect(() => {
+    setLoading(true);
+    fetchUserStatus()
+      .then(status => {
+        if (status.centerId) {
+          setCenterId(status.centerId);
+        } else {
+          throw new Error('No service center ID found for user');
+        }
+      })
+      .catch(err => setError(err.message || 'Failed to fetch user status'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Fetch services when centerId is available
+  useEffect(() => {
+    if (!centerId) return;
+    setLoading(true);
+    servicesApi.getServices(centerId.toString())
+      .then(data => setServices(data))
+      .catch(err => setError(err.message || 'Failed to fetch services'))
+      .finally(() => setLoading(false));
+  }, [centerId]);
+
   // Metrics
   const totalServices = services.length;
   const totalLaborHours = services.reduce((sum, s) => sum + s.laborHours, 0);
@@ -223,12 +118,80 @@ const CannedServices = () => {
   const individualServices = services.filter(s => !s.groupId);
 
   // Handler to toggle active status for individual services
-  const handleToggleActive = (serviceId: string) => {
-    setServices(prevServices =>
-      prevServices.map(s =>
-        s.id === serviceId ? { ...s, isActive: !s.isActive } : s
-      )
-    );
+  const handleToggleActive = async (serviceId: string) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await servicesApi.toggleServiceActive(centerId.toString(), serviceId);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to toggle service status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to add a new service
+  const handleAddService = async (serviceData: any) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await servicesApi.createService(centerId.toString(), serviceData);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+      setShowAddServiceModal(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add service');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to add a new package
+  const handleAddPackage = async (packageData: any) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await packagesApi.createPackage(centerId.toString(), packageData);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+      setShowPackageModal(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add package');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to delete a service
+  const handleDeleteService = async (serviceId: string) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await servicesApi.deleteService(centerId.toString(), serviceId);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete service');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to delete a package
+  const handleDeletePackage = async (packageId: string) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await packagesApi.deletePackage(centerId.toString(), packageId);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete package');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Chart Data
@@ -419,6 +382,8 @@ const CannedServices = () => {
 
   return (
     <div className="canned-services-page">
+      {loading && <div className="loading">Loading...</div>}
+      {error && <div className="error-message">{error}</div>}
       <div className="page-header">
         <div className="page-actions">
           <button className="btn btn--primary" onClick={() => setShowPackageModal(true)}>
@@ -539,10 +504,7 @@ const CannedServices = () => {
         <AddServiceModal
           service={selectedService}
           onClose={() => setShowAddServiceModal(false)}
-          onSave={(service) => {
-            // TODO: handle save logic
-            setShowAddServiceModal(false);
-          }}
+          onSave={handleAddService}
         />
       )}
       {showPackageModal && (
@@ -550,10 +512,7 @@ const CannedServices = () => {
           packageData={selectedPackage}
           individualServices={individualServices}
           onClose={() => setShowPackageModal(false)}
-          onSave={(pkg) => {
-            // TODO: handle save logic
-            setShowPackageModal(false);
-          }}
+          onSave={handleAddPackage}
         />
       )}
     </div>
