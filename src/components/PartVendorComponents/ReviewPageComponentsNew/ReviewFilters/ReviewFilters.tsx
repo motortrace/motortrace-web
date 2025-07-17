@@ -1,6 +1,8 @@
 import React from 'react';
 import './ReviewFilters.scss';
-import { Star } from 'lucide-react';
+import { Star, ChevronDown } from 'lucide-react';
+
+
 
 const ReviewFilters = ({
   selectedRating,
@@ -18,55 +20,56 @@ const ReviewFilters = ({
 
   return (
     <div className="review-filters">
-      <div className="review-filters__group">
-        <label>Rating:</label>
-        <div className="review-filters__stars">
-          {ratings.map((star) => (
+      <div className="review-filters__block">
+        <span className="review-filters__label">Rating</span>
+        <div className="review-filters__rating-buttons">
+          {ratings.map((r) => (
             <button
-              key={star}
-              className={selectedRating === star ? 'active' : ''}
-              onClick={() => setSelectedRating(selectedRating === star ? null : star)}
+              key={r}
+              className={`pill ${selectedRating === r ? 'active' : ''}`}
+              onClick={() => setSelectedRating(selectedRating === r ? null : r)}
             >
-              {star} <Star size={14} fill="#fbbf24" stroke="none" />
+              {r} <Star size={14} fill="#fbbf24" stroke="none" />
             </button>
           ))}
         </div>
       </div>
 
-      <div className="review-filters__group">
-        <label>Source:</label>
-        <select
-          value={selectedSource}
-          onChange={(e) => setSelectedSource(e.target.value)}
-        >
-          {sources.map((src) => (
-            <option key={src} value={src}>
-              {src}
-            </option>
-          ))}
-        </select>
+      {/* <div className="review-filters__block">
+        <span className="review-filters__label">Source</span>
+        <div className="select-wrapper">
+          <select value={selectedSource} onChange={(e) => setSelectedSource(e.target.value)}>
+            {sources.map((src) => (
+              <option key={src} value={src}>
+                {src}
+              </option>
+            ))}
+          </select>
+          <ChevronDown size={16} className="chevron" />
+        </div>
+      </div> */}
+
+      <div className="review-filters__block">
+        <span className="review-filters__label">Status</span>
+        <div className="select-wrapper">
+          <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+            {statuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+          <ChevronDown size={16} className="chevron" />
+        </div>
       </div>
 
-      <div className="review-filters__group">
-        <label>Status:</label>
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-        >
-          {statuses.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="review-filters__group">
-        <label>Date:</label>
+      <div className="review-filters__block">
+        <span className="review-filters__label">Month</span>
         <input
           type="month"
           value={dateRange}
           onChange={(e) => setDateRange(e.target.value)}
+          className="month-input"
         />
       </div>
     </div>
