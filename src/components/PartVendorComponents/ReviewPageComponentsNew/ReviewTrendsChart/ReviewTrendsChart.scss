@@ -1,0 +1,21 @@
+.review-trends-chart {
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  height: 100%;
+  flex: 2;
+  
+  max-height: 260px;
+
+  &__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  .recharts-legend-wrapper {
+    margin-bottom: 12px;
+  }
+}
