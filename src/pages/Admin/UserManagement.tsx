@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import "../../styles/components/SearchBarAndFilters.scss"
 import './UserManagement.scss';
 import { Car, Wrench, Store, Search } from 'lucide-react';
 
@@ -48,7 +49,6 @@ interface UserManagementProps {
 
 const UserManagement: React.FC<UserManagementProps> = ({
     carUsers = [
-        // ... your existing carUsers data
         {
             id: '1',
             name: 'K. Gunasekara',
@@ -151,7 +151,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
         }
     ],
     serviceCenters = [
-        // ... your existing serviceCenters data
         {
             id: '1',
             name: 'AutoCare Plus',
@@ -209,7 +208,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
         }
     ],
     sparePartsSellers = [
-        // ... your existing sparePartsSellers data
         {
             id: '1',
             name: 'Parts World',
@@ -323,9 +321,10 @@ const UserManagement: React.FC<UserManagementProps> = ({
         navigate(`/admin/userManagement/${urlType}`, { replace: true });
     };
 
+    // Updated handleViewProfile function to navigate to user profile
     const handleViewProfile = (userId: string) => {
-        console.log('View profile for user:', userId);
-        // Implement profile view logic
+        const urlType = urlTypeMap[activeTab];
+        navigate(`/admin/userManagement/${urlType}/${userId}/profile`);
     };
 
     const handleToggleStatus = (userId: string) => {
@@ -383,40 +382,18 @@ const UserManagement: React.FC<UserManagementProps> = ({
                 </div>
                 <div className="user-management__cell">
                     <div className="user-management__actions">
-                        {/* <button
-                            className="user-management__action-btn user-management__action-btn--view"
-                            onClick={() => handleViewProfile(user.id)}
-                            title="View Profile"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 16 16">
-                                <path d="M8 3C4.5 3 1.73 5.61 1 8c.73 2.39 3.5 5 7 5s6.27-2.61 7-5c-.73-2.39-3.5-5-7-5z" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                                <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                            </svg>
-                        </button> */}
-                         <button className="todays-bookings__action-btn" onClick={() => handleViewProfile(user.id)}>
+                        <button className="todays-bookings__action-btn" onClick={() => handleViewProfile(user.id)}>
                             View
                         </button>
-                        {/* <button
-                            className={`user-management__action-btn ${user.status === 'Active' ? 'user-management__action-btn--disable' : 'user-management__action-btn--enable'}`}
-                            onClick={() => handleToggleStatus(user.id)}
-                            title={user.status === 'Active' ? 'Disable User' : 'Enable User'}
-                        > */}
-                            {user.status === 'Active' ? (
-                                // <svg width="16" height="16" viewBox="0 0 16 16">
-                                //     <path d="M8 1v14M1 8h14" stroke="currentColor" strokeWidth="1.5" transform="rotate(45 8 8)" />
-                                // </svg>
-                                <button className="todays-bookings__action-btn" onClick={() => handleToggleStatus(user.id)}>
-                                    Disable
-                                </button>
-                            ) : (
-                                // <svg width="16" height="16" viewBox="0 0 16 16">
-                                //     <path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                                // </svg>
-                                <button className="todays-bookings__action-btn" onClick={() => handleToggleStatus(user.id)}>
-                                    Enable
-                                </button>
-                            )}
-                        {/* </button> */}
+                        {user.status === 'Active' ? (
+                            <button className="todays-bookings__action-btn" onClick={() => handleToggleStatus(user.id)}>
+                                Disable
+                            </button>
+                        ) : (
+                            <button className="todays-bookings__action-btn" onClick={() => handleToggleStatus(user.id)}>
+                                Enable
+                            </button>
+                        )}
                     </div>
                 </div>
             </>
@@ -443,43 +420,38 @@ const UserManagement: React.FC<UserManagementProps> = ({
             </div>
 
             <div className="user-management__content">
-                <div className="user-management__content-header">
-                    <div className="user-management__search-container">
-                        <input
-                            type="text"
-                            placeholder="Search Users..."
-                            className="user-management__search-input"
-                        />
-                        <button className="user-management__search-btn">
-                            <Search size={20} strokeWidth={3} />
-                        </button>
-                    </div>
+                <div className="search-bar">
+                    <div className="search-content">
+                        <div className="search-input-container">
+                            <Search className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search Users..."
+                            />
+                        </div>
 
-                    <div className="user-management__controls">
-                        <select
-                            className="user-management__dropdown"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option value="">Sort By...</option>
-                            <option value="Name (A-Z)">Name (A-Z)</option>
-                            <option value="Name (Z-A)">Name (Z-A)</option>
-                            <option value="Join Date (Newest)">Join Date (Newest)</option>
-                            <option value="Join Date (Oldest)">Join Date (Oldest)</option>
-                        </select>
-                    </div>
+                        <div className="filters">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                            >
+                                <option value="">Sort By...</option>
+                                <option value="Name (A-Z)">Name (A-Z)</option>
+                                <option value="Name (Z-A)">Name (Z-A)</option>
+                                <option value="Join Date (Newest)">Join Date (Newest)</option>
+                                <option value="Join Date (Oldest)">Join Date (Oldest)</option>
+                            </select>
 
-                    <div className="user-management__controls">
-                        <select
-                            className="user-management__dropdown"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option value="All Statuses">Filter By...</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Active">Active</option>
-                            <option value="Suspended">Suspended</option>
-                        </select>
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                            >
+                                <option value="all">Filter By...</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Active">Active</option>
+                                <option value="Suspended">Suspended</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 

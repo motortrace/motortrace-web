@@ -30,9 +30,11 @@ const Sidebar: React.FC = () => {
     {
       title: 'User Management',
       items: [
-        { id: 'carUsers', label: 'Car Users', icon: 'bx bx-car', route: '/admin/userManagement/carUsers' },
-        { id: 'serviceCenters', label: 'Service Centers', icon: 'bx bx-wrench', route: '/admin/userManagement/serviceCenters' },
-        { id: 'sparePartsSellers', label: 'Spare Parts Sellers', icon: 'bx bx-store', route: '/admin/userManagement/sparePartsSellers' }
+        // { id: 'carUsers', label: 'Car Users', icon: 'bx bx-car', route: '/admin/userManagement/carUsers' },
+        // { id: 'serviceCenters', label: 'Service Centers', icon: 'bx bx-wrench', route: '/admin/userManagement/serviceCenters' },
+        // { id: 'sparePartsSellers', label: 'Spare Parts Sellers', icon: 'bx bx-store', route: '/admin/userManagement/sparePartsSellers' },
+        { id: 'allUsers', label: 'All Users', icon: 'bx bx-group', route: '/admin/userManagement/carUsers' },
+        { id: 'pendingApprovals', label: 'Pending Approvals', icon: 'bx bx-hourglass', route: '/admin/userManagement/pendingApprovals' },
       ]
     },
     {
@@ -51,10 +53,10 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: ' Revenue Management',
+      title: ' Financial Overview',
       items: [
         // { id: 'subscriptionEarnings', label: 'Subscription Earnings', icon: 'bx bx-receipt', route: '/servicecenter/inventory' },
-        { id: 'commissionEarnings', label: 'Commission Earnings', icon: 'bx bx-line-chart', route: '/admin/commissions' },
+        { id: 'revenueAndPayouts', label: 'Revenue & Payouts', icon: 'bx bx-line-chart', route: '/admin/revenueAndPayouts' },
       ]
     },
     {

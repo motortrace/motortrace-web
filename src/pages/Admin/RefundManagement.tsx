@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import MetricCard from '../../components/MetricCard/MetricCard';
 import RefundDetailsPopup from '../../components/Admin/RefundDetailsPopup/RefundDetailsPopup';
-
+import "../../styles/components/SearchBarAndFilters.scss"
 import './RefundManagement.scss';
 
 interface RefundBooking {
@@ -322,46 +322,8 @@ const RefundManagement: React.FC = () => {
     return (
 
         <>
-            <div className="metric-cards-row">
-                <div className="booking-oversight__search-container">
-                    <input
-                        type="text"
-                        placeholder="Search Bookings..."
-                        className="booking-oversight__search-input"
-                    />
-                    <button className="booking-oversight__search-btn">
-                        <Search size={20} strokeWidth={3} />
-                    </button>
-                </div>
 
-                <div className="booking-oversight__controls">
-                    <select
-                        className="booking-oversight__dropdown"
-                        value={eligibilityFilter}
-                        onChange={(e) => setEligibilityFilter(e.target.value)}
-                    >
-                        <option value="today" selected disabled>Refund Eligibilty</option>
-                        <option value="100%">100% Refund</option>
-                        <option value="50%">50% Refund</option>
-                        <option value="0%">0% Refund</option>
-                    </select>
-                </div>
-
-                <div className="booking-oversight__controls">
-                    <select
-                        className="booking-oversight__dropdown"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                    >
-                        <option value="all">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="processed">Processed</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
-            </div>
-
-            <div className="metric-cards-row">
+             <div className="metric-cards-row">
                 <MetricCard
                     title="Total Cancelled Bookings"
                     amount="10"
@@ -386,6 +348,51 @@ const RefundManagement: React.FC = () => {
                     change="12.1%"
                     changeType="positive"
                 />
+            </div>
+
+
+            <div className="metric-cards-row">
+
+                <div className="search-bar">
+                    <div className="search-content">
+                        <div className="search-input-container">
+                            <Search className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search Bookings..."
+                                // value={searchTerm}
+                                // onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="filters">
+
+                            <select
+                                value={eligibilityFilter}
+                                onChange={(e) => setEligibilityFilter(e.target.value)}
+                            >
+                                <option value="today" selected disabled>Refund Eligibilty</option>
+                                <option value="100%">100% Refund</option>
+                                <option value="50%">50% Refund</option>
+                                <option value="0%">0% Refund</option>
+                            </select>
+
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                            >
+                                <option value="all">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="processed">Processed</option>
+                                <option value="completed">Completed</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
             </div>
 
             {/* Financial Summary

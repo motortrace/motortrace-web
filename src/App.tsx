@@ -17,6 +17,10 @@ import UserManagement from './pages/Admin/UserManagement';
 import BookingOversight from './pages/Admin/BookingOversight';
 import RefundManagement from './pages/Admin/RefundManagement';
 import ContentModeration from './pages/Admin/ContentModeration';
+import ViewUserProfile from './components/Admin/ViewUserProfile/UserProfile';
+import AdminSettings from './pages/Admin/AdminSettings';
+import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
+import RegistrationRequests from './components/Admin/UserManagement/RegistrationRequests';
 
 
 function App() {
@@ -38,13 +42,22 @@ function App() {
         </Route>
 
         <Route path="/admin" element={<AdminDashboardLayout />}>
-          {/* <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboard />} /> */}
-          <Route path="userManagement" element={<Navigate to="userManagement/carUsers" replace />} />
-          <Route path="userManagement/:userType" element={<UserManagement />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          
+          <Route path="userManagement">
+            <Route index element={<Navigate to="carUsers" replace />} />
+            <Route path=":userType" element={<UserManagement />} />
+            <Route path=":userType/:userId/profile" element={<ViewUserProfile />} />
+            <Route path="pendingApprovals" element={<RegistrationRequests />} />
+          </Route>
+
           <Route path = "bookingOversight" element = {<BookingOversight />} />
           <Route path = "refundManagement" element = {<RefundManagement />} />
           <Route path = "contentModeration" element = {<ContentModeration />} />
+          <Route path = "revenueAndPayouts" element = {<RevenueAndPayouts />} />
+          <Route path = "settings" element = {<AdminSettings />} />
+          
         </Route>
 
       </Routes>
