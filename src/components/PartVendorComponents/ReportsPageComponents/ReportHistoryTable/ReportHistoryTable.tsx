@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './ReportHistoryTable.scss';
-import { Download } from 'lucide-react';
-import clsx from 'clsx';
+import { Download, Eye } from 'lucide-react';
 
 const reportsData = [
   {
@@ -9,7 +8,6 @@ const reportsData = [
     name: 'July Orders',
     type: 'Orders',
     date: '2025-07-10',
-    status: 'Completed',
     file: '/reports/july-orders.pdf',
   },
   {
@@ -17,7 +15,6 @@ const reportsData = [
     name: 'Revenue Q2',
     type: 'Revenue',
     date: '2025-07-08',
-    status: 'Completed',
     file: '/reports/revenue-q2.pdf',
   },
   {
@@ -25,7 +22,6 @@ const reportsData = [
     name: 'Current Inventory',
     type: 'Inventory',
     date: '2025-07-05',
-    status: 'Completed',
     file: '/reports/inventory.pdf',
   },
   {
@@ -33,37 +29,36 @@ const reportsData = [
     name: 'Customer Summary',
     type: 'Customer',
     date: '2025-07-01',
-    status: 'Completed',
     file: '/reports/customers.pdf',
   },
 ];
 
-const typeColors: Record<string, string> = {
-  Orders: 'orders',
-  Revenue: 'revenue',
-  Inventory: 'inventory',
-  Customer: 'customer',
-};
-
 const ReportHistoryTable = () => {
   const [filterType, setFilterType] = useState('All');
 
-  const filteredReports = filterType === 'All'
-    ? reportsData
-    : reportsData.filter((r) => r.type === filterType);
+  const filteredReports =
+    filterType === 'All'
+      ? reportsData
+      : reportsData.filter((r) => r.type === filterType);
 
   return (
     <div className="report-history">
-      <div className="report-history__filters">
-        <div className="filter-block">
-          <label>Report Type</label>
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-            <option value="All">All</option>
-            <option value="Orders">Orders</option>
-            <option value="Revenue">Revenue</option>
-            <option value="Inventory">Inventory</option>
-            <option value="Customer">Customer</option>
-          </select>
+      <div className="report-history__header">
+        <h2>Generated Reports</h2>
+        <div className="report-history__filters">
+          <div className="filter-block">
+            <label>Report Type</label>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="All">All</option>
+              <option value="Orders">Orders</option>
+              <option value="Revenue">Revenue</option>
+              <option value="Inventory">Inventory</option>
+              <option value="Customer">Customer</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -73,8 +68,7 @@ const ReportHistoryTable = () => {
             <th>Name</th>
             <th>Type</th>
             <th>Date</th>
-            <th>Status</th>
-            <th>Download</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -82,18 +76,20 @@ const ReportHistoryTable = () => {
             <tr key={report.id}>
               <td>{report.name}</td>
               <td>
-                <span className={clsx('type-pill', typeColors[report.type])}>
-                  {report.type}
-                </span>
+                <span className="type-label">{report.type}</span>
               </td>
               <td>{report.date}</td>
               <td>
-                <span className="status-pill completed">✔ {report.status}</span>
-              </td>
-              <td>
-                <a href={report.file} download>
-                  <Download size={16} />
-                </a>
+                <div className="action-buttons">
+                  <a href={report.file} target="_blank" rel="noopener noreferrer">
+                    <Eye size={16} />
+                    <span>View</span>
+                  </a>
+                  <a href={report.file} download>
+                    <Download size={16} />
+                    <span>Download</span>
+                  </a>
+                </div>
               </td>
             </tr>
           ))}
