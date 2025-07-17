@@ -21,6 +21,7 @@ import CustomerSummaryPage from './pages/PartVendor/CustomerPages/CustomerSummar
 import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
 import CustomerDetailsPage from './pages/PartVendor/CustomerPages/CustomerDetailsPage';
 import AcceptedOrderDetailsPage from './pages/PartVendor/OrderPages/AcceptedOrderDetailsPage';
+import ReportPage from './pages/PartVendor/ReportPages/ReportPage';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
           <Route path="ReviewPage" element={<ReviewPage/>} />
           <Route path="CustomerDetails" element={<CustomerDetailsPage/>} />
           <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage/>} />
+          <Route path="ReportsSummary" element={<ReportPage/>}/>
         </Route>
       </Routes>
     </BrowserRouter>
