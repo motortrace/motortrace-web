@@ -1,4 +1,4 @@
-const API_BASE = '/service-centers';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/service-centers`;
 
 export async function getServices(centerId: string, params?: Record<string, any>) {
   const query = params ? '?' + new URLSearchParams(params).toString() : '';

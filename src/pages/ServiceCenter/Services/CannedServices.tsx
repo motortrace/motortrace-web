@@ -21,13 +21,23 @@ import { fetchUserStatus } from '../../../utils/fetchUserStatus';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 interface CannedService {
-  id: string;
+  id: number;
   name: string;
-  description: string;
-  category: string;
-  laborHours: number;
-  laborCharge: number;
+  description?: string;
+  price: number;
+  unit: string;
+  duration?: number;
+  discount?: number;
   isActive: boolean;
+  serviceType?: {
+    id: number;
+    name: string;
+    description?: string;
+  };
+  // legacy fields for packages, can be optional
+  category?: string;
+  laborHours?: number;
+  laborCharge?: number;
   groupId?: string;
   serviceCount?: number;
   packageServices?: string[];
@@ -99,14 +109,15 @@ const CannedServices = () => {
 
   // Metrics
   const totalServices = services.length;
-  const totalLaborHours = services.reduce((sum, s) => sum + s.laborHours, 0);
-  const avgLaborCharge = services.length > 0 ? (services.reduce((sum, s) => sum + s.laborCharge, 0) / services.length) : 0;
+  // For legacy fields in metrics, use nullish coalescing
+  const totalLaborHours = services.reduce((sum, s) => sum + (s.laborHours ?? 0), 0);
+  const avgLaborCharge = services.length > 0 ? (services.reduce((sum, s) => sum + (s.laborCharge ?? 0), 0) / services.length) : 0;
   const inactiveServices = services.filter(s => !s.isActive).length;
 
   // Filtered services
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchTerm.toLowerCase());
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || service.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -301,7 +312,7 @@ const CannedServices = () => {
             checked={!!value}
             onChange={e => {
               e.stopPropagation();
-              handleToggleActive(row.id);
+              handleToggleActive(row.id.toString());
             }}
           />
           <span className="slider round"></span>
@@ -347,31 +358,49 @@ const CannedServices = () => {
       render: (value) => <span className="service-description">{value}</span>,
     },
     {
-      key: 'laborHours',
-      label: 'Labor Hours',
+      key: 'serviceType',
+      label: 'Service Type',
       sortable: true,
-      align: 'center',
-      render: (value) => typeof value === 'number' ? value.toFixed(2) : '',
+      render: (_value, row) => row.serviceType?.name || '',
     },
     {
-      key: 'laborCharge',
-      label: 'Labor Charge (LKR)',
+      key: 'price',
+      label: 'Price (LKR)',
       sortable: true,
       align: 'right',
       render: (value) => typeof value === 'number' ? `LKR ${value.toLocaleString()}` : '',
     },
     {
+      key: 'unit',
+      label: 'Unit',
+      sortable: true,
+      render: (value) => typeof value === 'string' ? value : '',
+    },
+    {
+      key: 'duration',
+      label: 'Duration (hrs)',
+      sortable: true,
+      render: (value) => typeof value === 'number' ? value.toFixed(2) : '',
+    },
+    {
+      key: 'discount',
+      label: 'Discount',
+      sortable: true,
+      render: (value) => typeof value === 'number' && value > 0 ? `LKR ${value}` : '—',
+    },
+    // Move Status column to the rightmost position
+    {
       key: 'isActive',
       label: 'Status',
       align: 'center',
       render: (value, row) => (
-        <label className="switch">
+        <label className="switch switch--dark">
           <input
             type="checkbox"
             checked={!!value}
             onChange={e => {
               e.stopPropagation();
-              handleToggleActive(row.id);
+              handleToggleActive(row.id.toString());
             }}
           />
           <span className="slider round"></span>
