@@ -1,6 +1,6 @@
 @import '../../../../styles/variables.scss';
 
-.order-details {
+.order-details {  
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 20px;
@@ -8,6 +8,21 @@
   flex: 1;
   min-width: 0;
   margin-top: 30px;
+
+    &__cell {
+    font-size: 13px;
+    color: #374151;
+    font-family: 'Poppins';
+
+    // Add action icons styling
+    svg {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }}
 
   &__header {
     display: flex;
@@ -268,6 +283,67 @@
       }
     }
   }
+  &__actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &--view {
+      background: #eff6ff;
+      color: #3b82f6;
+      
+      &:hover {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+    }
+    
+    &--edit {
+      background: #fef3c7;
+      color: #d97706;
+      
+      &:hover {
+        background: #fde68a;
+        color: #b45309;
+      }
+    }
+    
+    &--delete {
+      background: #fee2e2;
+      color: #ef4444;
+      
+      &:hover {
+        background: #fecaca;
+        color: #dc2626;
+      }
+    }
+  }
+}
+
+// Add responsive styles for the view panel
+@media (max-width: 768px) {
+  .order-details {
+    &__cell {
+      // On mobile, make action buttons more touch-friendly
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
 }
 
 
@@ -307,3 +383,73 @@
     }
   }
 }
+
+// Add these styles to your ProductDetails.scss file
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  margin: auto;
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 10px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 10;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+}
+
+// Ensure the edit product component fits well in the modal
+.modal-content .edit-product {
+  margin: 0;
+  padding: 20px;
+  box-shadow: none;
+  border: none;
+}
+
+

@@ -1,3 +1,4 @@
+//this is EngineAddProduct.tsx
 import React, { useState } from 'react';
 import './AddProduct.scss';
 
@@ -11,8 +12,8 @@ const AddProduct: React.FC = () => {
 
   return (
     <div className="add-product">
-      {/* <h2 className="add-product__title">Create Product</h2> */}
-       <div className="add-product__header">
+      <h2 className="add-product__title">Create Product</h2>
+       {/* <div className="add-product__header">
         <h2 className="add-product__title">Product List</h2>
         <div className="add-product__actions">
             <button className="btn pdf">PDF</button>
@@ -20,7 +21,7 @@ const AddProduct: React.FC = () => {
             <button className="btn sort">⇅</button>
             <button className="btn add">+ Add Product</button>
             </div>
-        </div>
+        </div> */}
 
 
         <div className="add-product__section">

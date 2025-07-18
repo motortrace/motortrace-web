@@ -26,6 +26,9 @@ import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboar
 import OrderSummary from './pages/PartVendor/OrderPages/OrderSummary';
 import ProductList from './pages/PartVendor/Products/ProductList';
 import AddProduct from './pages/PartVendor/Products/AddProduct';
+import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
+
+import Login from './pages/Login/login';
 
 function App() {
   return (
@@ -67,6 +70,13 @@ function App() {
           <Route path="OrderSummary" element={<OrderSummary />} />
           <Route path="ProductList" element={<ProductList />} />
           <Route path="AddProduct" element={<AddProduct />} />
+          <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
+        </Route>
+
+        {/* Login */}
+        <Route path="/user" element={<Login />}>
+          <Route index element={<Navigate to="/user/login" replace />} />
+          <Route path="login" element={<Login />} />
         </Route>
       </Routes>
     </BrowserRouter>
