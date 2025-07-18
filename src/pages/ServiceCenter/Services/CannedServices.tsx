@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MetricCard from '../../../components/MetricCard/MetricCard';
 import Table, { type TableColumn } from '../../../components/Table/Table';
 import './CannedServices.scss';
@@ -14,166 +14,47 @@ import {
 } from 'chart.js';
 import PackageModal from '../../../components/PackageModal/PackageModal';
 import AddServiceModal from '../../../components/AddServiceModal/AddServiceModal';
+import * as servicesApi from '../../../utils/servicesApi';
+import * as packagesApi from '../../../utils/packagesApi';
+import { fetchUserStatus } from '../../../utils/fetchUserStatus';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 interface CannedService {
-  id: string;
+  id: number;
   name: string;
-  description: string;
-  category: string;
-  laborHours: number;
-  laborCharge: number;
+  description?: string;
+  price: number;
+  unit: string;
+  duration?: number;
+  discount?: number;
   isActive: boolean;
+  serviceType?: {
+    id: number;
+    name: string;
+    description?: string;
+  };
+  // legacy fields for packages, can be optional
+  category?: string;
+  laborHours?: number;
+  laborCharge?: number;
   groupId?: string;
-  serviceCount?: number; // Number of services in the package
-  packageServices?: string[]; // List of services in the package
+  serviceCount?: number;
+  packageServices?: string[];
 }
 
 const CannedServices = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
-  const [services, setServices] = useState<CannedService[]>([
-    // Canned Service Packages
-    {
-      id: '1',
-      name: 'Basic Maintenance Package',
-      description: 'Essential maintenance services for regular upkeep',
-      category: 'Maintenance',
-      laborHours: 2.0,
-      laborCharge: 149.99,
-      isActive: true,
-      groupId: 'package1',
-      serviceCount: 3,
-      packageServices: ['Oil Change', 'Tire Rotation', 'Fluid Top-up']
-    },
-    {
-      id: '2',
-      name: 'Brake Service Package',
-      description: 'Complete brake system maintenance',
-      category: 'Brakes',
-      laborHours: 2.5,
-      laborCharge: 249.99,
-      isActive: true,
-      groupId: 'package2',
-      serviceCount: 4,
-      packageServices: ['Brake Pad Replacement', 'Brake Fluid Change', 'Brake Inspection', 'Rotor Resurfacing']
-    },
-    {
-      id: '3',
-      name: 'Seasonal Prep Package',
-      description: 'Prepare your vehicle for seasonal changes',
-      category: 'Maintenance',
-      laborHours: 1.8,
-      laborCharge: 199.99,
-      isActive: true,
-      groupId: 'package3',
-      serviceCount: 5,
-      packageServices: ['Battery Test', 'AC Check', 'Coolant System Check', 'Belt Inspection', 'Wiper Blade Replacement']
-    },
-    {
-      id: '4',
-      name: 'Premium Service Package',
-      description: 'Comprehensive vehicle service package',
-      category: 'Maintenance',
-      laborHours: 4.0,
-      laborCharge: 399.99,
-      isActive: false,
-      groupId: 'package4',
-      serviceCount: 8,
-      packageServices: ['Oil Change', 'Brake Inspection', 'Tire Rotation', 'Battery Test', 'AC Service', 'Transmission Check', 'Engine Diagnostic', 'Exhaust Inspection']
-    },
-    {
-      id: '5',
-      name: 'Electrical System Package',
-      description: 'Complete electrical system diagnostics and service',
-      category: 'Electrical',
-      laborHours: 3.2,
-      laborCharge: 299.99,
-      isActive: true,
-      groupId: 'package5',
-      serviceCount: 6,
-      packageServices: ['Battery Replacement', 'Alternator Test', 'Starter Check', 'Wiring Inspection', 'Fuse Box Check', 'Headlight Alignment']
-    },
-    
-    // Individual Services
-    {
-      id: '6',
-      name: 'Oil Change',
-      description: 'Replace engine oil and filter',
-      category: 'Maintenance',
-      laborHours: 0.5,
-      laborCharge: 49.99,
-      isActive: true
-    },
-    {
-      id: '7',
-      name: 'Brake Pad Replacement',
-      description: 'Replace front brake pads',
-      category: 'Brakes',
-      laborHours: 1.2,
-      laborCharge: 129.99,
-      isActive: true
-    },
-    {
-      id: '8',
-      name: 'Tire Rotation',
-      description: 'Rotate all four tires',
-      category: 'Tires',
-      laborHours: 0.4,
-      laborCharge: 29.99,
-      isActive: true
-    },
-    {
-      id: '9',
-      name: 'Battery Replacement',
-      description: 'Replace car battery',
-      category: 'Electrical',
-      laborHours: 0.3,
-      laborCharge: 39.99,
-      isActive: false
-    },
-    {
-      id: '10',
-      name: 'AC Recharge',
-      description: 'Recharge air conditioning system',
-      category: 'HVAC',
-      laborHours: 1.0,
-      laborCharge: 99.99,
-      isActive: true
-    },
-    {
-      id: '11',
-      name: 'Transmission Service',
-      description: 'Change transmission fluid and filter',
-      category: 'Transmission',
-      laborHours: 1.5,
-      laborCharge: 159.99,
-      isActive: true
-    },
-    {
-      id: '12',
-      name: 'Engine Diagnostic',
-      description: 'Comprehensive engine diagnostic scan',
-      category: 'Diagnostic',
-      laborHours: 1.0,
-      laborCharge: 89.99,
-      isActive: true
-    }
-  ]);
+  const [services, setServices] = useState<CannedService[]>([]);
+  const [packages, setPackages] = useState<any[]>([]);
+  const [centerId, setCenterId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [showPackageModal, setShowPackageModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
-  const [selectedService, setSelectedService] = useState<undefined | {
-    id?: string;
-    name: string;
-    description: string;
-    category: string;
-    laborHours: number;
-    laborCharge: number;
-    tax: number;
-    isActive: boolean;
-  }>(undefined);
+  const [selectedService, setSelectedService] = useState<any>(undefined);
   // const [showAddModal, setShowAddModal] = useState(false);
   // const [newService, setNewService] = useState<Omit<CannedService, 'id'>>({
   //   name: '',
@@ -202,16 +83,50 @@ const CannedServices = () => {
   //   selectedServiceIds: [] as string[],
   // });
 
+  // Fetch centerId from user status on mount
+  useEffect(() => {
+    setLoading(true);
+    fetchUserStatus()
+      .then(status => {
+        if (status.centerId) {
+          setCenterId(status.centerId);
+        } else {
+          throw new Error('No service center ID found for user');
+        }
+      })
+      .catch(err => setError(err.message || 'Failed to fetch user status'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Fetch services when centerId is available
+  useEffect(() => {
+    if (!centerId) return;
+    setLoading(true);
+    servicesApi.getServices(centerId.toString())
+      .then(data => setServices(data))
+      .catch(err => setError(err.message || 'Failed to fetch services'))
+      .finally(() => setLoading(false));
+  }, [centerId]);
+
+  // Fetch packages when centerId is available
+  useEffect(() => {
+    if (!centerId) return;
+    packagesApi.getPackages(centerId.toString())
+      .then(data => setPackages(data))
+      .catch(err => setError(err.message || 'Failed to fetch packages'));
+  }, [centerId]);
+
   // Metrics
   const totalServices = services.length;
-  const totalLaborHours = services.reduce((sum, s) => sum + s.laborHours, 0);
-  const avgLaborCharge = services.length > 0 ? (services.reduce((sum, s) => sum + s.laborCharge, 0) / services.length) : 0;
+  // For legacy fields in metrics, use nullish coalescing
+  const totalLaborHours = services.reduce((sum, s) => sum + (s.laborHours ?? 0), 0);
+  const avgLaborCharge = services.length > 0 ? (services.reduce((sum, s) => sum + (s.laborCharge ?? 0), 0) / services.length) : 0;
   const inactiveServices = services.filter(s => !s.isActive).length;
 
   // Filtered services
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchTerm.toLowerCase());
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || service.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -219,16 +134,91 @@ const CannedServices = () => {
   const uniqueCategories = [...new Set(services.map(s => s.category))];
 
   // Grouped and individual services
-  const cannedServices = services.filter(s => s.groupId);
+  // Remove legacy cannedServices
+  // const cannedServices = services.filter(s => s.groupId);
   const individualServices = services.filter(s => !s.groupId);
 
   // Handler to toggle active status for individual services
-  const handleToggleActive = (serviceId: string) => {
-    setServices(prevServices =>
-      prevServices.map(s =>
-        s.id === serviceId ? { ...s, isActive: !s.isActive } : s
-      )
-    );
+  const handleToggleActive = async (serviceId: string) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await servicesApi.toggleServiceActive(centerId.toString(), serviceId);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to toggle service status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to add a new service
+  const handleAddService = async (serviceData: any) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await servicesApi.createService(centerId.toString(), serviceData);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+      setShowAddServiceModal(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add service');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to add a new package
+  const handleAddPackage = async (packageData: any) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      // Ensure serviceIds is an array of numbers (ShopService IDs)
+      const payload = {
+        ...packageData,
+        serviceIds: (packageData.serviceIds || []).map((id: string | number) => Number(id)),
+      };
+      await packagesApi.createPackage(centerId.toString(), payload);
+      // Refresh services and packages after adding
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+      setShowPackageModal(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add package');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to delete a service
+  const handleDeleteService = async (serviceId: string) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await servicesApi.deleteService(centerId.toString(), serviceId);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete service');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler to delete a package
+  const handleDeletePackage = async (packageId: string) => {
+    if (!centerId) return;
+    setLoading(true);
+    try {
+      await packagesApi.deletePackage(centerId.toString(), packageId);
+      const data = await servicesApi.getServices(centerId.toString());
+      setServices(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete package');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Chart Data
@@ -288,7 +278,7 @@ const CannedServices = () => {
   };
 
   // Table columns for Canned Services (packages)
-  const cannedServiceColumns: TableColumn<CannedService>[] = [
+  const cannedServiceColumns: TableColumn<any>[] = [
     {
       key: 'name',
       label: 'Package Name',
@@ -300,15 +290,14 @@ const CannedServices = () => {
         </div>
       ),
     },
-    // Description column removed
     {
-      key: 'serviceCount',
+      key: 'servicesCount',
       label: 'Services Count',
       sortable: true,
       align: 'center',
-      render: (value, row) => (
+      render: (_value, row) => (
         <div className="service-count-cell">
-          <strong>{value || 0}</strong>
+          <strong>{row.services?.length || 0}</strong>
           <div className="service-count-label">services</div>
         </div>
       ),
@@ -318,38 +307,26 @@ const CannedServices = () => {
       label: 'Total Labor Hours',
       sortable: true,
       align: 'center',
-      render: (value) => typeof value === 'number' ? value.toFixed(2) : '',
+      render: (_value, row) => {
+        const total = row.services?.reduce((sum: number, s: any) => sum + (s.service?.laborHours || 0), 0) || 0;
+        return total.toFixed(2);
+      },
     },
     {
       key: 'laborCharge',
       label: 'Package Price (LKR)',
       sortable: true,
       align: 'right',
-      render: (value) => typeof value === 'number' ? `LKR ${value.toLocaleString()}` : '',
-    },
-    {
-      key: 'isActive',
-      label: 'Status',
-      align: 'center',
-      render: (value, row) => (
-        <label className="switch">
-          <input
-            type="checkbox"
-            checked={!!value}
-            onChange={e => {
-              e.stopPropagation();
-              handleToggleActive(row.id);
-            }}
-          />
-          <span className="slider round"></span>
-        </label>
-      ),
+      render: (_value, row) => {
+        const total = row.services?.reduce((sum: number, s: any) => sum + (s.service?.laborCharge || s.service?.price || 0), 0) || 0;
+        return `LKR ${total.toLocaleString()}`;
+      },
     },
     {
       key: 'actions',
       label: 'Actions',
       align: 'center',
-      render: (_, row) => (
+      render: (_value, row) => (
         <button
           className="btn-icon"
           title="Manage Services"
@@ -360,6 +337,24 @@ const CannedServices = () => {
         >
           <i className="bx bx-cog"></i>
         </button>
+      ),
+    },
+    {
+      key: 'isActive',
+      label: 'Status',
+      align: 'center',
+      render: (value, row) => (
+        <label className="switch switch--dark">
+          <input
+            type="checkbox"
+            checked={!!row.isActive}
+            onChange={e => {
+              e.stopPropagation();
+              handleToggleActive(row.id.toString());
+            }}
+          />
+          <span className="slider round"></span>
+        </label>
       ),
     },
   ];
@@ -384,31 +379,49 @@ const CannedServices = () => {
       render: (value) => <span className="service-description">{value}</span>,
     },
     {
-      key: 'laborHours',
-      label: 'Labor Hours',
+      key: 'serviceType',
+      label: 'Service Type',
       sortable: true,
-      align: 'center',
-      render: (value) => typeof value === 'number' ? value.toFixed(2) : '',
+      render: (_value, row) => row.serviceType?.name || '',
     },
     {
-      key: 'laborCharge',
-      label: 'Labor Charge (LKR)',
+      key: 'price',
+      label: 'Price (LKR)',
       sortable: true,
       align: 'right',
       render: (value) => typeof value === 'number' ? `LKR ${value.toLocaleString()}` : '',
     },
     {
+      key: 'unit',
+      label: 'Unit',
+      sortable: true,
+      render: (value) => typeof value === 'string' ? value : '',
+    },
+    {
+      key: 'duration',
+      label: 'Duration (hrs)',
+      sortable: true,
+      render: (value) => typeof value === 'number' ? value.toFixed(2) : '',
+    },
+    {
+      key: 'discount',
+      label: 'Discount',
+      sortable: true,
+      render: (value) => typeof value === 'number' && value > 0 ? `LKR ${value}` : '—',
+    },
+    // Move Status column to the rightmost position
+    {
       key: 'isActive',
       label: 'Status',
       align: 'center',
       render: (value, row) => (
-        <label className="switch">
+        <label className="switch switch--dark">
           <input
             type="checkbox"
             checked={!!value}
             onChange={e => {
               e.stopPropagation();
-              handleToggleActive(row.id);
+              handleToggleActive(row.id.toString());
             }}
           />
           <span className="slider round"></span>
@@ -417,8 +430,18 @@ const CannedServices = () => {
     },
   ];
 
+  // Map individualServices to ServiceItem shape with string id for PackageModal
+  const individualServiceItems = individualServices.map(s => ({
+    ...s,
+    id: String(s.id),
+    description: s.description || '',
+    category: s.category || '',
+  }));
+
   return (
     <div className="canned-services-page">
+      {loading && <div className="loading">Loading...</div>}
+      {error && <div className="error-message">{error}</div>}
       <div className="page-header">
         <div className="page-actions">
           <button className="btn btn--primary" onClick={() => setShowPackageModal(true)}>
@@ -444,8 +467,8 @@ const CannedServices = () => {
         />
         <MetricCard
           title="Service Packages"
-          amount={cannedServices.length.toString()}
-          change={`${cannedServices.reduce((sum, s) => sum + (s.serviceCount || 0), 0)} total services`}
+          amount={packages.length.toString()}
+          change={`${packages.reduce((sum, s) => sum + (s.serviceCount || 0), 0)} total services`}
           changeType="positive"
           period="in packages"
         />
@@ -506,18 +529,18 @@ const CannedServices = () => {
       {/* Canned Services Table */}
       <div className="services-table-container">
         <div className="table-header">
-          <h3>Canned Service Packages</h3>
+          <h3>Service Packages</h3>
         </div>
         <Table
           columns={cannedServiceColumns}
-          data={cannedServices}
-          onRowClick={service => {
-            console.log('View package details:', service.name);
-            if (service.packageServices) {
-              console.log('Services in package:', service.packageServices);
+          data={packages}
+          onRowClick={pkg => {
+            console.log('View package details:', pkg.name);
+            if (pkg.services) {
+              console.log('Services in package:', pkg.services);
             }
           }}
-          emptyMessage="No canned service packages found."
+          emptyMessage="No service packages found."
         />
       </div>
 
@@ -539,21 +562,15 @@ const CannedServices = () => {
         <AddServiceModal
           service={selectedService}
           onClose={() => setShowAddServiceModal(false)}
-          onSave={(service) => {
-            // TODO: handle save logic
-            setShowAddServiceModal(false);
-          }}
+          onSave={handleAddService}
         />
       )}
       {showPackageModal && (
         <PackageModal
           packageData={selectedPackage}
-          individualServices={individualServices}
+          individualServices={individualServiceItems}
           onClose={() => setShowPackageModal(false)}
-          onSave={(pkg) => {
-            // TODO: handle save logic
-            setShowPackageModal(false);
-          }}
+          onSave={handleAddPackage}
         />
       )}
     </div>

@@ -6,8 +6,9 @@ interface ServiceItem {
   name: string;
   description: string;
   category: string;
-  laborHours: number;
-  laborCharge: number;
+  laborHours?: number;
+  laborCharge?: number;
+  price?: number;
   isActive: boolean;
 }
 
@@ -18,15 +19,17 @@ interface PackageModalProps {
   onSave: (pkg: any) => void;
 }
 
-const defaultDiscount = { type: 'percent', value: 0 };
+const defaultDiscount: { type: 'percent' | 'fixed'; value: number } = { type: 'percent', value: 0 };
 
 const PackageModal: React.FC<PackageModalProps> = ({
   packageData,
-  individualServices,
+  individualServices = [],
   onClose,
   onSave
 }) => {
-  const [currentPackage, setCurrentPackage] = useState<any | null>(packageData);
+  // Defensive: always use a safe array
+  const safeIndividualServices = Array.isArray(individualServices) ? individualServices : [];
+  const [currentPackage, setCurrentPackage] = useState<any | null>(packageData || null);
   const [isEditing, setIsEditing] = useState(!packageData);
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(packageData?.serviceIds || []);
   const [discount, setDiscount] = useState<{ type: 'percent' | 'fixed'; value: number }>(packageData?.discount || defaultDiscount);
@@ -75,8 +78,9 @@ const PackageModal: React.FC<PackageModalProps> = ({
     setSelectedServiceIds(prev => prev.filter(id => id !== serviceId));
   };
 
-  const selectedServices = individualServices.filter(s => selectedServiceIds.includes(s.id));
-  const subtotal = selectedServices.reduce((sum, s) => sum + s.laborCharge, 0);
+  // Use safeIndividualServices instead of individualServices
+  const selectedServices = safeIndividualServices.filter(s => selectedServiceIds.includes(s.id));
+  const subtotal = selectedServices.reduce((sum, s) => sum + (s.laborCharge || s.price || 0), 0);
   const discountAmount = discount.type === 'percent' ? (subtotal * discount.value) / 100 : discount.value;
   const calculatedTotal = Math.max(0, subtotal - discountAmount);
   const displayTotal = customTotal !== null ? customTotal : calculatedTotal;
@@ -194,11 +198,15 @@ const PackageModal: React.FC<PackageModalProps> = ({
                       className="service-select"
                     >
                       <option value="">Select a service to add...</option>
-                      {individualServices
+                      {safeIndividualServices
                         .filter(s => !selectedServiceIds.includes(s.id) && s.isActive)
                         .map(service => (
                           <option key={service.id} value={service.id}>
-                            {service.name} - ${service.laborCharge.toFixed(2)} ({service.laborHours}h)
+                            {service.name} - $
+                            {typeof service.laborCharge === 'number' ? service.laborCharge.toFixed(2)
+                              : typeof service.price === 'number' ? service.price.toFixed(2)
+                              : 'N/A'}
+                            ({typeof service.laborHours === 'number' ? service.laborHours : 0}h)
                           </option>
                         ))}
                     </select>
@@ -247,8 +255,10 @@ const PackageModal: React.FC<PackageModalProps> = ({
                         <td>
                           <span className="service-category">{service.category}</span>
                         </td>
-                        <td>{service.laborHours}</td>
-                        <td>${service.laborCharge.toFixed(2)}</td>
+                        <td>{typeof service.laborHours === 'number' ? service.laborHours : 0}</td>
+                        <td>${typeof service.laborCharge === 'number' ? service.laborCharge.toFixed(2)
+                          : typeof service.price === 'number' ? service.price.toFixed(2)
+                          : 'N/A'}</td>
                         {isEditing && (
                           <td>
                             <button
@@ -281,7 +291,7 @@ const PackageModal: React.FC<PackageModalProps> = ({
                       <div className="discount-inputs">
                         <select 
                           value={discount.type} 
-                          onChange={e => setDiscount(d => ({ ...d, type: e.target.value as 'percent' | 'fixed' }))}
+                          onChange={e => setDiscount(d => ({ ...d, type: e.target.value === 'percent' ? 'percent' : 'fixed' }))}
                           className="discount-type"
                         >
                           <option value="percent">%</option>
