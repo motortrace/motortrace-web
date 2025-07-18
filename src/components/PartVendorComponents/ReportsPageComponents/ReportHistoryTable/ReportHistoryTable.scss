@@ -2,42 +2,60 @@
 
 .report-history {
   margin-top: 40px;
+    background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 30px;
 
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 24px;
+&__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 
-    h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #111827;
-    }
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    flex: 1;
+    min-width: 180px;
   }
 
-  &__filters {
-    .filter-block {
+  .report-history__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    .filter {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: 8px;
       font-size: 0.85rem;
 
       label {
         color: #6b7280;
-        margin-bottom: 6px;
         font-weight: 500;
       }
 
-      select {
-        padding: 8px 12px;
+      select,
+      input[type='date'] {
+        padding: 6px 10px;
+        font-size: 0.85rem;
         border: 1px solid #d1d5db;
         border-radius: 8px;
-        font-size: 0.9rem;
-        background: white;
+        background: #ffffff;
         color: #111827;
       }
     }
   }
+}
+
 
   &__table {
     width: 100%;
@@ -84,6 +102,11 @@
             stroke-width: 1.8;
           }
         }
+
+        .pending-text {
+          font-size: 0.8rem;
+          color: #9ca3af;
+        }
       }
     }
   }
@@ -97,4 +120,57 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 500;
+}
+
+.status-label {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #374151;
+
+  &.completed {
+    background: #ecfdf5;
+    color: #047857;
+  }
+
+  &.in-progress {
+    background: #fef9c3;
+    color: #92400e;
+  }
+
+  &.failed {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+}
+
+
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 8px;
+
+  button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #374151;
+
+    &.active {
+      background: #fef3c7;
+      border-color: #fbbf24;
+      font-weight: 600;
+    }
+
+    &:hover {
+      background: #f3f4f6;
+    }
+  }
 }

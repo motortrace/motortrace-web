@@ -1,0 +1,213 @@
+.orders-report-modal__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(31, 41, 55, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.orders-report-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 960px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+  color: #1f2937;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  &__close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6b7280;
+    cursor: pointer;
+
+    &:hover {
+      color: #374151;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
+
+  &__logo {
+    width: 64px;
+    height: auto;
+  }
+
+  &__meta {
+    margin-bottom: 24px;
+
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    p {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+
+    .summary-card {
+      flex: 1;
+      min-width: 150px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+
+      h4 {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 6px;
+      }
+
+      p {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+      }
+    }
+  }
+
+  &__section {
+    margin-bottom: 32px;
+
+    h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+
+      th,
+      td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+      }
+
+      th {
+        background: #f3f4f6;
+        color: #6b7280;
+        font-weight: 500;
+      }
+
+      td {
+        color: #374151;
+      }
+    }
+
+    .cancellation-reasons {
+      list-style: none;
+      padding-left: 0;
+      margin: 0 0 8px;
+
+      li {
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 6px;
+        position: relative;
+        padding-left: 16px;
+
+        &::before {
+          content: '•';
+          position: absolute;
+          left: 0;
+          color: #3b82f6;
+        }
+      }
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
+
+    p {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  // Chart wrappers
+  .recharts-responsive-container {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .recharts-tooltip-wrapper {
+    font-size: 13px;
+  }
+
+  .recharts-default-tooltip {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .recharts-cartesian-axis-tick-value {
+    font-size: 12px;
+    fill: #6b7280;
+  }
+
+  .recharts-legend-wrapper {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  // Custom PieChart colors if needed
+  .region-color {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+}

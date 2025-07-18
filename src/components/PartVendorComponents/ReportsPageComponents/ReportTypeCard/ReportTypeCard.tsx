@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './ReportTypeCard.scss';
 import { FileText, BarChart2, Package, Users } from 'lucide-react';
+import DateRangeModal from '../DateRangeModal/DateRangeModal';
+import OrdersReportModal from '../OrdersReportModal/OrdersReportModal';
 
 const reportTypes = [
   {
@@ -34,8 +36,25 @@ const reportTypes = [
 ];
 
 const ReportTypeCards = () => {
-  const handleGenerate = (id: string) => {
-    console.log(`Generating report: ${id}`);
+  const [selectedReport, setSelectedReport] = useState<{ id: string; name: string } | null>(null);
+  const [dateRange, setDateRange] = useState<{ from: string; to: string } | null>(null);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
+
+  const handleGenerateClick = (id: string, name: string) => {
+    setSelectedReport({ id, name });
+    setShowDateModal(true);
+  };
+
+  const handleGenerateReport = (from: string, to: string) => {
+    setDateRange({ from, to });
+    setShowDateModal(false);
+
+    if (selectedReport?.id === 'orders') {
+      setShowOrdersModal(true);
+    }
+
+    // You can conditionally show other report modals here in the future
   };
 
   return (
@@ -51,13 +70,32 @@ const ReportTypeCards = () => {
           </div>
 
           <div className="report-card__footer">
-            <button onClick={() => handleGenerate(report.id)}>Generate</button>
+            <button onClick={() => handleGenerateClick(report.id, report.name)}>
+              Generate
+            </button>
             <span className="report-card__timestamp">
               Last: {report.lastGenerated}
             </span>
           </div>
         </div>
       ))}
+
+      {selectedReport && showDateModal && (
+        <DateRangeModal
+          isOpen={showDateModal}
+          onClose={() => setShowDateModal(false)}
+          onGenerate={handleGenerateReport}
+          reportName={selectedReport.name}
+        />
+      )}
+
+      {selectedReport?.id === 'orders' && showOrdersModal && dateRange && (
+        <OrdersReportModal
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+          onClose={() => setShowOrdersModal(false)}
+        />
+      )}
     </div>
   );
 };
