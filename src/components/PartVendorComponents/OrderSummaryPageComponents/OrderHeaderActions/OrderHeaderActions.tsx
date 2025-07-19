@@ -1,31 +1,46 @@
 import React from 'react';
 import './OrderHeaderActions.scss';
-import { ChevronLeft, Check, X } from 'lucide-react';
+import { ChevronLeft, Check, X, CornerUpRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface OrderHeaderActionsProps {
   orderNumber: string;
+  customerName: string;
   status: 'Paid' | 'Pending' | 'Failed' | 'Accepted';
-  onBack: () => void;
   onAccept: () => void;
   onDecline: () => void;
 }
 
 const OrderHeaderActions: React.FC<OrderHeaderActionsProps> = ({
   orderNumber,
+  customerName,
   status,
-  onBack,
   onAccept,
   onDecline,
 }) => {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate('/PartVendor/OrderSummary');
+  };
+
+  const handleCustomerClick = () => {
+    // Replace with the correct dynamic route if needed
+    const encodedName = encodeURIComponent(customerName);
+    navigate(`/PartVendor/Customers/${encodedName}`);
+  };
+
   return (
     <div className="order-header-actions">
-      <button className="order-header-actions__back-button" onClick={onBack}>
+      <button className="order-header-actions__back-button" onClick={handleBack}>
         <ChevronLeft size={16} /> Back to Orders
       </button>
 
       <div className="order-header-actions__details">
         <div className="order-header-actions__info">
-          <h2 className="order-header-actions__order-number">{orderNumber}</h2>
+          <h2 className="order-header-actions__order-number">
+            Order: {orderNumber}
+          </h2>
           <span
             className={`order-header-actions__status order-header-actions__status--${status.toLowerCase()}`}
           >

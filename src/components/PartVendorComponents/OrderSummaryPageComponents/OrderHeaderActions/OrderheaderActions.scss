@@ -53,7 +53,7 @@
       font-size: 12px;
       text-align: center;
 
-      &--paid {
+      &--completed {
         background-color: #d1fae5;
         color: var(--color-success);
       }
@@ -61,6 +61,11 @@
       &--pending {
         background-color: #fef9c3;
         color: var(--color-warning);
+      }
+
+      &--accepted {
+        background-color: #c3e3fe;
+        color: var(--color-info);
       }
 
       &--failed {
