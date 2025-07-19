@@ -6,12 +6,18 @@
   color: #374151;
   display: flex;
   flex-direction: column;
-  width: 100%;  /* Full width of its container */
+  width: 100%;
 
   &__section {
     display: flex;
     flex-direction: column;
     gap: 8px;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;  // Small gap between title and arrow
   }
 
   &__section-title {
@@ -42,5 +48,27 @@
     height: 1px;
     background-color: #e5e7eb;
     margin: 16px 0;
+  }
+
+  &__arrow-button {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+
+    svg {
+      display: block;
+      height: 14px;
+      width: 14px;
+    }
+
+    &:hover {
+      color: #ffffff;
+      background-color: #111827;
+    }
   }
 }
