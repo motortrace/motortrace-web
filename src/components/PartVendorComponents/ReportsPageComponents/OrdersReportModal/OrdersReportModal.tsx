@@ -3,16 +3,9 @@ import './OrdersReportModal.scss';
 import logo from '../../../../assets/images/autoparts.png';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar
+  PieChart, Pie, Cell, BarChart, Bar, Legend, CartesianGrid
 } from 'recharts';
-
-const regionData = [
-  { name: 'US', value: 46 },
-  { name: 'Canada', value: 21 },
-  { name: 'UK', value: 17 },
-  { name: 'Australia', value: 9 },
-  { name: 'Other', value: 7 }
-];
+import { Printer, Download } from 'lucide-react'; 
 
 const fulfillmentData = [
   { name: 'Shipped', value: 75.4 },
@@ -38,45 +31,51 @@ const orderTrend = [
   { day: 'Jul 10', orders: 178 }
 ];
 
-const COLORS = ['#3B82F6', '#34D399', '#FBBF24', '#F87171', '#9CA3AF'];
+const refundReasons = [
+  { name: 'Delivery delay', value: 38 },
+  { name: 'Changed mind', value: 27 },
+  { name: 'Wrong item ordered', value: 19 }
+];
+
+const COLORS = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#6B7280'];
 
 const OrdersReportModal = ({ fromDate, toDate, onClose }) => {
   const today = new Date().toLocaleDateString();
 
-  const handleDownloadPDF = () => {
-    const element = document.querySelector('.orders-report-modal');
-    if (!element) return;
+const handleDownloadPDF = () => {
+  const element = document.querySelector('.orders-report-modal');
+  if (!element) return;
 
-    import('html2pdf.js').then((html2pdf) => {
-      html2pdf.default()
-        .set({
-          margin: 0.5,
-          filename: `OrdersReport_${fromDate}_to_${toDate}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        })
-        .from(element)
-        .save();
-    });
-  };
+  import('html2pdf.js').then((html2pdf) => {
+    html2pdf.default()
+      .set({
+        margin: 0.5,
+        filename: `OrdersReport_${fromDate}_to_${toDate}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, scrollY: 0, windowWidth: element.scrollWidth, windowHeight: element.scrollHeight },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      })
+      .from(element)
+      .save();
+  });
+};
+
+
+  const formatNumber = (num) => new Intl.NumberFormat().format(num);
 
   return (
     <div className="orders-report-modal__backdrop">
       <div className="orders-report-modal">
-        <div className="orders-report-modal__actions">
-          <button onClick={() => window.print()}>🖨 Print</button>
-          <button onClick={handleDownloadPDF}>⬇ Download PDF</button>
-        </div>
-        <button className="orders-report-modal__close" onClick={onClose}>×</button>
+        <button className="orders-report-modal__close no-print" onClick={onClose}>×</button>
 
         <div className="orders-report-modal__header">
           <img src={logo} alt="Logo" className="orders-report-modal__logo" />
           <div className="orders-report-modal__shop-info">
             <h2>AutoParts HQ</h2>
+            <p>Powered by MotorTrace</p>
             <p>789 Service Park, Nugegoda, Sri Lanka</p>
             <p>+94 11 234 5678</p>
-            <p>support@autopartshq.lk</p>
+            <p>support@motortrace.lk</p>
           </div>
         </div>
 
@@ -87,22 +86,24 @@ const OrdersReportModal = ({ fromDate, toDate, onClose }) => {
         </div>
 
         <div className="orders-report-modal__summary">
-          {[['Total Orders', '1,342'], ['Total Revenue', '$92,410.20'], ['Avg. Order Value', '$68.87'], ['Website Orders', '905'], ['Service Center Orders', '437']].map(([label, value]) => (
+          {[['Total Orders', 1342], ['Total Revenue', 92410.2], ['Avg. Order Value', 68.87], ['Website Orders', 905], ['Service Center Orders', 437]].map(([label, value]) => (
             <div className="summary-card" key={label}>
               <h4>{label}</h4>
-              <p>{value}</p>
+              <p>{formatNumber(value)}</p>
             </div>
           ))}
         </div>
 
         <div className="orders-report-modal__section">
           <h4>Daily Order Volume</h4>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={orderTrend}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={orderTrend} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <XAxis dataKey="day" />
-              <YAxis />
+              <YAxis allowDecimals={false} />
+              <CartesianGrid strokeDasharray="3 3" />
               <Tooltip />
-              <Line type="monotone" dataKey="orders" stroke="#3B82F6" strokeWidth={2} />
+              <Legend />
+              <Line type="monotone" dataKey="orders" stroke="#2563EB" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -111,70 +112,76 @@ const OrdersReportModal = ({ fromDate, toDate, onClose }) => {
           <h4>Top Products</h4>
           <table>
             <thead>
-              <tr><th>Product</th><th>Orders</th><th>Revenue</th></tr>
+              <tr><th>Product</th><th>Orders</th><th>Revenue (LKR)</th></tr>
             </thead>
             <tbody>
-              <tr><td>Brake Pads</td><td>248</td><td>$6,200</td></tr>
-              <tr><td>Oil Filter</td><td>203</td><td>$2,640</td></tr>
-              <tr><td>Spark Plugs</td><td>142</td><td>$1,420</td></tr>
-              <tr><td>LED Headlights</td><td>108</td><td>$4,320</td></tr>
+              <tr><td>Brake Pads</td><td>{formatNumber(248)}</td><td>{formatNumber(6200)}</td></tr>
+              <tr><td>Oil Filter</td><td>{formatNumber(203)}</td><td>{formatNumber(2640)}</td></tr>
+              <tr><td>Spark Plugs</td><td>{formatNumber(142)}</td><td>{formatNumber(1420)}</td></tr>
+              <tr><td>LED Headlights</td><td>{formatNumber(108)}</td><td>{formatNumber(4320)}</td></tr>
             </tbody>
           </table>
         </div>
 
         <div className="orders-report-modal__section">
-          <h4>Orders by Region</h4>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={regionData} dataKey="value" nameKey="name" outerRadius={80} label>
-                {regionData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="orders-report-modal__section">
           <h4>Payment Type Split</h4>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={paymentTypeData}>
-              <XAxis dataKey="name" />
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={paymentTypeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
               <YAxis />
+              <CartesianGrid strokeDasharray="3 3" />
               <Tooltip />
-              <Bar dataKey="value" fill="#34D399" barSize={40} />
+              <Legend />
+              <Bar dataKey="value" fill="#10B981" barSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         <div className="orders-report-modal__section">
           <h4>Fulfillment Status</h4>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={fulfillmentData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={70} label>
+              <Pie data={fulfillmentData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} label>
                 {fulfillmentData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
         <div className="orders-report-modal__section">
-          <h4>Cancellations & Refunds</h4>
-          <ul className="cancellation-reasons">
-            <li>Delivery delay – 38%</li>
-            <li>Changed mind – 27%</li>
-            <li>Wrong item ordered – 19%</li>
-          </ul>
-          <p><strong>Refund Value:</strong> $4,020.75</p>
+          <h4>Refund Breakdown</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie data={refundReasons} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                {refundReasons.map((entry, index) => (
+                  <Cell key={`cell-refund-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+          <p><strong>Refund Value:</strong> LKR {formatNumber(4020.75)}</p>
         </div>
 
         <div className="orders-report-modal__footer">
-          <p>Thank you for using AutoParts HQ. For support, email us at support@autopartshq.lk</p>
+          <p>This report is generated through the AutoParts HQ platform — a spare parts vendor system by MotorTrace. For support, email us at <strong>support@motortrace.lk</strong>.</p>
         </div>
+
+<div className="orders-report-modal__actions no-print">
+  <button onClick={() => window.print()}>
+    <Printer size={16} style={{ marginRight: 8 }} />
+    Print Report
+  </button>
+  <button onClick={handleDownloadPDF}>
+    <Download size={16} style={{ marginRight: 8 }} />
+    Download PDF
+  </button>
+</div>
       </div>
     </div>
   );
