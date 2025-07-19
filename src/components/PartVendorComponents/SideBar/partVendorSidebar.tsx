@@ -20,36 +20,56 @@ const PartVendorSideBar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menuGroups: MenuGroup[] = [
-    {
-      title: 'Overview',
+const menuGroups: MenuGroup[] = [
+  {
+    title: 'Overview',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: '/PartVendor/dashboard' },
+    ]
+  },
+  {
+    title: 'Orders',
+    items: [
+      { id: 'orders', label: 'Orders', icon: 'bx bx-shopping-bag', route: '/PartVendor/OrderSummary' },
+      { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/PartVendor/IncomeSummary' },
+    ]
+  },
+  {
+    title: 'Reviews And Ratings',
+    items: [
+      { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/PartVendor/ReviewPage' },
+      { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/PartVendor/RatingsPage' },
+    ]
+  },
+  {
+    title: 'Inventory',
+    items: [
+      { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/PartVendor/products' },
+      { id: 'stock', label: 'Stock Levels', icon: 'bx bx-layer', route: '/PartVendor/stock' },
+    ]
+  },
+      {
+      title: 'Customers',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: '/spareparts/dashboard' },
+        { id: 'customer', label: 'Customers', icon: 'bx bx-grid-alt', route: '/PartVendor/CustomerSummary' },
       ]
     },
-    {
-      title: 'Sales',
-      items: [
-        { id: 'orders', label: 'Orders', icon: 'bx bx-cart', route: '/spareparts/orders' },
-        { id: 'invoices', label: 'Invoices', icon: 'bx bx-file', route: '/spareparts/invoices' },
-        { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: '/spareparts/payments' },
-      ]
-    },
-    {
-      title: 'Inventory',
-      items: [
-        { id: 'products', label: 'Products', icon: 'bx bx-box', route: '/spareparts/products' },
-        { id: 'stock', label: 'Stock Levels', icon: 'bx bx-layer', route: '/spareparts/stock' },
-        { id: 'suppliers', label: 'Suppliers', icon: 'bx bx-user', route: '/spareparts/suppliers' },
-      ]
-    },
-    {
-      title: 'Management',
-      items: [
-        { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/spareparts/settings' },
-      ]
-    }
-  ];
+  {
+    title: 'Reports',
+    items: [
+      { id: 'reports', label: 'Reports', icon: 'bx bx-bar-chart-alt-2', route: '/PartVendor/ReportsSummary' },
+    ]
+  },
+  {
+    title: 'Profile',
+    items: [
+      { id: 'profile', label: 'Profile', icon: 'bx bx-user', route: '/PartVendor/Profile' },
+      { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/PartVendor/Settings' },
+      { id: 'logout', label: 'Log Out', icon: 'bx bx-log-out', route: '/logout' },
+    ]
+  }
+];
+
 
   const handleMenuClick = useCallback((item: MenuItem) => {
     navigate(item.route);
