@@ -1,7 +1,7 @@
 @import '../../../../styles/variables.scss';
 
 .order-details {
-  background: rgb(222, 140, 140);
+  background: rgb(255, 255, 255);
   border: 2px solid #e5e7eb;
   border-radius: 20px;
   padding: 20px;
@@ -117,7 +117,7 @@
   }
 
   &__status {
-    &--paid {
+    &--completed {
       background-color: #d1fae5;
       color: var(--color-success);
     }

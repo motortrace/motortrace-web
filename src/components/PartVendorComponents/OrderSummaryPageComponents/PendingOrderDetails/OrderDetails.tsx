@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './OrderDetails.scss';
 
 import brakePadsImg from '../../../../assets/images/brakePads.png';
 import engineOilImg from '../../../../assets/images/QuartzEngineOil.png';
-import spark from '../../../../assets/images/spark.png' ;
-import battery from '../../../../assets/images/battery.png' ;
-import belt from '../../../../assets/images/timingBelt.png' ;
+import spark from '../../../../assets/images/spark.png';
+import battery from '../../../../assets/images/battery.png';
+import belt from '../../../../assets/images/timingBelt.png';
 
 interface Order {
   id: string;
@@ -14,11 +15,10 @@ interface Order {
   customerName: string;
   customerType: 'Customer' | 'Service Center';
   amount: string;
-  status: 'Paid' | 'Pending' | 'Failed';
+  status: 'Completed' | 'Pending' | 'Failed'| 'Accepted';
   products: { name: string; imageUrl: string }[];
 }
 
-// Inside your component
 const orders: Order[] = [
   {
     id: '1',
@@ -27,7 +27,7 @@ const orders: Order[] = [
     customerName: 'A. Fernando',
     customerType: 'Customer',
     amount: 'LKR 32,500',
-    status: 'Paid',
+    status: 'Completed',
     products: [
       { name: 'Brake Pads', imageUrl: brakePadsImg },
       { name: 'Engine Oil', imageUrl: engineOilImg },
@@ -64,7 +64,7 @@ const orders: Order[] = [
     customerName: 'AutoFix Garage',
     customerType: 'Service Center',
     amount: 'LKR 45,000',
-    status: 'Paid',
+    status: 'Completed',
     products: [
       { name: 'Timing Belt', imageUrl: belt },
       { name: 'Oil Filter', imageUrl: 'https://via.placeholder.com/40' },
@@ -91,7 +91,7 @@ const orders: Order[] = [
     customerName: 'R. Dissanayake',
     customerType: 'Customer',
     amount: 'LKR 25,800',
-    status: 'Paid',
+    status: 'Completed',
     products: [
       { name: 'Alternator', imageUrl: 'https://via.placeholder.com/40' },
       { name: 'Starter Motor', imageUrl: 'https://via.placeholder.com/40' },
@@ -127,7 +127,7 @@ const orders: Order[] = [
     customerName: 'Garage Pro',
     customerType: 'Service Center',
     amount: 'LKR 29,750',
-    status: 'Paid',
+    status: 'Accepted',
     products: [
       { name: 'Oil Pump', imageUrl: 'https://via.placeholder.com/40' },
       { name: 'Fan Belt', imageUrl: 'https://via.placeholder.com/40' },
@@ -140,22 +140,44 @@ const orders: Order[] = [
     customerName: 'L. Weerasinghe',
     customerType: 'Customer',
     amount: 'LKR 7,500',
-    status: 'Paid',
+    status: 'Completed',
     products: [{ name: 'Fuel Injector', imageUrl: 'https://via.placeholder.com/40' }],
   },
 ];
 
-// Set items per page to show a good number of lines visually
 const ITEMS_PER_PAGE = 5;
-
 
 const OrderDetails: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedOrders = orders.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
+const handleStatusClick = (status: string) => {
+  let path = '';
+
+  switch (status.toLowerCase()) {
+    case 'pending':
+      path = '/PartVendor/PendingOrderDetails';
+      break;
+    case 'accepted':
+      path = '/PartVendor/AcceptedOrders';
+      break;
+    case 'completed':
+      path = '/PartVendor/CompletedOrders';
+      break;
+    case 'failed':
+      path = '/PartVendor/FailedOrders';
+      break;
+    default:
+      console.warn(`Unknown status: ${status}`);
+      return;
+  }
+
+  navigate(path);
+};
   return (
     <div className="order-details">
       <div className="order-details__header">
@@ -211,7 +233,12 @@ const OrderDetails: React.FC = () => {
                 {order.amount}
               </div>
               <div className="order-details__cell" data-label="Status">
-                <span className={`order-details__status order-details__status--${order.status.toLowerCase()}`}>
+                <span
+                  className={`order-details__status order-details__status--${order.status.toLowerCase()}`}
+                  onClick={() => handleStatusClick(order.status)}
+                  style={{ cursor: 'pointer' }}
+                  title={`View all ${order.status} orders`}
+                >
                   {order.status}
                 </span>
               </div>
