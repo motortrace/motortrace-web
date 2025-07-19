@@ -107,12 +107,16 @@ const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({ orderStat
           <button className="btn btn-primary" onClick={handleReadyForShipping}>Ready for Shipping</button>
         </div>
       )}
-
-      {/* <ShippingConfirmationModal
+      {/* <OrderInvoiceModal
+        visible={showInvoice}
+        onClose={() => setShowInvoice(false)}
+        products={invoiceProducts}
+      /> */}
+      <ShippingConfirmationModal
         visible={showShipModal}
         onClose={() => setShowShipModal(false)}
         onShipNow={handleShipNow}
-      /> */}
+      />
 
       {showShippingStatus && <ShippingStatus />}
     </div>
