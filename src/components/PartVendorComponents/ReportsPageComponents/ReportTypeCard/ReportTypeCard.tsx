@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import './ReportTypeCard.scss';
 import { FileText, BarChart2, Package, Users } from 'lucide-react';
+
 import DateRangeModal from '../DateRangeModal/DateRangeModal';
 import OrdersReportModal from '../OrdersReportModal/OrdersReportModal';
+import OrderSummaryReportModal from '../OrderSummaryReportModal/OrderSummaryReportModal';
+import IncomeStatsReportModal from '../IncomeStatsReportModal/IncomeStatsReportModal';
+import IncomeSummaryReportModal from '../IncomeSummaryReportModal/IncomeSummaryReportModal';
+import InventoryStatsReportModal from '../InventoryStatsReportModal/InventoryStatsReportModal';
+import InventorySummaryReportModal from '../InventorySummaryReportModal/InventorySummaryReportModal';
 
 const reportTypes = [
   {
@@ -38,23 +44,41 @@ const reportTypes = [
 const ReportTypeCards = () => {
   const [selectedReport, setSelectedReport] = useState<{ id: string; name: string } | null>(null);
   const [dateRange, setDateRange] = useState<{ from: string; to: string } | null>(null);
+  const [reportType, setReportType] = useState<'summary' | 'stats' | null>(null);
+
   const [showDateModal, setShowDateModal] = useState(false);
-  const [showOrdersModal, setShowOrdersModal] = useState(false);
+  const [showOrdersStatsModal, setShowOrdersStatsModal] = useState(false);
+  const [showOrdersSummaryModal, setShowOrdersSummaryModal] = useState(false);
+  const [showRevenueStatsModal, setShowRevenueStatsModal] = useState(false);
+  const [showRevenueSummaryModal, setShowRevenueSummaryModal] = useState(false);
+  const [showInventoryStatsModal, setShowInventoryStatsModal] = useState(false);
+  const [showInventorySummaryModal, setShowInventorySummaryModal] = useState(false);
 
   const handleGenerateClick = (id: string, name: string) => {
     setSelectedReport({ id, name });
     setShowDateModal(true);
   };
 
-  const handleGenerateReport = (from: string, to: string) => {
+  const handleGenerateReport = (from: string, to: string, type: 'summary' | 'stats') => {
     setDateRange({ from, to });
+    setReportType(type);
     setShowDateModal(false);
 
-    if (selectedReport?.id === 'orders') {
-      setShowOrdersModal(true);
-    }
+    if (!selectedReport) return;
 
-    // You can conditionally show other report modals here in the future
+    switch (selectedReport.id) {
+      case 'orders':
+        type === 'stats' ? setShowOrdersStatsModal(true) : setShowOrdersSummaryModal(true);
+        break;
+      case 'revenue':
+        type === 'stats' ? setShowRevenueStatsModal(true) : setShowRevenueSummaryModal(true);
+        break;
+      case 'inventory':
+        type === 'stats' ? setShowInventoryStatsModal(true) : setShowInventorySummaryModal(true);
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -70,12 +94,8 @@ const ReportTypeCards = () => {
           </div>
 
           <div className="report-card__footer">
-            <button onClick={() => handleGenerateClick(report.id, report.name)}>
-              Generate
-            </button>
-            <span className="report-card__timestamp">
-              Last: {report.lastGenerated}
-            </span>
+            <button onClick={() => handleGenerateClick(report.id, report.name)}>Generate</button>
+            <span className="report-card__timestamp">Last: {report.lastGenerated}</span>
           </div>
         </div>
       ))}
@@ -89,11 +109,54 @@ const ReportTypeCards = () => {
         />
       )}
 
-      {selectedReport?.id === 'orders' && showOrdersModal && dateRange && (
+      {/* Orders */}
+      {selectedReport?.id === 'orders' && reportType === 'stats' && showOrdersStatsModal && dateRange && (
         <OrdersReportModal
           fromDate={dateRange.from}
           toDate={dateRange.to}
-          onClose={() => setShowOrdersModal(false)}
+          onClose={() => setShowOrdersStatsModal(false)}
+        />
+      )}
+
+      {selectedReport?.id === 'orders' && reportType === 'summary' && showOrdersSummaryModal && dateRange && (
+        <OrderSummaryReportModal
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+          onClose={() => setShowOrdersSummaryModal(false)}
+        />
+      )}
+
+      {/* Revenue */}
+      {selectedReport?.id === 'revenue' && reportType === 'stats' && showRevenueStatsModal && dateRange && (
+        <IncomeStatsReportModal
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+          onClose={() => setShowRevenueStatsModal(false)}
+        />
+      )}
+
+      {selectedReport?.id === 'revenue' && reportType === 'summary' && showRevenueSummaryModal && dateRange && (
+        <IncomeSummaryReportModal
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+          onClose={() => setShowRevenueSummaryModal(false)}
+        />
+      )}
+
+      {/* Inventory */}
+      {selectedReport?.id === 'inventory' && reportType === 'stats' && showInventoryStatsModal && dateRange && (
+        <InventoryStatsReportModal
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+          onClose={() => setShowInventoryStatsModal(false)}
+        />
+      )}
+
+      {selectedReport?.id === 'inventory' && reportType === 'summary' && showInventorySummaryModal && dateRange && (
+        <InventorySummaryReportModal
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+          onClose={() => setShowInventorySummaryModal(false)}
         />
       )}
     </div>
