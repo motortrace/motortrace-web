@@ -9,6 +9,8 @@ import IncomeStatsReportModal from '../IncomeStatsReportModal/IncomeStatsReportM
 import IncomeSummaryReportModal from '../IncomeSummaryReportModal/IncomeSummaryReportModal';
 import InventoryStatsReportModal from '../InventoryStatsReportModal/InventoryStatsReportModal';
 import InventorySummaryReportModal from '../InventorySummaryReportModal/InventorySummaryReportModal';
+import CustomerStatsReportModal from '../CustomerStatsReportModal/CustomerStatsReportModal';
+// import CustomerSummaryReportModal from '../CustomerSummaryReportModal/CustomerSummaryReportModal';
 
 const reportTypes = [
   {
@@ -53,6 +55,8 @@ const ReportTypeCards = () => {
   const [showRevenueSummaryModal, setShowRevenueSummaryModal] = useState(false);
   const [showInventoryStatsModal, setShowInventoryStatsModal] = useState(false);
   const [showInventorySummaryModal, setShowInventorySummaryModal] = useState(false);
+  const [showCustomerStatsModal, setShowCustomerStatsModal] = useState(false);
+  const [showCustomerSummaryModal, setShowCustomerSummaryModal] = useState(false);
 
   const handleGenerateClick = (id: string, name: string) => {
     setSelectedReport({ id, name });
@@ -75,6 +79,9 @@ const ReportTypeCards = () => {
         break;
       case 'inventory':
         type === 'stats' ? setShowInventoryStatsModal(true) : setShowInventorySummaryModal(true);
+        break;
+      case 'customers':
+        type === 'stats' ? setShowCustomerStatsModal(true) : setShowCustomerSummaryModal(true);
         break;
       default:
         break;
@@ -100,6 +107,7 @@ const ReportTypeCards = () => {
         </div>
       ))}
 
+      {/* Date Picker */}
       {selectedReport && showDateModal && (
         <DateRangeModal
           isOpen={showDateModal}
@@ -111,53 +119,34 @@ const ReportTypeCards = () => {
 
       {/* Orders */}
       {selectedReport?.id === 'orders' && reportType === 'stats' && showOrdersStatsModal && dateRange && (
-        <OrdersReportModal
-          fromDate={dateRange.from}
-          toDate={dateRange.to}
-          onClose={() => setShowOrdersStatsModal(false)}
-        />
+        <OrdersReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowOrdersStatsModal(false)} />
       )}
-
       {selectedReport?.id === 'orders' && reportType === 'summary' && showOrdersSummaryModal && dateRange && (
-        <OrderSummaryReportModal
-          fromDate={dateRange.from}
-          toDate={dateRange.to}
-          onClose={() => setShowOrdersSummaryModal(false)}
-        />
+        <OrderSummaryReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowOrdersSummaryModal(false)} />
       )}
 
       {/* Revenue */}
       {selectedReport?.id === 'revenue' && reportType === 'stats' && showRevenueStatsModal && dateRange && (
-        <IncomeStatsReportModal
-          fromDate={dateRange.from}
-          toDate={dateRange.to}
-          onClose={() => setShowRevenueStatsModal(false)}
-        />
+        <IncomeStatsReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowRevenueStatsModal(false)} />
       )}
-
       {selectedReport?.id === 'revenue' && reportType === 'summary' && showRevenueSummaryModal && dateRange && (
-        <IncomeSummaryReportModal
-          fromDate={dateRange.from}
-          toDate={dateRange.to}
-          onClose={() => setShowRevenueSummaryModal(false)}
-        />
+        <IncomeSummaryReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowRevenueSummaryModal(false)} />
       )}
 
       {/* Inventory */}
       {selectedReport?.id === 'inventory' && reportType === 'stats' && showInventoryStatsModal && dateRange && (
-        <InventoryStatsReportModal
-          fromDate={dateRange.from}
-          toDate={dateRange.to}
-          onClose={() => setShowInventoryStatsModal(false)}
-        />
+        <InventoryStatsReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowInventoryStatsModal(false)} />
+      )}
+      {selectedReport?.id === 'inventory' && reportType === 'summary' && showInventorySummaryModal && dateRange && (
+        <InventorySummaryReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowInventorySummaryModal(false)} />
       )}
 
-      {selectedReport?.id === 'inventory' && reportType === 'summary' && showInventorySummaryModal && dateRange && (
-        <InventorySummaryReportModal
-          fromDate={dateRange.from}
-          toDate={dateRange.to}
-          onClose={() => setShowInventorySummaryModal(false)}
-        />
+      {/* Customers */}
+      {selectedReport?.id === 'customers' && reportType === 'stats' && showCustomerStatsModal && dateRange && (
+        <CustomerStatsReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowCustomerStatsModal(false)} />
+      )}
+      {selectedReport?.id === 'customers' && reportType === 'summary' && showCustomerSummaryModal && dateRange && (
+        <CustomerSummaryReportModal fromDate={dateRange.from} toDate={dateRange.to} onClose={() => setShowCustomerSummaryModal(false)} />
       )}
     </div>
   );
