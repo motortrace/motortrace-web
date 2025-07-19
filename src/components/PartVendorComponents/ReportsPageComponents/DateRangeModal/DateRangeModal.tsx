@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { FaChartBar, FaListUl } from 'react-icons/fa';
 import './DateRangeModal.scss';
 
 interface DateRangeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onGenerate: (from: string, to: string) => void;
+  onGenerate: (from: string, to: string, type: 'summary' | 'stats') => void;
   reportName: string;
 }
 
@@ -16,6 +17,7 @@ const DateRangeModal: React.FC<DateRangeModalProps> = ({
 }) => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [reportType, setReportType] = useState<'summary' | 'stats'>('stats');
 
   if (!isOpen) return null;
 
@@ -23,6 +25,27 @@ const DateRangeModal: React.FC<DateRangeModalProps> = ({
     <div className="date-range-modal__overlay">
       <div className="date-range-modal">
         <h3>Generate {reportName}</h3>
+
+        <div className="modal-select">
+          <label>Report Type</label>
+          <div className="custom-dropdown">
+            <div
+              className={`dropdown-option ${reportType === 'stats' ? 'active' : ''}`}
+              onClick={() => setReportType('stats')}
+            >
+              <FaChartBar className="dropdown-icon" />
+              <span>Stats Report</span>
+            </div>
+            <div
+              className={`dropdown-option ${reportType === 'summary' ? 'active' : ''}`}
+              onClick={() => setReportType('summary')}
+            >
+              <FaListUl className="dropdown-icon" />
+              <span>Summary Report</span>
+            </div>
+          </div>
+        </div>
+
         <div className="modal-fields">
           <div>
             <label>From</label>
@@ -41,12 +64,13 @@ const DateRangeModal: React.FC<DateRangeModalProps> = ({
             />
           </div>
         </div>
+
         <div className="modal-actions">
           <button onClick={onClose}>Cancel</button>
           <button
             className="primary"
             onClick={() => {
-              onGenerate(fromDate, toDate);
+              onGenerate(fromDate, toDate, reportType);
               onClose();
             }}
             disabled={!fromDate || !toDate}
