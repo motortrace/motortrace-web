@@ -64,7 +64,7 @@ const PartVendorDashboard = () => {
           ratingTrend={+0.2}
         />
       </div>
-
+<OrdersOverview />
       <div className="dashboard-cards-row">
         <ProfitOverviewCard
           totalRevenue={145000}
@@ -81,10 +81,10 @@ const PartVendorDashboard = () => {
         <SalesOverviewCard
         />
       </div>
-
+{/* 
       <SalesByItemChart />
-      <OrdersOverview />
-      <DashboardCharts />
+      
+      <DashboardCharts /> */}
     </div>
   );
 };
