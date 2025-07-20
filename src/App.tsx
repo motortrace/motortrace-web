@@ -28,6 +28,18 @@ import AutoRepairReviews from './pages/ServiceCenter/Reviews/AutoRepairReviews';
 import AutoRepairChat from './pages/ServiceCenter/AutoRepairChat/AutoRepairChat';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 
+import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
+import AdminDashboard from './pages/Admin/Dashboard';
+import UserManagement from './pages/Admin/UserManagement';
+import BookingOversight from './pages/Admin/BookingOversight';
+import RefundManagement from './pages/Admin/RefundManagement';
+import ContentModeration from './pages/Admin/ContentModeration';
+import ViewUserProfile from './components/Admin/ViewUserProfile/UserProfile';
+import AdminSettings from './pages/Admin/AdminSettings';
+import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
+import RegistrationRequests from './components/Admin/UserManagement/RegistrationRequests';
+
+
 function App() {
   return (
     <BrowserRouter>
@@ -82,9 +94,25 @@ function App() {
           <Route path="profile" element={<EditProfile />} />
         </Route>
 
-        {/* Redirect dashboard to service center dashboard for now */}
-        <Route path="/dashboard" element={<Navigate to="/servicecenter/dashboard" replace />} />
-        
+        <Route path="/admin" element={<AdminDashboardLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          
+          <Route path="userManagement">
+            <Route index element={<Navigate to="carUsers" replace />} />
+            <Route path=":userType" element={<UserManagement />} />
+            <Route path=":userType/:userId/profile" element={<ViewUserProfile />} />
+            <Route path="pendingApprovals" element={<RegistrationRequests />} />
+          </Route>
+
+          <Route path = "bookingOversight" element = {<BookingOversight />} />
+          <Route path = "refundManagement" element = {<RefundManagement />} />
+          <Route path = "contentModeration" element = {<ContentModeration />} />
+          <Route path = "revenueAndPayouts" element = {<RevenueAndPayouts />} />
+          <Route path = "settings" element = {<AdminSettings />} />
+          
+        </Route>
+
       </Routes>
     </BrowserRouter>
   );

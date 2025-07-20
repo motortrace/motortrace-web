@@ -40,6 +40,50 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
+
+  '/admin/dashboard': {
+    title: 'Welcome back, Admin!',
+    description: 'Overview of your platform and activities',
+  },
+  '/admin/userManagement/carUsers': {
+    title: 'Car Users Management',
+    description: 'Manage and support your platform’s car users with ease',
+  },
+  '/admin/userManagement/serviceCenters': {
+    title: 'Service Centers Management',
+    description: 'Oversee service centers and maintain service quality',
+  },
+  '/admin/userManagement/sparePartsSellers': {
+    title: 'Spare Parts Sellers Management',
+    description: 'Manage seller accounts and monitor spare parts listings efficiently',
+  },
+  '/admin/userManagement/pendingApprovals': {
+    title: 'Pending Registration Requests',
+    description: 'Quickly review and approve new user registration requests to keep your platform active and up-to-date',
+  },
+  '/admin/bookingOversight': {
+    title: 'Booking Oversight',
+    description: 'Track and manage all service bookings across the platform',
+  },
+  '/admin/refundManagement': {
+    title: 'Refund Management',
+    description: 'Manage cancellation refunds based on your refund policy',
+  },
+  '/admin/contentModeration': {
+    title: 'Content Moderation',
+    description: 'Handle reported posts and comments to maintain a respectful community environment',
+  },
+  '/admin/revenueAndPayouts': {
+    title: 'Revenue & Payouts',
+    description: 'Monitor platform earnings and payouts to service providers seamlessly',
+  },
+  '/admin/settings': {
+    title: 'System Configuration',
+    description: 'Manage essential platform settings to ensure seamless experience for all users',
+  }
+};
+
+
   '/servicecenter/appointments/details': {
     title: 'Appointment Details',
     description: 'View details about the appointment request',
@@ -77,6 +121,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     description: 'Manage your profile',
   },
 }
+
 const Navbar: React.FC = () => {
   const location = useLocation();
   const info = pageInfo[location.pathname] || {
