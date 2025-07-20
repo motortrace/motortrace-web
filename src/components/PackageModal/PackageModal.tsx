@@ -29,19 +29,28 @@ const PackageModal: React.FC<PackageModalProps> = ({
 }) => {
   // Defensive: always use a safe array
   const safeIndividualServices = Array.isArray(individualServices) ? individualServices : [];
-  const [currentPackage, setCurrentPackage] = useState<any | null>(packageData || null);
+  // If editing, start in view mode; if creating, start in edit mode
   const [isEditing, setIsEditing] = useState(!packageData);
-  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(packageData?.serviceIds || []);
-  const [discount, setDiscount] = useState<{ type: 'percent' | 'fixed'; value: number }>(packageData?.discount || defaultDiscount);
+  const [currentPackage, setCurrentPackage] = useState<any | null>(packageData || null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(packageData?.serviceIds || (packageData?.services ? packageData.services.map((s: any) => String(s.serviceId || s.service?.id)) : []));
+  const [discount, setDiscount] = useState<{ type: 'percent' | 'fixed'; value: number }>(packageData?.discount || (packageData?.discountType ? { type: packageData.discountType, value: packageData.discountValue } : defaultDiscount));
   const [customTotal, setCustomTotal] = useState<number | null>(packageData?.customTotal || null);
   const [serviceToAdd, setServiceToAdd] = useState<string>('');
 
+  // When packageData changes (e.g. opening for edit), update state
   useEffect(() => {
     if (packageData) {
       setCurrentPackage(packageData);
-      setSelectedServiceIds(packageData.serviceIds || []);
-      setDiscount(packageData.discount || defaultDiscount);
+      setSelectedServiceIds(
+        packageData.serviceIds ||
+        (packageData.services ? packageData.services.map((s: any) => String(s.serviceId || s.service?.id)) : [])
+      );
+      setDiscount(
+        packageData.discount ||
+        (packageData.discountType ? { type: packageData.discountType, value: packageData.discountValue } : defaultDiscount)
+      );
       setCustomTotal(packageData.customTotal || null);
+      setIsEditing(false); // Always start in view mode for edit
     } else {
       setCurrentPackage({
         id: `package-${Date.now()}`,
@@ -56,6 +65,7 @@ const PackageModal: React.FC<PackageModalProps> = ({
       setSelectedServiceIds([]);
       setDiscount(defaultDiscount);
       setCustomTotal(null);
+      setIsEditing(true); // Always start in edit mode for create
     }
   }, [packageData]);
 

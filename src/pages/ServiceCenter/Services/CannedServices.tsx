@@ -169,23 +169,36 @@ const CannedServices = () => {
     }
   };
 
-  // Handler to add a new package
-  const handleAddPackage = async (packageData: any) => {
+  // Handler to add or update a package
+  const handleSavePackage = async (packageData: any) => {
     if (!centerId) return;
     setLoading(true);
     try {
-      // Ensure serviceIds is an array of numbers (ShopService IDs)
-      const payload = {
-        ...packageData,
+      // Prepare payload for backend
+      const payload: any = {
+        name: packageData.name,
+        description: packageData.description,
+        category: packageData.category,
+        isActive: packageData.isActive,
+        discountType: packageData.discount?.type || packageData.discountType || 'percent',
+        discountValue: typeof packageData.discount?.value === 'number' ? packageData.discount.value : packageData.discountValue || 0,
+        customTotal: packageData.customTotal ?? null,
         serviceIds: (packageData.serviceIds || []).map((id: string | number) => Number(id)),
       };
-      await packagesApi.createPackage(centerId.toString(), payload);
-      // Refresh services and packages after adding
+      if (packageData.id) {
+        // Edit mode: PUT
+        await packagesApi.updatePackage(centerId.toString(), packageData.id, payload);
+      } else {
+        // Create mode: POST
+        await packagesApi.createPackage(centerId.toString(), payload);
+      }
+      // Refresh services and packages after saving
       const data = await servicesApi.getServices(centerId.toString());
       setServices(data);
       setShowPackageModal(false);
+      setSelectedPackage(null);
     } catch (err: any) {
-      setError(err.message || 'Failed to add package');
+      setError(err.message || 'Failed to save package');
     } finally {
       setLoading(false);
     }
@@ -329,10 +342,11 @@ const CannedServices = () => {
       render: (_value, row) => (
         <button
           className="btn-icon"
-          title="Manage Services"
+          title="Manage Package"
           onClick={e => {
             e.stopPropagation();
-            alert(`Manage services for ${row.name}`);
+            setSelectedPackage(row);
+            setShowPackageModal(true);
           }}
         >
           <i className="bx bx-cog"></i>
@@ -569,8 +583,11 @@ const CannedServices = () => {
         <PackageModal
           packageData={selectedPackage}
           individualServices={individualServiceItems}
-          onClose={() => setShowPackageModal(false)}
-          onSave={handleAddPackage}
+          onClose={() => {
+            setShowPackageModal(false);
+            setSelectedPackage(null);
+          }}
+          onSave={handleSavePackage}
         />
       )}
     </div>

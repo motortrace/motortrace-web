@@ -63,7 +63,10 @@ const LoginPage = () => {
     try {
       const res = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Type': 'web',
+        },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
