@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import "../../../styles/variables.scss"
 import './Header.scss';
@@ -9,6 +9,7 @@ const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [activeLink, setActiveLink] = useState<string>('home');
   const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleMobileMenu = (): void => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -146,7 +147,13 @@ const Header: React.FC = () => {
           Contact Us
         </a>
 
-        <Button variant = 'contained'  sx={{ textTransform: 'none', fontFamily: 'Poppins, sans-serif'}}>Login</Button>
+        <Button 
+          variant='contained'  
+          sx={{ textTransform: 'none', fontFamily: 'Poppins, sans-serif'}}
+          onClick={() => navigate('/login')}
+        >
+          Login
+        </Button>
       </div>
     </nav>
   );

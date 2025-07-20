@@ -80,10 +80,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
   '/admin/settings': {
     title: 'System Configuration',
     description: 'Manage essential platform settings to ensure seamless experience for all users',
-  }
-};
-
-
+  },
   '/servicecenter/appointments/details': {
     title: 'Appointment Details',
     description: 'View details about the appointment request',
@@ -120,7 +117,8 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Profile',
     description: 'Manage your profile',
   },
-}
+};
+
 
 const Navbar: React.FC = () => {
   const location = useLocation();
