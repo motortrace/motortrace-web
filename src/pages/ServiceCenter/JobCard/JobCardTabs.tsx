@@ -48,7 +48,15 @@ export const JobCardTabs: React.FC<JobCardTabsProps> = ({
           <ServicesTab services={services} setServices={setServices} calculateGrandTotal={calculateGrandTotal} />
         )}
         {activeTab === 'parts' && <PartsTab partItems={partItems} />}
-        {activeTab === 'inspections' && <InspectionsTab />}
+        {activeTab === 'inspections' && (
+          <InspectionsTab 
+            workOrderId="WO-2024-001"
+            customerName="Amber Miller"
+            vehicleInfo="2020 Audi A4 Premium"
+            licensePlate="ABC-1234"
+            technician="Chuck Ivanes"
+          />
+        )}
         {activeTab === 'notes' && <NotesTab notes={notes} onNotesChange={setNotes} />}
       </div>
     </>

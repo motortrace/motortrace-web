@@ -1,0 +1,380 @@
+@import '../../styles/variables.scss';
+
+.digital-inspections-page {
+  min-height: 100vh;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .page-title {
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 8px 0;
+        font-family: var(--font-primary);
+      }
+
+      p {
+        font-size: 16px;
+        color: #64748b;
+        margin: 0;
+        font-family: var(--font-secondary);
+      }
+    }
+
+    .page-actions {
+      display: flex;
+      gap: 12px;
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+
+        i {
+          font-size: 16px;
+        }
+
+        &--primary {
+          background: var(--color-primary);
+          color: white;
+
+          &:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-1px);
+          }
+        }
+
+        &--secondary {
+          background: white;
+          color: var(--color-primary);
+          border: 2px solid var(--color-primary);
+
+          &:hover {
+            background: var(--color-primary);
+            color: white;
+            transform: translateY(-1px);
+          }
+        }
+      }
+    }
+  }
+
+  .metric-cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .inspection-controls {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .search-filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+
+      .search-box {
+        flex: 1 1 220px;
+        min-width: 180px;
+      }
+      .filter-select {
+        width: auto;
+        min-width: 140px;
+        flex: 0 0 auto;
+      }
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #f1f5f9;
+          color: #374151;
+        }
+
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  // Table customizations
+  .table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .work-order-cell {
+      .work-order-id {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 14px;
+      }
+
+      .template-name {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 2px;
+      }
+    }
+
+    .customer-vehicle-cell {
+      .customer-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 14px;
+      }
+
+      .vehicle-info {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 2px;
+      }
+    }
+
+    .technician-name {
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .progress-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .progress-bar {
+        flex: 1;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #10b981, #059669);
+          border-radius: 3px;
+          transition: width 0.3s ease;
+        }
+      }
+
+      .progress-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: #059669;
+        min-width: 35px;
+      }
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: capitalize;
+
+      &.status-draft {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      &.status-in-progress {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      &.status-completed {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      &.status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+
+    .overall-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+
+      &.overall-pass {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      &.overall-fail {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      &.overall-warning {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      &.overall-pending {
+        background: #e2e8f0;
+        color: #475569;
+      }
+    }
+
+    .action-buttons-cell {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+
+      .btn-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 6px;
+        background-color: var(--color- );
+        color: var(--color-neutral-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: var(--color-primary);
+          color: white;
+          transform: translateY(-1px);
+        }
+
+        &.btn-danger {
+          background-color: rgba(199, 44, 43, 0.1);
+          color: var(--color-danger);
+
+          &:hover {
+            background-color: var(--color-danger);
+            color: white;
+          }
+        }
+
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 1024px) {
+  .digital-inspections-page {
+    padding: 16px;
+
+    .page-header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      .page-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    .inspection-controls {
+      .search-filters {
+        flex-direction: column;
+        align-items: stretch;
+
+        .search-box {
+          min-width: auto;
+        }
+
+        .filter-select {
+          width: 100%;
+        }
+      }
+
+      .quick-actions {
+        justify-content: flex-start;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .digital-inspections-page {
+    padding: 12px;
+
+    .page-header {
+      .page-title {
+        h1 {
+          font-size: 24px;
+        }
+
+        p {
+          font-size: 14px;
+        }
+      }
+
+      .page-actions {
+        flex-direction: column;
+        gap: 8px;
+
+        .btn {
+          justify-content: center;
+        }
+      }
+    }
+
+    .metric-cards-row {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .inspection-controls {
+      padding: 16px;
+
+      .search-filters {
+        gap: 12px;
+      }
+    }
+  }
+} 

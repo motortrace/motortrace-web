@@ -5,14 +5,14 @@ export interface WorkOrder {
     customer: string;
     vehicle: string;
     year: number;
-    estimateNumber: string;
+    estimateNumber?: string;
     amount: number;
     hours: {
       left: number;
       billed: number;
     };
     tags: string[];
-    status: 'opened' | 'estimate-sent' | 'in-progress' | 'invoiced' | 'closed' | 'estimates' | 'approved' | 'completed';
+    status: 'opened' | 'in-progress' | 'on-hold' | 'completed';
     image?: string;
     assignedPeople?: {
       id: string;
