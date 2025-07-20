@@ -62,7 +62,20 @@ const SetupPaymentPage = () => {
         return;
       }
       if (status.hasActiveSubscription) {
-        navigate('/dashboard');
+        // Get user from localStorage or status
+        let user = status.user;
+        if (!user) {
+          try {
+            user = JSON.parse(localStorage.getItem('user') || '{}');
+          } catch {}
+        }
+        if (user && user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (user && user.role === 'service_center') {
+          navigate('/servicecenter/dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         setCheckingStatus(false);
       }
@@ -183,8 +196,18 @@ const SetupPaymentPage = () => {
       const result = await createSubscription(paymentData);
       
       if (result.success) {
-        // Payment complete, redirect to dashboard
-        window.location.href = '/dashboard';
+        // Payment complete, redirect to role-specific dashboard
+        let user = null;
+        try {
+          user = JSON.parse(localStorage.getItem('user') || '{}');
+        } catch {}
+        if (user && user.role === 'admin') {
+          window.location.href = '/admin/dashboard';
+        } else if (user && user.role === 'service_center') {
+          window.location.href = '/servicecenter/dashboard';
+        } else {
+          window.location.href = '/';
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Payment failed. Please try again.');
