@@ -19,6 +19,7 @@ export interface JobService {
   scheduledStart: Date | null;
   scheduledEnd: Date | null;
   status: 'pending' | 'assigned' | 'in_progress' | 'completed';
+  taskType: 'appointment' | 'service' | 'inspection';
   notes?: string;
 }
 

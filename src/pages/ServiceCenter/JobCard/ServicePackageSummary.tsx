@@ -15,15 +15,15 @@ export const ServicePackageSummary: React.FC<ServicePackageSummaryProps> = ({ se
       <div className="summary-list">
         <div className="summary-list__item">
           <span className="summary-list__label">Service Total</span>
-          <span className="summary-list__value">${serviceTotal.toFixed(2)}</span>
+          <span className="summary-list__value">{serviceTotal.toFixed(2)} LKR</span>
         </div>
         <div className="summary-list__item">
           <span className="summary-list__label">Total Discount</span>
-          <span className="summary-list__value">-${totalDiscount.toFixed(2)}</span>
+          <span className="summary-list__value">-{totalDiscount.toFixed(2)} LKR</span>
         </div>
         <div className="summary-list__total">
           <span className="summary-list__label">Net Total</span>
-          <span className="summary-list__value">${netTotal.toFixed(2)}</span>
+          <span className="summary-list__value">{netTotal.toFixed(2)} LKR</span>
         </div>
       </div>
     </div>

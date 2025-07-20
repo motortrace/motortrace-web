@@ -11,8 +11,7 @@ export const ServicePackageDetails: React.FC<ServicePackageDetailsProps> = ({ se
       <strong>Note:</strong> {service.note || 'No notes for this service.'}
     </p>
     <div className="service-package__add-ons">
-      <button className="btn btn--secondary-emerald">Add Service Item</button>
-      <button className="btn btn--secondary">Add Inspection Checklist</button>
+      <button className="btn btn--primary">Add Service Item</button>
     </div>
   </div>
 ); 

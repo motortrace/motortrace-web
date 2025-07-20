@@ -4,6 +4,13 @@
   padding: 0;
 //   background-color: var(--background-color);
   min-height: 100vh;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
 
   .metric-cards-row {
     display: grid;
@@ -14,9 +21,8 @@
   }
 
   .technician-scheduling-content {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
     padding: 0 1.5rem 1.5rem;
     height: calc(100vh - 200px);
   }
@@ -165,6 +171,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    flex: 1;
+    width: 100%;
   }
 
   // Calendar Toolbar
@@ -286,11 +294,14 @@
   .calendar-container {
     flex: 1;
     padding: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
 
     // FullCalendar custom styles
     .fc {
       height: 100%;
       font-family: var(--font-primary);
+      min-width: 800px;
 
       .fc-toolbar {
         display: none; // We use custom toolbar
@@ -324,17 +335,28 @@
         border: none;
         font-size: 0.75rem;
         font-weight: 500;
-        padding: 2px 4px;
+        padding: 8px 12px;
         cursor: pointer;
         transition: all 0.2s ease;
+        min-height:30px;
+        margin: 2px 0;
+        min-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         &:hover {
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          white-space: normal;
+          overflow: visible;
+          z-index: 10;
+          position: relative;
         }
 
         .fc-event-title {
-          font-weight: 600;
+          font-weight: 460;
+          line-height: 1.2;
         }
 
         .fc-event-time {

@@ -1,354 +1,240 @@
-// AppointmentModal.tsx
-import React, { useState, useEffect } from 'react';
-import Modal from 'react-modal';
-import type { PendingRequest } from '../../types/PendingRequest';
+import React from 'react';
 import './AppointmentModal.scss';
 
-interface ServiceItem {
-  name: string;
-  charge: number;
-  estimatedDuration: number;
-  assignedTechnician: string | null;
+interface Vehicle {
+  make: string;
+  model: string;
+  year: number;
+  mileage: number;
+  color: string;
+  licensePlate: string;
 }
 
-interface Technician {
+interface Customer {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  isReturning: boolean;
+}
+
+interface AppointmentRequest {
   id: string;
-  name: string;
-  currentJobs: number;
-  skillLevel: 'Junior' | 'Senior' | 'Expert';
-  availability: 'Available' | 'Busy' | 'Off';
-}
-
-interface TimeSlotConflict {
-  hasConflict: boolean;
-  conflictDetails?: string;
+  customer: Customer;
+  vehicle: Vehicle;
+  serviceType: string;
+  description: string;
+  urgency: 'low' | 'medium' | 'high' | 'emergency';
+  preferredDate: string;
+  preferredTime: string;
+  alternativeDate?: string;
+  alternativeTime?: string;
+  estimatedDuration: string;
+  budgetRange: string;
+  images?: string[];
+  previousVisits?: number;
+  lastServiceDate?: string;
+  requestDate: string;
+  contactPreference: 'phone' | 'email' | 'text';
 }
 
 interface AppointmentModalProps {
   isOpen: boolean;
-  request: PendingRequest | null;
   onClose: () => void;
-  onConfirm: (updatedRequest: Omit<PendingRequest, 'services'> & {
-    services: ServiceItem[];
-    estimatedPrice: number;
-    images: string[];
-    errorCodes: string[];
-    customerNotes: string;
-    estimatedDuration: number;
-  }) => void;
+  appointment: AppointmentRequest | null;
+  onAccept: (appointmentId: string) => void;
+  onDecline: (appointmentId: string) => void;
+  onSchedule: (appointmentId: string) => void;
 }
 
-const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, request, onClose, onConfirm }) => {
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [images, setImages] = useState<string[]>([]);
-  const [errorCodes] = useState<string[]>(['P0300', 'P0171']);
-  const [newService, setNewService] = useState<string>('');
-  const [customerNotes, setCustomerNotes] = useState<string>('');
-  const [showHistory, setShowHistory] = useState(false);
+const AppointmentModal: React.FC<AppointmentModalProps> = ({
+  isOpen,
+  onClose,
+  appointment,
+  onAccept,
+  onDecline,
+  onSchedule
+}) => {
+  if (!isOpen || !appointment) return null;
 
-  // Mock data for technicians
-  const technicians: Technician[] = [
-    { id: 'tech1', name: 'Alex Kumar', currentJobs: 3, skillLevel: 'Expert', availability: 'Available' },
-    { id: 'tech2', name: 'Nisha Patel', currentJobs: 2, skillLevel: 'Senior', availability: 'Available' },
-    { id: 'tech3', name: 'Ravi Singh', currentJobs: 1, skillLevel: 'Junior', availability: 'Available' },
-    { id: 'tech4', name: 'Maria Santos', currentJobs: 4, skillLevel: 'Senior', availability: 'Busy' },
-  ];
-
-  // Mock time slot conflict check
-  const checkTimeSlotConflict = (date: string, time: string): TimeSlotConflict => {
-    const conflictChance = Math.random();
-    if (conflictChance > 0.7) {
-      return {
-        hasConflict: true,
-        conflictDetails: `${technicians[0].name} already has 1 job scheduled for this time slot`
-      };
-    }
-    return { hasConflict: false };
-  };
-
-  const [timeSlotConflict, setTimeSlotConflict] = useState<TimeSlotConflict>({ hasConflict: false });
-
-  useEffect(() => {
-    if (request) {
-      const initialServices = request.services.map(serviceName => ({
-        name: serviceName,
-        charge: 50 + Math.floor(Math.random() * 100),
-        estimatedDuration: 30 + Math.floor(Math.random() * 60),
-        assignedTechnician: null
-      }));
-      setServices(initialServices);
-      setImages([]);
-      setCustomerNotes(request.notes || "");
-      
-      const conflict = checkTimeSlotConflict(request.requestedDate, request.requestedTime);
-      setTimeSlotConflict(conflict);
-    }
-  }, [request]);
-
-  if (!request) return null;
-
-  const addService = () => {
-    if (newService.trim()) {
-      const newServiceItem: ServiceItem = {
-        name: newService.trim(),
-        charge: 25 + Math.floor(Math.random() * 75),
-        estimatedDuration: 20 + Math.floor(Math.random() * 40),
-        assignedTechnician: null
-      };
-      setServices([...services, newServiceItem]);
-      setNewService('');
+  const getUrgencyClass = (urgency: string) => {
+    switch (urgency) {
+      case 'emergency': return 'urgency-emergency';
+      case 'high': return 'urgency-high';
+      case 'medium': return 'urgency-medium';
+      default: return 'urgency-low';
     }
   };
 
-  const removeService = (indexToRemove: number) => {
-    setServices(services.filter((_, index) => index !== indexToRemove));
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    const urls = Array.from(files).map(file => URL.createObjectURL(file));
-    setImages(prev => [...prev, ...urls]);
-  };
-
-  const handleTechAssignment = (serviceIndex: number, techId: string | null) => {
-    const updatedServices = [...services];
-    updatedServices[serviceIndex].assignedTechnician = techId;
-    setServices(updatedServices);
-  };
-
-  // Calculate totals
-  const estimatedPrice = services.reduce((total, service) => total + service.charge, 0);
-  const estimatedDuration = services.reduce((total, service) => total + service.estimatedDuration, 0);
-
-  const isReadyToConfirm = services.every(service => service.assignedTechnician !== null);
-
-  const handleConfirm = () => {
-    if (!isReadyToConfirm) {
-      alert('Please assign technicians to all services before confirming.');
-      return;
-    }
-    
-    onConfirm({
-      ...request,
-      services,
-      estimatedPrice,
-      images,
-      errorCodes,
-      customerNotes,
-      estimatedDuration,
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
-    onClose();
   };
 
-  // Hardcoded data for demonstration
-  const vehicleHistory = [
-    { date: '2023-11-20', service: 'Brake Pad Replacement', cost: 150.00, mileage: 68500 },
-    { date: '2023-05-10', service: 'Oil Change', cost: 65.00, mileage: 64200 },
-    { date: '2023-01-15', service: 'Tire Rotation', cost: 35.00, mileage: 61200 },
-    { date: '2022-11-30', service: 'Battery Replacement', cost: 120.00, mileage: 59800 },
-  ];
-
-  const visibleHistory = showHistory ? vehicleHistory : vehicleHistory.slice(0, 2);
-
-  const vehicleInfo = {
-    mileage: 72000,
-    lastServiceDate: '2023-11-20',
-    lastServiceMileage: 68500
+  const formatTime = (timeString: string) => {
+    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onClose}
-      contentLabel="Appointment Details"
-      className="appointment-modal"
-      overlayClassName="modal-overlay"
-      appElement={document.getElementById('root') || undefined}
-    >
-      <h2>
-        Appointment Details - {request.id}
-        <button className="close-btn" onClick={onClose}>×</button>
-      </h2>
-      
-      <div className="modal-content">
-        <div className="modal-layout">
-          {/* Left Panel */}
-          <div className="left-panel">
-            <div className="modal-section">
-              <h3>Customer Details</h3>
-              <div className="customer-info">
-                <img 
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(request.customer)}&background=random`} 
-                  alt={request.customer}
-                  className="customer-avatar"
-                />
-                <div>
-                  <p><strong>Name:</strong> {request.customer}</p>
-                  <p><strong>Phone:</strong> {request.phone}</p>
-                  <button 
-                    className="view-profile-btn"
-                    onClick={() => alert(`Navigating to ${request.customer}'s profile`)}
-                  >
-                    View Profile
-                  </button>
-                </div>
-              </div>
-            </div>
+    <div className="appointment-modal-overlay" onClick={onClose}>
+      <div className="appointment-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Appointment Request Details</h2>
+          <button className="close-btn" onClick={onClose}>×</button>
+        </div>
 
-            <div className="modal-section">
-              <h3>Vehicle Details</h3>
-              <div className="vehicle-details">
-                <div className="vehicle-image-container">
-                  <img 
-                    src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" 
-                    alt={request.vehicle} 
-                    className="vehicle-image"
-                  />
-                </div>
-                <p><strong>Vehicle:</strong> {request.vehicle}</p>
-                <p><strong>Odometer:</strong> {vehicleInfo.mileage.toLocaleString()} km</p>
-                <p><strong>Last Service:</strong> {vehicleInfo.lastServiceDate} ({vehicleInfo.lastServiceMileage.toLocaleString()} km)</p>
-                <p><strong>Requested At:</strong> {request.requestedDate} {request.requestedTime}</p>
-                {timeSlotConflict.hasConflict && (
-                  <div className="conflict-warning">
-                    ⚠️ {timeSlotConflict.conflictDetails}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="modal-section">
-              <h3>Customer Notes</h3>
-              <textarea
-                value={customerNotes}
-                onChange={(e) => setCustomerNotes(e.target.value)}
-                placeholder="Customer comments, urgency notes, specific issues..."
-                rows={3}
-                className="notes-textarea"
-              />
-            </div>
-
-            <div className="modal-section">
-              <div className="section-header">
-                <h3>Vehicle Service History</h3>
-                <button 
-                  className="view-all-btn"
-                  onClick={() => setShowHistory(!showHistory)}
-                >
-                  {showHistory ? 'Show Less' : 'View All'}
-                </button>
-              </div>
-              <table className="history-table">
-                <thead>
-                  <tr><th>Date</th><th>Service</th><th>Cost</th><th>Mileage</th></tr>
-                </thead>
-                <tbody>
-                  {visibleHistory.map((item, i) => (
-                    <tr key={i}>
-                      <td>{item.date}</td>
-                      <td>{item.service}</td>
-                      <td>${item.cost.toFixed(2)}</td>
-                      <td>{item.mileage.toLocaleString()} km</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        <div className="modal-content">
+          {/* Urgency Badge */}
+          <div className={`urgency-badge ${getUrgencyClass(appointment.urgency)}`}>
+            {appointment.urgency.toUpperCase()} PRIORITY
           </div>
 
-          {/* Right Panel */}
-          <div className="right-panel">
-            <div className="modal-section">
-              <h3>Services Required</h3>
-              <table className="services-table">
-                <thead>
-                  <tr>
-                    <th>Service</th>
-                    <th>Duration</th>
-                    <th>Charge</th>
-                    <th>Technician</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {services.map((service, index) => (
-                    <tr key={index}>
-                      <td>{service.name}</td>
-                      <td>{service.estimatedDuration} min</td>
-                      <td>${service.charge.toFixed(2)}</td>
-                      <td>
-                        <select
-                          value={service.assignedTechnician || ''}
-                          onChange={(e) => handleTechAssignment(index, e.target.value || null)}
-                          className="technician-select"
-                        >
-                          <option value="">Select Technician</option>
-                          {technicians.map(tech => (
-                            <option 
-                              key={tech.id} 
-                              value={tech.id}
-                              disabled={tech.availability === 'Busy'}
-                            >
-                              {tech.name} ({tech.skillLevel}) - {tech.availability}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td>
-                        <button className="remove-btn" onClick={() => removeService(index)}>Remove</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="add-row">
-                <input
-                  type="text"
-                  value={newService}
-                  placeholder="Add a new service..."
-                  onChange={e => setNewService(e.target.value)}
-                />
-                <button onClick={addService}>Add Service</button>
+          {/* Customer Information */}
+          <section className="section">
+            <h3>Customer Information</h3>
+            <div className="info-grid">
+              <div className="info-item">
+                <label>Name:</label>
+                <span>{appointment.customer.name}</span>
+                {appointment.customer.isReturning && <span className="returning-badge">Returning Customer</span>}
               </div>
-              <div className="totals-summary">
-                <div className="total-item">
-                  <strong>Estimated Duration:</strong> {Math.floor(estimatedDuration / 60)}h {estimatedDuration % 60}m
+              <div className="info-item">
+                <label>Phone:</label>
+                <span>{appointment.customer.phone}</span>
+              </div>
+              <div className="info-item">
+                <label>Email:</label>
+                <span>{appointment.customer.email}</span>
+              </div>
+              <div className="info-item">
+                <label>Address:</label>
+                <span>{appointment.customer.address}</span>
+              </div>
+              <div className="info-item">
+                <label>Contact Preference:</label>
+                <span className="contact-pref">{appointment.contactPreference.toUpperCase()}</span>
+              </div>
+              {appointment.previousVisits && (
+                <div className="info-item">
+                  <label>Previous Visits:</label>
+                  <span>{appointment.previousVisits}</span>
                 </div>
-                <div className="total-item">
-                  <strong>Estimated Cost:</strong> ${estimatedPrice.toFixed(2)}
+              )}
+            </div>
+          </section>
+
+          {/* Vehicle Information */}
+          <section className="section">
+            <h3>Vehicle Information</h3>
+            <div className="info-grid">
+              <div className="info-item">
+                <label>Vehicle:</label>
+                <span>{appointment.vehicle.year} {appointment.vehicle.make} {appointment.vehicle.model}</span>
+              </div>
+              <div className="info-item">
+                <label>Color:</label>
+                <span>{appointment.vehicle.color}</span>
+              </div>
+              <div className="info-item">
+                <label>License Plate:</label>
+                <span>{appointment.vehicle.licensePlate}</span>
+              </div>
+              <div className="info-item">
+                <label>Mileage:</label>
+                <span>{appointment.vehicle.mileage.toLocaleString()} miles</span>
+              </div>
+              {appointment.lastServiceDate && (
+                <div className="info-item">
+                  <label>Last Service:</label>
+                  <span>{formatDate(appointment.lastServiceDate)}</span>
                 </div>
+              )}
+            </div>
+          </section>
+
+          {/* Service Details */}
+          <section className="section">
+            <h3>Service Request</h3>
+            <div className="service-details">
+              <div className="info-item">
+                <label>Service Type:</label>
+                <span className="service-type">{appointment.serviceType}</span>
+              </div>
+              <div className="info-item">
+                <label>Budget Range:</label>
+                <span className="budget">{appointment.budgetRange}</span>
+              </div>
+              <div className="info-item">
+                <label>Estimated Duration:</label>
+                <span>{appointment.estimatedDuration}</span>
+              </div>
+              <div className="description-item">
+                <label>Description:</label>
+                <p>{appointment.description}</p>
               </div>
             </div>
+          </section>
 
-            <div className="modal-section">
-              <h3>OBD Error Codes</h3>
-              <ul className="error-list">
-                {errorCodes.map((e,i) => <li key={i}>{e}</li>)}
-              </ul>
-            </div>
-
-            <div className="modal-section">
-              <h3>Images & Documentation</h3>
-              <input type="file" multiple accept="image/*" onChange={handleImageUpload} />
-              <div className="image-grid">
-                {images.map((src,i) => <img key={i} src={src} alt={`upload-${i}`} />)}
+          {/* Scheduling Preferences */}
+          <section className="section">
+            <h3>Scheduling Preferences</h3>
+            <div className="scheduling-info">
+              <div className="preferred-slot">
+                <label>Preferred:</label>
+                <span>{formatDate(appointment.preferredDate)} at {formatTime(appointment.preferredTime)}</span>
               </div>
+              {appointment.alternativeDate && (
+                <div className="alternative-slot">
+                  <label>Alternative:</label>
+                  <span>{formatDate(appointment.alternativeDate)} at {formatTime(appointment.alternativeTime!)}</span>
+                </div>
+              )}
             </div>
-          </div>
+          </section>
+
+          {/* Images if available */}
+          {appointment.images && appointment.images.length > 0 && (
+            <section className="section">
+              <h3>Uploaded Images</h3>
+              <div className="images-grid">
+                {appointment.images.map((image, index) => (
+                  <img key={index} src={image} alt={`Damage ${index + 1}`} className="damage-image" />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Request Metadata */}
+          <section className="section request-meta">
+            <div className="meta-info">
+              <span>Request ID: {appointment.id}</span>
+              <span>Submitted: {formatDate(appointment.requestDate)}</span>
+            </div>
+          </section>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="modal-footer">
+          <button className="btn btn-decline" onClick={() => onDecline(appointment.id)}>
+            Decline Request
+          </button>
+          <button className="btn btn-schedule" onClick={() => onSchedule(appointment.id)}>
+            Schedule Later
+          </button>
+          <button className="btn btn-accept" onClick={() => onAccept(appointment.id)}>
+            Accept & Confirm
+          </button>
         </div>
       </div>
-
-      <div className="modal-actions">
-        <button 
-          className={`confirm-btn ${isReadyToConfirm ? 'ready' : 'not-ready'}`} 
-          onClick={handleConfirm}
-        >
-          {isReadyToConfirm ? 'Confirm Appointment' : 'Assign Technicians First'}
-        </button>
-        <button className="cancel-btn" onClick={onClose}>Cancel</button>
-      </div>
-    </Modal>
+    </div>
   );
 };
 
