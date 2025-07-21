@@ -46,14 +46,15 @@
         font-size: 16px;
     }
 
-    input, select{
+    input, select, textarea{
         font-size: 15px;
         color: #444;
         border-color: #ccc;
     }
 
     input:focus,
-    select:focus {
+    select:focus,
+    textarea:focus {
         outline: none;
         box-shadow: 0 0 0 1px #bfdbfe; // focus:ring-2 focus:ring-blue-500
         border-color: transparent; // focus:border-transparent

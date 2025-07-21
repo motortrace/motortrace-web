@@ -1,7 +1,7 @@
 export interface BaseUser {
   id: string;
   userType: 'car_user' | 'service_center' | 'spare_parts_seller';
-  status: 'active' | 'suspended';
+  status: 'active' | 'suspended' | 'inactive';
   dateJoined: string;
   email: string;
   phoneNumber: string;
@@ -16,6 +16,25 @@ export interface CarUser extends BaseUser {
   totalPosts: number;
 }
 
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  duration: '1_month' | '3_months' | '6_months' | '1_year';
+  price: number;
+  features: string[];
+}
+
+export interface Subscription {
+  id: string;
+  planId: string;
+  planName: string;
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'expired' | 'cancelled';
+  amount: number;
+  autoRenew: boolean;
+}
+
 export interface ServiceCenter extends BaseUser {
   userType: 'service_center';
   businessName: string;
@@ -27,6 +46,8 @@ export interface ServiceCenter extends BaseUser {
   completedServices: number;
   averageRating: number;
   services: Service[];
+  currentSubscription?: Subscription | null;
+  subscriptionHistory: Subscription[];
 }
 
 export interface SparePartsSeller extends BaseUser {
@@ -38,6 +59,8 @@ export interface SparePartsSeller extends BaseUser {
   operatingHours: string;
   totalPartsListed: number;
   parts: SparePart[];
+  currentSubscription?: Subscription | null;
+  subscriptionHistory: Subscription[];
 }
 
 export interface Vehicle {

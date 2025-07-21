@@ -6,6 +6,7 @@ import PaymentAndCommissionSettings from '../../components/Admin/AdminSettings/P
 import BookingSettings from '../../components/Admin/AdminSettings/BookingSettings';
 import BookingCancellationSettings from '../../components/Admin/AdminSettings/BookingCancellationSettings';
 import RefundPolicySettings from '../../components/Admin/AdminSettings/RefundPolicySettings';
+import SubscriptionPlanSettings from '../../components/Admin/AdminSettings/SubscriptionPlanSettings';
 
 const AdminSettings = () => {
 
@@ -50,6 +51,8 @@ const AdminSettings = () => {
                 settings={userSettings}
                 onSettingsChange={handleUserSettingsChange}
             />
+
+            <SubscriptionPlanSettings />
 
             <BookingSettings />
 
