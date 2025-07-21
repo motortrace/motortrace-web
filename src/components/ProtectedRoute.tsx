@@ -11,10 +11,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
       const status = await fetchUserStatus();
       if (!status) {
         setRedirect('/login');
-      } else if (!status.isSetupComplete) {
-        setRedirect('/setup/details');
-      } else if (!status.hasActiveSubscription) {
-        setRedirect('/setup/payment');
       }
       setChecking(false);
     };

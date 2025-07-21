@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSetupFlow } from '../../hooks/useSetupFlow';
 import { useNavigate } from 'react-router-dom';
-import { fetchUserStatus } from '../../utils/fetchUserStatus';
 import './SetupPaymentPage.scss';
 
 interface PaymentData {
@@ -13,10 +11,8 @@ interface PaymentData {
 }
 
 const SetupPaymentPage = () => {
-  const { setupStatus } = useSetupFlow();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [checkingStatus, setCheckingStatus] = useState(true);
   const navigate = useNavigate();
   
   const [paymentData, setPaymentData] = useState<PaymentData>({
@@ -53,55 +49,6 @@ const SetupPaymentPage = () => {
       ]
     }
   };
-
-  useEffect(() => {
-    const checkStatus = async () => {
-      const status = await fetchUserStatus();
-      if (!status) {
-        navigate('/login');
-        return;
-      }
-      if (status.hasActiveSubscription) {
-        // Get user from localStorage or status
-        let user = status.user;
-        if (!user) {
-          try {
-            user = JSON.parse(localStorage.getItem('user') || '{}');
-          } catch {}
-        }
-        if (user && user.role === 'admin') {
-          navigate('/admin/dashboard');
-        } else if (user && user.role === 'service_center') {
-          navigate('/servicecenter/dashboard');
-        } else {
-          navigate('/');
-        }
-      } else {
-        setCheckingStatus(false);
-      }
-    };
-    checkStatus();
-  }, [navigate]);
-
-  if (checkingStatus) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
-      <div style={{
-        width: 48,
-        height: 48,
-        border: '6px solid #e5e7eb',
-        borderTop: '6px solid #6366f1',
-        borderRadius: '50%',
-        animation: 'spin-cogwheel 1s linear infinite',
-        marginBottom: 12
-      }}></div>
-      <style>{`
-        @keyframes spin-cogwheel {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
-  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
