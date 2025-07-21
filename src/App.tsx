@@ -22,6 +22,7 @@ import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
 import CustomerDetailsPage from './pages/PartVendor/CustomerPages/CustomerDetailsPage';
 import AcceptedOrderDetailsPage from './pages/PartVendor/OrderPages/AcceptedOrderDetailsPage';
 import ReportPage from './pages/PartVendor/ReportPages/ReportPage';
+import BackendTest from './pages/PartVendor/BackendTest/BackendTest';
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
           <Route path="CustomerDetails" element={<CustomerDetailsPage/>} />
           <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage/>} />
           <Route path="ReportsSummary" element={<ReportPage/>}/>
+          <Route path="test" element={<BackendTest/>} />
         </Route>
       </Routes>
     </BrowserRouter>
