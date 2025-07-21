@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import KanbanBoard from '../../components/KanbanBoard/KanbanBoard';
 import { Users, Car, ClipboardList, Wrench, Eye, FileText, AlertCircle, CheckCircle2, Circle, Calendar as CalendarIcon, DollarSign, PackageSearch } from 'lucide-react';
 import './KanbanPage.scss';
+import ManageWorkOrderModal from '../../components/WorkOrderModal/ManageWorkOrderModal';
 
 interface WorkOrder {
   id: string;
@@ -18,6 +19,8 @@ const KanbanPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState<string>('');
   const [technicianFilter, setTechnicianFilter] = useState<string>('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
 
   // Sample data for Work Orders
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([
@@ -97,6 +100,16 @@ const KanbanPage: React.FC = () => {
     );
   };
 
+  const handleCardClick = (workOrder: WorkOrder) => {
+    setSelectedWorkOrder(workOrder);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedWorkOrder(null);
+  };
+
   // Icon/color helpers for work order (optional, can be customized)
   const getTypeIcon = () => <ClipboardList size={16} />;
   const getTypeColor = () => '#3b82f6';
@@ -114,7 +127,7 @@ const KanbanPage: React.FC = () => {
   };
 
   // Kanban columns for work order stages
-  const columns = [
+  const columns: { id: WorkOrder['status']; title: string; color: string }[] = [
     { id: 'created', title: 'Created', color: '#6B7280' },
     { id: 'inspection', title: 'Inspection', color: '#10B981' },
     { id: 'estimation', title: 'Estimation', color: '#f59e0b' },
@@ -154,6 +167,13 @@ const KanbanPage: React.FC = () => {
         getTypeColor={getTypeColor}
         getPriorityColor={getPriorityColor}
         columns={columns}
+        onCardClick={handleCardClick}
+      />
+
+      <ManageWorkOrderModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        workOrder={selectedWorkOrder}
       />
     </>
   );

@@ -36,7 +36,7 @@ interface PartItem {
 interface ManageWorkOrderModalProps {
   open: boolean;
   onClose: () => void;
-  // Add more props as needed
+  workOrder?: any; // Accept workOrder, type as any for now (can refine later)
 }
 
 // Accordion Info Component
@@ -366,7 +366,7 @@ const mockParts: PartItem[] = [
   },
 ];
 
-const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose }) => {
+const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder }) => {
   const [notes, setNotes] = useState('');
 
   if (!open) return null;

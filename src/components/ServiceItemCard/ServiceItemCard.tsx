@@ -19,6 +19,7 @@ interface ServiceItemCardProps {
   getTypeIcon: () => React.ReactNode;
   getTypeColor: () => string;
   getPriorityColor: (priority: WorkOrder['priority']) => string;
+  onClick?: () => void; // Add this line
 }
 
 const getPriorityIndicator = (priority: WorkOrder['priority']) => {
@@ -68,7 +69,8 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
   onMove,
   getTypeIcon,
   getTypeColor,
-  getPriorityColor
+  getPriorityColor,
+  onClick // Add this line
 }) => {
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('text/plain', serviceItem.id);
@@ -81,6 +83,7 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
       className="service-item-card"
       draggable
       onDragStart={handleDragStart}
+      onClick={onClick} // Add this line
     >
       {/* Status indicator bar (optional, can be colored by status) */}
       <div

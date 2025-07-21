@@ -29,6 +29,7 @@ interface KanbanBoardProps {
   getTypeColor: () => string;
   getPriorityColor: (priority: WorkOrder['priority']) => string;
   columns: KanbanColumnDef[];
+  onCardClick?: (workOrder: WorkOrder) => void;
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
@@ -40,7 +41,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   getTypeIcon,
   getTypeColor,
   getPriorityColor,
-  columns
+  columns,
+  onCardClick
 }) => {
   const filterWorkOrders = (items: WorkOrder[], status: WorkOrder['status']) => {
     return items.filter(item => {
@@ -71,6 +73,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             getTypeIcon={getTypeIcon}
             getTypeColor={getTypeColor}
             getPriorityColor={getPriorityColor}
+            onCardClick={onCardClick}
           />
         ))}
       </div>

@@ -23,6 +23,7 @@ interface KanbanColumnProps {
   getTypeIcon: () => React.ReactNode;
   getTypeColor: () => string;
   getPriorityColor: (priority: WorkOrder['priority']) => string;
+  onCardClick?: (serviceItem: WorkOrder) => void; // Add this line
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -34,7 +35,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   columnId,
   getTypeIcon,
   getTypeColor,
-  getPriorityColor
+  getPriorityColor,
+  onCardClick // Add this line
 }) => {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -72,6 +74,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             getTypeIcon={getTypeIcon}
             getTypeColor={getTypeColor}
             getPriorityColor={getPriorityColor}
+            onClick={onCardClick ? () => onCardClick(serviceItem) : undefined} // Add this line
           />
         ))}
         
