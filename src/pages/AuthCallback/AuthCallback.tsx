@@ -63,13 +63,13 @@ const AuthCallback = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
-        // Determine redirect based on setup status
-        if (requiresSetup && setupStatus) {
-          // Redirect to appropriate setup page
-          window.location.href = setupStatus.redirectTo;
+        // Redirect to role-specific dashboard
+        if (user && user.role === 'admin') {
+          window.location.href = '/admin/dashboard';
+        } else if (user && user.role === 'service_center') {
+          window.location.href = '/servicecenter/dashboard';
         } else {
-          // Setup complete, redirect to dashboard
-          window.location.href = '/dashboard';
+          window.location.href = '/';
         }
 
       } catch (err: any) {

@@ -15,8 +15,6 @@ import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import PricingPage from './pages/PricingPage/PricingPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
-import SetupDetailsPage from './pages/SetupDetailsPage/SetupDetailsPage';
-import SetupPaymentPage from './pages/SetupPaymentPage/SetupPaymentPage';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
 import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
 import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
@@ -58,12 +56,6 @@ function App() {
 
         {/* Auth Callback Route */}
         <Route path="/auth/callback" element={<AuthCallback />} />
-
-        {/* Setup Flow Routes */}
-        <Route path="/setup">
-          <Route path="details" element={<SetupDetailsPage />} />
-          <Route path="payment" element={<SetupPaymentPage />} />
-        </Route>
 
         {/* Protected Dashboard Routes */}
         <Route path="/servicecenter" element={

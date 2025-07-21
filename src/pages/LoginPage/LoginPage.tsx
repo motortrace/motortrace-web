@@ -96,28 +96,21 @@ const LoginPage = () => {
       if (data.user) {
         localStorage.setItem('user', JSON.stringify(data.user));
       }
-      // Check if setup is required
-      if (data.requiresSetup) {
-        // Redirect to the appropriate setup page
-        window.location.href = data.setupStatus.redirectTo;
-      } else {
-        // Setup complete, redirect to role-specific dashboard
-        let user = data.user;
-        if (!user) {
-          // Try to get from localStorage if not in response
-          try {
-            user = JSON.parse(localStorage.getItem('user') || '{}');
-          } catch {}
-        }
-        if (user && user.role === 'admin') {
-          window.location.href = '/admin/dashboard';
-        } else if (user && user.role === 'service_center') {
-          window.location.href = '/servicecenter/index';
-        } else {
-          window.location.href = '/';
-        }
+      // Redirect to role-specific dashboard
+      let user = data.user;
+      if (!user) {
+        // Try to get from localStorage if not in response
+        try {
+          user = JSON.parse(localStorage.getItem('user') || '{}');
+        } catch {}
       }
-      
+      if (user && user.role === 'admin') {
+        window.location.href = '/admin/dashboard';
+      } else if (user && user.role === 'service_center') {
+        window.location.href = '/servicecenter/dashboard';
+      } else {
+        window.location.href = '/';
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {

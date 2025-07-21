@@ -19,7 +19,20 @@ const RegisterPage = () => {
     const checkStatus = async () => {
       const status = await fetchUserStatus();
       if (status) {
-        navigate('/dashboard');
+        // Get user from localStorage or status
+        let user = status.user;
+        if (!user) {
+          try {
+            user = JSON.parse(localStorage.getItem('user') || '{}');
+          } catch {}
+        }
+        if (user && user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (user && user.role === 'service_center') {
+          navigate('/servicecenter/dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         setCheckingStatus(false);
       }
