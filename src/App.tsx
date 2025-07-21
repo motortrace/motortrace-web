@@ -82,7 +82,7 @@ function App() {
         }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="jobs" element={<KanbanPage />} />
+          <Route path="workflow" element={<KanbanPage />} />
           <Route path="workorders" element={<WorkOrdersPage />} />
           <Route path="appointments">
             <Route index element={<AppointmentPage />} />

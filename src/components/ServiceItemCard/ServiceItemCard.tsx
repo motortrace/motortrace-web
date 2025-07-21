@@ -1,73 +1,48 @@
 import React from 'react';
-import { Clock, User, Car, FileText, AlertCircle, CheckCircle2, Circle } from 'lucide-react';
+import { Clock, User, Car } from 'lucide-react';
 import './ServiceItemCard.scss';
 
-interface ServiceItem {
+interface WorkOrder {
   id: string;
-  type: 'service' | 'inspection' | 'appointment';
-  title: string;
-  workOrderId: string;
   workOrderNumber: string;
   customer: string;
   vehicle: string;
-  estimatedDuration: number;
   assignedTechnician: string;
-  technicianPhoto?: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'created' | 'to-do' | 'in-progress' | 'done' | 'not-done';
+  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
   description?: string;
-  notes?: string;
+  priority: 'high' | 'medium' | 'low';
 }
 
 interface ServiceItemCardProps {
-  serviceItem: ServiceItem;
-  onMove: (cardId: string, newStatus: ServiceItem['status']) => void;
-  getTypeIcon: (type: ServiceItem['type']) => React.ReactNode;
-  getTypeColor: (type: ServiceItem['type']) => string;
-  getPriorityColor: (priority: ServiceItem['priority']) => string;
+  serviceItem: WorkOrder;
+  onMove: (cardId: string, newStatus: WorkOrder['status']) => void;
+  getTypeIcon: () => React.ReactNode;
+  getTypeColor: () => string;
+  getPriorityColor: (priority: WorkOrder['priority']) => string;
 }
 
-// Helper for type badge colors
-const getTypeBadgeStyle = (type: ServiceItem['type']) => {
-  switch (type) {
-    case 'service': 
-      return { backgroundColor: '#eff6ff', color: '#1d4ed8', borderColor: '#dbeafe' };
-    case 'inspection': 
-      return { backgroundColor: '#f0fdf4', color: '#15803d', borderColor: '#d1fae5' };
-    case 'appointment': 
-      return { backgroundColor: '#faf5ff', color: '#7c3aed', borderColor: '#ede9fe' };
-    default: 
-      return { backgroundColor: '#f8fafc', color: '#475569', borderColor: '#e2e8f0' };
-  }
-};
-
-// Helper for priority indicators
-const getPriorityIndicator = (priority: ServiceItem['priority']) => {
+const getPriorityIndicator = (priority: WorkOrder['priority']) => {
   switch (priority) {
-    case 'high': 
-      return { 
-        icon: <AlertCircle size={12} />, 
+    case 'high':
+      return {
         color: '#dc2626',
         backgroundColor: '#fef2f2',
         borderColor: '#fecaca'
       };
-    case 'medium': 
-      return { 
-        icon: <Circle size={12} />, 
+    case 'medium':
+      return {
         color: '#d97706',
         backgroundColor: '#fffbeb',
         borderColor: '#fed7aa'
       };
-    case 'low': 
-      return { 
-        icon: <CheckCircle2 size={12} />, 
+    case 'low':
+      return {
         color: '#059669',
         backgroundColor: '#f0fdf4',
         borderColor: '#bbf7d0'
       };
-    default: 
-      return { 
-        icon: <Circle size={12} />, 
+    default:
+      return {
         color: '#64748b',
         backgroundColor: '#f8fafc',
         borderColor: '#e2e8f0'
@@ -75,34 +50,17 @@ const getPriorityIndicator = (priority: ServiceItem['priority']) => {
   }
 };
 
-// Helper for status indicator
-const getStatusIndicator = (status: ServiceItem['status']) => {
-  switch (status) {
-    case 'done': return { color: '#059669', label: 'Completed' };
-    case 'in-progress': return { color: '#dc2626', label: 'In Progress' };
-    case 'to-do': return { color: '#d97706', label: 'Pending' };
-    case 'created': return { color: '#64748b', label: 'Created' };
-    case 'not-done': return { color: '#6b7280', label: 'Not Done' };
-    default: return { color: '#64748b', label: 'Unknown' };
-  }
-};
-
-const getTechnicianAvatar = (name: string, photo?: string) => {
-  if (photo) {
-    return <img className="technician-avatar" src={photo} alt={name} />;
-  }
-  // fallback to initials
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-  const colorIndex = name.length % colors.length;
-  return (
-    <div 
-      className="technician-avatar technician-avatar--initials"
-      style={{ backgroundColor: colors[colorIndex] }}
-    >
-      {initials}
-    </div>
-  );
+const getVehicleImage = (vehicle: string) => {
+  // Simple mapping for demo; in real app, use a better mapping or a vehicle image API
+  const lower = vehicle.toLowerCase();
+  if (lower.includes('camry')) return 'https://platform.cstatic-images.com/xxlarge/in/v2/stock_photos/8760bf48-c1a5-42f7-a83b-1cd39e2efbec/57ee2adf-a4a3-4757-8f50-6d85fcf5a351.png';
+  if (lower.includes('cr-v')) return 'https://di-uploads-pod11.dealerinspire.com/hondaofkirkland/uploads/2019/08/2019-Honda-CR-V-LX-2WD-1.png';
+  if (lower.includes('f-150')) return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZGOHHY8IeOYnZJ1iILcd8v-8kzs8hZ0QIVg&s';
+  if (lower.includes('altima')) return 'https://di-shared-assets.dealerinspire.com/legacy/rackspace/ldm-images/2021-Nissan-Altima-hero.png';
+  if (lower.includes('x5')) return 'https://larte-design.com/storage/app/media/models/bmw/x5m-competition-front-site-carbon-gray-donington.webp';
+  if (lower.includes('a4')) return 'https://images.dealer.com/ddc/vehicles/2025/Audi/A4/Sedan/color/Navarra%20Blue%20Metallic-2D2D-10,33,127-320-en_US.jpg';
+  // Default placeholder
+  return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
 };
 
 const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
@@ -116,54 +74,40 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
     e.dataTransfer.setData('text/plain', serviceItem.id);
   };
 
-  const formatDuration = (hours: number) => {
-    if (hours < 1) {
-      return `${Math.round(hours * 60)}m`;
-    }
-    const wholeHours = Math.floor(hours);
-    const minutes = Math.round((hours - wholeHours) * 60);
-    return minutes > 0 ? `${wholeHours}h ${minutes}m` : `${wholeHours}h`;
-  };
-
-  const typeBadgeStyle = getTypeBadgeStyle(serviceItem.type);
   const priorityIndicator = getPriorityIndicator(serviceItem.priority);
-  const statusIndicator = getStatusIndicator(serviceItem.status);
 
   return (
-    <div 
+    <div
       className="service-item-card"
       draggable
       onDragStart={handleDragStart}
     >
-      {/* Status indicator bar */}
-      <div 
+      {/* Status indicator bar (optional, can be colored by status) */}
+      <div
         className="status-indicator"
-        style={{ backgroundColor: statusIndicator.color }}
+        style={{ backgroundColor: getPriorityColor(serviceItem.priority) }}
       />
+
+      {/* Vehicle Image */}
+      <div className="vehicle-image-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '8px 0' }}>
+        <img
+          src={getVehicleImage(serviceItem.vehicle)}
+          alt={serviceItem.vehicle}
+          className="vehicle-image"
+          style={{ width: 200, height: 200, objectFit: 'contain', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+        />
+      </div>
 
       {/* Card Header */}
       <div className="card-header">
         <div className="header-left">
-          <div 
-            className="type-badge"
-            style={typeBadgeStyle}
-          >
-            <span className="type-icon">
-              {getTypeIcon(serviceItem.type)}
-            </span>
-            <span className="type-label">
-              {serviceItem.type.charAt(0).toUpperCase() + serviceItem.type.slice(1)}
-            </span>
-          </div>
           <span className="work-order-number">#{serviceItem.workOrderNumber}</span>
         </div>
-        
-
       </div>
 
-      {/* Card Title */}
+      {/* Card Title (Customer + Vehicle) */}
       <div className="card-title">
-        {serviceItem.title}
+        {serviceItem.customer} - {serviceItem.vehicle}
       </div>
 
       {/* Card Content */}
@@ -175,7 +119,6 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
             <span className="content-value">{serviceItem.customer}</span>
           </div>
         </div>
-        
         <div className="content-row">
           <div className="content-item">
             <Car size={14} />
@@ -183,28 +126,18 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
             <span className="content-value">{serviceItem.vehicle}</span>
           </div>
         </div>
-        
-        <div className="content-row">
-          <div className="content-item">
-            <Clock size={14} />
-            <span className="content-label">Duration</span>
-            <span className="content-value">{formatDuration(serviceItem.estimatedDuration)}</span>
-          </div>
-        </div>
       </div>
 
       {/* Card Footer */}
       <div className="card-footer">
         <div className="technician-info">
-          {getTechnicianAvatar(serviceItem.assignedTechnician, serviceItem.technicianPhoto)}
+          <div className="technician-avatar technician-avatar--initials" style={{ backgroundColor: '#3b82f6' }}>
+            {serviceItem.assignedTechnician.split(' ').map(n => n[0]).join('').toUpperCase()}
+          </div>
           <div className="technician-details">
             <span className="technician-name">{serviceItem.assignedTechnician}</span>
           </div>
         </div>
-        
-        {/* <div className="status-badge" style={{ color: statusIndicator.color }}>
-          {statusIndicator.label}
-        </div> */}
       </div>
     </div>
   );

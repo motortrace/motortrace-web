@@ -8,9 +8,9 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Dashboard',
     description: 'Overview of your service center',
   },
-  '/servicecenter/jobs': {
-    title: 'Job board',
-    description: 'Manage your services, inspections and appointments',
+  '/servicecenter/workflow': {
+    title: 'Workflow',
+    description: 'Manage your workflow',
   },
   '/servicecenter/appointments': {
     title: 'Appointments',

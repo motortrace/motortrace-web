@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
       items: [
         { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
         { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
-        { id: 'jobs', label: 'Jobs', icon: 'bx bx-briefcase', route: '/servicecenter/jobs' },
+        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
         { id: 'reviews', label: 'Reviews', icon: 'bx bx-search-alt', route: '/servicecenter/reviews' },
         { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
         { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
