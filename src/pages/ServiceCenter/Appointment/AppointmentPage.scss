@@ -12,7 +12,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 32px;
+    // margin-bottom: 32px;
+    border-bottom: none;
 
     .header-content {
       h1 {
@@ -30,7 +31,7 @@
     }
 
     .add-appointment-btn {
-      background-color: #6366f1;
+      background-color: var(--color-carbon);
       color: white;
       border: none;
       border-radius: 8px;
@@ -39,12 +40,13 @@
       font-weight: 500;
       cursor: pointer;
       display: flex;
+      flex-direction: row-reverse;
       align-items: center;
       gap: 8px;
       transition: all 0.2s ease;
 
       &:hover {
-        background-color: #4f46e5;
+        background-color: #232326;
         transform: translateY(-1px);
       }
     }
@@ -552,7 +554,7 @@
     padding: 16px;
 
     .page-header {
-      flex-direction: column;
+      flex-direction: column-reverse;
       gap: 16px;
       align-items: flex-start;
 
@@ -631,6 +633,81 @@
     .action-btn {
       width: 100%;
       margin-right: 0;
+    }
+  }
+}
+
+// Services list and cost display styles
+.services-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  
+  .service-tag {
+    background-color: #e0e7ff;
+    color: #3730a3;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+}
+
+.cost-display {
+  font-weight: 600;
+  color: #059669;
+  font-size: 14px;
+}
+
+// Incoming requests section styles
+.incoming-requests-section {
+  margin-bottom: 30px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 20px;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+    }
+
+    .request-count {
+      background-color: #f3f4f6;
+      color: #6b7280;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+
+  .requests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 0 20px;
+  }
+}
+
+// Responsive design for requests grid
+@media (max-width: 768px) {
+  .incoming-requests-section {
+    .section-header {
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .requests-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
   }
 }

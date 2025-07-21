@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
 
   const menuGroups: MenuGroup[] = [
     {
-      title: 'Overview',
+      title: 'Dashboard',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: '/servicecenter/dashboard' },
       ]
@@ -30,26 +30,34 @@ const Sidebar: React.FC = () => {
     {
       title: 'Operations',
       items: [
-        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar', route: '/servicecenter/appointments' },
-        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
         { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
         { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
         { id: 'jobs', label: 'Jobs', icon: 'bx bx-briefcase', route: '/servicecenter/jobs' },
+        { id: 'reviews', label: 'Reviews', icon: 'bx bx-search-alt', route: '/servicecenter/reviews' },
+        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
+        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+        { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
+        { id: 'Chat', label: 'Chat', icon: 'bx bx-chat', route: '/servicecenter/chat' },
+      ]
+    },
+    {
+      title: 'Inventory & Orders',
+      items: [
+        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
+        { id: 'order', label: 'Order', icon: 'bx bx-cube', route: '/servicecenter/parts-order' },
       ]
     },
     {
       title: 'Business',
       items: [
-        { id: 'suppliers', label: 'Suppliers', icon: 'bx bx-user', route: '/servicecenter/suppliers' },
-        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: '/servicecenter/estimates' },
-        { id: 'invoices', label: 'Invoices', icon: 'bx bx-file', route: '/servicecenter/invoices' },
+        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: '/servicecenter/reports' },
         { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: '/servicecenter/payments' },
+        { id: 'suppliers', label: 'Suppliers', icon: 'bx bx-user', route: '/servicecenter/suppliers' },
       ]
     },
     {
-      title: 'Management',
+      title: 'Settings',
       items: [
-        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
         { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/servicecenter/settings' },
       ]
     }
@@ -58,6 +66,13 @@ const Sidebar: React.FC = () => {
   const handleMenuClick = useCallback((item: MenuItem) => {
     navigate(item.route);
   }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Optionally clear other user/session data here
+    window.location.href = '/login';
+  };
 
   const renderMenuItem = (item: MenuItem, isBottomMenu = false) => {
     const isActive = location.pathname === item.route;
@@ -105,6 +120,22 @@ const Sidebar: React.FC = () => {
           </div>
         ))}
       </nav>
+
+      {/* Logout Button at the bottom */}
+      <div style={{ marginTop: 'auto', padding: '1rem' }}>
+        <button
+          className="sidebar-menu-link sidebar-menu-link--bottom"
+          onClick={handleLogout}
+          aria-label="Logout"
+          type="button"
+          style={{ color: '#ef4444', width: '100%', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}
+        >
+          <span className="sidebar-menu-icon sidebar-menu-icon--danger">
+            <i className="bx bx-log-out" aria-hidden="true"></i>
+          </span>
+          <span className="sidebar-menu-label sidebar-menu-label--danger">Logout</span>
+        </button>
+      </div>
     </aside>
   );
 };
