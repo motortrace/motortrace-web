@@ -73,16 +73,19 @@ const Sidebar: React.FC = () => {
   }, [navigate]);
 
   // Helper function to check if a menu item is active
-  const isMenuItemActive = (route: string) => {
-    if (route.startsWith('/admin/userManagement/')) {
-      // For user management routes, check if the current path matches exactly
-      return location.pathname === route;
+  const isMenuItemActive = (route: string, id?: string) => {
+    if (id === 'allUsers') {
+      // Active for any user management tab except pending approvals
+      return (
+        location.pathname.startsWith('/admin/userManagement/') &&
+        !location.pathname.includes('pendingApprovals')
+      );
     }
     return location.pathname === route;
   };
 
   const renderMenuItem = (item: MenuItem, isBottomMenu = false) => {
-    const isActive = isMenuItemActive(item.route);
+    const isActive = isMenuItemActive(item.route, item.id);
     return (
       <li key={item.id} className="sidebar-menu-item">
         <button

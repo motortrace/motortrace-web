@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import "../../styles/components/SearchBarAndFilters.scss"
 import './UserManagement.scss';
-import { Car, Wrench, Store, Search } from 'lucide-react';
+import { Car, Wrench, Store, Search, Plus } from 'lucide-react';
+import AddUserModal from '../../components/Admin/UserManagement/AddUserModal';
 
 interface CarUser {
     id: string;
@@ -11,7 +12,7 @@ interface CarUser {
     phone: string;
     totalVehicles: number;
     totalBookings: number;
-    status: 'Active' | 'Inactive' | 'Suspended';
+    status: 'Active' | 'Suspended';
     joinDate: string;
 }
 
@@ -23,7 +24,7 @@ interface ServiceCenter {
     location: string;
     rating: number;
     totalServices: number;
-    status: 'Active' | 'Inactive' | 'Pending';
+    status: 'Active' | 'Inactive' | 'Suspended';
     joinDate: string;
 }
 
@@ -96,7 +97,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
             phone: '+94 72 654 7890',
             totalVehicles: 1,
             totalBookings: 7,
-            status: 'Inactive',
+            status: 'Suspended',
             joinDate: '2023-10-15'
         },
         {
@@ -126,7 +127,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
             phone: '+94 71 912 3456',
             totalVehicles: 1,
             totalBookings: 5,
-            status: 'Inactive',
+            status: 'Suspended',
             joinDate: '2023-09-12'
         },
         {
@@ -175,17 +176,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
         },
         {
             id: '3',
-            name: 'Elite Service Hub',
-            email: 'hello@eliteservice.com',
-            phone: '+94 91 345 6789',
-            location: 'Galle',
-            rating: 3.8,
-            totalServices: 67,
-            status: 'Pending',
-            joinDate: '2024-01-05'
-        },
-        {
-            id: '4',
             name: 'Royal Auto Services',
             email: 'royal@autoservices.lk',
             phone: '+94 66 456 7890',
@@ -196,6 +186,17 @@ const UserManagement: React.FC<UserManagementProps> = ({
             joinDate: '2024-02-10'
         },
         {
+            id: '4',
+            name: 'Elite Service Hub',
+            email: 'hello@eliteservice.com',
+            phone: '+94 91 345 6789',
+            location: 'Galle',
+            rating: 3.8,
+            totalServices: 67,
+            status: 'Inactive',
+            joinDate: '2024-01-05'
+        },
+        {
             id: '5',
             name: 'Express Car Care',
             email: 'support@expresscarcare.com',
@@ -203,7 +204,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
             location: 'Negombo',
             rating: 3.9,
             totalServices: 58,
-            status: 'Inactive',
+            status: 'Suspended',
             joinDate: '2023-10-03'
         }
     ],
@@ -269,6 +270,34 @@ const UserManagement: React.FC<UserManagementProps> = ({
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<UserType>('Car Users');
     const [statusFilter, setStatusFilter] = useState('All Statuses');
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+    // Handler to open the add user modal
+    const handleOpenAddModal = () => setIsAddModalOpen(true);
+    const handleCloseAddModal = () => setIsAddModalOpen(false);
+
+    // Handlers to add new user to the correct list
+    const [carUsersState, setCarUsersState] = useState(carUsers);
+    const [serviceCentersState, setServiceCentersState] = useState(serviceCenters);
+    const [sparePartsSellersState, setSparePartsSellersState] = useState(sparePartsSellers);
+
+    // Pagination state
+    const itemsPerPage = 5;
+    const [displayCount, setDisplayCount] = useState(itemsPerPage);
+    useEffect(() => {
+        setDisplayCount(itemsPerPage); // Reset display count when tab changes
+    }, [activeTab]);
+
+    const handleCreateUser = (newUser: any) => {
+        if (activeTab === 'Car Users') {
+            setCarUsersState([...carUsersState, newUser]);
+        } else if (activeTab === 'Service Centers') {
+            setServiceCentersState([...serviceCentersState, newUser]);
+        } else {
+            setSparePartsSellersState([...sparePartsSellersState, newUser]);
+        }
+        setIsAddModalOpen(false);
+    };
 
     // Mapping between URL parameters and display names
     const userTypeMap: Record<string, UserType> = {
@@ -299,17 +328,17 @@ const UserManagement: React.FC<UserManagementProps> = ({
     const userTypeConfig = {
         'Car Users': {
             icon: <Car size={20} strokeWidth={1.5} />,
-            data: carUsers,
+            data: carUsersState,
             headers: ['NAME', 'EMAIL', 'PHONE', 'VEHICLES', 'BOOKINGS', 'STATUS', 'ACTIONS']
         },
         'Service Centers': {
             icon: <Wrench size={18} strokeWidth={1.5} />,
-            data: serviceCenters,
+            data: serviceCentersState,
             headers: ['NAME', 'EMAIL', 'PHONE', 'LOCATION', 'RATING', 'SERVICES', 'STATUS', 'ACTIONS']
         },
         'Spare Parts Sellers': {
             icon: <Store size={18} strokeWidth={1.5} />,
-            data: sparePartsSellers,
+            data: sparePartsSellersState,
             headers: ['NAME', 'EMAIL', 'PHONE', 'LOCATION', 'PRODUCTS', 'SALES', 'STATUS', 'ACTIONS']
         }
     };
@@ -400,6 +429,14 @@ const UserManagement: React.FC<UserManagementProps> = ({
         );
     };
 
+    // Table data for current tab
+    const currentData = userTypeConfig[activeTab].data;
+    const displayedUsers = currentData.slice(0, displayCount);
+    const hasMore = displayCount < currentData.length;
+    const handleLoadMore = () => {
+        setDisplayCount(prev => Math.min(prev + itemsPerPage, currentData.length));
+    };
+
     return (
         <div className="user-management">
             <div className="user-management__header">
@@ -420,8 +457,8 @@ const UserManagement: React.FC<UserManagementProps> = ({
             </div>
 
             <div className="user-management__content">
-                <div className="search-bar">
-                    <div className="search-content">
+                <div className="search-bar" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div className="search-content" style={{ flex: 1 }}>
                         <div className="search-input-container">
                             <Search className="search-icon" />
                             <input
@@ -447,12 +484,55 @@ const UserManagement: React.FC<UserManagementProps> = ({
                                 onChange={(e) => setStatusFilter(e.target.value)}
                             >
                                 <option value="all">Filter By...</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Active">Active</option>
-                                <option value="Suspended">Suspended</option>
+                                {activeTab === 'Car Users' ? (
+                                    <>
+                                        <option value="Active">Active</option>
+                                        <option value="Suspended">Suspended</option>
+                                    </>
+                                ) : activeTab === 'Service Centers' ? (
+                                    <>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="Suspended">Suspended</option>
+                                    </>
+                                ) : (
+                                    <>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="Suspended">Suspended</option>
+                                    </>
+                                )}
                             </select>
                         </div>
                     </div>
+                    {activeTab !== 'Car Users' && (
+                        <button
+                            className="user-management__add-btn"
+                            onClick={handleOpenAddModal}
+                            style={{
+                                background: '#0ea5e9',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontFamily: 'Poppins',
+                                fontWeight: 500,
+                                fontSize: '15px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                marginTop: '0px',
+                                padding: '7.5px 22.5px',
+                                // height: '40px',
+                                boxSizing: 'border-box',
+                            }}
+                        >
+                            <span style={{ display: 'flex', alignItems: 'center' }}>
+                                <Plus size={18} strokeWidth={2} />
+                            </span>
+                            {`Create New ${activeTab.slice(0, -1)}`}
+                        </button>
+                    )}
                 </div>
 
                 <div className="user-management__table">
@@ -465,14 +545,30 @@ const UserManagement: React.FC<UserManagementProps> = ({
                     </div>
 
                     <div className="user-management__table-body">
-                        {userTypeConfig[activeTab].data.map((user: any) => (
+                        {displayedUsers.map((user: any) => (
                             <div key={user.id} className="user-management__row" data-user-type={activeTab}>
                                 {renderTableRow(user)}
                             </div>
                         ))}
+                        {hasMore && (
+                            <div className="user-management__load-more">
+                                <button
+                                    className="user-management__load-more-btn"
+                                    onClick={handleLoadMore}
+                                >
+                                    Load More ({currentData.length - displayCount} remaining)
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+            <AddUserModal
+                open={isAddModalOpen}
+                userType={activeTab}
+                onClose={handleCloseAddModal}
+                onCreate={handleCreateUser}
+            />
         </div>
     );
 };

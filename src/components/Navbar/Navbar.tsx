@@ -84,10 +84,37 @@ const pageInfo: Record<string, { title: string; description: string }> = {
 
 const Navbar: React.FC = () => {
   const location = useLocation();
-  const info = pageInfo[location.pathname] || {
-    title: 'Welcome!',
-    description: 'Select a page to get started',
+  
+  // Function to get page info with support for dynamic routes
+  const getPageInfo = (pathname: string) => {
+    // Check for exact match first
+    if (pageInfo[pathname]) {
+      return pageInfo[pathname];
+    }
+    
+    // Check for dynamic profile routes
+    const profileMatch = pathname.match(/^\/admin\/userManagement\/(carUsers|serviceCenters|sparePartsSellers)\/\d+\/profile$/);
+    if (profileMatch) {
+      const userType = profileMatch[1];
+      const userTypeMap = {
+        carUsers: 'Car User',
+        serviceCenters: 'Service Center', 
+        sparePartsSellers: 'Spare Parts Seller'
+      };
+      
+      return {
+        title: `${userTypeMap[userType as keyof typeof userTypeMap]} Profile`,
+        description: `View and manage detailed information about this ${userTypeMap[userType as keyof typeof userTypeMap].toLowerCase()} account`
+      };
+    }
+    
+    return {
+      title: 'Welcome!',
+      description: 'Select a page to get started',
+    };
   };
+  
+  const info = getPageInfo(location.pathname);
 
   return (
     <nav className="navbar">
