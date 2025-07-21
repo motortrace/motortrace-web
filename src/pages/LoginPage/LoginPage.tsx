@@ -19,7 +19,20 @@ const LoginPage = () => {
     const checkStatus = async () => {
       const status = await fetchUserStatus();
       if (status) {
-        navigate('/dashboard');
+        // Get user from localStorage or status
+        let user = status.user;
+        if (!user) {
+          try {
+            user = JSON.parse(localStorage.getItem('user') || '{}');
+          } catch {}
+        }
+        if (user && user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (user && user.role === 'service_center') {
+          navigate('/servicecenter/dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         setCheckingStatus(false);
       }
@@ -79,14 +92,30 @@ const LoginPage = () => {
       if (data.token) {
         localStorage.setItem('token', data.token);
       }
-      
+      // Store user object if present
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
       // Check if setup is required
       if (data.requiresSetup) {
         // Redirect to the appropriate setup page
         window.location.href = data.setupStatus.redirectTo;
       } else {
-        // Setup complete, redirect to dashboard
-        window.location.href = '/dashboard';
+        // Setup complete, redirect to role-specific dashboard
+        let user = data.user;
+        if (!user) {
+          // Try to get from localStorage if not in response
+          try {
+            user = JSON.parse(localStorage.getItem('user') || '{}');
+          } catch {}
+        }
+        if (user && user.role === 'admin') {
+          window.location.href = '/admin/dashboard';
+        } else if (user && user.role === 'service_center') {
+          window.location.href = '/servicecenter/index';
+        } else {
+          window.location.href = '/';
+        }
       }
       
     } catch (err: any) {

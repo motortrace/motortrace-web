@@ -13,6 +13,7 @@ import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConn
 import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
+import PricingPage from './pages/PricingPage/PricingPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import SetupDetailsPage from './pages/SetupDetailsPage/SetupDetailsPage';
 import SetupPaymentPage from './pages/SetupPaymentPage/SetupPaymentPage';
@@ -52,6 +53,7 @@ function App() {
            <Route path="index" element={<LandingPage />} />
            <Route path="login" element={<LoginPage />} />
            <Route path="register" element={<RegisterPage />} />
+           <Route path="pricing" element={<PricingPage/>} />
         </Route>
 
         {/* Auth Callback Route */}
