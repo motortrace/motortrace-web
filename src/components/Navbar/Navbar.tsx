@@ -40,6 +40,44 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
+  
+  '/servicecenter/appointments/details': {
+    title: 'Appointment Details',
+    description: 'View details about the appointment request',
+  },
+  '/servicecenter/reports': {
+    title: 'Reports',
+    description: 'Manage your estimates and invoices',
+  },
+  '/servicecenter/inspections': {
+    title: 'Digital Inspections',
+    description: 'Manage vehicle inspections and checklists',
+  },
+  '/servicecenter/calendar': {
+    title: 'Calendar',
+    description: 'Manage your appointments',
+  },
+  '/servicecenter/services': {
+    title: 'Services',
+    description: 'Manage your services',
+  },
+  '/servicecenter/work-order': {
+    title: 'Work Orders',
+    description: 'Manage your work orders',
+  },
+  '/servicecenter/reviews': {
+    title: 'Reviews and Ratings',
+    description: 'View your reviews and ratings',
+  },
+  '/servicecenter/chat': {
+    title: 'Client Chat',
+    description: 'Message your clients',
+  },
+  '/servicecenter/profile': {
+    title: 'Profile',
+    description: 'Manage your profile',
+  },
+  
 
   '/admin/dashboard': {
     title: 'Welcome back, Admin!',
@@ -83,44 +121,6 @@ const pageInfo: Record<string, { title: string; description: string }> = {
   }
 };
 
-
-  '/servicecenter/appointments/details': {
-    title: 'Appointment Details',
-    description: 'View details about the appointment request',
-  },
-  '/servicecenter/reports': {
-    title: 'Reports',
-    description: 'Manage your estimates and invoices',
-  },
-  '/servicecenter/inspections': {
-    title: 'Digital Inspections',
-    description: 'Manage vehicle inspections and checklists',
-  },
-  '/servicecenter/calendar': {
-    title: 'Calendar',
-    description: 'Manage your appointments',
-  },
-  '/servicecenter/services': {
-    title: 'Services',
-    description: 'Manage your services',
-  },
-  '/servicecenter/work-order': {
-    title: 'Work Orders',
-    description: 'Manage your work orders',
-  },
-  '/servicecenter/reviews': {
-    title: 'Reviews and Ratings',
-    description: 'View your reviews and ratings',
-  },
-  '/servicecenter/chat': {
-    title: 'Client Chat',
-    description: 'Message your clients',
-  },
-  '/servicecenter/profile': {
-    title: 'Profile',
-    description: 'Manage your profile',
-  },
-}
 
 const Navbar: React.FC = () => {
   const location = useLocation();
