@@ -6,8 +6,12 @@ import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import interactionPlugin from '@fullcalendar/interaction';
 import DashboardHeader from '../../../layouts/DashboardHeader/DashboardHeader';
 import MetricCard from '../../../components/MetricCard/MetricCard';
-import type { JobCard, JobService, Technician, Service } from '../../../types/JobCard';
+import type { JobCard as OriginalJobCard, JobService as OriginalJobService, Technician, Service } from '../../../types/JobCard';
 import './TechnicianSchedulingPage.scss';
+import AppointmentDetailsModal from '../../../components/AppointmentDetailsModal';
+
+type JobService = Omit<OriginalJobService, 'status'> & { status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled' };
+type JobCard = Omit<OriginalJobCard, 'jobServices'> & { jobServices: JobService[] };
 
 const TechnicianSchedulingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +21,8 @@ const TechnicianSchedulingPage: React.FC = () => {
   const calendarRef = useRef<FullCalendar>(null);
   const [jobCards, setJobCards] = useState<JobCard[]>([]);
   const [calendarKey, setCalendarKey] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   // Reset calendar when component mounts and handle view changes
   useEffect(() => {
@@ -74,8 +80,8 @@ const TechnicianSchedulingPage: React.FC = () => {
     },
   ]);
 
-  // Sample services data
-  const [services] = useState<Service[]>([
+  // Sample appointments data
+  const [appointments] = useState<Service[]>([
     { id: 's1', name: 'Oil Change', category: 'Maintenance', estimatedDuration: 30, requiredSkill: 'engine' },
     { id: 's2', name: 'Brake Service', category: 'Brakes', estimatedDuration: 120, requiredSkill: 'brakes' },
     { id: 's3', name: 'Wheel Alignment', category: 'Suspension', estimatedDuration: 60, requiredSkill: 'alignment' },
@@ -84,21 +90,21 @@ const TechnicianSchedulingPage: React.FC = () => {
     { id: 's6', name: 'Transmission Service', category: 'Transmission', estimatedDuration: 180, requiredSkill: 'transmission' },
   ]);
 
-  // Initialize job cards with assigned tasks
+  // Initialize job cards with assigned appointments
   useEffect(() => {
     const today = new Date();
     const initialJobCards: JobCard[] = [
       {
-        id: 'JC001',
-        customer: 'John Doe',
+        id: 'APR#1001',
+        customer: 'Jack Martin',
         vehicle: '2020 Toyota Camry',
-        status: 'in_progress',
+        status: 'completed',
         createdAt: today,
         updatedAt: today,
         jobServices: [
           {
             id: 'js1',
-            jobCardId: 'JC001',
+            jobCardId: 'APR#1001',
             serviceId: 's1',
             serviceName: 'Oil Change',
             estimatedDuration: 30,
@@ -106,12 +112,22 @@ const TechnicianSchedulingPage: React.FC = () => {
             technicianId: 'tech1',
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 30, 0),
-            status: 'assigned',
+            status: 'completed',
             taskType: 'service',
           },
+        ] as JobService[],
+      },
+      {
+        id: 'APR#1002',
+        customer: 'Sarah Wilson',
+        vehicle: '2019 Honda Civic',
+        status: 'in_progress',
+        createdAt: today,
+        updatedAt: today,
+        jobServices: [
           {
             id: 'js2',
-            jobCardId: 'JC001',
+            jobCardId: 'APR#1002',
             serviceId: 's2',
             serviceName: 'Brake Service',
             estimatedDuration: 120,
@@ -122,19 +138,19 @@ const TechnicianSchedulingPage: React.FC = () => {
             status: 'assigned',
             taskType: 'service',
           },
-        ],
+        ] as JobService[],
       },
       {
-        id: 'JC002',
-        customer: 'Jane Smith',
-        vehicle: '2019 Honda Civic',
+        id: 'APR#1003',
+        customer: 'Michael Davis',
+        vehicle: '2021 Ford F-150',
         status: 'approved',
         createdAt: today,
         updatedAt: today,
         jobServices: [
           {
             id: 'js3',
-            jobCardId: 'JC002',
+            jobCardId: 'APR#1003',
             serviceId: 's4',
             serviceName: 'Engine Diagnostics',
             estimatedDuration: 45,
@@ -145,9 +161,19 @@ const TechnicianSchedulingPage: React.FC = () => {
             status: 'assigned',
             taskType: 'inspection',
           },
+        ] as JobService[],
+      },
+      {
+        id: 'APR#1004',
+        customer: 'Emma Thompson',
+        vehicle: '2018 BMW X3',
+        status: 'cancelled',
+        createdAt: today,
+        updatedAt: today,
+        jobServices: [
           {
             id: 'js4',
-            jobCardId: 'JC002',
+            jobCardId: 'APR#1004',
             serviceId: 's5',
             serviceName: 'AC Service',
             estimatedDuration: 90,
@@ -155,22 +181,22 @@ const TechnicianSchedulingPage: React.FC = () => {
             technicianId: 'tech4',
             scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 0, 0),
             scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 15, 30, 0),
-            status: 'assigned',
+            status: 'cancelled',
             taskType: 'service',
           },
-        ],
+        ] as JobService[],
       },
       {
-        id: 'JC003',
-        customer: 'Bob Wilson',
-        vehicle: '2021 Ford F-150',
+        id: 'APR#1005',
+        customer: 'Robert Johnson',
+        vehicle: '2020 Mercedes C-Class',
         status: 'approved',
         createdAt: today,
         updatedAt: today,
         jobServices: [
           {
             id: 'js5',
-            jobCardId: 'JC003',
+            jobCardId: 'APR#1005',
             serviceId: 's3',
             serviceName: 'Wheel Alignment',
             estimatedDuration: 60,
@@ -181,9 +207,19 @@ const TechnicianSchedulingPage: React.FC = () => {
             status: 'assigned',
             taskType: 'service',
           },
+        ] as JobService[],
+      },
+      {
+        id: 'APR#1006',
+        customer: 'Lisa Anderson',
+        vehicle: '2022 Tesla Model 3',
+        status: 'approved',
+        createdAt: today,
+        updatedAt: today,
+        jobServices: [
           {
             id: 'js6',
-            jobCardId: 'JC003',
+            jobCardId: 'APR#1006',
             serviceId: 's6',
             serviceName: 'Transmission Service',
             estimatedDuration: 180,
@@ -194,114 +230,19 @@ const TechnicianSchedulingPage: React.FC = () => {
             status: 'assigned',
             taskType: 'service',
           },
-        ],
+        ] as JobService[],
       },
       {
-        id: 'JC004',
-        customer: 'Alice Brown',
-        vehicle: '2018 BMW X3',
+        id: 'APR#1007',
+        customer: 'David Miller',
+        vehicle: '2019 Audi A4',
         status: 'approved',
         createdAt: today,
         updatedAt: today,
         jobServices: [
           {
             id: 'js7',
-            jobCardId: 'JC004',
-            serviceId: 's1',
-            serviceName: 'Oil Change',
-            estimatedDuration: 30,
-            requiredSkill: 'engine',
-            technicianId: null,
-            scheduledStart: null,
-            scheduledEnd: null,
-            status: 'pending',
-            taskType: 'service',
-          },
-          {
-            id: 'js8',
-            jobCardId: 'JC004',
-            serviceId: 's2',
-            serviceName: 'Brake Service',
-            estimatedDuration: 120,
-            requiredSkill: 'brakes',
-            technicianId: null,
-            scheduledStart: null,
-            scheduledEnd: null,
-            status: 'pending',
-            taskType: 'service',
-          },
-        ],
-      },
-      {
-        id: 'JC005',
-        customer: 'David Miller',
-        vehicle: '2022 Tesla Model 3',
-        status: 'approved',
-        createdAt: today,
-        updatedAt: today,
-        jobServices: [
-          {
-            id: 'js9',
-            jobCardId: 'JC005',
-            serviceId: 's4',
-            serviceName: 'Engine Diagnostics',
-            estimatedDuration: 45,
-            requiredSkill: 'diagnostics',
-            technicianId: 'tech3',
-            scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 0, 0),
-            scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 45, 0),
-            status: 'assigned',
-            taskType: 'inspection',
-          },
-        ],
-      },
-      {
-        id: 'JC006',
-        customer: 'Emma Davis',
-        vehicle: '2020 Mercedes C-Class',
-        status: 'approved',
-        createdAt: today,
-        updatedAt: today,
-        jobServices: [
-          {
-            id: 'js10',
-            jobCardId: 'JC006',
-            serviceId: 's5',
-            serviceName: 'AC Service',
-            estimatedDuration: 90,
-            requiredSkill: 'ac',
-            technicianId: 'tech4',
-            scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 16, 0, 0),
-            scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 30, 0),
-            status: 'assigned',
-            taskType: 'service',
-          },
-          {
-            id: 'js11',
-            jobCardId: 'JC006',
-            serviceId: 's1',
-            serviceName: 'Oil Change',
-            estimatedDuration: 30,
-            requiredSkill: 'engine',
-            technicianId: 'tech1',
-            scheduledStart: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 16, 30, 0),
-            scheduledEnd: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 0, 0),
-            status: 'assigned',
-            taskType: 'service',
-          },
-        ],
-      },
-      {
-        id: 'JC007',
-        customer: 'Maria Garcia',
-        vehicle: '2021 Audi A4',
-        status: 'approved',
-        createdAt: today,
-        updatedAt: today,
-        jobServices: [
-          {
-            id: 'js12',
-            jobCardId: 'JC007',
+            jobCardId: 'APR#1007',
             serviceId: 'app1',
             serviceName: 'Customer Consultation',
             estimatedDuration: 60,
@@ -312,9 +253,19 @@ const TechnicianSchedulingPage: React.FC = () => {
             status: 'assigned',
             taskType: 'appointment',
           },
+        ] as JobService[],
+      },
+      {
+        id: 'APR#1008',
+        customer: 'Jennifer Brown',
+        vehicle: '2021 Hyundai Elantra',
+        status: 'approved',
+        createdAt: today,
+        updatedAt: today,
+        jobServices: [
           {
-            id: 'js13',
-            jobCardId: 'JC007',
+            id: 'js8',
+            jobCardId: 'APR#1008',
             serviceId: 'app2',
             serviceName: 'Vehicle Assessment',
             estimatedDuration: 45,
@@ -325,51 +276,51 @@ const TechnicianSchedulingPage: React.FC = () => {
             status: 'assigned',
             taskType: 'appointment',
           },
-        ],
+        ] as JobService[],
       },
     ];
     setJobCards(initialJobCards);
     setCalendarKey(prev => prev + 1); // Force calendar remount
   }, []);
 
-  // Get job card by service
-  const getJobCardByService = (serviceId: string) => {
+  // Get job card by appointment
+  const getJobCardByAppointment = (appointmentId: string) => {
     return jobCards.find(jobCard => 
-      jobCard.jobServices.some(service => service.id === serviceId)
+      jobCard.jobServices.some(appointment => appointment.id === appointmentId)
     );
   };
 
-  // Get task type color
-  const getTaskTypeColor = (taskType: 'appointment' | 'service' | 'inspection') => {
-    switch (taskType) {
-      case 'appointment': return '#8b5cf6'; // Purple
-      case 'service': return '#3b82f6';     // Blue
-      case 'inspection': return '#10b981';  // Green
-      default: return '#6b7280';
+  // Get status color based on appointment status
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return '#10b981';  // Green
+      case 'cancelled': return '#ef4444';  // Red
+      case 'assigned': return '#3b82f6';   // Blue
+      case 'pending': return '#f59e0b';    // Orange
+      case 'in_progress': return '#8b5cf6'; // Purple
+      default: return '#6b7280';           // Gray
     }
   };
 
-  // Get all job services
-  const allJobServices = useMemo(() => {
+  // Get all job appointments
+  const allJobAppointments = useMemo(() => {
     return jobCards.flatMap(jobCard => jobCard.jobServices);
   }, [jobCards]);
 
-
-
-  // Get assigned job services for today
-  const todayAssignedServices = useMemo(() => {
+  // Get assigned job appointments for today
+  const todayAssignedAppointments = useMemo(() => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date(todayStart);
     todayEnd.setDate(todayEnd.getDate() + 1);
     
-    return allJobServices.filter(service => 
-      service.technicianId !== null && 
-      service.scheduledStart && 
-      service.scheduledStart >= todayStart &&
-      service.scheduledStart < todayEnd
+    return allJobAppointments.filter(appointment => 
+      appointment.technicianId !== null && 
+      appointment.scheduledStart && 
+      appointment.scheduledStart >= todayStart &&
+      appointment.scheduledStart < todayEnd
     );
-  }, [allJobServices]);
+  }, [allJobAppointments]);
 
   // Convert technicians to FullCalendar resources
   const calendarResources = useMemo(() => {
@@ -386,115 +337,111 @@ const TechnicianSchedulingPage: React.FC = () => {
     }));
   }, [technicians]);
 
-  // Convert job services to FullCalendar events
+  // Convert job appointments to FullCalendar events
   const calendarEvents = useMemo(() => {
-    return todayAssignedServices
-      .filter(service => service.scheduledStart && service.scheduledEnd && service.technicianId)
-      .map(service => {
-        const jobCard = getJobCardByService(service.id);
-        const technician = technicians.find(t => t.id === service.technicianId);
+    return todayAssignedAppointments
+      .filter(appointment => appointment.scheduledStart && appointment.scheduledEnd && appointment.technicianId)
+      .map(appointment => {
+        const jobCard = getJobCardByAppointment(appointment.id);
+        const technician = technicians.find(t => t.id === appointment.technicianId);
         
         return {
-          id: service.id,
-          resourceId: service.technicianId!,
-          title: `${service.serviceName} - ${jobCard?.customer}`,
-          start: service.scheduledStart!,
-          end: service.scheduledEnd!,
+          id: appointment.id,
+          resourceId: appointment.technicianId!,
+          title: `${jobCard?.id} - ${jobCard?.customer}`,
+          start: appointment.scheduledStart!,
+          end: appointment.scheduledEnd!,
           extendedProps: {
-            service,
+            appointment,
             jobCard,
             technician
           },
-          backgroundColor: getTaskTypeColor(service.taskType),
-          borderColor: getTaskTypeColor(service.taskType),
+          backgroundColor: getStatusColor(appointment.status),
+          borderColor: getStatusColor(appointment.status),
           textColor: '#ffffff',
-          classNames: [`task-type-${service.taskType}`]
+          classNames: [`status-${appointment.status}`]
         };
       });
-  }, [todayAssignedServices, technicians]);
+  }, [todayAssignedAppointments, technicians]);
 
   // Handle task assignment via drag and drop
   const handleEventReceive = (info: any) => {
-    const serviceId = info.event.id;
+    const appointmentId = info.event.id;
     const technicianId = info.event.getResources()[0].id;
     const startTime = info.event.start;
     
-    // Update the job service with new technician and time
+    // Update the job appointment with new technician and time
     setJobCards(prevJobCards => 
       prevJobCards.map(jobCard => {
-        const updatedServices = jobCard.jobServices.map(service => {
-          if (service.id === serviceId) {
-            const endTime = new Date(startTime.getTime() + service.estimatedDuration * 60000);
+        const updatedAppointments = jobCard.jobServices.map(appointment => {
+          if (appointment.id === appointmentId) {
+            const endTime = new Date(startTime.getTime() + appointment.estimatedDuration * 60000);
             return {
-              ...service,
+              ...appointment,
               technicianId,
               scheduledStart: startTime,
               scheduledEnd: endTime,
               status: 'assigned' as const
             };
           }
-          return service;
+          return appointment;
         });
-        return { ...jobCard, jobServices: updatedServices };
+        return { ...jobCard, jobServices: updatedAppointments };
       })
     );
   };
 
   // Handle task reassignment via drag and drop
   const handleEventDrop = (info: any) => {
-    const serviceId = info.event.id;
+    const appointmentId = info.event.id;
     const newTechnicianId = info.event.getResources()[0].id;
     const newStartTime = info.event.start;
     const newEndTime = info.event.end;
 
-    // Update the service assignment
+    // Update the appointment assignment
     setJobCards(prevJobCards => 
       prevJobCards.map(jobCard => {
-        const updatedServices = jobCard.jobServices.map(service => {
-          if (service.id === serviceId) {
+        const updatedAppointments = jobCard.jobServices.map(appointment => {
+          if (appointment.id === appointmentId) {
             return {
-              ...service,
+              ...appointment,
               technicianId: newTechnicianId,
               scheduledStart: newStartTime,
               scheduledEnd: newEndTime
             };
           }
-          return service;
+          return appointment;
         });
-        return { ...jobCard, jobServices: updatedServices };
+        return { ...jobCard, jobServices: updatedAppointments };
       })
     );
   };
 
   // Handle task resize
   const handleEventResize = (info: any) => {
-    const serviceId = info.event.id;
+    const appointmentId = info.event.id;
     const newStartTime = info.event.start;
     const newEndTime = info.event.end;
 
-    // Update the service duration
+    // Update the appointment duration
     setJobCards(prevJobCards => 
       prevJobCards.map(jobCard => {
-        const updatedServices = jobCard.jobServices.map(service => {
-          if (service.id === serviceId) {
+        const updatedAppointments = jobCard.jobServices.map(appointment => {
+          if (appointment.id === appointmentId) {
             return {
-              ...service,
+              ...appointment,
               scheduledStart: newStartTime,
               scheduledEnd: newEndTime
             };
           }
-          return service;
+          return appointment;
         });
-        return { ...jobCard, jobServices: updatedServices };
+        return { ...jobCard, jobServices: updatedAppointments };
       })
     );
   };
 
-  // Auto-schedule function
-  const handleAutoSchedule = () => {
-    console.log('Auto-scheduling unassigned services...');
-    // Implement auto-scheduling logic here
-  };
+
 
   // Handle date navigation
   const handleDatesSet = (dateInfo: any) => {
@@ -504,6 +451,12 @@ const TechnicianSchedulingPage: React.FC = () => {
   // Handle navigation to job card
   const handleNavigateToJobCard = () => {
     navigate('/servicecenter/jobcard');
+  };
+
+  // Handle event click to open modal
+  const handleEventClick = (info: any) => {
+    setSelectedEvent(info.event.extendedProps);
+    setModalOpen(true);
   };
 
   // Custom toolbar component
@@ -557,10 +510,7 @@ const TechnicianSchedulingPage: React.FC = () => {
               Week
             </button>
           </div>
-          <button className="auto-schedule-btn" onClick={handleAutoSchedule}>
-            <Play size={16} />
-            Auto Schedule
-          </button>
+
         </div>
       </div>
     );
@@ -575,8 +525,10 @@ const TechnicianSchedulingPage: React.FC = () => {
   }, [currentDate]);
 
   return (
-    <div className="technician-scheduling-page" onClick={handleNavigateToJobCard}>
+    <div className="technician-scheduling-page">
 
+      {/* Modal for event details */}
+      <AppointmentDetailsModal open={modalOpen} onClose={() => setModalOpen(false)} appointment={selectedEvent} />
       {/* Metrics */}
       <div className="metric-cards-row">
         <MetricCard
@@ -587,14 +539,14 @@ const TechnicianSchedulingPage: React.FC = () => {
         />
         <MetricCard
           title="Scheduled Today"
-          amount={todayAssignedServices.length.toString()}
+          amount={todayAssignedAppointments.length.toString()}
           change="12%"
           changeType="positive"
         />
 
         <MetricCard
           title="Completed Today"
-          amount={todayAssignedServices.filter(s => s.status === 'completed').length.toString()}
+          amount={todayAssignedAppointments.filter(a => a.status === 'completed').length.toString()}
           change="8%"
           changeType="positive"
         />
@@ -633,6 +585,7 @@ const TechnicianSchedulingPage: React.FC = () => {
               eventOverlap={false}
               slotEventOverlap={false}
               eventDisplay="block"
+              eventClick={handleEventClick}
             />
           </div>
         </div>
@@ -643,15 +596,15 @@ const TechnicianSchedulingPage: React.FC = () => {
         <h2 className="technician-dashboard__title">Technician Overview</h2>
         <div className="technician-dashboard__grid">
           {technicians.map(technician => {
-            const technicianServices = todayAssignedServices.filter(
-              service => service.technicianId === technician.id
+            const technicianAppointments = todayAssignedAppointments.filter(
+              appointment => appointment.technicianId === technician.id
             );
-            const totalHours = technicianServices.reduce(
-              (sum, service) => sum + service.estimatedDuration, 0
+            const totalHours = technicianAppointments.reduce(
+              (sum, appointment) => sum + appointment.estimatedDuration, 0
             );
             const loadPercentage = Math.min((totalHours / (technician.dailyCapacity * 60)) * 100, 100);
-            const completedServices = technicianServices.filter(s => s.status === 'completed').length;
-            const inProgressServices = technicianServices.filter(s => s.status === 'assigned').length;
+            const completedAppointments = technicianAppointments.filter(a => a.status === 'completed').length;
+            const inProgressAppointments = technicianAppointments.filter(a => a.status === 'assigned').length;
             
             return (
               <div key={technician.id} className="technician-card">
@@ -680,15 +633,15 @@ const TechnicianSchedulingPage: React.FC = () => {
                 <div className="technician-card__content">
                   <div className="technician-card__metrics">
                     <div className="technician-card__metric">
-                      <div className="metric-value">{technicianServices.length}</div>
+                      <div className="metric-value">{technicianAppointments.length}</div>
                       <div className="metric-label">Assigned</div>
                     </div>
                     <div className="technician-card__metric">
-                      <div className="metric-value">{completedServices}</div>
+                      <div className="metric-value">{completedAppointments}</div>
                       <div className="metric-label">Completed</div>
                     </div>
                     <div className="technician-card__metric">
-                      <div className="metric-value">{inProgressServices}</div>
+                      <div className="metric-value">{inProgressAppointments}</div>
                       <div className="metric-label">In Progress</div>
                     </div>
                   </div>

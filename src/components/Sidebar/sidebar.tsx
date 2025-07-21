@@ -30,13 +30,16 @@ const Sidebar: React.FC = () => {
     {
       title: 'Operations',
       items: [
-        { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
-        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
-        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
-        { id: 'reviews', label: 'Reviews', icon: 'bx bx-search-alt', route: '/servicecenter/reviews' },
+        // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
+
         { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
-        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
         { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
+        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
+        { id: 'reviews', label: 'Reviews', icon: 'bx bx-search-alt', route: '/servicecenter/reviews' },
+
+        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+
         { id: 'Chat', label: 'Chat', icon: 'bx bx-chat', route: '/servicecenter/chat' },
       ]
     },
