@@ -1,6 +1,7 @@
 import DashboardLayout from './layouts/DashboardLayout';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import { useEffect } from 'react';
 
 import Dashboard from './pages/ServiceCenter/Dashboard';
 import KanbanPage from './pages/ServiceCenter/KanbanPage';
@@ -14,7 +15,6 @@ import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import PricingPage from './pages/PricingPage/PricingPage';
-import RegisterPage from './pages/RegisterPage/RegisterPage';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
 import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
 import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
@@ -39,6 +39,24 @@ import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
 import RegistrationRequests from './components/Admin/UserManagement/RegistrationRequests';
 
 
+function NotFoundRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem('user') || '{}');
+    } catch {}
+    if (user && user.role === 'admin') {
+      navigate('/admin/dashboard', { replace: true });
+    } else if (user && user.role === 'service_center') {
+      navigate('/servicecenter/dashboard', { replace: true });
+    } else {
+      navigate('/index', { replace: true });
+    }
+  }, [navigate]);
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -50,7 +68,6 @@ function App() {
            <Route index element={<Navigate to="index" replace />} />
            <Route path="index" element={<LandingPage />} />
            <Route path="login" element={<LoginPage />} />
-           <Route path="register" element={<RegisterPage />} />
            <Route path="pricing" element={<PricingPage/>} />
         </Route>
 
@@ -107,6 +124,7 @@ function App() {
           
         </Route>
 
+        <Route path="*" element={<NotFoundRedirect />} />
       </Routes>
     </BrowserRouter>
   );
