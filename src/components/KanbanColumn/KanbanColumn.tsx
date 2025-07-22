@@ -2,32 +2,28 @@ import React from 'react';
 import ServiceItemCard from '../ServiceItemCard/ServiceItemCard';
 import './KanbanColumn.scss';
 
-interface ServiceItem {
+interface WorkOrder {
   id: string;
-  type: 'service' | 'inspection' | 'appointment';
-  title: string;
-  workOrderId: string;
   workOrderNumber: string;
   customer: string;
   vehicle: string;
-  estimatedDuration: number;
   assignedTechnician: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'created' | 'to-do' | 'in-progress' | 'done' | 'not-done';
+  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
   description?: string;
-  notes?: string;
+  priority: 'high' | 'medium' | 'low';
 }
 
 interface KanbanColumnProps {
   title: string;
   color: string;
   count: number;
-  serviceItems: ServiceItem[];
-  onCardMove: (cardId: string, newStatus: ServiceItem['status']) => void;
-  columnId: ServiceItem['status'];
-  getTypeIcon: (type: ServiceItem['type']) => React.ReactNode;
-  getTypeColor: (type: ServiceItem['type']) => string;
-  getPriorityColor: (priority: ServiceItem['priority']) => string;
+  serviceItems: WorkOrder[];
+  onCardMove: (cardId: string, newStatus: WorkOrder['status']) => void;
+  columnId: WorkOrder['status'];
+  getTypeIcon: () => React.ReactNode;
+  getTypeColor: () => string;
+  getPriorityColor: (priority: WorkOrder['priority']) => string;
+  onCardClick?: (serviceItem: WorkOrder) => void; // Add this line
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -39,7 +35,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   columnId,
   getTypeIcon,
   getTypeColor,
-  getPriorityColor
+  getPriorityColor,
+  onCardClick // Add this line
 }) => {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -77,6 +74,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             getTypeIcon={getTypeIcon}
             getTypeColor={getTypeColor}
             getPriorityColor={getPriorityColor}
+            onClick={onCardClick ? () => onCardClick(serviceItem) : undefined} // Add this line
           />
         ))}
         

@@ -30,13 +30,17 @@ const Sidebar: React.FC = () => {
     {
       title: 'Operations',
       items: [
-        { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
-        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
-        { id: 'jobs', label: 'Jobs', icon: 'bx bx-briefcase', route: '/servicecenter/jobs' },
-        { id: 'reviews', label: 'Reviews', icon: 'bx bx-search-alt', route: '/servicecenter/reviews' },
+        // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
+
         { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
-        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
         { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
+        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
+        { id: 'reviews', label: 'Reviews', icon: 'bx bx-search-alt', route: '/servicecenter/reviews' },
+
+        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+
+        { id: 'Chat', label: 'Chat', icon: 'bx bx-chat', route: '/servicecenter/chat' },
       ]
     },
     {
@@ -65,6 +69,13 @@ const Sidebar: React.FC = () => {
   const handleMenuClick = useCallback((item: MenuItem) => {
     navigate(item.route);
   }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Optionally clear other user/session data here
+    window.location.href = '/login';
+  };
 
   const renderMenuItem = (item: MenuItem, isBottomMenu = false) => {
     const isActive = location.pathname === item.route;
@@ -112,6 +123,22 @@ const Sidebar: React.FC = () => {
           </div>
         ))}
       </nav>
+
+      {/* Logout Button at the bottom */}
+      <div style={{ marginTop: 'auto', padding: '1rem' }}>
+        <button
+          className="sidebar-menu-link sidebar-menu-link--bottom"
+          onClick={handleLogout}
+          aria-label="Logout"
+          type="button"
+          style={{ color: '#ef4444', width: '100%', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}
+        >
+          <span className="sidebar-menu-icon sidebar-menu-icon--danger">
+            <i className="bx bx-log-out" aria-hidden="true"></i>
+          </span>
+          <span className="sidebar-menu-label sidebar-menu-label--danger">Logout</span>
+        </button>
+      </div>
     </aside>
   );
 };

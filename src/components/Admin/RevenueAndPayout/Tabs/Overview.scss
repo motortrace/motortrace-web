@@ -1,0 +1,39 @@
+@import '../../styles/variables.scss';
+
+.revenue-overview {
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.revenue-overview__header {
+  margin-bottom: 32px;
+  
+  h1 {
+    font-family: var(--font-primary);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-carbon);
+    margin: 0;
+  }
+}
+
+.revenue-overview__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  @media (min-width: 769px) and (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1025px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

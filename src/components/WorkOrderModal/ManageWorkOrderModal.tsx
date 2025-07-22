@@ -36,7 +36,7 @@ interface PartItem {
 interface ManageWorkOrderModalProps {
   open: boolean;
   onClose: () => void;
-  // Add more props as needed
+  workOrder?: any; // Accept workOrder, type as any for now (can refine later)
 }
 
 // Accordion Info Component
@@ -105,13 +105,6 @@ const AccordionInfoSection: React.FC = () => {
                   <span className="info-label">Customer Since</span>
                 </div>
                 <span className="info-value">March 2020</span>
-              </div>
-              <div className="info-item">
-                <div className="info-item-header">
-                  <i className="bx bx-crown"></i>
-                  <span className="info-label">Loyalty Status</span>
-                </div>
-                <span className="status-badge status-badge--gold">Gold Member</span>
               </div>
             </div>
           </div>
@@ -366,7 +359,11 @@ const mockParts: PartItem[] = [
   },
 ];
 
-const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose }) => {
+// Add a mock work order status for demonstration
+const mockWorkOrderStatus: string = 'Estimation'; // Possible: Created, Inspection, Estimation, In Progress, Waiting for Parts, Payment
+const estimateSent = false; // Mock: set to true if estimate is sent
+
+const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder }) => {
   const [notes, setNotes] = useState('');
 
   if (!open) return null;
@@ -377,14 +374,51 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   const totalTax = mockServices.reduce((sum, s) => sum + s.tax, 0);
   const total = subtotal - totalDiscount + totalTax;
 
+  // Group services by package
+  const packages = mockServices.filter(s => s.type === 'package');
+  const services = mockServices.filter(s => s.type === 'service');
+  // For demo, assign all services to the first package
+  const packageServicesMap: Record<string, ServiceLine[]> = {};
+  if (packages.length > 0) {
+    packageServicesMap[packages[0].id] = services;
+  }
+
   return (
     <div className="manage-workorder-modal__overlay" onClick={onClose}>
       <div className="manage-workorder-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Manage Work Order</h2>
-          <button className="close-btn" onClick={onClose} title="Close">
-            <i className="bx bx-x"></i>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {(() => {
+              const statusColors: Record<string, string> = {
+                Created: '#6c757d',
+                Inspection: '#17a2b8',
+                Estimation: '#007bff',
+                'In Progress': '#28a745',
+                'Waiting for Parts': '#ffc107',
+                Payment: '#6610f2',
+              };
+              const badgeColor = statusColors[mockWorkOrderStatus] || '#343a40';
+              return (
+                <span
+                  className={`workorder-status-badge workorder-status-badge--${mockWorkOrderStatus.toLowerCase().replace(/ /g, '-')}`}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: 12,
+                    fontWeight: 600,
+                    color: '#fff',
+                    background: badgeColor,
+                    marginRight: 28,
+                  }}
+                >
+                  {mockWorkOrderStatus}
+                </span>
+              );
+            })()}
+            <button className="close-btn" onClick={onClose} title="Close">
+              <i className="bx bx-x"></i>
+            </button>
+          </div>
         </div>
         <div className="modal-content">
           <div className="modal-section modal-section--info">
@@ -410,38 +444,50 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
                     <th>Discount</th>
                     <th>Tax</th>
                     <th>Status</th>
-                    <th>Technician</th>
                     <th>Type</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mockServices.map(service => (
-                    <tr key={service.id}>
-                      <td>{service.name}</td>
-                      <td>{service.description}</td>
-                      <td>LKR {service.price.toFixed(2)}</td>
-                      <td>{service.qty} / {service.hours}h</td>
-                      <td>LKR {service.discount.toFixed(2)}</td>
-                      <td>LKR {service.tax.toFixed(2)}</td>
-                      <td>{service.status}</td>
-                      <td>
-                        {service.technician && (
-                          <span className="tech-avatar">
-                            <img src={service.technician.avatar} alt={service.technician.name} />
-                            <span>{service.technician.name}</span>
-                          </span>
-                        )}
-                      </td>
-                      <td>{service.type === 'package' ? 'Package' : 'Service'}</td>
-                      <td>
-                        <button className="btn-icon" title="Edit"><i className="bx bx-edit"></i></button>
-                        <button className="btn-icon btn-danger" title="Remove"><i className="bx bx-trash"></i></button>
-                      </td>
-                    </tr>
+                  {/* Render Packages with their services */}
+                  {packages.map(pkg => (
+                    <React.Fragment key={pkg.id}>
+                      {/* Package header row */}
+                      <tr className="package-header-row">
+                        <td colSpan={9} style={{ background: '#f5f5f5', fontWeight: 'bold' }}>
+                          <span className="package-label" style={{ color: '#007bff', marginRight: 8 }}>[Package]</span>
+                          {pkg.name} — {pkg.description}
+                          {/* Optionally show package status and actions here */}
+                        </td>
+                      </tr>
+                      {/* Render services under this package */}
+                      {(packageServicesMap[pkg.id] || []).map(service => (
+                        <tr className="service-in-package-row" key={service.id}>
+                          <td style={{ paddingLeft: 32 }}>{service.name}</td>
+                          <td>{service.description}</td>
+                          <td>LKR {service.price.toFixed(2)}</td>
+                          <td>{service.qty} / {service.hours}h</td>
+                          <td>LKR {service.discount.toFixed(2)}</td>
+                          <td>LKR {service.tax.toFixed(2)}</td>
+                          <td>{!estimateSent ? 'Not Sent' : service.status}</td>
+                          <td>Service</td>
+                          <td>
+                            <button className="btn-icon" title="Edit"><i className="bx bx-edit"></i></button>
+                            <button className="btn-icon btn-danger" title="Remove"><i className="bx bx-trash"></i></button>
+                          </td>
+                        </tr>
+                      ))}
+                      {/* Optionally, add a package summary row here if needed */}
+                    </React.Fragment>
                   ))}
+                  {/* Render standalone services if any (not in a package) */}
+                  {/* For demo, all services are in the first package */}
                 </tbody>
               </table>
+              {/*
+                Add CSS for .package-header-row (background, bold),
+                .service-in-package-row (indent), etc. for better clarity.
+              */}
             </div>
             <div className="services-bill-summary">
               <div className="bill-row"><span>Subtotal:</span><span>LKR {subtotal.toFixed(2)}</span></div>
@@ -478,21 +524,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
             </div>
           </div>
 
-          <div className="modal-section modal-section--links">
-            <div className="section-header">
-              <h3>Linked Items</h3>
-            </div>
-            <div className="linked-items-row">
-              <div className="linked-item">
-                <span className="linked-label">Digital Inspection</span>
-                <button className="btn btn--secondary">Link Inspection</button>
-              </div>
-              <div className="linked-item">
-                <span className="linked-label">Appointment Details</span>
-                <button className="btn btn--secondary">Link Appointment</button>
-              </div>
-            </div>
-          </div>
+          {/* Remove the Linked Items section entirely */}
 
           <div className="modal-section modal-section--notes">
             <div className="section-header">
@@ -502,8 +534,11 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
           </div>
         </div>
         <div className="modal-footer">
-          <button className="btn btn--secondary">Generate Estimate</button>
-          <button className="btn btn--primary">Generate Invoice</button>
+          { !estimateSent ? (
+            <button className="btn btn--secondary">Send Estimate</button>
+          ) : (
+            <button className="btn btn--primary">Generate Invoice</button>
+          )}
         </div>
       </div>
     </div>

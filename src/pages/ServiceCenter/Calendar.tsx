@@ -1,559 +1,424 @@
 import React, { useState } from 'react';
-import DashboardHeader from '../../layouts/DashboardHeader/DashboardHeader';
-import './Calendar.scss';
-import WalkInAppointmentModal from '../../components/WalkInAppointmentModel/WalkInAppointmentModel';
-import ViewRequestModal from '../../components/WalkInAppointmentModel/ViewRequestModal';
-
-interface IncomingRequest {
-  id: string;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-  vehicleInfo: string;
-  licensePlate: string;
-  servicesRequested: string[];
-  estimatedCharge: number;
-  preferredDate: string;
-  preferredTime: string;
-  urgency: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: string;
-  notes?: string;
-}
 
 interface Appointment {
   id: string;
-  customerName: string;
-  customerPhone: string;
-  vehicleInfo: string;
-  licensePlate: string;
-  services: string[];
-  startTime: string;
-  endTime: string;
-  duration: number; // in minutes
-  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
-  assignedTechnician: string;
-  bay: string;
-  totalCharge: number;
-  depositPaid: number;
-  notes?: string;
-  createdAt: string;
+  title: string;
+  start: Date;
+  end: Date;
+  technician: string;
+  customer: string;
+  vehicle?: string;
+  service?: string;
+  priority?: 'urgent' | 'moderate' | 'normal';
+  status?: 'scheduled' | 'in-progress' | 'completed';
 }
 
-const Calendar = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [showWalkInModal, setShowWalkInModal] = useState(false);
-  const [viewRequest, setViewRequest] = useState<IncomingRequest | null>(null);
+interface Technician {
+  id: string;
+  name: string;
+  specialty: string;
+  status: 'available' | 'busy' | 'break' | 'offline';
+}
 
-  // Sample incoming requests data
-  const [incomingRequests] = useState<IncomingRequest[]>([
-    {
-      id: 'req-001',
-      customerName: 'Sarah Johnson',
-      customerPhone: '(555) 123-4567',
-      customerEmail: 'sarah.johnson@email.com',
-      vehicleInfo: '2020 Toyota Camry',
-      licensePlate: 'ABC-1234',
-      servicesRequested: ['Oil Change', 'Brake Inspection', 'Tire Rotation'],
-      estimatedCharge: 189.99,
-      preferredDate: '2024-07-02',
-      preferredTime: '10:00',
-      urgency: 'medium',
-      status: 'pending',
-      createdAt: '2024-06-30T14:30:00Z',
-      notes: 'Customer prefers morning appointment'
-    },
-    {
-      id: 'req-002',
-      customerName: 'Benjamin Clarke',
-      customerPhone: '(555) 234-5678',
-      customerEmail: 'benjamin.clarke@email.com',
-      vehicleInfo: '2021 Ford F-150 Lariat',
-      licensePlate: 'XYZ-5678',
-      servicesRequested: ['Engine Diagnostic', 'AC System Check'],
-      estimatedCharge: 245.00,
-      preferredDate: '2024-07-01',
-      preferredTime: '14:00',
-      urgency: 'high',
-      status: 'pending',
-      createdAt: '2024-06-30T16:15:00Z',
-      notes: 'Check engine light is on'
-    },
-    {
-      id: 'req-003',
-      customerName: 'Olivia Martinez',
-      customerPhone: '(555) 345-6789',
-      customerEmail: 'olivia.martinez@email.com',
-      vehicleInfo: '2019 Honda CR-V',
-      licensePlate: 'DEF-9012',
-      servicesRequested: ['Brake Pad Replacement', 'Brake Fluid Flush'],
-      estimatedCharge: 320.50,
-      preferredDate: '2024-07-03',
-      preferredTime: '09:00',
-      urgency: 'urgent',
-      status: 'pending',
-      createdAt: '2024-06-30T18:45:00Z',
-      notes: 'Brakes making grinding noise'
-    },
-    {
-      id: 'req-004',
-      customerName: 'Liam Garcia',
-      customerPhone: '(555) 456-7890',
-      customerEmail: 'liam.garcia@email.com',
-      vehicleInfo: '2017 Chevrolet Malibu',
-      licensePlate: 'GHI-3456',
-      servicesRequested: ['Full Vehicle Inspection', 'Oil Change'],
-      estimatedCharge: 125.00,
-      preferredDate: '2024-07-02',
-      preferredTime: '15:00',
-      urgency: 'low',
-      status: 'pending',
-      createdAt: '2024-06-30T20:20:00Z'
-    }
-  ]);
-
-  // Sample appointments data
-  const [appointments] = useState<Appointment[]>([
-    {
-      id: 'apt-001',
-      customerName: 'Emma Wilson',
-      customerPhone: '(555) 567-8901',
-      vehicleInfo: '2018 Nissan Rogue',
-      licensePlate: 'MNO-2345',
-      services: ['Oil Change', 'Filter Replacement'],
-      startTime: '09:00',
-      endTime: '10:00',
-      duration: 60,
-      status: 'scheduled',
-      assignedTechnician: 'Mike Johnson',
-      bay: 'Bay 1',
-      totalCharge: 89.99,
-      depositPaid: 20.00,
-      createdAt: '2024-06-29T10:00:00Z'
-    },
-    {
-      id: 'apt-002',
-      customerName: 'David Brown',
-      customerPhone: '(555) 678-9012',
-      vehicleInfo: '2020 Honda Civic',
-      licensePlate: 'PQR-6789',
-      services: ['Brake Inspection', 'Tire Rotation'],
-      startTime: '10:30',
-      endTime: '11:30',
-      duration: 60,
-      status: 'scheduled',
-      assignedTechnician: 'Sarah Lee',
-      bay: 'Bay 2',
-      totalCharge: 145.00,
-      depositPaid: 50.00,
-      createdAt: '2024-06-29T11:30:00Z'
-    },
-    {
-      id: 'apt-003',
-      customerName: 'Sophia Rodriguez',
-      customerPhone: '(555) 789-0123',
-      vehicleInfo: '2022 Hyundai Palisade',
-      licensePlate: 'STU-0123',
-      services: ['Engine Diagnostic', 'AC System Check'],
-      startTime: '13:00',
-      endTime: '14:30',
-      duration: 90,
-      status: 'scheduled',
-      assignedTechnician: 'Mike Johnson',
-      bay: 'Bay 1',
-      totalCharge: 245.00,
-      depositPaid: 100.00,
-      notes: 'Check engine light on',
-      createdAt: '2024-06-29T14:00:00Z'
-    },
-    {
-      id: 'apt-004',
-      customerName: 'Lisa Anderson',
-      customerPhone: '(555) 890-1234',
-      vehicleInfo: '2019 Toyota Highlander',
-      licensePlate: 'VWX-4567',
-      services: ['Transmission Service', 'Fluid Check'],
-      startTime: '15:00',
-      endTime: '17:00',
-      duration: 120,
-      status: 'scheduled',
-      assignedTechnician: 'Sarah Lee',
-      bay: 'Bay 2',
-      totalCharge: 320.00,
-      depositPaid: 150.00,
-      createdAt: '2024-06-29T15:30:00Z'
-    }
-  ]);
-
-  // Calendar functions
-  const getDaysInMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+// AppointmentDetailModal component
+interface AppointmentDetailModalProps {
+  open: boolean;
+  onClose: () => void;
+  appointment: {
+    date: string;
+    time: string;
+    customer: string;
+    vehicle: string;
+    source: string;
+    services: string[];
+    description: string;
   };
+}
 
-  const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
+const modalOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  background: 'rgba(0,0,0,0.25)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000
+};
 
-  const isToday = (day: number) => {
-    const today = new Date();
-    return today.getDate() === day && 
-           today.getMonth() === currentMonth.getMonth() && 
-           today.getFullYear() === currentMonth.getFullYear();
-  };
+const modalStyle: React.CSSProperties = {
+  background: 'white',
+  borderRadius: '12px',
+  padding: '32px 24px',
+  minWidth: 340,
+  maxWidth: 420,
+  boxShadow: '0 4px 32px rgba(0,0,0,0.18)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 18,
+  position: 'relative'
+};
 
-  const isSelectedDate = (day: number) => {
-    return selectedDate.getDate() === day && 
-           selectedDate.getMonth() === currentMonth.getMonth() && 
-           selectedDate.getFullYear() === currentMonth.getFullYear();
-  };
+const tagStyle: React.CSSProperties = {
+  display: 'inline-block',
+  background: '#f3f4f6',
+  color: '#2563eb',
+  borderRadius: '16px',
+  padding: '4px 12px',
+  fontSize: 13,
+  fontWeight: 500,
+  marginRight: 8,
+  marginBottom: 6
+};
 
-  const handleDateClick = (day: number) => {
-    setSelectedDate(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day));
-  };
-
-  const handlePrevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-  };
-
-  const getUrgencyColor = (urgency: IncomingRequest['urgency']) => {
-    switch (urgency) {
-      case 'urgent': return '#ef4444';
-      case 'high': return '#f59e0b';
-      case 'medium': return '#3b82f6';
-      case 'low': return '#10b981';
-      default: return '#6b7280';
-    }
-  };
-
-  const getStatusColor = (status: Appointment['status']) => {
-    switch (status) {
-      case 'scheduled': return '#3b82f6';
-      case 'in-progress': return '#f59e0b';
-      case 'completed': return '#10b981';
-      case 'cancelled': return '#ef4444';
-      default: return '#6b7280';
-    }
-  };
-
-  const formatTime = (time: string) => {
-    return time;
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `LKR ${amount.toFixed(2)}`;
-  };
-
-  const renderCalendar = () => {
-    const daysInMonth = getDaysInMonth(currentMonth);
-    const firstDay = getFirstDayOfMonth(currentMonth);
-    const days = [];
-
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
-    }
-
-    // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayClass = `calendar-day ${isToday(day) ? 'today' : ''} ${isSelectedDate(day) ? 'selected' : ''}`;
-      days.push(
-        <div 
-          key={day} 
-          className={dayClass}
-          onClick={() => handleDateClick(day)}
-        >
-          {day}
-        </div>
-      );
-    }
-
-    return days;
-  };
-
-  const handleApproveRequest = (requestId: string) => {
-    console.log('Approve request:', requestId);
-  };
-
-  const handleRejectRequest = (requestId: string) => {
-    console.log('Reject request:', requestId);
-  };
-
-  const handleScheduleAppointment = (requestId: string) => {
-    console.log('Schedule appointment for request:', requestId);
-  };
-
+const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({ open, onClose, appointment }) => {
+  if (!open) return null;
   return (
-    <div className="calendar-page">
-
-      <div className="calendar-container">
-        {/* Left Panel - Calendar and Incoming Requests */}
-        <div className="calendar-left-panel">
-          {/* Calendar */}
-          <div className="calendar-section">
-            <div className="calendar-header">
-              <button className="calendar-nav-btn" onClick={handlePrevMonth}>
-                <i className='bx bx-chevron-left'></i>
-              </button>
-              <h2 className="calendar-title">
-                {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </h2>
-              <button className="calendar-nav-btn" onClick={handleNextMonth}>
-                <i className='bx bx-chevron-right'></i>
-              </button>
-            </div>
-
-            <div className="calendar-grid">
-              <div className="calendar-weekdays">
-                <div>Sun</div>
-                <div>Mon</div>
-                <div>Tue</div>
-                <div>Wed</div>
-                <div>Thu</div>
-                <div>Fri</div>
-                <div>Sat</div>
-              </div>
-              <div className="calendar-days">
-                {renderCalendar()}
-              </div>
-            </div>
-          </div>
-
-          {/* Incoming Requests */}
-          <div className="requests-section">
-            <div className="section-header">
-              <h3 className="section-title">
-                <i className='bx bx-time'></i>
-                Incoming Requests
-              </h3>
-              <span className="request-count">{incomingRequests.length}</span>
-            </div>
-            
-            <div className="requests-list">
-              {incomingRequests.map(request => (
-                <div key={request.id} className="request-card">
-                  <div className="request-header">
-                    <div className="customer-info">
-                      <div className="customer-name">{request.customerName}</div>
-                      <div className="customer-contact">
-                        <i className='bx bx-phone'></i>
-                        {request.customerPhone}
-                      </div>
-                    </div>
-                    <div 
-                      className="urgency-badge"
-                      style={{ backgroundColor: getUrgencyColor(request.urgency) }}
-                    >
-                      {request.urgency}
-                    </div>
-                  </div>
-
-                  <div className="vehicle-info">
-                    <i className='bx bx-car'></i>
-                    {request.vehicleInfo} • {request.licensePlate}
-                  </div>
-
-                  <div className="services-requested">
-                    <div className="services-label">Services:</div>
-                    <div className="services-list">
-                      {request.servicesRequested.map((service, index) => (
-                        <span key={index} className="service-tag">{service}</span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="request-details">
-                    <div className="detail-row">
-                      <span className="detail-label">Estimated:</span>
-                      <span className="detail-value">{formatCurrency(request.estimatedCharge)}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Preferred:</span>
-                      <span className="detail-value">
-                        {new Date(request.preferredDate).toLocaleDateString()} at {request.preferredTime}
-                      </span>
-                    </div>
-                  </div>
-
-                  {request.notes && (
-                    <div className="request-notes">
-                      <i className='bx bx-note'></i>
-                      {request.notes}
-                    </div>
-                  )}
-
-                  <div className="request-actions">
-                    <button 
-                      className="btn btn--success"
-                      onClick={() => setViewRequest(request)}
-                    >
-                      <i className='bx bx-show'></i>
-                      View
-                    </button>
-                    <button 
-                      className="btn btn--secondary"
-                      onClick={() => handleApproveRequest(request.id)}
-                    >
-                      <i className='bx bx-check'></i>
-                      Approve
-                    </button>
-                    <button 
-                      className="btn btn--danger"
-                      onClick={() => handleRejectRequest(request.id)}
-                    >
-                      <i className='bx bx-x'></i>
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+    <div style={modalOverlayStyle}>
+      <div style={modalStyle}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 16,
+            background: 'none',
+            border: 'none',
+            fontSize: 22,
+            color: '#6b7280',
+            cursor: 'pointer',
+            fontWeight: 700
+          }}
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: '#1f2937' }}>Appointment Details</h2>
+        <div style={{ fontSize: 15, color: '#374151', marginBottom: 4 }}>
+          <strong>Date & Time:</strong> {appointment.date} {appointment.time}
+        </div>
+        <div style={{ fontSize: 15, color: '#374151', marginBottom: 4 }}>
+          <strong>Customer:</strong> {appointment.customer}
+        </div>
+        <div style={{ fontSize: 15, color: '#374151', marginBottom: 4 }}>
+          <strong>Vehicle:</strong> {appointment.vehicle}
+        </div>
+        <div style={{ fontSize: 15, color: '#374151', marginBottom: 4 }}>
+          <strong>Source:</strong> {appointment.source}
+        </div>
+        <div style={{ fontSize: 15, color: '#374151', marginBottom: 4 }}>
+          <strong>Services:</strong>
+          <div style={{ marginTop: 6 }}>
+            {appointment.services.map((service, idx) => (
+              <span key={service + idx} style={tagStyle}>{service}</span>
+            ))}
           </div>
         </div>
-
-        {/* Right Panel - Daily Schedule */}
-        <div className="schedule-panel">
-          <div className="schedule-header">
-            <h2 className="schedule-title">
-              <i className='bx bx-calendar-check'></i>
-              Appointments - {selectedDate.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </h2>
-            <div className="schedule-actions">
-              <button className="btn btn--primary" onClick={() => setShowWalkInModal(true)}>
-                <i className='bx bx-plus'></i>
-                New Appointment
-              </button>
-            </div>
-          </div>
-
-          <div className="schedule-timeline">
-            {Array.from({ length: 12 }, (_, i) => i + 8).map(hour => {
-              const hourAppointments = appointments.filter(appointment => {
-                const startHour = parseInt(appointment.startTime.split(':')[0]);
-                const endHour = parseInt(appointment.endTime.split(':')[0]);
-                return startHour <= hour && endHour > hour;
-              });
-
-              return (
-                <div key={hour} className="timeline-hour">
-                  <div className="hour-label">{hour}:00</div>
-                  <div className="hour-content">
-                    {hourAppointments.length > 0 ? (
-                      <div className="hour-appointments">
-                        {hourAppointments.map(appointment => (
-                          <div 
-                            key={appointment.id} 
-                            className="appointment-slot"
-                            style={{ borderColor: getStatusColor(appointment.status) }}
-                          >
-                            <div className="appointment-header">
-                              <div className="appointment-time">
-                                <i className='bx bx-time'></i>
-                                {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
-                              </div>
-                              <div className="appointment-status">
-                                <span 
-                                  className="status-badge"
-                                  style={{ backgroundColor: getStatusColor(appointment.status) }}
-                                >
-                                  {appointment.status}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="appointment-customer">
-                              <div className="customer-name">{appointment.customerName}</div>
-                              <div className="customer-phone">
-                                <i className='bx bx-phone'></i>
-                                {appointment.customerPhone}
-                              </div>
-                            </div>
-
-                            <div className="appointment-vehicle">
-                              <i className='bx bx-car'></i>
-                              {appointment.vehicleInfo} • {appointment.licensePlate}
-                            </div>
-
-                            <div className="appointment-services">
-                              <div className="services-label">Services:</div>
-                              <div className="services-list">
-                                {appointment.services.map((service, index) => (
-                                  <span key={index} className="service-tag">{service}</span>
-                                ))}
-                              </div>
-                            </div>
-
-                            <div className="appointment-assignment">
-                              <div className="technician-info">
-                                <i className='bx bx-user'></i>
-                                <span className="technician-name">{appointment.assignedTechnician}</span>
-                              </div>
-                              <div className="bay-info">
-                                <i className='bx bx-building'></i>
-                                <span className="bay-name">{appointment.bay}</span>
-                              </div>
-                            </div>
-
-                            <div className="appointment-financial">
-                              <div className="financial-row">
-                                <span className="financial-label">Total:</span>
-                                <span className="financial-value">{formatCurrency(appointment.totalCharge)}</span>
-                              </div>
-                              <div className="financial-row">
-                                <span className="financial-label">Deposit:</span>
-                                <span className="financial-value">{formatCurrency(appointment.depositPaid)}</span>
-                              </div>
-                            </div>
-
-                            {appointment.notes && (
-                              <div className="appointment-notes">
-                                <i className='bx bx-note'></i>
-                                {appointment.notes}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="empty-hour">
-                        <i className='bx bx-calendar-x'></i>
-                        <span>No appointments scheduled</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div style={{ fontSize: 15, color: '#374151', marginBottom: 4 }}>
+          <strong>Problem Description:</strong>
+          <div style={{ marginTop: 4, color: '#6b7280', fontSize: 14 }}>{appointment.description}</div>
         </div>
       </div>
-      {showWalkInModal && (
-        <WalkInAppointmentModal
-          onClose={() => setShowWalkInModal(false)}
-          onSave={(data) => {
-            setShowWalkInModal(false);
-            // handle the saved data here
-            console.log('Saved appointment:', data);
-          }}
-        />
-      )}
-      {viewRequest && (
-        <ViewRequestModal
-          request={viewRequest}
-          onClose={() => setViewRequest(null)}
-        />
-      )}
     </div>
   );
 };
 
-export default Calendar; 
+const AutoCalendar: React.FC = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date(2025, 6, 22)); // July 22, 2025
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalAppointment, setModalAppointment] = useState<any | null>(null);
+
+  const technicians: Technician[] = [
+    { id: '1', name: 'Jack Martin', specialty: 'Engine Specialist', status: 'available' },
+    { id: '2', name: 'Sarah Connor', specialty: 'Brake Expert', status: 'busy' },
+    { id: '3', name: 'Mike Johnson', specialty: 'Electrical', status: 'available' },
+    { id: '4', name: 'Bruce Wayne', specialty: 'Transmission', status: 'break' },
+    { id: '5', name: 'Clark Kent', specialty: 'General Repair', status: 'available' }
+  ];
+
+  const appointments: Appointment[] = [
+    {
+      id: '1',
+      title: 'Oil Change Service',
+      start: new Date(2025, 6, 22, 9, 0),
+      end: new Date(2025, 6, 22, 9, 30),
+      technician: 'Jack Martin',
+      customer: 'John Doe',
+      vehicle: '2018 Honda Civic EX',
+      service: 'Oil Change',
+      priority: 'normal',
+      status: 'scheduled'
+    },
+    {
+      id: '2',
+      title: 'Brake Inspection',
+      start: new Date(2025, 6, 22, 10, 0),
+      end: new Date(2025, 6, 22, 11, 30),
+      technician: 'Sarah Connor',
+      customer: 'Jane Smith',
+      vehicle: '2020 Toyota Camry',
+      service: 'Brake Service',
+      priority: 'urgent',
+      status: 'in-progress'
+    },
+    {
+      id: '3',
+      title: 'Battery Replacement',
+      start: new Date(2025, 6, 22, 11, 0),
+      end: new Date(2025, 6, 22, 12, 0),
+      technician: 'Mike Johnson',
+      customer: 'Bob Wilson',
+      vehicle: '2019 Ford F-150',
+      service: 'Battery Service',
+      priority: 'moderate',
+      status: 'scheduled'
+    },
+    {
+      id: '4',
+      title: 'Transmission Check',
+      start: new Date(2025, 6, 22, 14, 0),
+      end: new Date(2025, 6, 22, 16, 0),
+      technician: 'Bruce Wayne',
+      customer: 'Alice Johnson',
+      vehicle: '2017 BMW X3',
+      service: 'Transmission Service',
+      priority: 'normal',
+      status: 'scheduled'
+    },
+    {
+      id: '5',
+      title: 'Engine Diagnostic',
+      start: new Date(2025, 6, 22, 13, 0),
+      end: new Date(2025, 6, 22, 15, 0),
+      technician: 'Clark Kent',
+      customer: 'David Brown',
+      vehicle: '2021 Chevrolet Silverado',
+      service: 'Engine Check',
+      priority: 'urgent',
+      status: 'scheduled'
+    }
+  ];
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'scheduled': return '#3b82f6';
+      case 'in-progress': return '#f59e0b';
+      case 'completed': return '#10b981';
+      default: return '#6b7280';
+    }
+  };
+
+  const getPriorityBorder = (priority: string) => {
+    return priority === 'urgent' ? '#ef4444' : 'transparent';
+  };
+
+  const timeSlots = [];
+  for (let hour = 8; hour <= 18; hour++) {
+    timeSlots.push({
+      hour,
+      display: hour <= 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`
+    });
+  }
+
+  if (timeSlots[4]) timeSlots[4].display = '12:00 PM';
+
+  return (
+    <div style={{ 
+      width: '100%', 
+      minHeight: '100vh', 
+      background: '#f8fafc', 
+      padding: '20px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      {/* Calendar Grid */}
+      <div style={{ 
+        background: 'white',
+        borderRadius: '12px',
+        padding: '20px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        overflowX: 'auto'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 20px 0', 
+          fontSize: '18px', 
+          fontWeight: 'bold',
+          color: '#1f2937'
+        }}>
+          📅 Daily Schedule - Tuesday, July 22, 2025
+        </h2>
+
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '100px repeat(5, 1fr)', 
+          gap: '1px',
+          backgroundColor: '#e5e7eb',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          minWidth: '800px'
+        }}>
+          {/* Header Row */}
+          <div style={{ 
+            backgroundColor: '#f9fafb', 
+            padding: '12px 8px', 
+            fontWeight: 'bold',
+            fontSize: '14px',
+            color: '#374151'
+          }}>
+            Time
+          </div>
+          {technicians.map(tech => (
+            <div key={tech.id} style={{ 
+              backgroundColor: '#f9fafb', 
+              padding: '12px 8px', 
+              fontWeight: 'bold',
+              fontSize: '14px',
+              color: '#374151',
+              textAlign: 'center'
+            }}>
+              {tech.name}
+            </div>
+          ))}
+
+          {/* Time Slots */}
+          {timeSlots.map(slot => (
+            <React.Fragment key={slot.hour}>
+              {/* Time Column */}
+              <div style={{ 
+                backgroundColor: 'white',
+                padding: '20px 8px',
+                fontSize: '12px',
+                color: '#6b7280',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                {slot.display}
+              </div>
+              
+              {/* Technician Columns */}
+              {technicians.map(tech => {
+                const appointment = appointments.find(apt => 
+                  apt.technician === tech.name && 
+                  apt.start.getHours() === slot.hour
+                );
+
+                return (
+                  <div key={`${tech.id}-${slot.hour}`} style={{ 
+                    backgroundColor: 'white',
+                    padding: '4px',
+                    minHeight: '60px',
+                    position: 'relative'
+                  }}>
+                    {appointment && (
+                      <div 
+                        style={{
+                          backgroundColor: getStatusColor(appointment.status || 'scheduled'),
+                          color: 'white',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '600',
+                          height: '100%',
+                          border: `2px solid ${getPriorityBorder(appointment.priority || 'normal')}`,
+                          cursor: 'pointer',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                        onClick={() => {
+                          setModalAppointment({
+                            date: 'Tuesday, July 22, 2025',
+                            time: `${formatTime(appointment.start)} - ${formatTime(appointment.end)}`,
+                            customer: appointment.customer,
+                            vehicle: appointment.vehicle,
+                            source: 'Online Booking', // Replace with real data if available
+                            services: ['Brakes', 'Transmission', 'Brake fluid change', 'Wheel alignment'], // Replace with real data if available
+                            description: 'Problem description goes here.' // Replace with real data if available
+                          });
+                          setModalOpen(true);
+                        }}
+                      >
+                        <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
+                          {appointment.title}
+                        </div>
+                        <div style={{ fontSize: '10px', opacity: 0.9 }}>
+                          {appointment.customer}
+                        </div>
+                        <div style={{ fontSize: '9px', opacity: 0.8 }}>
+                          {appointment.vehicle}
+                        </div>
+                        {appointment.priority === 'urgent' && (
+                          <div style={{ 
+                            position: 'absolute',
+                            top: '2px',
+                            right: '2px',
+                            fontSize: '10px'
+                          }}>
+                            🚨
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Legend */}
+        <div style={{ 
+          marginTop: '20px',
+          display: 'flex',
+          gap: '16px',
+          flexWrap: 'wrap',
+          fontSize: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#3b82f6', borderRadius: '2px' }}></div>
+            Scheduled
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#f59e0b', borderRadius: '2px' }}></div>
+            In Progress
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#10b981', borderRadius: '2px' }}></div>
+            Completed
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '12px', height: '12px', border: '2px solid #ef4444', borderRadius: '2px' }}></div>
+            Urgent Priority
+          </div>
+        </div>
+      </div>
+      {/* Modal Integration */}
+      <AppointmentDetailModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        appointment={modalAppointment || {
+          date: '',
+          time: '',
+          customer: '',
+          vehicle: '',
+          source: '',
+          services: [],
+          description: ''
+        }}
+      />
+    </div>
+  );
+};
+
+export default AutoCalendar;
+export { AppointmentDetailModal };

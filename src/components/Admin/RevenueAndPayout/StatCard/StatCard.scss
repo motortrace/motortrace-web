@@ -1,0 +1,155 @@
+@import '../../../../styles/variables.scss';
+
+.metric-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  flex: 1;
+  min-width: 0;
+  transition: all 0.2s ease;
+  font-family: 'poppins';
+
+  &:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+}
+
+.metric-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.metric-card__title-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.metric-card__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  i {
+    font-size: 18px;
+    color: var(--color-carbon);
+  }
+}
+
+.metric-card__title {
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-carbon);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.metric-card__arrow {
+  background: white;
+  border: none;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #f9fafb;
+  }
+}
+
+.metric-card__arrow-icon {
+  font-size: 20px;
+  color: var(--color-carbon);
+}
+
+.metric-card__amount {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.metric-card__currency {
+  font-size: 18px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.metric-card__subtitle {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.metric-card__decimal {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.metric-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.metric-card__change {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.metric-card__change--positive {
+  color: #059669;
+  background-color: #d1fae5;
+}
+
+.metric-card__change--negative {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.metric-card__period {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .metric-card {
+    padding: 16px;
+  }
+  
+  .metric-card__amount {
+    font-size: 24px;
+  }
+  
+  .metric-card__currency {
+    font-size: 14px;
+  }
+}
