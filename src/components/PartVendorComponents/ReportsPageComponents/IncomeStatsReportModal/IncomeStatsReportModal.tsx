@@ -45,6 +45,33 @@ const refundReasons = [
   { name: 'Other', value: 1000 },
 ];
 
+const ADMIN_COLORS = ['#1a1a1a', '#666666', '#999999', '#2563EB', '#10B981', '#F59E0B', '#EF4444', '#6B7280'];
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: '#fff',
+        border: '1px solid #e0e0e0',
+        borderRadius: 8,
+        padding: '12px 16px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+        zIndex: 1000,
+        position: 'relative',
+      }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', margin: '0 0 8px 0', borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>{label}</p>
+        {payload.map((entry, idx) => (
+          <p key={idx} style={{ fontSize: 13, fontWeight: 500, margin: '4px 0', color: entry.color, display: 'flex', alignItems: 'center' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: entry.color, display: 'inline-block', marginRight: 8 }} />
+            {`${entry.name}: ${entry.value}`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 const IncomeStatsReportModal = ({ fromDate, toDate, onClose }) => {
   const today = new Date().toLocaleDateString();
 
@@ -101,34 +128,39 @@ const IncomeStatsReportModal = ({ fromDate, toDate, onClose }) => {
 
         <div className="income-stats-report-modal__section">
           <h4>Monthly Total Payments</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={monthlyPayments} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <XAxis dataKey="month" />
-              <YAxis tickFormatter={(value) => `${value / 1000}k`} />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
-              <Legend />
-              <Line type="monotone" dataKey="payments" stroke="#2563EB" strokeWidth={2} name="Total Payments" />
+            <LineChart data={monthlyPayments} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.8} />
+              <XAxis dataKey="month" stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <YAxis tickFormatter={(value) => `${value / 1000}k`} stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <Tooltip content={<CustomTooltip />} formatter={(value) => formatCurrency(value)} />
+              <Legend wrapperStyle={{ paddingTop: 20, fontSize: 14, fontWeight: 500 }} />
+              <Line type="monotone" dataKey="payments" stroke="#1a1a1a" strokeWidth={3} dot={{ fill: '#1a1a1a', strokeWidth: 2, r: 6 }} activeDot={{ r: 8, fill: '#1a1a1a', strokeWidth: 2 }} name="Total Payments" />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         <div className="income-stats-report-modal__section">
           <h4>Monthly Payments by Service Centers</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={serviceCenterPaymentsMonthly} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <XAxis dataKey="month" />
-              <YAxis tickFormatter={(value) => `${value / 1000}k`} />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
-              <Legend />
-              <Bar dataKey="payments" fill="#10B981" name="Service Center Payments" barSize={40} />
+            <BarChart data={serviceCenterPaymentsMonthly} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.8} />
+              <XAxis dataKey="month" stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <YAxis tickFormatter={(value) => `${value / 1000}k`} stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <Tooltip content={<CustomTooltip />} formatter={(value) => formatCurrency(value)} />
+              <Legend wrapperStyle={{ paddingTop: 20, fontSize: 14, fontWeight: 500 }} />
+              <Bar dataKey="payments" fill="#1a1a1a" name="Service Center Payments" barSize={32} radius={[10,10,0,0]} />
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         <div className="income-stats-report-modal__section">
           <h4>Refund Breakdown</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -141,13 +173,14 @@ const IncomeStatsReportModal = ({ fromDate, toDate, onClose }) => {
                 label
               >
                 {refundReasons.map((entry, index) => (
-                  <Cell key={`cell-refund-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-refund-${index}`} fill={ADMIN_COLORS[index % ADMIN_COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip formatter={(value) => formatCurrency(value)} />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 14, fontWeight: 500 }} />
             </PieChart>
           </ResponsiveContainer>
+          </div>
           <p><strong>Total Refunds:</strong> {formatCurrency(refundReasons.reduce((acc, r) => acc + r.value, 0))}</p>
         </div>
 

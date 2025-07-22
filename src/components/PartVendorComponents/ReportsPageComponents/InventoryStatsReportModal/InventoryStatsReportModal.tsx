@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import { Printer, Download } from 'lucide-react';
 
-const COLORS = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#6B7280'];
+const ADMIN_COLORS = ['#1a1a1a', '#666666', '#999999', '#2563EB', '#10B981', '#F59E0B', '#EF4444', '#6B7280'];
 
 // --- Sample data (replace with props or API) ---
 const totalInventoryItems = 597;
@@ -55,6 +55,31 @@ const deadStock = [
 const inventoryTurnoverRate = 3.4;
 
 const formatCurrency = (num) => `LKR ${new Intl.NumberFormat().format(num.toFixed(2))}`;
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: '#fff',
+        border: '1px solid #e0e0e0',
+        borderRadius: 8,
+        padding: '12px 16px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+        zIndex: 1000,
+        position: 'relative',
+      }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', margin: '0 0 8px 0', borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>{label}</p>
+        {payload.map((entry, idx) => (
+          <p key={idx} style={{ fontSize: 13, fontWeight: 500, margin: '4px 0', color: entry.color, display: 'flex', alignItems: 'center' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: entry.color, display: 'inline-block', marginRight: 8 }} />
+            {`${entry.name}: ${entry.value}`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 const InventoryStatsReportModal = ({ fromDate, toDate, onClose }) => {
   const today = new Date().toLocaleDateString();
@@ -128,6 +153,7 @@ const InventoryStatsReportModal = ({ fromDate, toDate, onClose }) => {
         {/* Stock Status Pie Chart */}
         <div className="income-stats-report-modal__section" style={{ maxWidth: 420, margin: '2rem auto' }}>
           <h4>Stock Status Overview</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
@@ -140,46 +166,55 @@ const InventoryStatsReportModal = ({ fromDate, toDate, onClose }) => {
                 label
               >
                 {stockStatus.map((entry, idx) => (
-                  <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  <Cell key={`cell-${idx}`} fill={ADMIN_COLORS[idx % ADMIN_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend verticalAlign="bottom" height={36} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: 14, fontWeight: 500 }} />
             </PieChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Monthly Restocks Line Chart */}
         <div className="income-stats-report-modal__section" style={{ maxWidth: 700, margin: '0 auto' }}>
           <h4>Monthly Restocks</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={monthlyRestocks} margin={{ top: 5, right: 20, left: 0, bottom: 0 }}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+            <LineChart data={monthlyRestocks} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.8} />
+              <XAxis dataKey="month" stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <YAxis stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ paddingTop: 20, fontSize: 14, fontWeight: 500 }} />
               <Line
                 type="monotone"
                 dataKey="count"
-                stroke="#10B981"
+                stroke="#1a1a1a"
                 strokeWidth={3}
-                dot={{ r: 5 }}
-                activeDot={{ r: 7 }}
+                dot={{ fill: '#1a1a1a', strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8, fill: '#1a1a1a', strokeWidth: 2 }}
+                name="Restocks"
               />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Stock by Category Bar Chart */}
         <div className="income-stats-report-modal__section" style={{ maxWidth: 700, margin: '2rem auto' }}>
           <h4>Stock by Category</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={stockByCategory} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <XAxis dataKey="category" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="quantity" fill="#2563EB" barSize={32} />
+            <BarChart data={stockByCategory} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <XAxis dataKey="category" stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <YAxis stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ paddingTop: 20, fontSize: 14, fontWeight: 500 }} />
+              <Bar dataKey="quantity" fill="#1a1a1a" barSize={32} radius={[10,10,0,0]} name="Quantity" />
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Low Stock Items Table */}

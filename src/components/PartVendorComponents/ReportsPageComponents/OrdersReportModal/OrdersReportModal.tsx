@@ -37,7 +37,32 @@ const refundReasons = [
   { name: 'Wrong item ordered', value: 19 }
 ];
 
-const COLORS = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#6B7280'];
+const ADMIN_COLORS = ['#1a1a1a', '#666666', '#999999', '#2563EB', '#10B981', '#F59E0B', '#EF4444', '#6B7280'];
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: '#fff',
+        border: '1px solid #e0e0e0',
+        borderRadius: 8,
+        padding: '12px 16px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+        zIndex: 1000,
+        position: 'relative',
+      }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', margin: '0 0 8px 0', borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>{label}</p>
+        {payload.map((entry, idx) => (
+          <p key={idx} style={{ fontSize: 13, fontWeight: 500, margin: '4px 0', color: entry.color, display: 'flex', alignItems: 'center' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: entry.color, display: 'inline-block', marginRight: 8 }} />
+            {`${entry.name}: ${entry.value}`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 const OrdersReportModal = ({ fromDate, toDate, onClose }) => {
   const today = new Date().toLocaleDateString();
@@ -96,16 +121,18 @@ const handleDownloadPDF = () => {
 
         <div className="orders-report-modal__section">
           <h4>Daily Order Volume</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={orderTrend} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <XAxis dataKey="day" />
-              <YAxis allowDecimals={false} />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="orders" stroke="#2563EB" strokeWidth={2} />
+            <LineChart data={orderTrend} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.8} />
+              <XAxis dataKey="day" stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <YAxis allowDecimals={false} stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ paddingTop: 20, fontSize: 14, fontWeight: 500 }} />
+              <Line type="monotone" dataKey="orders" stroke="#1a1a1a" strokeWidth={3} dot={{ fill: '#1a1a1a', strokeWidth: 2, r: 6 }} activeDot={{ r: 8, fill: '#1a1a1a', strokeWidth: 2 }} />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         <div className="orders-report-modal__section">
@@ -125,46 +152,52 @@ const handleDownloadPDF = () => {
 
         <div className="orders-report-modal__section">
           <h4>Payment Type Split</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={paymentTypeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="value" fill="#10B981" barSize={40} />
+            <BarChart data={paymentTypeData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <XAxis dataKey="name" stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <YAxis stroke="#666" fontSize={12} fontWeight={500} tick={{ fill: '#666' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.8} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ paddingTop: 20, fontSize: 14, fontWeight: 500 }} />
+              <Bar dataKey="value" fill="#1a1a1a" barSize={32} radius={[10,10,0,0]} />
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         <div className="orders-report-modal__section">
           <h4>Fulfillment Status</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={fulfillmentData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} label>
                 {fulfillmentData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={ADMIN_COLORS[index % ADMIN_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 14, fontWeight: 500 }} />
             </PieChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         <div className="orders-report-modal__section">
           <h4>Refund Breakdown</h4>
+          <div style={{background:'#fafafa', borderRadius:12, padding:24, border:'1px solid #e8e8e8', marginBottom:24}}>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={refundReasons} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                 {refundReasons.map((entry, index) => (
-                  <Cell key={`cell-refund-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-refund-${index}`} fill={ADMIN_COLORS[index % ADMIN_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 14, fontWeight: 500 }} />
             </PieChart>
           </ResponsiveContainer>
+          </div>
           <p><strong>Refund Value:</strong> LKR {formatNumber(4020.75)}</p>
         </div>
 

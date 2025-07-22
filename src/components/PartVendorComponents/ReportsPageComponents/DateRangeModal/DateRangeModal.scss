@@ -64,6 +64,18 @@
       border: 1px solid #d1d5db;
       background: #f9fafb;
       cursor: pointer;
+      color: #202124; // Make cancel button text dark
+
+      &:not(.primary) {
+        color: #202124;
+        background: #f9fafb;
+        border: 1px solid #d1d5db;
+        font-weight: 600;
+        &:hover {
+          background: #e5e7eb;
+          color: #111827;
+        }
+      }
 
       &.primary {
         background-color: #202124;

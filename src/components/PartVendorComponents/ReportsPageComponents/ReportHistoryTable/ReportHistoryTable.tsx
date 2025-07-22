@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import './ReportHistoryTable.scss';
 import { Download, Eye, Filter, CalendarDays, FileDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const reportsData = [
   {
     id: 1,
     name: 'July Orders',
     type: 'Orders',
+    subtype: 'Summary',
     status: 'Completed',
     date: '2025-07-10',
     file: '/reports/july-orders.pdf',
@@ -15,29 +17,75 @@ const reportsData = [
     id: 2,
     name: 'Revenue Q2',
     type: 'Revenue',
+    subtype: 'Stats',
     status: 'Completed',
     date: '2025-07-08',
     file: '/reports/revenue-q2.pdf',
   },
+  // Additional rows for demo
   {
-    id: 3,
-    name: 'Inventory Draft',
-    type: 'Inventory',
-    status: 'In Progress',
-    date: '2025-07-05',
-    file: '',
+    id: 5,
+    name: 'August Orders',
+    type: 'Orders',
+    subtype: 'Stats',
+    status: 'Completed',
+    date: '2025-08-10',
+    file: '/reports/august-orders.pdf',
   },
   {
-    id: 4,
-    name: 'Customer Summary',
+    id: 6,
+    name: 'Revenue Q3',
+    type: 'Revenue',
+    subtype: 'Summary',
+    status: 'Completed',
+    date: '2025-08-08',
+    file: '/reports/revenue-q3.pdf',
+  },
+  {
+    id: 7,
+    name: 'Inventory Final',
+    type: 'Inventory',
+    subtype: 'Summary',
+    status: 'Completed',
+    date: '2025-08-05',
+    file: '/reports/inventory-final.pdf',
+  },
+  {
+    id: 8,
+    name: 'Customer Stats',
     type: 'Customer',
-    status: 'Failed',
-    date: '2025-07-01',
-    file: '',
+    subtype: 'Stats',
+    status: 'Completed',
+    date: '2025-08-01',
+    file: '/reports/customer-stats.pdf',
+  },
+
+  {
+    id: 11,
+    name: 'Inventory Q4',
+    type: 'Inventory',
+    subtype: 'Stats',
+    status: 'Completed',
+    date: '2025-09-05',
+    file: '/reports/inventory-q4.pdf',
+  },
+  {
+    id: 12,
+    name: 'Customer Q4',
+    type: 'Customer',
+    subtype: 'Summary',
+    status: 'Completed',
+    date: '2025-09-01',
+    file: '/reports/customer-q4.pdf',
   },
 ];
 
-const ReportHistoryTable = () => {
+interface ReportHistoryTableProps {
+  onViewReport?: (report: any) => void;
+}
+
+const ReportHistoryTable: React.FC<ReportHistoryTableProps> = ({ onViewReport }) => {
+  const navigate = useNavigate();
   const [type, setType] = useState('All');
   const [status, setStatus] = useState('All');
   const [fromDate, setFromDate] = useState('');
@@ -129,22 +177,30 @@ const ReportHistoryTable = () => {
           {paginated.map((report) => (
             <tr key={report.id}>
               <td>{report.name}</td>
-              <td><span className="type-label">{report.type}</span></td>
+              <td><span className="type-label">{report.type} - {report.subtype}</span></td>
               <td>
-                <span className={`status-label ${report.status.toLowerCase().replace(' ', '-')}`}>
-                  {report.status}
-                </span>
+                <span className={`status-label ${report.status.toLowerCase().replace(' ', '-')}`}>{report.status}</span>
               </td>
               <td>{report.date}</td>
               <td>
                 <div className="action-buttons">
                   {report.file ? (
                     <>
-                      <a href={report.file} target="_blank">
+                      <button
+                        className="action-btn"
+                        onClick={() => onViewReport && onViewReport(report)}
+                        title="View Report"
+                        type="button"
+                      >
                         <Eye size={16} />
                         View
-                      </a>
-                      <a href={report.file} download>
+                      </button>
+                      <a
+                        className="action-btn download"
+                        href={report.file}
+                        download
+                        title="Download Report"
+                      >
                         <Download size={16} />
                         Download
                       </a>
@@ -159,16 +215,25 @@ const ReportHistoryTable = () => {
         </tbody>
       </table>
 
-      <div className="pagination">
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            className={i + 1 === currentPage ? 'active' : ''}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
+      {/* Pagination - match order details table style */}
+      <div className="order-details__pagination">
+        <button
+          className="order-details__pagination-btn"
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="order-details__pagination-info">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="order-details__pagination-btn"
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
