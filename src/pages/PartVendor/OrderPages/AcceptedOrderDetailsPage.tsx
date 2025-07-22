@@ -95,6 +95,22 @@ const AcceptedOrderDetailsPage = () => {
                             // },
                         ]}
                     />
+                    <span
+                        style={{
+                            background: '#c3e3fe',
+                            color: '#2563eb',
+                            fontWeight: 600,
+                            padding: '4px 10px',
+                            borderRadius: 12,
+                            fontSize: 12,
+                            textAlign: 'center',
+                            display: 'inline-block',
+                            marginBottom: 12,
+                            marginLeft: 2
+                        }}
+                    >
+                        Accepted
+                    </span>
                 </div>
                 <div style={{ flex: '0 0 260px' }}>
                     <OrderDetailsSidebar
