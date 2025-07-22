@@ -35,10 +35,10 @@ const menuGroups: MenuGroup[] = [
     ]
   },
   {
-    title: 'Reviews And Ratings',
+    title: 'Reviews',
     items: [
       { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/PartVendor/ReviewPage' },
-      { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/PartVendor/RatingsPage' },
+      // { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/PartVendor/RatingsPage' },
     ]
   },
   {
