@@ -55,6 +55,9 @@ import DeclinedOrderDetailsPage from './pages/PartVendor/OrderPages/DeclinedOrde
 import CompletedOrderDetailsPage from './pages/PartVendor/OrderPages/CompletedOrderDetailsPage';
 import FailedOrderDetailsPage from './pages/PartVendor/OrderPages/FailedOrderDetailsPage';
 import ServiceCenterCustomerDetailsPage from './pages/PartVendor/CustomerPages/ServiceCenterCustomerDetailsPage';
+import AddProduct from './pages/PartVendor/Products/AddProduct';
+import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
+import ProductList from './pages/PartVendor/Products/ProductList';
 
 function NotFoundRedirect() {
   const navigate = useNavigate();
@@ -159,7 +162,9 @@ function App() {
           <Route path="ReportsSummary" element={<ReportPage/>}/>
           <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage/>}/>
           <Route path="FailedOrderDetailsPage" element={<FailedOrderDetailsPage />} />
-
+          <Route path="ProductList" element={<ProductList />} />
+          <Route path="AddProduct" element={<AddProduct />} />
+          <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
           
         </Route>
       </Routes>

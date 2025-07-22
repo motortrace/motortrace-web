@@ -44,8 +44,8 @@ const menuGroups: MenuGroup[] = [
   {
     title: 'Inventory',
     items: [
-      { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/PartVendor/products' },
-      { id: 'stock', label: 'Stock Levels', icon: 'bx bx-layer', route: '/PartVendor/stock' },
+      { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/PartVendor/ProductList' },
+      
     ]
   },
       {
@@ -63,8 +63,8 @@ const menuGroups: MenuGroup[] = [
   {
     title: 'Profile',
     items: [
-      { id: 'profile', label: 'Profile', icon: 'bx bx-user', route: '/PartVendor/Profile' },
-      { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/PartVendor/Settings' },
+      { id: 'profile', label: 'Profile', icon: 'bx bx-user', route: '/PartVendor/ProfilePartVendor' },
+      // { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/PartVendor/Settings' },
       { id: 'logout', label: 'Log Out', icon: 'bx bx-log-out', route: '/logout' },
     ]
   }

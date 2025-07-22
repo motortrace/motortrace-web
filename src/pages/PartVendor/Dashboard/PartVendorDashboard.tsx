@@ -17,7 +17,7 @@ import ProfitOverviewCard from '../../../components/PartVendorComponents/Dashboa
 import SubscriptionPlanCard from '../../../components/PartVendorComponents/DashboardComponents/SubscriptionPlanCard/SubscriptionPlanCard';
 import SalesOverviewCard from '../../../components/PartVendorComponents/DashboardComponents/SalesOverview/SalesOverviewCard';
 import MonthFilter from '../../../components/MonthFilter/MonthFilter';
-import MetricCard from '../../../components/PartVendorComponents/DashboardComponents/MetricCard/MetricCard';
+import PartVendorMetricCard from '../../../components/PartVendorComponents/DashboardComponents/MetricCard/MetricCard';
 
 const PartVendorDashboard = () => {
   return (
@@ -26,26 +26,26 @@ const PartVendorDashboard = () => {
       {/* <PartVendorSideBar /> */}
       {/* <SalesOverviewChart /> */}
       {/* <InventoryOverview /> */}
-            <div className="metric-cards-row">
-        <MetricCard
+      <div className="partvendor-metric-cards-row">
+        <PartVendorMetricCard
           title="New Orders"
           amount="13"
           change="12.1%"
           changeType="positive"
         />
-        <MetricCard
+        <PartVendorMetricCard
           title="Low Stock"
           amount="19"
           change="2.4%"
           changeType="negative"
         />
-        <MetricCard
+        <PartVendorMetricCard
           title="Pending Orders"
           amount="7"
           change="6.3%"
           changeType="positive"
         />
-        <MetricCard
+        <PartVendorMetricCard
           title="Total Earnings"
           amount="27 500 LKR"
           change="12.1%"
