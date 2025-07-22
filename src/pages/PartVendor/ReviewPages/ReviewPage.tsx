@@ -1,6 +1,5 @@
 import React from 'react';
 import './ReviewPage.scss';
-import UnrepliedReviewsCard from '../../../components/PartVendorComponents/ReviewPageComponentsNew/UnrepliedReviewsCard/UnrepliedReviewsCard';
 import RatingsOverviewCard from '../../../components/PartVendorComponents/ReviewPageComponentsNew/RatingOverviewCard/RatingOverviewCard';
 import RatingComparisonChart from '../../../components/PartVendorComponents/ReviewPageComponentsNew/RatingBreakdownCard/RatingBreakdownCard';
 import ReviewTrendsChart from '../../../components/PartVendorComponents/ReviewPageComponentsNew/ReviewTrendsChart/ReviewTrendsChart';
@@ -16,9 +15,6 @@ const ReviewPage = () => {
         </div>
         <div className="rating-stats">
           <RatingComparisonChart />
-        </div>
-        <div className="unreplied-reviews">
-          <UnrepliedReviewsCard />
         </div>
         <div className="review-trends">
           <ReviewTrendsChart />

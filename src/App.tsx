@@ -22,7 +22,10 @@ import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
 import CustomerDetailsPage from './pages/PartVendor/CustomerPages/CustomerDetailsPage';
 import AcceptedOrderDetailsPage from './pages/PartVendor/OrderPages/AcceptedOrderDetailsPage';
 import ReportPage from './pages/PartVendor/ReportPages/ReportPage';
-import BackendTest from './pages/PartVendor/BackendTest/BackendTest';
+import DeclinedOrderDetailsPage from './pages/PartVendor/OrderPages/DeclinedOrderDetailsPage';
+import CompletedOrderDetailsPage from './pages/PartVendor/OrderPages/CompletedOrderDetailsPage';
+
+
 
 function App() {
   return (
@@ -56,8 +59,11 @@ function App() {
           <Route path="ReviewPage" element={<ReviewPage/>} />
           <Route path="CustomerDetails" element={<CustomerDetailsPage/>} />
           <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage/>} />
+          <Route path="CompletedOrders" element={<CompletedOrderDetailsPage/>} />
           <Route path="ReportsSummary" element={<ReportPage/>}/>
-          <Route path="test" element={<BackendTest/>} />
+          <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage/>}/>
+
+          
         </Route>
       </Routes>
     </BrowserRouter>

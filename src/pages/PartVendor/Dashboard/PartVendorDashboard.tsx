@@ -17,6 +17,7 @@ import ProfitOverviewCard from '../../../components/PartVendorComponents/Dashboa
 import SubscriptionPlanCard from '../../../components/PartVendorComponents/DashboardComponents/SubscriptionPlanCard/SubscriptionPlanCard';
 import SalesOverviewCard from '../../../components/PartVendorComponents/DashboardComponents/SalesOverview/SalesOverviewCard';
 import MonthFilter from '../../../components/MonthFilter/MonthFilter';
+import MetricCard from '../../../components/PartVendorComponents/DashboardComponents/MetricCard/MetricCard';
 
 const PartVendorDashboard = () => {
   return (
@@ -25,15 +26,56 @@ const PartVendorDashboard = () => {
       {/* <PartVendorSideBar /> */}
       {/* <SalesOverviewChart /> */}
       {/* <InventoryOverview /> */}
-      <DashboardMetrics />
+            <div className="metric-cards-row">
+        <MetricCard
+          title="New Orders"
+          amount="13"
+          change="12.1%"
+          changeType="positive"
+        />
+        <MetricCard
+          title="Low Stock"
+          amount="19"
+          change="2.4%"
+          changeType="negative"
+        />
+        <MetricCard
+          title="Pending Orders"
+          amount="7"
+          change="6.3%"
+          changeType="positive"
+        />
+        <MetricCard
+          title="Total Earnings"
+          amount="27 500 LKR"
+          change="12.1%"
+          changeType="positive"
+        />
+      </div>
+            <div className="dashboard-cards-row">
+        {/* <ProfitOverviewCard
+          totalRevenue={145000}
+          totalCosts={87000}
+          profitTrend={+4.8}
+        /> */}
+        <SubscriptionPlanCard
+          currentPlan="Pro Seller"
+          totalDays={30}
+          daysLeft={12}
+          suggestion={{ planName: 'Premium Seller', savings: 120 }}
+          onUpdatePlan={() => console.log('Updating plan...')}
+        />
+        <SalesOverviewCard
+        />
+      </div>
       <div className="dashboard-cards-row">
-        <UnpaidPaymentsCard
+        {/* <UnpaidPaymentsCard
           payments={[
             { serviceCenter: 'AutoFix Center', month: 'June 2025', amount: 4500, status: 'reminder' },
             { serviceCenter: 'Speedy Motors', month: 'May 2025', amount: 6700, status: 'pending' },
             { serviceCenter: 'Quick Auto Hub', month: 'July 2025', amount: 3000, status: 'settled' },
           ]}
-        />
+        /> */}
         <NewReviewsCard
           googleRating={4.5}
           googleReviews={454}
@@ -65,22 +107,7 @@ const PartVendorDashboard = () => {
         />
       </div>
 <OrdersOverview />
-      <div className="dashboard-cards-row">
-        <ProfitOverviewCard
-          totalRevenue={145000}
-          totalCosts={87000}
-          profitTrend={+4.8}
-        />
-        <SubscriptionPlanCard
-          currentPlan="Pro Seller"
-          totalDays={30}
-          daysLeft={12}
-          suggestion={{ planName: 'Premium Seller', savings: 120 }}
-          onUpdatePlan={() => console.log('Updating plan...')}
-        />
-        <SalesOverviewCard
-        />
-      </div>
+
 {/* 
       <SalesByItemChart />
       
