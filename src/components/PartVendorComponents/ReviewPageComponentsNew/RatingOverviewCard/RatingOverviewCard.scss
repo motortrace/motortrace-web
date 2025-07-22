@@ -1,16 +1,23 @@
 .ratings-overview-card {
-  background: #fff;
+  font-family: 'Poppins';
+  background: #ffffff;
   border-radius: 16px;
-  padding: 20px;
+  padding: 32px;
+  margin: 0;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  position: relative;
   flex: 1;
-  border: 2px solid #e5e7eb;
   max-height: 350px;
+  min-height: 500px;
 
   &__title {
-    font-size: 1.1rem;
+    font-size: 20px;
     font-weight: 600;
-    margin-bottom: 16px;
-    color: #111827;
+    color: #1a1a1a;
+    margin: 0 0 24px 0;
   }
 
   &__sources-vertical {
@@ -20,12 +27,23 @@
   }
 
   &__source {
-    background: #f9fafb;
+    background: #fff;
     border-radius: 12px;
-    padding: 16px;
+    border: 1px solid #e8e8e8;
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     gap: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border-color: #d0d0d0;
+    }
   }
 
   &__header {
@@ -54,24 +72,25 @@
   }
 
   &__rating {
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 4px;
-    color: #111827;
+    color: #1a1a1a;
   }
 
   &__count {
-    font-size: 0.9rem;
-    color: #6b7280;
+    font-size: 13px;
+    color: #666666;
+    opacity: 0.8;
   }
 
   &__change {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.82rem;
+    font-size: 13px;
     font-weight: 500;
 
     &.positive {
@@ -81,5 +100,39 @@
     &.negative {
       color: #dc2626;
     }
+  }
+
+  &__tags-section {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  &__tags-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 2px;
+  }
+
+  &__tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-top: 2px;
+  }
+
+  &__tag {
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 999px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 2px;
   }
 }

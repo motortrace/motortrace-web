@@ -159,22 +159,25 @@ const DetailedReviewsSection = () => {
 
   return (
     <div className="detailed-reviews">
-      <div className="detailed-reviews__tabs">
-        <button
-          className={`detailed-reviews__tab ${activeTab === 'google' ? 'active' : ''}`}
-          onClick={() => handleTabSwitch('google')}
-        >
-          Google Reviews
-        </button>
-        <button
-          className={`detailed-reviews__tab ${activeTab === 'motortrace' ? 'active' : ''}`}
-          onClick={() => handleTabSwitch('motortrace')}
-        >
-          MotorTrace Reviews
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
+        <div className="detailed-reviews__tabs">
+          <button
+            className={`detailed-reviews__tab ${activeTab === 'google' ? 'active' : ''}`}
+            onClick={() => handleTabSwitch('google')}
+          >
+            Google Reviews
+          </button>
+          <button
+            className={`detailed-reviews__tab ${activeTab === 'motortrace' ? 'active' : ''}`}
+            onClick={() => handleTabSwitch('motortrace')}
+          >
+            MotorTrace Reviews
+          </button>
+        </div>
+        <div style={{ flex: 1 }}>
+          <ReviewFilters />
+        </div>
       </div>
-
-      <ReviewFilters />
 
       <div className="detailed-reviews__list">
         {paginatedReviews.map((review) => (

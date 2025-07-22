@@ -44,6 +44,20 @@ const RatingsOverviewCard = () => (
         </div>
       ))}
     </div>
+    <div className="ratings-overview-card__tags-section">
+      
+      <div className="ratings-overview-card__tags-list">
+        <span className="ratings-overview-card__tag">Perfect Part Match +5</span>
+        <span className="ratings-overview-card__tag">Fast Delivery +3</span>
+        <span className="ratings-overview-card__tag">Good Packaging +2</span>
+        <span className="ratings-overview-card__tag">Helpful Support +1</span>
+        <span className="ratings-overview-card__tag">Easy Returns +2</span>
+        <span className="ratings-overview-card__tag">Accurate Description +4</span>
+        <span className="ratings-overview-card__tag">Friendly Staff +2</span>
+        <span className="ratings-overview-card__tag">Affordable Price +3</span>
+        <span className="ratings-overview-card__tag">Quick Response +2</span>
+      </div>
+    </div>
   </div>
 );
 
