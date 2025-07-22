@@ -25,7 +25,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     description: 'Details for the selected job card',
   },
   '/servicecenter/scheduling': {
-    title: 'Appointment Calendar',
+    title: 'Work Schedule',
     description: 'Schedule appointments for your technicians',
   },
   '/servicecenter/inventory': {

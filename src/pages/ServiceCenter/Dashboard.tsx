@@ -239,7 +239,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard">
-      <DashboardHeader />
+      {/* <DashboardHeader /> */}
 
       <div className="metric-cards-row">
         <MetricCard
