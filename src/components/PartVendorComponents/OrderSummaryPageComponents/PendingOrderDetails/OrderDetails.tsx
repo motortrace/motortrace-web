@@ -185,7 +185,7 @@ const getOrderDetailsPath = (status: string, id: string) => {
     case 'pending':
       return '/PartVendor/PendingOrderDetails';
     case 'completed':
-      return '/PartVendor/CompletedOrderDetailsPage';
+      return '/PartVendor/CompletedOrders';
     case 'accepted':
       return '/PartVendor/AcceptedOrders';
     case 'failed':
