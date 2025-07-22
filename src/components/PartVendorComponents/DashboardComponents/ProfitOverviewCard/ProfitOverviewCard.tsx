@@ -15,7 +15,6 @@ const ProfitOverviewCard: React.FC<ProfitOverviewCardProps> = ({
 }) => {
   const totalProfit = totalRevenue - totalCosts;
   const profitMargin = ((totalProfit / totalRevenue) * 100).toFixed(1);
-
   const isPositive = profitTrend >= 0;
 
   return (
@@ -23,17 +22,17 @@ const ProfitOverviewCard: React.FC<ProfitOverviewCardProps> = ({
       <h3 className="profit-overview-card__title">Profit Overview</h3>
 
       <div className="profit-overview-card__profit">
-        ${totalProfit.toLocaleString()}
+        ₨ {totalProfit.toLocaleString()}
       </div>
 
       <div className="profit-overview-card__details">
         <div className="profit-overview-card__details__item">
-          <span className="label">Revenue:</span>
-          <span>${totalRevenue.toLocaleString()}</span>
+          <span className="label">Total Revenue:</span>
+          <span>₨ {totalRevenue.toLocaleString()}</span>
         </div>
         <div className="profit-overview-card__details__item">
-          <span className="label">Costs:</span>
-          <span>${totalCosts.toLocaleString()}</span>
+          <span className="label">Total Costs:</span>
+          <span>₨ {totalCosts.toLocaleString()}</span>
         </div>
         <div className="profit-overview-card__details__item">
           <span className="label">Profit Margin:</span>

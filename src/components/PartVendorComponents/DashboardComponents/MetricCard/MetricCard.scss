@@ -1,0 +1,72 @@
+@import '../../../../styles/variables.scss';
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.metric-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.metric-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.metric-card__amount {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.metric-card__decimal {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.metric-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metric-card__change {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.metric-card__change--positive {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.metric-card__change--negative {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.metric-card__period {
+  font-size: 12px;
+  color: #6b7280;
+}

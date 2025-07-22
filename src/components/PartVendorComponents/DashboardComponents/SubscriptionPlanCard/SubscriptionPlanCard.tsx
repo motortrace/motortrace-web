@@ -37,16 +37,17 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({
       </div>
 
       <div className="subscription-plan-card__progress">
-        <CircularProgressbar
-          value={percentage}
-          text={`${daysLeft}d left`}
-          styles={buildStyles({
-            textColor: '#111827',
-            pathColor: '#10b981',
-            trailColor: '#e5e7eb',
-            textSize: '16px',
-          })}
-        />
+<CircularProgressbar
+  value={percentage}
+  text={`${daysLeft}d left`}
+  styles={buildStyles({
+    textColor: '#1a1a1a',
+    pathColor: '#242525ff', // Accent green
+    trailColor: '#e5e7eb',
+    textSize: '16px',
+  })}
+/>
+
       </div>
 
       <div className="subscription-plan-card__plan-name">{currentPlan}</div>
