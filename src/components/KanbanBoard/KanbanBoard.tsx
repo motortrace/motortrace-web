@@ -1,58 +1,60 @@
 import React from 'react';
 import KanbanColumn from '../KanbanColumn/KanbanColumn';
-import type { WorkOrder } from '../../types/WorkOrder';
 import './KanbanBoard.scss';
+
+interface WorkOrder {
+  id: string;
+  workOrderNumber: string;
+  customer: string;
+  vehicle: string;
+  assignedTechnician: string;
+  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
+  description?: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+interface KanbanColumnDef {
+  id: WorkOrder['status'];
+  title: string;
+  color: string;
+}
 
 interface KanbanBoardProps {
   workOrders: WorkOrder[];
   onCardMove: (cardId: string, newStatus: WorkOrder['status']) => void;
   searchTerm: string;
-  selectedFilters: string[];
+  priorityFilter: string;
+  technicianFilter: string;
+  getTypeIcon: () => React.ReactNode;
+  getTypeColor: () => string;
+  getPriorityColor: (priority: WorkOrder['priority']) => string;
+  columns: KanbanColumnDef[];
+  onCardClick?: (workOrder: WorkOrder) => void;
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
   workOrders,
   onCardMove,
   searchTerm,
-  selectedFilters
+  priorityFilter,
+  technicianFilter,
+  getTypeIcon,
+  getTypeColor,
+  getPriorityColor,
+  columns,
+  onCardClick
 }) => {
-  const columns = [
-    {
-      id: 'opened',
-      title: 'Opened',
-      color: '#6B7280',
-      count: workOrders.filter(order => order.status === 'opened').length
-    },
-    {
-      id: 'estimate-sent',
-      title: 'Estimate Sent',
-      color: '#F59E0B',
-      count: workOrders.filter(order => order.status === 'estimate-sent').length
-    },
-    {
-      id: 'in-progress',
-      title: 'In Progress',
-      color: '#3B82F6',
-      count: workOrders.filter(order => order.status === 'in-progress').length
-    },
-    {
-      id: 'invoiced',
-      title: 'Invoiced',
-      color: '#8B5CF6',
-      count: workOrders.filter(order => order.status === 'invoiced').length
-    }
-  ];
-
-  const filterWorkOrders = (orders: WorkOrder[], status: WorkOrder['status']) => {
-    return orders.filter(order => {
-      const matchesStatus = order.status === status;
-      const matchesSearch = searchTerm === '' || 
-        order.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.estimateNumber.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      return matchesStatus && matchesSearch;
+  const filterWorkOrders = (items: WorkOrder[], status: WorkOrder['status']) => {
+    return items.filter(item => {
+      const matchesStatus = item.status === status;
+      const matchesSearch = searchTerm === '' ||
+        item.workOrderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.assignedTechnician.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesPriority = priorityFilter === '' || item.priority === priorityFilter;
+      const matchesTechnician = technicianFilter === '' || item.assignedTechnician.toLowerCase().includes(technicianFilter.toLowerCase());
+      return matchesStatus && matchesSearch && matchesPriority && matchesTechnician;
     });
   };
 
@@ -64,10 +66,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             key={column.id}
             title={column.title}
             color={column.color}
-            count={column.count}
-            workOrders={filterWorkOrders(workOrders, column.id as WorkOrder['status'])}
+            count={workOrders.filter(item => item.status === column.id).length}
+            serviceItems={filterWorkOrders(workOrders, column.id)}
             onCardMove={onCardMove}
-            columnId={column.id as WorkOrder['status']}
+            columnId={column.id}
+            getTypeIcon={getTypeIcon}
+            getTypeColor={getTypeColor}
+            getPriorityColor={getPriorityColor}
+            onCardClick={onCardClick}
           />
         ))}
       </div>

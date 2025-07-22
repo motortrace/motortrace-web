@@ -3,6 +3,7 @@ export interface PendingRequest {
   customer: string;
   phone: string;
   vehicle: string;
+  licensePlate: string;
   requestedDate: string;
   requestedTime: string;
   services: string[];
@@ -10,4 +11,5 @@ export interface PendingRequest {
   createdAt: string;
   technician?: string;
   notes?: string;
+  estimatedCost?: number;
 } 
