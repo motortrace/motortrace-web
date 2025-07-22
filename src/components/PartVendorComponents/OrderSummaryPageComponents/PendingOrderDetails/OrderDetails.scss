@@ -32,7 +32,7 @@
 
   &__table-header {
     display: grid;
-    grid-template-columns: 1.2fr 2fr 1.2fr 1.5fr 1.2fr 1.2fr 1.2fr;
+    grid-template-columns: 1.2fr 2fr 1.2fr 1.5fr 1.2fr 1.2fr 1.2fr 0.8fr;
     gap: 16px;
     padding: 12px 0;
     background: #f8f9fa;
@@ -59,7 +59,7 @@
 
   &__row {
     display: grid;
-    grid-template-columns: 1.2fr 2fr 1.2fr 1.5fr 1.2fr 1.2fr 1.2fr;
+    grid-template-columns: 1.2fr 2fr 1.2fr 1.5fr 1.2fr 1.2fr 1.2fr 0.8fr;
     gap: 16px;
     align-items: center;
     padding: 12px 16px;
@@ -131,6 +131,11 @@
       background-color: #fee2e2;
       color: #dc2626;
     }
+
+    &--accepted {
+      background-color: #c3e3fe;
+      color: #2563eb;
+    }
   }
 
   &__customer-type {
@@ -142,6 +147,24 @@
     &--service-center {
       background-color: #ede9fe;
       color: #7c3aed;
+    }
+  }
+
+  &__action-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+    color: #656970;
+
+    &:hover {
+      color: #111827;
+      svg {
+        stroke: #111827;
+      }
     }
   }
 

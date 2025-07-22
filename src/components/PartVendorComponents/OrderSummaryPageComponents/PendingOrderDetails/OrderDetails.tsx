@@ -7,6 +7,7 @@ import engineOilImg from '../../../../assets/images/QuartzEngineOil.png';
 import spark from '../../../../assets/images/spark.png';
 import battery from '../../../../assets/images/battery.png';
 import belt from '../../../../assets/images/timingBelt.png';
+import { Eye } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -78,7 +79,7 @@ const orders: Order[] = [
     customerName: 'N. Jayasinghe',
     customerType: 'Customer',
     amount: 'LKR 19,200',
-    status: 'Pending',
+    status: 'Accepted',
     products: [
       { name: 'Battery', imageUrl: battery },
       { name: 'Headlights', imageUrl: 'https://via.placeholder.com/40' },
@@ -178,6 +179,21 @@ const handleStatusClick = (status: string) => {
 
   navigate(path);
 };
+
+const getOrderDetailsPath = (status: string, id: string) => {
+  switch (status.toLowerCase()) {
+    case 'pending':
+      return '/PartVendor/PendingOrderDetails';
+    case 'completed':
+      return '/PartVendor/CompletedOrderDetailsPage';
+    case 'accepted':
+      return '/PartVendor/AcceptedOrders';
+    case 'failed':
+      return '/PartVendor/FailedOrderDetailsPage';
+    default:
+      return '/PartVendor/PendingOrderDetailsPage';
+  }
+};
   return (
     <div className="order-details">
       <div className="order-details__header">
@@ -193,6 +209,7 @@ const handleStatusClick = (status: string) => {
           <div className="order-details__header-cell">Type</div>
           <div className="order-details__header-cell">Amount</div>
           <div className="order-details__header-cell">Status</div>
+          <div className="order-details__header-cell">Actions</div>
         </div>
 
         <div className="order-details__table-body">
@@ -241,6 +258,16 @@ const handleStatusClick = (status: string) => {
                 >
                   {order.status}
                 </span>
+              </div>
+              <div className="order-details__cell" data-label="Actions">
+                <button
+                  className="order-details__action-btn"
+                  title="View Details"
+                  onClick={() => navigate(getOrderDetailsPath(order.status, order.id))}
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                >
+                  <Eye size={18} stroke="#656970" />
+                </button>
               </div>
             </div>
           ))}

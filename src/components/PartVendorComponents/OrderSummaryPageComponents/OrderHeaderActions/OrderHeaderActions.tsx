@@ -5,10 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface OrderHeaderActionsProps {
   orderNumber: string;
-  customerName: string;
-  status: 'Paid' | 'Pending' | 'Failed' | 'Accepted';
-  onAccept: () => void;
-  onDecline: () => void;
+  customerName?: string;
+  status: 'Paid' | 'Pending' | 'Failed' | 'Accepted' | 'Declined' | 'Completed';
+  onAccept?: () => void;
+  onDecline?: () => void;
 }
 
 const OrderHeaderActions: React.FC<OrderHeaderActionsProps> = ({
@@ -26,6 +26,7 @@ const OrderHeaderActions: React.FC<OrderHeaderActionsProps> = ({
 
   const handleCustomerClick = () => {
     // Replace with the correct dynamic route if needed
+    if (!customerName) return;
     const encodedName = encodeURIComponent(customerName);
     navigate(`/PartVendor/Customers/${encodedName}`);
   };
@@ -48,7 +49,7 @@ const OrderHeaderActions: React.FC<OrderHeaderActionsProps> = ({
           </span>
         </div>
 
-        {status === 'Pending' && (
+        {status === 'Pending' && onAccept && onDecline && (
           <div className="order-header-actions__buttons">
             <button className="order-header-actions__button" onClick={onAccept}>
               <span className="order-header-actions__button-icon">

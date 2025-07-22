@@ -8,7 +8,7 @@ import ShippingConfirmationModal from '../ShippingConfirmationModal/ShippingConf
 import ShippingStatus from '../ShippingConfirmationModal/ShippingStatus';
 
 interface ProductDetailsSectionProps {
-  orderStatus: 'Pending' | 'Accepted' | 'Declined';
+  orderStatus: 'Pending' | 'Accepted' | 'Declined' | 'Completed';
 }
 
 interface Product {
