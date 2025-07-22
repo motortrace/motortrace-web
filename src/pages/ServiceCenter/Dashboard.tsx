@@ -1,11 +1,12 @@
 // Dashboard.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardHeader from '../../layouts/DashboardHeader/DashboardHeader';
 import MetricCard from '../../components/MetricCard/MetricCard';
 import ServiceFlow from '../../components/ServiceFlow/ServiceFlow';
 import TodaysBookingsOverview from '../../components/TodaysBookingOverview/TodaysBookingsOverview';
 import Budget from '../../components/Budget/Budget';
 import BayUtilizationChart from '../../components/BayUtilizationChart/BayUtilizationChart';
+import AcceptAppointmentModal from '../../components/AcceptAppointmentModal/AcceptAppointmentModal';
 import './Dashboard.scss';
 
 // Types
@@ -78,44 +79,32 @@ const Dashboard: React.FC = () => {
     notDone: 3
   };
 
-  const todaysAppointments: Appointment[] = [
-    {
-      id: 1,
-      customerName: "Mike Johnson",
-      time: "09:00 AM",
-      date: "18 Jan 2025",
-      licensePlate: "ABC-1234",
-      service: "Oil Change",
-      status: "confirmed"
-    },
-    {
-      id: 2,
-      customerName: "Sarah Williams",
-      time: "10:30 AM",
-      date: "18 Jan 2025",
-      licensePlate: "XYZ-5678",
-      service: "Brake Inspection",
-      status: "pending"
-    },
-    {
-      id: 3,
-      customerName: "David Chen",
-      time: "02:00 PM",
-      date: "18 Jan 2025",
-      licensePlate: "DEF-9012",
-      service: "Engine Diagnostic",
-      status: "confirmed"
-    },
-    {
-      id: 4,
-      customerName: "Emma Davis",
-      time: "03:30 PM",
-      date: "18 Jan 2025",
-      licensePlate: "GHI-3456",
-      service: "Tire Rotation",
-      status: "pending"
+  // Replace mock data with backend fetch
+  const [todaysAppointments, setTodaysAppointments] = useState<Appointment[]>([]);
+  const serviceCenterId = 2; // TODO: Replace with actual service center ID from auth/context
+
+  const fetchAppointments = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/service-center/${serviceCenterId}/appointments/`);
+      if (!res.ok) throw new Error('Failed to fetch appointments');
+      const data = await res.json();
+      const mapped = data.map((a: any) => ({
+        id: a.id,
+        customerName: a.carOwner?.name || 'Unknown',
+        time: a.requestedDate ? new Date(a.requestedDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+        date: a.requestedDate ? new Date(a.requestedDate).toLocaleDateString() : '',
+        licensePlate: a.vehicle?.licensePlate || '',
+        status: a.status || 'pending',
+      }));
+      setTodaysAppointments(mapped);
+    } catch (err) {
+      setTodaysAppointments([]);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [serviceCenterId]);
 
   const recentTransactions: Transaction[] = [
     {
@@ -206,6 +195,46 @@ const Dashboard: React.FC = () => {
 
   const getTaskProgressPercentage = (count: number) => {
     return Math.round((count / totalTasks) * 100);
+  };
+
+  const [acceptModalOpen, setAcceptModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+
+  const handleAccept = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setAcceptModalOpen(true);
+  };
+
+  const handleConfirmAccept = async (appointmentId: number, technicianId: number) => {
+    try {
+      await fetch(`http://localhost:3000/api/appointments/${appointmentId}/accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ technicianId })
+      });
+      fetchAppointments();
+    } catch (err) {
+      alert('Failed to accept appointment');
+    }
+  };
+
+  const handleReject = async (appointment: Appointment) => {
+    if (!window.confirm(`Reject appointment for ${appointment.customerName}?`)) return;
+    try {
+      await fetch(`http://localhost:3000/api/appointments/${appointment.id}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: '' })
+      });
+      fetchAppointments();
+    } catch (err) {
+      alert('Failed to reject appointment');
+    }
+  };
+
+  const handleCloseAcceptModal = () => {
+    setAcceptModalOpen(false);
+    setSelectedAppointment(null);
   };
 
   return (
@@ -352,10 +381,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Row - Two Cards */}
-        <div className="dashboard__row dashboard__row--bottom">
-          {/* Today's Appointments */}
-          <div className="dashboard__card dashboard__card--appointments">
+        <div className="dashboard__card dashboard__card--appointments">
             <div className="dashboard__card-header">
               <h3 className="dashboard__card-title">Today's Appointments</h3>
               <div className="dashboard__card-actions">
@@ -400,7 +426,6 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div className="dashboard__client-info">
                           <div className="dashboard__client-name">{appointment.customerName}</div>
-                          <div className="dashboard__client-service">{appointment.service}</div>
                         </div>
                       </div>
                     </div>
@@ -416,14 +441,29 @@ const Dashboard: React.FC = () => {
                     <div className="dashboard__appointment-col">
                       {getStatusBadge(appointment.status)}
                     </div>
-                    <div className="dashboard__appointment-col">
-                      <button className="dashboard__action-btn dashboard__action-btn--menu btn btn--ghost">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="1"/>
-                          <circle cx="12" cy="5" r="1"/>
-                          <circle cx="12" cy="19" r="1"/>
-                        </svg>
-                      </button>
+                    <div className="dashboard__appointment-col" style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', minWidth: 120 }}>
+                      {appointment.status === 'pending' && (
+                        <>
+                          <button
+                            className="btn-icon"
+                            style={{ color: '#22c55e', fontSize: 20, background: 'none', border: 'none', cursor: 'pointer' }}
+                            onClick={() => handleAccept(appointment)}
+                            aria-label="Accept"
+                            title="Accept"
+                          >
+                            <i className="bx bx-check"></i>
+                          </button>
+                          <button
+                            className="btn-icon"
+                            style={{ color: '#ef4444', fontSize: 20, background: 'none', border: 'none', cursor: 'pointer' }}
+                            onClick={() => handleReject(appointment)}
+                            aria-label="Reject"
+                            title="Reject"
+                          >
+                            <i className="bx bx-x"></i>
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -431,64 +471,15 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Recent Payments */}
-          <div className="dashboard__card dashboard__card--payments">
-            <div className="dashboard__card-header">
-              <h3 className="dashboard__card-title">Recent Payments</h3>
+        {/* Bottom Row - Two Cards */}
 
-            </div>
-            
-            <div className="dashboard__card-main">
-              <div className="dashboard__payments-summary">
-                <div className="dashboard__payment-total">
-                  <div className="dashboard__payment-amount">
-                    {`LKR ${recentTransactions.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}`}
-                  </div>
-                  <div className="dashboard__payment-label">Total Recent Payments</div>
-                </div>
-                
-                <div className="dashboard__payment-stats">
-                  <div className="dashboard__payment-stat">
-                    <div className="dashboard__payment-stat-number">
-                      {recentTransactions.filter(t => t.status === 'completed').length}
-                    </div>
-                    <div className="dashboard__payment-stat-label">Completed</div>
-                  </div>
-                  <div className="dashboard__payment-stat">
-                    <div className="dashboard__payment-stat-number">
-                      {recentTransactions.filter(t => t.status === 'pending').length}
-                    </div>
-                    <div className="dashboard__payment-stat-label">Pending</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="dashboard__payments-list">
-                {recentTransactions.map((transaction) => (
-                  <div key={transaction.id} className="dashboard__payment-row">
-                    <div className="dashboard__payment-client">
-                      <div className="dashboard__client-avatar">
-                        {transaction.customerName.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div className="dashboard__client-info">
-                        <div className="dashboard__client-name">{transaction.customerName}</div>
-                        <div className="dashboard__client-service">{transaction.service}</div>
-                      </div>
-                    </div>
-                    <div className="dashboard__payment-info">
-                      <div className="dashboard__payment-amount">LKR {transaction.amount.toLocaleString()}</div>
-                      <div className="dashboard__payment-date">{transaction.date}</div>
-                    </div>
-                    <div className="dashboard__payment-status">
-                      {getStatusBadge(transaction.status)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
+      <AcceptAppointmentModal
+        open={acceptModalOpen}
+        onClose={handleCloseAcceptModal}
+        appointment={selectedAppointment}
+        onConfirm={handleConfirmAccept}
+      />
     </div>
   );
 };
