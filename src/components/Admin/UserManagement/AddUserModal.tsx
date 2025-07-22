@@ -8,20 +8,21 @@ interface AddUserModalProps {
 }
 
 const initialFormState = {
-  // Common
+  // Common User fields
   name: '',
   email: '',
   phone: '',
-  // Car User
-  totalVehicles: '',
-  // Service Center & Spare Parts Seller
+  password: '',
+  // Service Center Profile fields
   businessName: '',
-  businessRegNo: '',
-  location: '',
-  contactPerson: '',
-  contactNumber: '',
-  contactEmail: '',
-  defaultPassword: '',
+  address: '',
+  businessRegistrationNumber: '',
+  contactPersonName: '',
+  // Spare Parts Seller fields
+  shopName: '',
+  inventoryCapacity: '',
+  // Car User fields
+  totalVehicles: '',
   status: 'Active',
   joinDate: new Date().toISOString().slice(0, 10),
 };
@@ -44,6 +45,7 @@ const sectionDividerStyle: React.CSSProperties = {
 const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, onCreate }) => {
   const [form, setForm] = useState(initialFormState);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (!open) return null;
 
@@ -51,11 +53,34 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     // Validation
-    if (userType === 'Service Centers' || userType === 'Spare Parts Sellers') {
-      if (!form.businessName || !form.businessRegNo || !form.location || !form.contactPerson || !form.contactNumber || !form.contactEmail || !form.defaultPassword) {
+    if (userType === 'Service Centers') {
+      if (
+        !form.name ||
+        !form.email ||
+        !form.phone ||
+        !form.password ||
+        !form.businessName ||
+        !form.address ||
+        !form.businessRegistrationNumber ||
+        !form.contactPersonName
+      ) {
+        setError('Please fill in all required fields.');
+        return;
+      }
+    } else if (userType === 'Spare Parts Sellers') {
+      if (
+        !form.name ||
+        !form.email ||
+        !form.phone ||
+        !form.password ||
+        !form.shopName ||
+        !form.address ||
+        !form.contactPersonName
+      ) {
         setError('Please fill in all required fields.');
         return;
       }
@@ -65,37 +90,48 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
         return;
       }
     }
-    setError('');
-    // Generate a random id for demo
-    const id = Math.random().toString(36).substr(2, 9);
-    let newUser: any = { joinDate: form.joinDate, status: form.status };
-    if (userType === 'Car Users') {
-      newUser = {
-        id,
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        totalVehicles: Number(form.totalVehicles),
-        totalBookings: 0,
-        status: form.status,
-        joinDate: form.joinDate,
-      };
-    } else {
-      newUser = {
-        id,
-        businessName: form.businessName,
-        businessRegNo: form.businessRegNo,
-        location: form.location,
-        contactPerson: form.contactPerson,
-        contactNumber: form.contactNumber,
-        contactEmail: form.contactEmail,
-        defaultPassword: form.defaultPassword,
-        status: form.status,
-        joinDate: form.joinDate,
-      };
+    setLoading(true);
+    try {
+      // Prepare payload for backend
+      let payload: any = { ...form };
+      if (userType === 'Service Centers') {
+        payload = {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+          businessName: form.businessName,
+          address: form.address,
+          businessRegistrationNumber: form.businessRegistrationNumber,
+          contactPersonName: form.contactPersonName,
+        };
+      } else if (userType === 'Spare Parts Sellers') {
+        payload = {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+          shopName: form.shopName,
+          address: form.address,
+          contactPersonName: form.contactPersonName,
+          categoriesSold: '[]', // send empty array for now
+          inventoryCapacity: form.inventoryCapacity || '',
+        };
+      } else if (userType === 'Car Users') {
+        payload = {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          totalVehicles: Number(form.totalVehicles),
+        };
+      }
+      await onCreate(payload);
+      setForm(initialFormState);
+    } catch (err: any) {
+      setError(err.message || 'An error occurred.');
+    } finally {
+      setLoading(false);
     }
-    onCreate(newUser);
-    setForm(initialFormState);
   };
 
   return (
@@ -130,33 +166,48 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
               </select>
             </>
           )}
-          {(userType === 'Service Centers' || userType === 'Spare Parts Sellers') && (
+          {userType === 'Service Centers' && (
             <>
+              {/* Account Details */}
+              <div style={sectionTitleStyle}>Account Details</div>
+              <input name="name" value={form.name} onChange={handleChange} placeholder="Owner Name" style={inputStyle} />
+              <input name="email" value={form.email} onChange={handleChange} placeholder="Email" style={inputStyle} type="email" />
+              <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" style={inputStyle} />
+              <input name="password" value={form.password} onChange={handleChange} placeholder="Default Password" style={inputStyle} type="password" />
               {/* Business Details */}
               <div style={sectionTitleStyle}>Business Details</div>
-              <input name="businessName" value={form.businessName} onChange={handleChange} placeholder={userType === 'Service Centers' ? 'Service Center Name' : 'Shop Name'} style={inputStyle} />
-              <input name="businessRegNo" value={form.businessRegNo} onChange={handleChange} placeholder="Business Registration Number" style={inputStyle} />
-              <input name="location" value={form.location} onChange={handleChange} placeholder={userType === 'Service Centers' ? 'Service Center Location' : 'Shop Location'} style={inputStyle} />
-              <hr style={sectionDividerStyle} />
-              {/* Contact Person Details */}
-              <div style={sectionTitleStyle}>Contact Person Details</div>
-              <input name="contactPerson" value={form.contactPerson} onChange={handleChange} placeholder="Contact Person Name" style={inputStyle} />
-              <input name="contactNumber" value={form.contactNumber} onChange={handleChange} placeholder="Contact Number" style={inputStyle} />
-              <input name="contactEmail" value={form.contactEmail} onChange={handleChange} placeholder="Email Address" style={inputStyle} type="email" />
-              <hr style={sectionDividerStyle} />
-              {/* Account Setup */}
-              <div style={sectionTitleStyle}>Account Setup</div>
-              <input name="defaultPassword" value={form.defaultPassword} onChange={handleChange} placeholder="Default Password" style={inputStyle} type="password" />
-              <select name="status" value={form.status} onChange={handleChange} style={inputStyle}>
-                <option value="Pending">Pending</option>
-                <option value="Active">Active</option>
-              </select>
+              <input name="businessName" value={form.businessName} onChange={handleChange} placeholder="Service Center Name" style={inputStyle} />
+              <input name="address" value={form.address} onChange={handleChange} placeholder="Service Center Address" style={inputStyle} />
+              <input name="businessRegistrationNumber" value={form.businessRegistrationNumber} onChange={handleChange} placeholder="Business Registration Number" style={inputStyle} />
+              {/* Contact Person */}
+              <div style={sectionTitleStyle}>Contact Person</div>
+              <input name="contactPersonName" value={form.contactPersonName} onChange={handleChange} placeholder="Contact Person Name" style={inputStyle} />
             </>
           )}
+          {userType === 'Spare Parts Sellers' && (
+            <>
+              {/* Account Details */}
+              <div style={sectionTitleStyle}>Account Details</div>
+              <input name="name" value={form.name} onChange={handleChange} placeholder="Owner Name" style={inputStyle} />
+              <input name="email" value={form.email} onChange={handleChange} placeholder="Email" style={inputStyle} type="email" />
+              <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" style={inputStyle} />
+              <input name="password" value={form.password} onChange={handleChange} placeholder="Default Password" style={inputStyle} type="password" />
+              {/* Business Details */}
+              <div style={sectionTitleStyle}>Business Details</div>
+              <input name="shopName" value={form.shopName} onChange={handleChange} placeholder="Spare Parts Shop Name" style={inputStyle} />
+              <input name="address" value={form.address} onChange={handleChange} placeholder="Shop Address" style={inputStyle} />
+              {/* Optional: Inventory Capacity */}
+              <input name="inventoryCapacity" value={form.inventoryCapacity} onChange={handleChange} placeholder="Inventory Capacity (optional)" style={inputStyle} />
+              {/* Contact Person */}
+              <div style={sectionTitleStyle}>Contact Person</div>
+              <input name="contactPersonName" value={form.contactPersonName} onChange={handleChange} placeholder="Contact Person Name" style={inputStyle} />
+            </>
+          )}
+          {/* Add similar section for Spare Parts Sellers if needed */}
           {error && <div style={{ color: '#dc2626', fontSize: 13, marginTop: 8 }}>{error}</div>}
           <div style={{ display: 'flex', gap: 12, marginTop: 18, justifyContent: 'flex-end' }}>
-            <button type="button" onClick={onClose} style={{ ...buttonStyle, background: '#f3f4f6', color: '#374151' }}>Cancel</button>
-            <button type="submit" style={{ ...buttonStyle, background: '#0ea5e9', color: 'white' }}>Add User</button>
+            <button type="button" onClick={onClose} style={{ ...buttonStyle, background: '#f3f4f6', color: '#374151' }} disabled={loading}>Cancel</button>
+            <button type="submit" style={{ ...buttonStyle, background: '#0ea5e9', color: 'white' }} disabled={loading}>{loading ? 'Adding...' : 'Add User'}</button>
           </div>
         </form>
       </div>
