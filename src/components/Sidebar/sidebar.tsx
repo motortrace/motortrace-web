@@ -32,6 +32,7 @@ const Sidebar: React.FC = () => {
       items: [
         // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
 
+        { id: 'booking', label: 'Booking', icon: 'bx bx-calendar-check', route: '/servicecenter/booking' },
         { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
         { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
         { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
@@ -44,10 +45,10 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'Inventory & Orders',
+      title: 'Inventory',
       items: [
-        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
-        { id: 'order', label: 'Order', icon: 'bx bx-cube', route: '/servicecenter/parts-order' },
+        // { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
+        { id: 'Inventory', label: 'Inventory', icon: 'bx bx-cube', route: '/servicecenter/inventory' },
       ]
     },
     {

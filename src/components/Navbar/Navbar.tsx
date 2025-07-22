@@ -187,10 +187,10 @@ const Navbar: React.FC = () => {
           <span className="notification-badge">3</span>
         </button>
 
-        <button aria-label="Cart" className="icon-btn notification-btn">
+        {/* <button aria-label="Cart" className="icon-btn notification-btn">
           <i className="bx bx-cart"></i>
           <span className="notification-badge">1</span>
-        </button>
+        </button> */}
 
         <div className="user-profile">
           <img

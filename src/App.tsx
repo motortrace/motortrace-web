@@ -84,16 +84,16 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="workflow" element={<KanbanPage />} />
           <Route path="workorders" element={<WorkOrdersPage />} />
-          <Route path="appointments">
+          <Route path="booking">
             <Route index element={<AppointmentPage />} />
             <Route path="details" element={<AppointmentDetails />} />
           </Route>
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
           <Route path="scheduling" element={<TechnicianSchedulingPage />} />
-          <Route path="inventory" element={<PartsInventory />} />
+          <Route path="inventory" element={<PartsSearch />} />
           <Route path="suppliers" element={<SupplierConnectionPage />} />
-          <Route path="parts-order" element={<PartsSearch />} />
+          {/* <Route path="parts-order" element={<PartsSearch />} /> */}
           <Route path="reports" element={<EstimatesInvoices />} />
           <Route path="inspections" element={<DigitalInspections />} />
           <Route path="calendar" element={<Calendar />} />
