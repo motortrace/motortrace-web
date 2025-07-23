@@ -4,6 +4,8 @@ import "../../styles/components/SearchBarAndFilters.scss"
 import './UserManagement.scss';
 import { Car, Wrench, Store, Search, Plus } from 'lucide-react';
 import AddUserModal from '../../components/Admin/UserManagement/AddUserModal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface CarUser {
     id: string;
@@ -288,15 +290,39 @@ const UserManagement: React.FC<UserManagementProps> = ({
         setDisplayCount(itemsPerPage); // Reset display count when tab changes
     }, [activeTab]);
 
-    const handleCreateUser = (newUser: any) => {
-        if (activeTab === 'Car Users') {
-            setCarUsersState([...carUsersState, newUser]);
-        } else if (activeTab === 'Service Centers') {
-            setServiceCentersState([...serviceCentersState, newUser]);
-        } else {
-            setSparePartsSellersState([...sparePartsSellersState, newUser]);
+    const handleCreateUser = async (newUser: any) => {
+        if (activeTab === 'Service Centers') {
+            try {
+                const response = await fetch('http://localhost:3000/admin/createServiceCenter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userType: 'Service Centers', ...newUser }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to create service center');
+                setServiceCentersState([...serviceCentersState, data.user]);
+                setIsAddModalOpen(false);
+                toast.success('Service Center created successfully!');
+            } catch (error: any) {
+                toast.error(error.message || 'An error occurred');
+            }
+        } else if (activeTab === 'Spare Parts Sellers') {
+            try {
+                const response = await fetch('http://localhost:3000/admin/createSparePartsSeller', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userType: 'Spare Parts Sellers', ...newUser }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to create spare parts seller');
+                setSparePartsSellersState([...sparePartsSellersState, data.user]);
+                setIsAddModalOpen(false);
+                toast.success('Spare Parts Seller created successfully!');
+            } catch (error: any) {
+                toast.error(error.message || 'An error occurred');
+            }
         }
-        setIsAddModalOpen(false);
+        // No Car Users creation from admin
     };
 
     // Mapping between URL parameters and display names
@@ -523,7 +549,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
                                 gap: 8,
                                 marginTop: '0px',
                                 padding: '7.5px 22.5px',
-                                // height: '40px',
                                 boxSizing: 'border-box',
                             }}
                         >
@@ -564,11 +589,12 @@ const UserManagement: React.FC<UserManagementProps> = ({
                 </div>
             </div>
             <AddUserModal
-                open={isAddModalOpen}
+                open={isAddModalOpen && activeTab !== 'Car Users'}
                 userType={activeTab}
                 onClose={handleCloseAddModal}
                 onCreate={handleCreateUser}
             />
+            <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );
 };

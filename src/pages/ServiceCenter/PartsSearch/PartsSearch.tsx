@@ -352,7 +352,7 @@ const PartsSearch: React.FC = () => {
             {(priceRange.min || priceRange.max) && <span className="active-filter">Price: {priceRange.min || 'Any'} - {priceRange.max || 'Any'} <button onClick={() => removeFilter('price')}>×</button></span>}
             {inStockOnly && <span className="active-filter">In Stock Only <button onClick={() => removeFilter('inStock')}>×</button></span>}
           </div>
-          <div className="parts-search__stores">
+          {/* <div className="parts-search__stores">
             <div className="stores-header">
               <h3>My Suppliers ({stores.length})</h3>
             </div>
@@ -379,7 +379,7 @@ const PartsSearch: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="parts-search__results-header">
             <h3>Products ({filteredProducts.length} results)</h3>
@@ -426,7 +426,7 @@ const PartsSearch: React.FC = () => {
                       onClick={() => handleAddToCart(product)}
                       disabled={!product.inStock}
                     >
-                      {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                      {product.inStock ? 'View Details' : 'View Details'}
                     </button>
                   </div>
                 </div>

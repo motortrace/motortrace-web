@@ -29,7 +29,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     description: 'View technician skills, availability, and workloads to assign jobs efficiently',
   },
   '/servicecenter/scheduling': {
-    title: 'Appointment Calendar',
+    title: 'Work Schedule',
     description: 'Schedule appointments for your technicians',
   },
   '/servicecenter/inventory': {
@@ -194,10 +194,10 @@ const Navbar: React.FC = () => {
           <span className="notification-badge">3</span>
         </button>
 
-        <button aria-label="Cart" className="icon-btn notification-btn">
+        {/* <button aria-label="Cart" className="icon-btn notification-btn">
           <i className="bx bx-cart"></i>
           <span className="notification-badge">1</span>
-        </button>
+        </button> */}
 
         <div className="user-profile">
           <img
