@@ -33,6 +33,7 @@
         padding: 8px;
         border-radius: 4px;
         color: #5f6368;
+        transition: background-color 0.2s;
 
         &:hover {
           background-color: #f1f3f4;
@@ -44,6 +45,8 @@
         font-weight: 400;
         color: #202124;
         margin: 0;
+        min-width: 200px;
+        text-align: center;
       }
     }
 
@@ -61,6 +64,7 @@
         font-size: 14px;
         cursor: pointer;
         font-weight: 500;
+        transition: background-color 0.2s;
 
         &:hover {
           background-color: #1557b0;
@@ -75,6 +79,7 @@
         border-radius: 4px;
         cursor: pointer;
         font-size: 14px;
+        transition: background-color 0.2s;
 
         &:hover {
           background-color: #f8f9fa;
@@ -117,6 +122,7 @@
         background-color: white;
         cursor: pointer;
         position: relative;
+        transition: background-color 0.2s;
 
         &.prev-month {
           .day-number {
@@ -124,8 +130,10 @@
           }
         }
 
-        &:hover {
-          background-color: #f8f9fa;
+        &.current-month {
+          &:hover {
+            background-color: #f8f9fa;
+          }
         }
 
         .day-number {
@@ -133,6 +141,7 @@
           font-weight: 500;
           color: #202124;
           margin-bottom: 4px;
+          display: block;
         }
 
         .events-container {
@@ -148,6 +157,7 @@
             font-size: 11px;
             cursor: pointer;
             margin-bottom: 1px;
+            transition: background-color 0.2s;
 
             &:hover {
               background-color: #d2e3fc;
@@ -171,12 +181,17 @@
             &.cancelled {
               background-color: #fce8e6;
               border-left-color: #ea4335;
-              text-decoration: line-through;
+              
+              .event-time,
+              .event-title {
+                text-decoration: line-through;
+              }
             }
 
             .event-time {
               font-weight: 500;
               display: block;
+              color: #202124;
             }
 
             .event-title {
@@ -220,43 +235,7 @@
         cursor: pointer;
         color: #5f6368;
         padding: 4px;
-
-        &:hover {
-          color: #202124;
-        }
-      }
-    }
-
-    .booking-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      border: 1px solid #e8eaed;
-
-      .link-icon {
-        color: #1a73e8;
-      }
-
-      a {
-        color: #1a73e8;
-        text-decoration: none;
-        flex: 1;
-        font-size: 14px;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-
-      .copy-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 4px;
-        color: #5f6368;
+        transition: color 0.2s;
 
         &:hover {
           color: #202124;
@@ -428,33 +407,6 @@
           }
         }
       }
-
-      .add-people-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: none;
-        border: none;
-        color: #1a73e8;
-        cursor: pointer;
-        font-size: 14px;
-        padding: 8px 0;
-
-        .plus-icon {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background-color: #f8f9fa;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-        }
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
     }
 
     .notes-section {
@@ -491,6 +443,7 @@
             cursor: pointer;
             position: relative;
             transition: all 0.3s;
+            display: block;
 
             &::after {
               content: '';
@@ -518,6 +471,7 @@
         font-size: 14px;
         resize: vertical;
         background-color: #f8f9fa;
+        box-sizing: border-box;
 
         &:focus {
           outline: none;
@@ -527,6 +481,159 @@
 
         &::placeholder {
           color: #9aa0a6;
+        }
+      }
+    }
+  }
+
+  // Modal styles
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 24px 0;
+      margin-bottom: 24px;
+
+      h2 {
+        font-size: 24px;
+        font-weight: 400;
+        color: #202124;
+        margin: 0;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #5f6368;
+        padding: 4px;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #202124;
+        }
+      }
+    }
+
+    .appointment-form {
+      padding: 0 24px 24px;
+
+      .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+
+        .form-group {
+          flex: 1;
+
+          &.full-width {
+            flex: none;
+            width: 100%;
+          }
+
+          label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 8px;
+          }
+
+          input,
+          select,
+          textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            background-color: white;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+
+            &:focus {
+              outline: none;
+              border-color: #1a73e8;
+            }
+
+            &::placeholder {
+              color: #9aa0a6;
+            }
+          }
+
+          textarea {
+            resize: vertical;
+            min-height: 80px;
+          }
+
+          select {
+            cursor: pointer;
+          }
+        }
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid #dadce0;
+
+        .cancel-btn {
+          background: none;
+          border: 1px solid #dadce0;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          color: #5f6368;
+          transition: all 0.2s;
+
+          &:hover {
+            background-color: #f8f9fa;
+            border-color: #bdc1c6;
+          }
+        }
+
+        .submit-btn {
+          background-color: #1a73e8;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #1557b0;
+          }
         }
       }
     }
@@ -552,6 +659,10 @@
 
       .nav-controls {
         justify-content: center;
+
+        .month-year {
+          min-width: auto;
+        }
       }
 
       .header-actions {
@@ -562,6 +673,39 @@
     .calendar-days {
       .calendar-day {
         min-height: 80px;
+        padding: 4px;
+
+        .events-container {
+          .event-item {
+            font-size: 10px;
+            padding: 1px 4px;
+          }
+        }
+      }
+    }
+
+    .modal-content {
+      width: 95%;
+      margin: 20px;
+
+      .appointment-form {
+        .form-row {
+          flex-direction: column;
+          gap: 0;
+
+          .form-group {
+            margin-bottom: 16px;
+          }
+        }
+
+        .modal-actions {
+          flex-direction: column;
+          gap: 8px;
+
+          button {
+            width: 100%;
+          }
+        }
       }
     }
   }
