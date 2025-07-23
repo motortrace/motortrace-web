@@ -1,0 +1,67 @@
+.order-summary {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 20px;
+  font-family: 'Poppins';
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  &__header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__payment-method {
+    background-color: #818181; // light gray capsule
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__delivery {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #374151;
+  }
+
+  &__divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 8px 0;
+  }
+
+  &__total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 20px;
+    color: #111827;
+  }
+}

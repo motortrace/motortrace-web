@@ -1,0 +1,142 @@
+.ratings-card {
+  font-family: 'Poppins', sans-serif;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 360px;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  &__average {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .star-icon {
+      color: #fbbf24;
+      font-size: 20px;
+    }
+  }
+
+  &__total {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666666;
+    opacity: 0.85;
+  }
+
+  &__trend {
+    font-size: 12px;
+    font-weight: 600;
+    color: #10b981;
+    margin-top: 2px;
+  }
+
+  &__breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__stars {
+    width: 60px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+
+    .star-icon {
+      color: #fbbf24;
+    }
+  }
+
+  &__bar-track {
+    flex-grow: 1;
+    height: 8px;
+    background-color: #f3f4f6;
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__bar-fill {
+    height: 100%;
+    background-color: #595959;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+  }
+
+  &__count {
+    width: 30px;
+    text-align: right;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  &__feedback {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
+  &__badge {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
+// Responsive tweaks
+@media (max-width: 768px) {
+  .ratings-card {
+    padding: 24px;
+
+    &__average {
+      font-size: 24px;
+    }
+
+    &__total {
+      font-size: 13px;
+    }
+
+    &__count {
+      font-size: 12px;
+    }
+
+    &__badge {
+      font-size: 11px;
+    }
+  }
+}
