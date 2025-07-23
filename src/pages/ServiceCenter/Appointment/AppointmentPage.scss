@@ -1,0 +1,712 @@
+// AutoRepairCalendar.scss
+.auto-repair-calendar {
+  display: flex;
+  height: 100vh;
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #fff;
+  color: #202124;
+
+  .calendar-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    border-right: 1px solid #dadce0;
+  }
+
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .nav-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        color: #5f6368;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #f1f3f4;
+        }
+      }
+
+      .month-year {
+        font-size: 22px;
+        font-weight: 400;
+        color: #202124;
+        margin: 0;
+        min-width: 200px;
+        text-align: center;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .create-booking-btn {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #1557b0;
+        }
+      }
+
+      .filter-btn,
+      .calendar-view-btn {
+        background: none;
+        border: 1px solid #dadce0;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #f8f9fa;
+        }
+      }
+    }
+  }
+
+  .calendar-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .weekday-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      margin-bottom: 8px;
+
+      .weekday-header {
+        padding: 8px;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 500;
+        color: #70757a;
+        text-transform: uppercase;
+      }
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      flex: 1;
+
+      .calendar-day {
+        border: 1px solid #dadce0;
+        padding: 8px;
+        min-height: 120px;
+        background-color: white;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.2s;
+
+        &.prev-month {
+          .day-number {
+            color: #9aa0a6;
+          }
+        }
+
+        &.current-month {
+          &:hover {
+            background-color: #f8f9fa;
+          }
+        }
+
+        .day-number {
+          font-size: 14px;
+          font-weight: 500;
+          color: #202124;
+          margin-bottom: 4px;
+          display: block;
+        }
+
+        .events-container {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          .event-item {
+            background-color: #e8f0fe;
+            border-left: 3px solid #1a73e8;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-bottom: 1px;
+            transition: background-color 0.2s;
+
+            &:hover {
+              background-color: #d2e3fc;
+            }
+
+            &.scheduled {
+              background-color: #e8f0fe;
+              border-left-color: #1a73e8;
+            }
+
+            &.in-progress {
+              background-color: #fff3e0;
+              border-left-color: #f57c00;
+            }
+
+            &.completed {
+              background-color: #e8f5e8;
+              border-left-color: #34a853;
+            }
+
+            &.cancelled {
+              background-color: #fce8e6;
+              border-left-color: #ea4335;
+              
+              .event-time,
+              .event-title {
+                text-decoration: line-through;
+              }
+            }
+
+            .event-time {
+              font-weight: 500;
+              display: block;
+              color: #202124;
+            }
+
+            .event-title {
+              color: #5f6368;
+              display: block;
+              margin-top: 1px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .event-details-panel {
+    width: 400px;
+    background: white;
+    padding: 24px;
+    border-left: 1px solid #dadce0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-height: 100vh;
+    overflow-y: auto;
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 {
+        font-size: 24px;
+        font-weight: 400;
+        color: #202124;
+        margin: 0;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #5f6368;
+        padding: 4px;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #202124;
+        }
+      }
+    }
+
+    .time-slots {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      .time-slot {
+        padding: 8px 16px;
+        border: 1px solid #dadce0;
+        border-radius: 20px;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+        color: #5f6368;
+        transition: all 0.2s;
+
+        &:hover {
+          border-color: #1a73e8;
+        }
+
+        &.active {
+          background-color: #1a73e8;
+          color: white;
+          border-color: #1a73e8;
+        }
+      }
+    }
+
+    .appointment-time {
+      .time-display {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+
+        .start-time,
+        .end-time {
+          font-size: 24px;
+          font-weight: 400;
+          color: #202124;
+        }
+
+        .arrow {
+          color: #5f6368;
+          font-size: 20px;
+        }
+      }
+
+      .appointment-date {
+        font-size: 14px;
+        color: #5f6368;
+        margin-bottom: 8px;
+      }
+
+      .all-day-badge {
+        display: inline-block;
+        background-color: #f1f3f4;
+        color: #5f6368;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+    }
+
+    .service-info {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .info-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .label {
+          font-weight: 500;
+          color: #5f6368;
+          min-width: 80px;
+        }
+
+        .value {
+          color: #202124;
+        }
+
+        .status-badge {
+          padding: 4px 12px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
+
+          &.scheduled {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+          }
+
+          &.in-progress {
+            background-color: #fff3e0;
+            color: #f57c00;
+          }
+
+          &.completed {
+            background-color: #e8f5e8;
+            color: #34a853;
+          }
+
+          &.cancelled {
+            background-color: #fce8e6;
+            color: #ea4335;
+          }
+        }
+      }
+    }
+
+    .attendees-section {
+      .attendee-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+
+        .avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background-color: #1a73e8;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .attendee-info {
+          flex: 1;
+
+          .attendee-name {
+            font-size: 14px;
+            color: #202124;
+            font-weight: 500;
+          }
+
+          .attendee-email {
+            font-size: 13px;
+            color: #5f6368;
+          }
+        }
+
+        .role-badge {
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 500;
+
+          &.customer {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+          }
+
+          &.technician {
+            background-color: #e8f5e8;
+            color: #34a853;
+          }
+        }
+      }
+    }
+
+    .notes-section {
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+
+        label {
+          font-size: 14px;
+          color: #202124;
+          font-weight: 500;
+        }
+
+        .toggle-switch {
+          input[type="checkbox"] {
+            display: none;
+
+            &:checked + label {
+              background-color: #1a73e8;
+
+              &::after {
+                transform: translateX(20px);
+              }
+            }
+          }
+
+          label {
+            width: 44px;
+            height: 24px;
+            background-color: #dadce0;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            display: block;
+
+            &::after {
+              content: '';
+              width: 20px;
+              height: 20px;
+              background-color: white;
+              border-radius: 50%;
+              position: absolute;
+              top: 2px;
+              left: 2px;
+              transition: all 0.3s;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            }
+          }
+        }
+      }
+
+      .notes-textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 12px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 14px;
+        resize: vertical;
+        background-color: #f8f9fa;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: #1a73e8;
+          background-color: white;
+        }
+
+        &::placeholder {
+          color: #9aa0a6;
+        }
+      }
+    }
+  }
+
+  // Modal styles
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 24px 0;
+      margin-bottom: 24px;
+
+      h2 {
+        font-size: 24px;
+        font-weight: 400;
+        color: #202124;
+        margin: 0;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #5f6368;
+        padding: 4px;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #202124;
+        }
+      }
+    }
+
+    .appointment-form {
+      padding: 0 24px 24px;
+
+      .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+
+        .form-group {
+          flex: 1;
+
+          &.full-width {
+            flex: none;
+            width: 100%;
+          }
+
+          label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 8px;
+          }
+
+          input,
+          select,
+          textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            background-color: white;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+
+            &:focus {
+              outline: none;
+              border-color: #1a73e8;
+            }
+
+            &::placeholder {
+              color: #9aa0a6;
+            }
+          }
+
+          textarea {
+            resize: vertical;
+            min-height: 80px;
+          }
+
+          select {
+            cursor: pointer;
+          }
+        }
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid #dadce0;
+
+        .cancel-btn {
+          background: none;
+          border: 1px solid #dadce0;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          color: #5f6368;
+          transition: all 0.2s;
+
+          &:hover {
+            background-color: #f8f9fa;
+            border-color: #bdc1c6;
+          }
+        }
+
+        .submit-btn {
+          background-color: #1a73e8;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #1557b0;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .calendar-section {
+      border-right: none;
+      border-bottom: 1px solid #dadce0;
+    }
+
+    .event-details-panel {
+      width: 100%;
+      max-height: 50vh;
+    }
+
+    .calendar-header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      .nav-controls {
+        justify-content: center;
+
+        .month-year {
+          min-width: auto;
+        }
+      }
+
+      .header-actions {
+        justify-content: center;
+      }
+    }
+
+    .calendar-days {
+      .calendar-day {
+        min-height: 80px;
+        padding: 4px;
+
+        .events-container {
+          .event-item {
+            font-size: 10px;
+            padding: 1px 4px;
+          }
+        }
+      }
+    }
+
+    .modal-content {
+      width: 95%;
+      margin: 20px;
+
+      .appointment-form {
+        .form-row {
+          flex-direction: column;
+          gap: 0;
+
+          .form-group {
+            margin-bottom: 16px;
+          }
+        }
+
+        .modal-actions {
+          flex-direction: column;
+          gap: 8px;
+
+          button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

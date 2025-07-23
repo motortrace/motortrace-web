@@ -1,0 +1,50 @@
+@import '../../styles/variables.scss';
+@import '../../styles/components/button.scss';
+
+.low-stock-alert {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-neutral-100);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  margin-bottom: calc(var(--spacing-unit) * 2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  &__icon {
+    margin-right: var(--spacing-unit);
+    color: var(--color-warning);
+    flex-shrink: 0;
+  }
+
+  &__content {
+    flex-grow: 1;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-neutral-900);
+    margin: 0 0 0.25rem 0;
+  }
+
+  &__message {
+    color: var(--color-neutral-700);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+  
+  &__count--warning {
+    font-weight: 600;
+    color: var(--color-warning);
+  }
+
+  &__count--critical {
+    font-weight: 600;
+    color: var(--color-danger);
+  }
+
+  &__actions {
+    margin-left: var(--spacing-unit);
+  }
+} 

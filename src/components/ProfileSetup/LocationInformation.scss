@@ -1,0 +1,34 @@
+.location-info{
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 20px;
+    flex: 1;
+    min-width: 0;
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    &__title {
+        font-size: 18px;
+        font-weight: 600;
+        font-family: 'Poppins';
+        color: #111827;
+        margin: 0;
+    }
+
+    input, select{
+        font-size: 15px;
+        color: #444;
+        border-color: #ccc;
+    }
+
+    input:focus{
+        border-color: #888;
+    }
+}

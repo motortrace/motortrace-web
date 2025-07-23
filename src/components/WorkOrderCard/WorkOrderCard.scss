@@ -1,0 +1,283 @@
+// WorkOrderCard.scss
+@import '../../styles/variables.scss';
+
+.work-order-card {
+  background: #ffffff !important;
+  border-radius: 8px;
+  border: 2px solid #d8dade;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  margin-bottom: 8px;
+  color: #1e293b;
+  width: 100%;
+  min-height: 140px;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+    border-color: var(--color-primary);
+  }
+  
+  &:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    flex-shrink: 0;
+    
+    .estimate-number {
+      font-weight: 600;
+      color: #334155 !important;
+      font-size: 12px;
+      font-family: var(--font-primary);
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      margin-right: 6px;
+    }
+    
+    .card-menu {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 3px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      
+      &:hover {
+        background: #f8fafc;
+        color: #64748b;
+      }
+      
+      i {
+        font-size: 14px;
+      }
+    }
+  }
+  
+  .card-content {
+    padding: 12px 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    
+    .vehicle-info {
+      .info-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .icon-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 18px;
+          height: 18px;
+          flex-shrink: 0;
+          
+          i {
+            font-size: 13px;
+            line-height: 1;
+            color: #6b7280;
+          }
+        }
+        
+        .vehicle-name,
+        .customer-name {
+          font-size: 12px;
+          color: #374151;
+          font-weight: 500;
+          line-height: 1.2;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex: 1;
+        }
+      }
+    }
+    
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f1f5f9;
+      
+      .assigned-people {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        
+        .profile-photo {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          overflow: hidden;
+          border: 2px solid #ffffff;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          position: relative;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin-left: -6px;
+          
+          &:first-child {
+            margin-left: 0;
+          }
+          
+          &:hover {
+            transform: scale(1.1);
+            z-index: 10 !important;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+          }
+          
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          
+          &.more-indicator {
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 600;
+            color: #6b7280;
+            min-width: 26px;
+            
+            &:hover {
+              background: #d1d5db;
+              color: #374151;
+            }
+            
+            span {
+              line-height: 1;
+            }
+          }
+        }
+        
+        .no-assignment {
+          font-size: 10px;
+          color: #9ca3af;
+          font-style: italic;
+        }
+      }
+      
+      .amount {
+        .amount-text {
+          font-size: 13px;
+          font-weight: 600;
+          color: #059669;
+          font-family: var(--font-primary);
+        }
+      }
+    }
+  }
+  
+  // Drag states
+  &.dragging {
+    opacity: 0.6;
+    transform: rotate(2deg) scale(0.95);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  // Mobile responsive
+  @media (max-width: 768px) {
+    border-radius: 6px;
+    margin-bottom: 6px;
+    min-height: 120px;
+    max-width: 260px;
+    
+    .card-header {
+      padding: 8px 12px;
+      
+      .estimate-number {
+        font-size: 11px;
+      }
+      
+      .card-menu {
+        font-size: 12px;
+        
+        i {
+          font-size: 12px;
+        }
+      }
+    }
+    
+    .card-content {
+      padding: 10px 12px;
+      
+      .vehicle-info {
+        .info-row {
+          gap: 6px;
+          margin-bottom: 6px;
+          
+          .icon-wrapper {
+            width: 16px;
+            height: 16px;
+            
+            i {
+              font-size: 11px;
+            }
+          }
+          
+          .vehicle-name,
+          .customer-name {
+            font-size: 11px;
+          }
+        }
+      }
+      
+      .card-footer {
+        margin-top: 8px;
+        padding-top: 8px;
+        
+        .assigned-people {
+          .profile-photo {
+            width: 22px;
+            height: 22px;
+            margin-left: -4px;
+            
+            &.more-indicator {
+              min-width: 22px;
+              font-size: 8px;
+            }
+          }
+          
+          .no-assignment {
+            font-size: 9px;
+          }
+        }
+        
+        .amount {
+          .amount-text {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

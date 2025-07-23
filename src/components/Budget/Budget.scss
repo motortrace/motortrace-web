@@ -1,0 +1,153 @@
+/* src/components/Budget/Budget.scss */
+
+.budget {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .budget__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .budget__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+  }
+  
+  .budget__trend-btn {
+    background: #f3f4f6;
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  
+    &:hover {
+      background: #e5e7eb;
+    }
+  }
+  
+  .budget__trend-icon {
+    width: 16px;
+    height: 16px;
+    color: #6b7280;
+  }
+  
+  .budget__content {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  
+  .budget__chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .budget__circle-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .budget__circle {
+    transform: rotate(-90deg);
+  }
+  
+  .budget__progress-circle {
+    transition: stroke-dashoffset 0.5s ease;
+  }
+  
+  .budget__circle-content {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .budget__percentage {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+  }
+  
+  .budget__amount-label {
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  
+  .budget__spent {
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  .budget__total {
+    color: #9ca3af;
+  }
+  
+  .budget__remaining {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+  }
+  
+  .budget__remaining-text {
+    font-size: 10px;
+    color: #9ca3af;
+  }
+  
+  .budget__remaining-amount {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  .budget__categories {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  
+  .budget__category {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .budget__category-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  .budget__category-name {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.2;
+  }

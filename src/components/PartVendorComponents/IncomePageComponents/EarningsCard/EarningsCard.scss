@@ -1,0 +1,151 @@
+.earnings-card {
+  
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 24px;
+  font-family: 'Poppins';
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  &__amount {
+    font-size: 24px;
+    font-weight: 800;
+    color: #111827;
+  }
+
+  &__sections {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__section {
+    flex: 1;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    /* Removed max-height and overflow here */
+  }
+
+  &__section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  &__table {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    max-height: 200px; /* scrollable height */
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f9fafb;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: #f9fafb;
+    }
+  }
+
+  &__table-header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+
+  &__table-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    font-size: 14px;
+    color: #374151;
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;
+    align-items: center;
+    transition: background 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #f3f4f6;
+    }
+
+    div:last-child {
+      font-weight: 600;
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__section-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .metric-card__change {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 16px;
+  }
+
+  .metric-card__change--positive {
+    color: #059669;
+    background-color: #d1fae5;
+  }
+
+  .metric-card__change--negative {
+    color: #dc2626;
+    background-color: #fee2e2;
+  }
+}

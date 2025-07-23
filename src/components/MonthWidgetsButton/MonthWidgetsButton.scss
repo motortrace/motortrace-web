@@ -1,0 +1,24 @@
+/* src/components/ManageWidgetsButton/ManageWidgetsButton.css */
+@use '../../styles/variables' as *;
+
+.manage-widgets-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #6b7280;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .manage-widgets-button:hover {
+    color: #111827;
+  }
+  
+  .manage-widgets-button__icon {
+    width: 16px;
+    height: 16px;
+  }
