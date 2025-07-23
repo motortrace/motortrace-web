@@ -3,6 +3,8 @@ import DashboardHeader from '../../../layouts/DashboardHeader/DashboardHeader';
 import MetricCard from '../../../components/MetricCard/MetricCard';
 import Table, { type TableColumn } from '../../../components/Table/Table';
 import './PartsInventory.scss';
+import InventoryProductDetailsModal from '../../../components/InventoryProductDetailsModal/InventoryProductDetailsModal';
+import brakePad from '../../../assets/images/manageInventory.jpg';
 
 interface Part {
   id: string;
@@ -56,6 +58,7 @@ const PartsInventory = () => {
   const [filterPartType, setFilterPartType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterSupplier, setFilterSupplier] = useState('all');
+  const [showProductModal, setShowProductModal] = useState(false);
 
   // Sample parts data with realistic auto parts
   const [parts, setParts] = useState<Part[]>([
@@ -439,10 +442,38 @@ const PartsInventory = () => {
         <Table 
           columns={columns}
           data={filteredParts}
-          onRowClick={(part) => console.log('View part details:', part.partName)}
+          onRowClick={() => setShowProductModal(true)}
           emptyMessage="No parts found matching your search criteria."
         />
       </div>
+      {showProductModal && (
+        <InventoryProductDetailsModal
+          product={{
+            image: brakePad,
+            name: 'Ceramic Brake Pads - Front',
+            sku: 'BRK-PAD-001',
+            brand: 'Wagner ThermoQuiet',
+            category: 'Brake Components',
+            supplier: 'AutoZone Distribution',
+            location: 'A1-B2-03',
+            description: 'Premium ceramic brake pad set for front axle. Long-lasting, low dust, and quiet operation. Fits 2018-2023 Honda Accord.',
+            price: 8999,
+            cost: 4250,
+            markup: 111.7,
+            stock: 24,
+            minStock: 8,
+            maxStock: 50,
+            reorderPoint: 8,
+            status: 'Active',
+            lastRestocked: '2024-06-15',
+            lastSold: '2024-06-28',
+            warranty: '12 months / 12,000 miles',
+            vehicleApplication: '2018-2023 Honda Accord',
+            notes: 'Best seller. Check compatibility before installation.'
+          }}
+          onClose={() => setShowProductModal(false)}
+        />
+      )}
     </div>
   );
 };
