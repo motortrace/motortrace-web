@@ -1,0 +1,89 @@
+.profit-overview-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: 'Poppins', sans-serif;
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+  }
+
+  &__profit {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-size: 14px;
+    color: #1a1a1a;
+
+    &__item {
+      display: flex;
+      justify-content: space-between;
+
+      .label {
+        color: #666666;
+        font-weight: 600;
+        margin-right: 8px;
+      }
+    }
+  }
+
+  &__trend {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    gap: 10px;
+    font-size: 15px;
+
+    svg {
+      font-size: 16px;
+    }
+
+    &.positive {
+      color: #10b981;
+    }
+
+    &.negative {
+      color: #ef4444;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .profit-overview-card {
+    padding: 24px;
+
+    &__title {
+      font-size: 16px;
+    }
+
+    &__profit {
+      font-size: 28px;
+    }
+
+    &__trend {
+      font-size: 14px;
+    }
+  }
+}

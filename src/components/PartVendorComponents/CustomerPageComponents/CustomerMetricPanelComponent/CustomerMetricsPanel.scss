@@ -1,0 +1,73 @@
+@import '../../../../styles/variables.scss';
+
+.customer-metrics-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 24px;
+  margin-bottom: 0;
+}
+
+.metric-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  min-width: 180px;
+  
+}
+
+.metric-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-card__title {
+  font-family: var(--font-primary, 'Poppins');
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-carbon, #111827);
+}
+
+.metric-card__amount {
+  font-size: 28px; // Smaller amount text
+  font-weight: 700;
+  color: #111827;
+  
+  align-self: flex-end;
+}
+
+.metric-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.metric-card__change {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 16px;
+}
+
+.metric-card__change--positive {
+  color: #059669;
+  background-color: #d1fae5;
+}
+
+.metric-card__change--negative {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.metric-card__period {
+  font-size: 10px;
+  color: #9ca3af;
+}

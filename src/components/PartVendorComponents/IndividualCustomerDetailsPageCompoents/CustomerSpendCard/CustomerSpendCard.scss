@@ -1,0 +1,132 @@
+@import '../../../../styles/variables.scss';
+
+.customer-spend-card {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  gap: 12px;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-carbon, #111827);
+    margin: 0;
+  }
+
+  &__amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    line-height: 1;
+  }
+
+  &__delta {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &.positive {
+      color: #059669;
+      background-color: #d1fae5;
+    }
+
+    &.negative {
+      color: #dc2626;
+      background-color: #fee2e2;
+    }
+  }
+
+  &__stats-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    width: 100%;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+}
+
+.stat-box {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  h4 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 4px 0;
+  }
+
+  p {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .stat-delta {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+
+    &.positive {
+      color: #059669;
+      background-color: #d1fae5;
+    }
+
+    &.negative {
+      color: #dc2626;
+      background-color: #fee2e2;
+    }
+  }
+
+  .rating-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 4px;
+
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+
+    .rated-orders {
+      font-size: 12px;
+      color: #9ca3af;
+      font-weight: 500;
+    }
+  }
+}

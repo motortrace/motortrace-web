@@ -1,0 +1,256 @@
+// OrderInvoiceModal.scss
+
+.order-invoice-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__card {
+    background: white;
+    width: 1000px;
+    max-height: 95vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    padding: 40px;
+    color: #374151;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+
+    h2 {
+      font-size: 22px;
+      margin: 0 0 4px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
+
+  &__logo {
+    width: 64px;
+    height: auto;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  &__info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+
+    span:first-child {
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    span:last-child {
+      max-width: 300px;
+      text-align: right;
+      word-break: break-word;
+    }
+  }
+
+  &__addresses {
+    flex-direction: row;
+    justify-content: space-between;
+
+    div {
+      width: 48%;
+
+      h4 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      p {
+        font-size: 13px;
+        margin: 0;
+        color: #4b5563;
+      }
+    }
+  }
+
+  &__divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 24px 0;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th {
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 10px;
+      color: #6b7280;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: top;
+    }
+  }
+
+  &__reason {
+    font-size: 12px;
+    color: #b91c1c;
+    margin-top: 4px;
+  }
+
+  &__totals {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+
+    div {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .order-invoice-modal__total {
+      font-weight: 600;
+      color: #111827;
+    }
+  }
+
+  &__signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    font-size: 13px;
+
+    .signature-box {
+      width: 45%;
+      text-align: center;
+      border-top: 1px solid #4b5563;
+      padding-top: 4px;
+    }
+
+    .signature-label {
+      margin-top: 4px;
+      color: #6b7280;
+    }
+  }
+
+  &__qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 32px;
+
+    img {
+      height: 100px;
+      margin-bottom: 8px;
+    }
+
+    span {
+      font-size: 12px;
+      color: #374151;
+    }
+  }
+
+  &__footer-note {
+    background-color: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 40px;
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #374151;
+    border-radius: 12px;
+
+    p {
+      margin: 8px 0;
+    }
+
+    strong {
+      color: #111827;
+    }
+
+    .order-invoice-modal__thank-you {
+      font-weight: 600;
+      font-size: 14px;
+      margin-top: 16px;
+      color: #1f2937;
+    }
+  }
+
+  &__footer {
+    margin-top: 28px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background-color: #f3f4f6;
+      color: #1f2937;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #e5e7eb;
+      }
+
+      &.btn-primary {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+
+        &:hover {
+          background-color: #1d4ed8;
+        }
+      }
+    }
+  }
+
+
+  /* Print Optimization */
+  @media print {
+    background: none !important;
+
+    .order-invoice-modal__card {
+      width: 100%;
+      max-height: none;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .no-print {
+      display: none;
+    }
+  }
+}

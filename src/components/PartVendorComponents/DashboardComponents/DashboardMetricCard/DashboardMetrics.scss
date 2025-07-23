@@ -1,0 +1,11 @@
+.dashboard-cards-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px ;
+  
+  > div {
+    flex: 1;
+    min-width: 250px;
+  }
+}

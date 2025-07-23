@@ -1,0 +1,455 @@
+@import '../../../../styles/variables.scss';
+
+.order-details {  
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 20px;
+  flex: 1;
+  min-width: 0;
+  margin-top: 30px;
+
+    &__cell {
+    font-size: 13px;
+    color: #374151;
+    font-family: 'Poppins';
+
+    // Add action icons styling
+    svg {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }}
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Poppins';
+    color: #111827;
+    margin: 0;
+  }
+
+  &__table {
+    width: 100%;
+  }
+
+  &__table-header {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr 1.2fr 1.5fr 1.2fr 1.2fr 1.2fr 1.2fr 1.2fr 1.2fr;
+    gap: 16px;
+    padding: 12px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  &__header-cell {
+    font-size: 11px;
+    font-weight: 600;
+    color: #656970;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Poppins';
+  }
+
+  &__table-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr 1.2fr 1.5fr 1.2fr 1.2fr 1.2fr 1.2fr 1.2fr 1.2fr;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #f9fafb;
+    }
+  }
+
+  &__cell {
+    font-size: 13px;
+    color: #374151;
+    font-family: 'Poppins';
+  }
+
+  &__product {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    img {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    &-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+
+      .order-details__product-name {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .order-details__other-products {
+        color: #6b7280;
+        font-size: 12px;
+      }
+    }
+  }
+
+  &__status {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+
+    &--in-stock {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    &--low-stock {
+      background-color: #fef9c3;
+      color: #92400e;
+    }
+
+    &--out-of-stock {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+  }
+  &__actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &.pdf {
+        background-color: var( --color-neutral-700);
+      }
+
+      &.refresh, &.sort {
+        background-color: var( --color-neutral-700);
+      }
+
+      &.add {
+        background-color: var( --color-neutral-700);
+        color: white;
+      }
+
+
+      &:hover {
+        opacity: 0.9;
+        color: #111827;
+      }
+    }
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    margin-top: 12px;
+
+    .filter-input,
+    .filter-select {
+      background-color: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-family: 'Poppins';
+      color: #374151;
+    }
+
+    .filter-input {
+      width: 200px;
+    }
+
+    .filter-select {
+      width: 180px;
+    }
+  }
+
+
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 12px;
+    font-family: 'Poppins';
+
+    &-btn {
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #e5e7eb;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &-info {
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    &__table-header {
+      display: none;
+    }
+
+    &__row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    &__cell {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      &::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Poppins';
+      }
+    }
+  }
+  &__actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &--view {
+      background: #eff6ff;
+      color: #3b82f6;
+      
+      &:hover {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+    }
+    
+    &--edit {
+      background: #fef3c7;
+      color: #d97706;
+      
+      &:hover {
+        background: #fde68a;
+        color: #b45309;
+      }
+    }
+    
+    &--delete {
+      background: #fee2e2;
+      color: #ef4444;
+      
+      &:hover {
+        background: #fecaca;
+        color: #dc2626;
+      }
+    }
+  }
+}
+
+// Add responsive styles for the view panel
+@media (max-width: 768px) {
+  .order-details {
+    &__cell {
+      // On mobile, make action buttons more touch-friendly
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+}
+
+
+.order-details {
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 12px;
+    font-family: 'Poppins';
+
+    &-btn {
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #e5e7eb;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &-info {
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
+}
+
+// Add these styles to your ProductDetails.scss file
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  margin: auto;
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 10px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 10;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+}
+
+// Ensure the edit product component fits well in the modal
+.modal-content .edit-product {
+  margin: 0;
+  padding: 20px;
+  box-shadow: none;
+  border: none;
+}
+
+
