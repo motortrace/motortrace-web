@@ -130,6 +130,26 @@ const Sidebar: React.FC = () => {
           </div>
         ))}
       </nav>
+
+      {/* Logout Button at the bottom */}
+      <div style={{ marginTop: 'auto', padding: '1rem' }}>
+        <button
+          className="sidebar-menu-link sidebar-menu-link--bottom"
+          onClick={() => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+          }}
+          aria-label="Logout"
+          type="button"
+          style={{ color: '#ef4444', width: '100%', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}
+        >
+          <span className="sidebar-menu-icon sidebar-menu-icon--danger">
+            <i className="bx bx-log-out" aria-hidden="true"></i>
+          </span>
+          <span className="sidebar-menu-label sidebar-menu-label--danger">Logout</span>
+        </button>
+      </div>
     </aside>
   );
 };

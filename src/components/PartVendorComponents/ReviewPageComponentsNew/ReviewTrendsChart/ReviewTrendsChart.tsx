@@ -80,31 +80,31 @@ const ReviewTrendsChart = () => {
         <p className="chart-subtitle">Google & MotorTrace Ratings Over Past 6 Months</p>
       </div>
       <div className="chart-container">
-        <ResponsiveContainer width="100%" height={210}>
-          <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
-            <YAxis domain={[3.5, 5]} tick={{ fontSize: 12, fill: '#6b7280' }} />
-            <Tooltip />
-            <Legend verticalAlign="top" height={36} iconType="circle" />
-            <Line
-              type="monotone"
-              dataKey="google"
+      <ResponsiveContainer width="100%" height={210}>
+        <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
+          <YAxis domain={[3.5, 5]} tick={{ fontSize: 12, fill: '#6b7280' }} />
+          <Tooltip />
+          <Legend verticalAlign="top" height={36} iconType="circle" />
+          <Line
+            type="monotone"
+            dataKey="google"
               stroke="#1a1a1a"
-              strokeWidth={2.5}
-              dot={{ r: 4 }}
-              name="Google"
-            />
-            <Line
-              type="monotone"
-              dataKey="motortrace"
+            strokeWidth={2.5}
+            dot={{ r: 4 }}
+            name="Google"
+          />
+          <Line
+            type="monotone"
+            dataKey="motortrace"
               stroke="#666666"
-              strokeWidth={2.5}
-              dot={{ r: 4 }}
-              name="MotorTrace"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+            strokeWidth={2.5}
+            dot={{ r: 4 }}
+            name="MotorTrace"
+          />
+        </LineChart>
+      </ResponsiveContainer>
       </div>
       {statCards}
     </div>
