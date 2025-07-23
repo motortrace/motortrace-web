@@ -28,6 +28,8 @@ import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import AutoRepairReviews from './pages/ServiceCenter/Reviews/AutoRepairReviews';
 import AutoRepairChat from './pages/ServiceCenter/AutoRepairChat/AutoRepairChat';
 import EditProfile from './pages/ServiceCenter/EditProfile';
+import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
+import OrderHistory from './pages/ServiceCenter/OrderHistory';
 
 
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
@@ -114,6 +116,7 @@ function App() {
           <Route path="inventory" element={<PartsInventory />} />
           <Route path="suppliers" element={<SupplierConnectionPage />} />
           <Route path="parts-order" element={<PartsSearch />} />
+          <Route path="order-history" element={<OrderHistory />} />
           <Route path="reports" element={<EstimatesInvoices />} />
           <Route path="inspections" element={<DigitalInspections />} />
           <Route path="calendar" element={<Calendar />} />
@@ -123,6 +126,7 @@ function App() {
           <Route path="reviews" element={<AutoRepairReviews />} />
           <Route path="chat" element={<AutoRepairChat />} />
           <Route path="profile" element={<EditProfile />} />
+          <Route path="employee-management" element={<EmployeeManagement />} />
         </Route>
 
         <Route path="/admin" element={<AdminDashboardLayout />}>

@@ -24,8 +24,12 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Job Card',
     description: 'Details for the selected job card',
   },
+  '/servicecenter/employee-management': {
+    title: 'Technician Management',
+    description: 'View technician skills, availability, and workloads to assign jobs efficiently',
+  },
   '/servicecenter/scheduling': {
-    title: 'Appointment Calendar',
+    title: 'Work Schedule',
     description: 'Schedule appointments for your technicians',
   },
   '/servicecenter/inventory': {
@@ -40,7 +44,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
-  
+  '/servicecenter/order-history':{
+    title: 'Order History',
+    description: 'Review past spare parts orders, track their status, payment details, and reorder with ease',
+  },
   '/servicecenter/appointments/details': {
     title: 'Appointment Details',
     description: 'View details about the appointment request',
@@ -187,10 +194,10 @@ const Navbar: React.FC = () => {
           <span className="notification-badge">3</span>
         </button>
 
-        <button aria-label="Cart" className="icon-btn notification-btn">
+        {/* <button aria-label="Cart" className="icon-btn notification-btn">
           <i className="bx bx-cart"></i>
           <span className="notification-badge">1</span>
-        </button>
+        </button> */}
 
         <div className="user-profile">
           <img
