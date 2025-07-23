@@ -28,27 +28,29 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'Operations',
+      title: 'Technicians',
       items: [
-        // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
-
-        { id: 'booking', label: 'Booking', icon: 'bx bx-calendar-check', route: '/servicecenter/booking' },
-        { id: 'scheduling', label: 'Scheduling', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
-        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
-        { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
-        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
-        { id: 'reviews', label: 'Reviews', icon: 'bx bx-search-alt', route: '/servicecenter/reviews' },
-
-        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
-
-        { id: 'Chat', label: 'Chat', icon: 'bx bx-chat', route: '/servicecenter/chat' },
+        { id: 'manage-technicians', label: 'Manage Technicians', icon: 'bx bx-id-card', route: '/servicecenter/employee-management' },
+        { id: 'schedule-technicians', label: 'Schedule Technicians', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
       ]
     },
     {
-      title: 'Inventory',
+      title: 'Operations',
       items: [
-        // { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
-        { id: 'Inventory', label: 'Inventory', icon: 'bx bx-cube', route: '/servicecenter/inventory' },
+        // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
+        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
+        { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
+        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
+        { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+      ]
+    },
+    {
+      title: 'Spare Parts',
+      items: [
+        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
+        { id: 'suppliers', label: 'Find Sellers', icon: 'bx bx-user', route: '/servicecenter/suppliers' },
+        { id: 'order', label: 'Order Parts', icon: 'bx bx-cube', route: '/servicecenter/parts-order' },
+        { id: 'orderHistory', label: 'Order History', icon: 'bx bx-history', route: '/servicecenter/order-history' },
       ]
     },
     {
@@ -56,7 +58,13 @@ const Sidebar: React.FC = () => {
       items: [
         { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: '/servicecenter/reports' },
         { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: '/servicecenter/payments' },
-        { id: 'suppliers', label: 'Suppliers', icon: 'bx bx-user', route: '/servicecenter/suppliers' },
+      ]
+    },
+    {
+      title: 'Customer Interaction',
+      items: [
+        { id: 'reviews', label: 'Reviews', icon: 'bx bx-star', route: '/servicecenter/reviews' },
+        { id: 'chat', label: 'Chat', icon: 'bx bx-chat', route: '/servicecenter/chat' },
       ]
     },
     {
