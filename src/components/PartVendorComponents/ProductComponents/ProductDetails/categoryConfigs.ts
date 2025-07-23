@@ -31,7 +31,7 @@ export const categoryConfigs = {
     { key: "color", label: "Color" },
     { key: "finish", label: "Finish" },
     { key: "type", label: "Type" },
-    { key: "surfaceUse", label: "Surface Use" },
+    // { key: "surfaceUse", label: "Surface Use" },
     { key: "brand", label: "Brand" }
   ],
   "Engine & Drivetrain Components": [
@@ -58,13 +58,13 @@ export const categoryConfigs = {
     { key: "finish", label: "Finish" },
     { key: "brand", label: "Brand" }
   ],
-  "Tools & Kits": [
-    { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
-    { key: "category", label: "Category" },
-    { key: "type", label: "Tool Type" },
-    { key: "brand", label: "Brand" },
-    { key: "material", label: "Material" }   
-  ]
+  // "Tools & Kits": [
+  //   { key: "id", label: "ID" },
+  //   { key: "productName", label: "Product Name" },
+  //   { key: "category", label: "Category" },
+  //   { key: "type", label: "Tool Type" },
+  //   { key: "brand", label: "Brand" },
+  //   { key: "material", label: "Material" }   
+  // ]
   // Add more categories as needed
 };
