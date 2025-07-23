@@ -24,6 +24,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Job Card',
     description: 'Details for the selected job card',
   },
+  '/servicecenter/employee-management': {
+    title: 'Technician Management',
+    description: 'View technician skills, availability, and workloads to assign jobs efficiently',
+  },
   '/servicecenter/scheduling': {
     title: 'Appointment Calendar',
     description: 'Schedule appointments for your technicians',
@@ -40,7 +44,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
-  
+  '/servicecenter/order-history':{
+    title: 'Order History',
+    description: 'Review past spare parts orders, track their status, payment details, and reorder with ease',
+  },
   '/servicecenter/appointments/details': {
     title: 'Appointment Details',
     description: 'View details about the appointment request',
