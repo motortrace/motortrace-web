@@ -1,0 +1,12 @@
+.income-summary-metric-card {
+  display: flex;
+  gap: 20px;
+
+  &__earnings {
+    flex: 4;
+  }
+
+  &__refunds {
+    flex: 2;
+  }
+}

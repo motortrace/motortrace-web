@@ -1,0 +1,34 @@
+.reviews-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "overview stats"
+    "trends trends";
+  gap: 24px;
+  padding: 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "overview"
+      "stats"
+      "trends";
+  }
+}
+
+.ratings-overview {
+  grid-area: overview;
+}
+
+.rating-stats {
+  grid-area: stats;
+}
+
+.review-trends {
+  grid-area: trends;
+}
+
+.reviews-detailed-section {
+  width: 100%;
+  padding: 0 24px 24px;
+}

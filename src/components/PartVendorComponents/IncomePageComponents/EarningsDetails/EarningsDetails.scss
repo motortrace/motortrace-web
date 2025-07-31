@@ -1,0 +1,192 @@
+@import '../../../../styles/variables.scss';
+
+.earnings-details {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 20px;
+  flex: 1;
+  min-width: 0;
+  margin-top: 30px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Poppins';
+    color: #111827;
+    margin: 0;
+  }
+
+  &__table {
+    width: 100%;
+  }
+
+  &__table-header {
+    display: grid;
+    grid-template-columns: 1.5fr 1.2fr 1.5fr 1.5fr 1.5fr 1.2fr;
+    gap: 16px;
+    padding: 12px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  &__header-cell {
+    font-size: 11px;
+    font-weight: 600;
+    color: #656970;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Poppins';
+  }
+
+  &__table-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1.5fr 1.2fr 1.5fr 1.5fr 1.5fr 1.2fr;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #f9fafb;
+    }
+  }
+
+  &__cell {
+    font-size: 13px;
+    color: #374151;
+    font-family: 'Poppins';
+  }
+
+  &__payment-type,
+  &__customer-type {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  &__payment-type {
+    &--order-payment {
+      background-color: #d1fae5;
+      color: #059669;
+    }
+
+    &--monthly-payment {
+      background-color: #dbeafe;
+      color: #2563eb;
+    }
+
+    &--refund {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+  }
+
+  &__customer-type {
+    &--customer {
+      background-color: #e0f2fe;
+      color: #0284c7;
+    }
+
+    &--service-center {
+      background-color: #ede9fe;
+      color: #7c3aed;
+    }
+  }
+
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 12px;
+    font-family: 'Poppins';
+
+    &-btn {
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #e5e7eb;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &-info {
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    &__table-header {
+      display: none;
+    }
+
+    &__row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    &__cell {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      &::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        
+      }
+    }
+  }
+}

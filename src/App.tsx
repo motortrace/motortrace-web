@@ -1,5 +1,7 @@
 import DashboardLayout from './layouts/DashboardLayout';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import PartVendorDashboardLayout from './layouts/PartVendorLayout/PartVendorLayout';
+
+import { BrowserRouter, Routes, Route, Navigate, useNavigate  } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
@@ -29,6 +31,7 @@ import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
 import OrderHistory from './pages/ServiceCenter/OrderHistory';
 
+
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
 import AdminDashboard from './pages/Admin/Dashboard';
@@ -41,6 +44,23 @@ import AdminSettings from './pages/Admin/AdminSettings';
 import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
 import RegistrationRequests from './components/Admin/UserManagement/RegistrationRequests';
 
+
+import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
+import OrderSummary from './pages/PartVendor/OrderPages/OrderSummary';
+import PendingOrderDetailsPage from './pages/PartVendor/OrderPages/PendingOrderDetailsPage';
+import IncomeSummaryPage from './pages/PartVendor/IncomePages/IncomeSummaryPage';
+import CustomerSummaryPage from './pages/PartVendor/CustomerPages/CustomerSummaryPage';
+import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
+import CustomerDetailsPage from './pages/PartVendor/CustomerPages/CustomerDetailsPage';
+import AcceptedOrderDetailsPage from './pages/PartVendor/OrderPages/AcceptedOrderDetailsPage';
+import ReportPage from './pages/PartVendor/ReportPages/ReportPage';
+import DeclinedOrderDetailsPage from './pages/PartVendor/OrderPages/DeclinedOrderDetailsPage';
+import CompletedOrderDetailsPage from './pages/PartVendor/OrderPages/CompletedOrderDetailsPage';
+import FailedOrderDetailsPage from './pages/PartVendor/OrderPages/FailedOrderDetailsPage';
+import ServiceCenterCustomerDetailsPage from './pages/PartVendor/CustomerPages/ServiceCenterCustomerDetailsPage';
+import AddProduct from './pages/PartVendor/Products/AddProduct';
+import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
+import ProductList from './pages/PartVendor/Products/ProductList';
 
 function NotFoundRedirect() {
   const navigate = useNavigate();
@@ -64,10 +84,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Root Redirect */}
         <Route path="/" element={<Navigate to="/index" replace />} />
-        
-        {/* Public Routes */}
-        <Route path="/" >
+
+<Route path="/" >
            <Route index element={<Navigate to="index" replace />} />
            <Route path="index" element={<LandingPage />} />
            <Route path="login" element={<LoginPage />} />
@@ -132,6 +152,28 @@ function App() {
         </Route>
 
         <Route path="*" element={<NotFoundRedirect />} />
+
+        {/* Part Vendor */}
+        <Route path="/partvendor" element={<PartVendorDashboardLayout />}>
+          <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
+          <Route path="dashboard" element={<PartVendorDashboard />} />
+          <Route path="OrderSummary" element={<OrderSummary />} />
+          <Route path="PendingOrderDetails" element={<PendingOrderDetailsPage/>} />
+          <Route path="IncomeSummary" element={<IncomeSummaryPage/>} />
+          <Route path="CustomerSummary" element={<CustomerSummaryPage/>} />
+          <Route path="ReviewPage" element={<ReviewPage/>} />
+          <Route path="CustomerDetails" element={<CustomerDetailsPage/>} />
+          <Route path="ServiceCenterCustomerDetails" element={<ServiceCenterCustomerDetailsPage />} />
+          <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage/>} />
+          <Route path="CompletedOrders" element={<CompletedOrderDetailsPage/>} />
+          <Route path="ReportsSummary" element={<ReportPage/>}/>
+          <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage/>}/>
+          <Route path="FailedOrderDetailsPage" element={<FailedOrderDetailsPage />} />
+          <Route path="ProductList" element={<ProductList />} />
+          <Route path="AddProduct" element={<AddProduct />} />
+          <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
+          
+        </Route>
       </Routes>
     </BrowserRouter>
   );
