@@ -76,7 +76,7 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     // Optionally clear other user/session data here
-    window.location.href = '/login';
+    window.location.href = '/admin';
   };
 
   // Helper function to check if a menu item is active

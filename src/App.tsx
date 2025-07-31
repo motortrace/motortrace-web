@@ -29,6 +29,7 @@ import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
 import OrderHistory from './pages/ServiceCenter/OrderHistory';
 
+import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
 import AdminDashboard from './pages/Admin/Dashboard';
 import UserManagement from './pages/Admin/UserManagement';
@@ -109,8 +110,10 @@ function App() {
           <Route path="employee-management" element={<EmployeeManagement />} />
         </Route>
 
-        <Route path="/admin" element={<AdminDashboardLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<Navigate to="login" replace />} />
+        <Route path="/admin/*" element={<AdminDashboardLayout />}>
+        
           <Route path="dashboard" element={<AdminDashboard />} />
           
           <Route path="userManagement">

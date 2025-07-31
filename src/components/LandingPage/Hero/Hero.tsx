@@ -5,7 +5,8 @@ import { UserCog, Calendar, Check, X, Clock, BarChart3, DollarSign, Car, Wrench,
 
 import "../../../styles/variables.scss"
 import './Hero.scss';
-import HeroImg from "../../../assets/images/heroSectionImage.jpg"
+// import HeroImg from "../../../assets/images/heroSectionImage.jpg"
+import HeroImg from "../../../assets/images/landingBgImage.png"
 import Mech1 from "../../../assets/images/mech1.jpg"
 import Mech2 from "../../../assets/images/mech2.jpg"
 import UserPic from "../../../assets/images/userPic.jpg"
@@ -105,7 +106,7 @@ const Hero: React.FC<HeroSectionProps> = ({ className = '' }) => {
                                     <div className="booking-customer">Vishva Fernando</div>
                                     <div className="booking-service">
                                         <Car size={12} />
-                                        <span>Oil Change - Toyota Aqua</span>
+                                        <span>Oil Change </span>
                                     </div>
                                     <div className="booking-time">
                                         <Clock size={10} />
