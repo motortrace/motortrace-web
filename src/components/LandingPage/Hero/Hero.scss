@@ -89,7 +89,7 @@ $neutral-300: #cbd5e1;
     }
 
     &__container {
-        max-width: 1250px;
+        max-width: 1350px;
         margin: 0 auto;
         padding: 0 20px;
         display: grid;
@@ -183,20 +183,23 @@ $neutral-300: #cbd5e1;
     &__dashboard {
         position: relative;
         height: 600px;
+        min-width: 750px;
         animation: slideInRight 1s ease-out 0.3s both;
         margin-top: 2rem;
     }
 
     &__person {
         position: absolute;
-        top: 50%;
-        left: 30%;
+        top: 47.5%;
+        left: 45%;
         transform: translate(-50%, -50%);
         z-index: 1;
+        min-width: 750px;
 
         &-image {
-            width: 450px;
-            height: 300px;
+            width: 600px !important;
+            height: 400px !important;
+            aspect-ratio: unset !important;
             border-radius: 20px;
             object-fit: cover;
             @include card-shadow;
@@ -214,8 +217,8 @@ $neutral-300: #cbd5e1;
         z-index: 10;
 
         &--assign {
-            top: 20px;
-            left: -100px;
+            top: 30px;
+            left: -150px;
             width: 240px;
             @include floating-animation(0s);
 
@@ -293,8 +296,8 @@ $neutral-300: #cbd5e1;
 
         // New Manage Bookings Card
         &--bookings {
-            top: 50px;
-            right: -75px;
+            top: 0px;
+            right: 87.5px;
             width: 280px;
             @include floating-animation(1s);
 
@@ -412,8 +415,8 @@ $neutral-300: #cbd5e1;
         }
 
         &--rating {
-            bottom: 75px;
-            right: 100px;
+            bottom: 25px;
+            right: 112.5px;
             width: 160px;
             @include floating-animation(2s);
 
@@ -454,8 +457,8 @@ $neutral-300: #cbd5e1;
 
         // New Quick Stats Card
         &--stats {
-            bottom: 100px;
-            left: -125px;
+            bottom: 87.5px;
+            left: -112.5px;
             width: 200px;
             @include floating-animation(1.5s);
 
@@ -526,8 +529,9 @@ $neutral-300: #cbd5e1;
 
         &__person {
             &-image {
-                width: 350px;
+                width: 500px;
                 height: 250px;
+                border: 1px solid red;
             }
         }
 
