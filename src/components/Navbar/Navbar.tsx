@@ -44,7 +44,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
-  '/servicecenter/order-history':{
+  '/servicecenter/order-history': {
     title: 'Order History',
     description: 'Review past spare parts orders, track their status, payment details, and reorder with ease',
   },
@@ -84,7 +84,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Profile',
     description: 'Manage your profile',
   },
-  
+
 
   '/admin/dashboard': {
     title: 'Welcome back, Admin!',
@@ -94,13 +94,13 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Car Users Management',
     description: 'Manage and support your platform’s car users with ease',
   },
-  '/admin/userManagement/serviceCenters': {
-    title: 'Service Centers Management',
-    description: 'Oversee service centers and maintain service quality',
+  '/admin/userManagement/employees/serviceAdvisors': {
+    title: 'Service Advisors Management',
+    description: 'Oversee and manage service advisors to ensure smooth customer interactions and job handling',
   },
-  '/admin/userManagement/sparePartsSellers': {
-    title: 'Spare Parts Sellers Management',
-    description: 'Manage seller accounts and monitor spare parts listings efficiently',
+  '/admin/userManagement/employees/technicians': {
+    title: 'Technicians Management',
+    description: 'Manage technicians efficiently to ensure high-quality service and task completion',
   },
   '/admin/userManagement/pendingApprovals': {
     title: 'Pending Registration Requests',
@@ -131,36 +131,39 @@ const pageInfo: Record<string, { title: string; description: string }> = {
 
 const Navbar: React.FC = () => {
   const location = useLocation();
-  
+
   // Function to get page info with support for dynamic routes
   const getPageInfo = (pathname: string) => {
     // Check for exact match first
     if (pageInfo[pathname]) {
       return pageInfo[pathname];
     }
-    
+
     // Check for dynamic profile routes
-    const profileMatch = pathname.match(/^\/admin\/userManagement\/(carUsers|serviceCenters|sparePartsSellers)\/\d+\/profile$/);
+    const profileMatch = pathname.match(/^\/admin\/userManagement\/(carUsers)\/\d+\/profile$/) ||
+                         pathname.match(/^\/admin\/userManagement\/employees\/(serviceAdvisors|technicians)\/\d+\/profile$/);
+    
     if (profileMatch) {
+      console.log(profileMatch[1]);
       const userType = profileMatch[1];
       const userTypeMap = {
         carUsers: 'Car User',
-        serviceCenters: 'Service Center', 
-        sparePartsSellers: 'Spare Parts Seller'
+        serviceAdvisors: 'Service Advisor',
+        technicians: 'Technician'
       };
-      
+
       return {
         title: `${userTypeMap[userType as keyof typeof userTypeMap]} Profile`,
         description: `View and manage detailed information about this ${userTypeMap[userType as keyof typeof userTypeMap].toLowerCase()} account`
       };
     }
-    
+
     return {
       title: 'Welcome!',
       description: 'Select a page to get started',
     };
   };
-  
+
   const info = getPageInfo(location.pathname);
 
   const [user, setUser] = useState<{ name?: string; email?: string }>({});

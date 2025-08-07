@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 interface AddUserModalProps {
   open: boolean;
-  userType: 'Car Users' | 'Service Centers' | 'Spare Parts Sellers';
+  userType: 'Car Users' | 'Service Centers' | 'Spare Parts Sellers' | 'Service Advisors' | 'Technicians';
   onClose: () => void;
   onCreate: (user: any) => void;
 }
@@ -23,6 +23,10 @@ const initialFormState = {
   inventoryCapacity: '',
   // Car User fields
   totalVehicles: '',
+  // Employee fields
+  role: '',
+  department: '',
+  totalServices: '',
   status: 'Active',
   joinDate: new Date().toISOString().slice(0, 10),
 };
@@ -89,6 +93,11 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
         setError('Please fill in all required fields.');
         return;
       }
+    } else if (userType === 'Service Advisors' || userType === 'Technicians') {
+      if (!form.name || !form.email || !form.phone || !form.password || !form.department) {
+        setError('Please fill in all required fields.');
+        return;
+      }
     }
     setLoading(true);
     try {
@@ -123,6 +132,16 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
           email: form.email,
           phone: form.phone,
           totalVehicles: Number(form.totalVehicles),
+        };
+      } else if (userType === 'Service Advisors' || userType === 'Technicians') {
+        payload = {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+          role: userType === 'Service Advisors' ? 'Service Advisor' : 'Technician',
+          department: form.department,
+          totalServices: Number(form.totalServices) || 0,
         };
       }
       await onCreate(payload);
@@ -203,7 +222,31 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
               <input name="contactPersonName" value={form.contactPersonName} onChange={handleChange} placeholder="Contact Person Name" style={inputStyle} />
             </>
           )}
-          {/* Add similar section for Spare Parts Sellers if needed */}
+          {(userType === 'Service Advisors' || userType === 'Technicians') && (
+            <>
+              {/* Account Details */}
+              <div style={sectionTitleStyle}>Account Details</div>
+              <input name="name" value={form.name} onChange={handleChange} placeholder="Employee Name" style={inputStyle} />
+              <input name="email" value={form.email} onChange={handleChange} placeholder="Email" style={inputStyle} type="email" />
+              <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" style={inputStyle} />
+              <input name="password" value={form.password} onChange={handleChange} placeholder="Default Password" style={inputStyle} type="password" />
+              {/* Employee Details */}
+              <div style={sectionTitleStyle}>Employee Details</div>
+              <select name="department" value={form.department} onChange={handleChange} style={inputStyle}>
+                <option value="">Select Department</option>
+                <option value="Customer Service">Customer Service</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Body Shop">Body Shop</option>
+              </select>
+              <input name="totalServices" value={form.totalServices} onChange={handleChange} placeholder="Total Services (optional)" style={inputStyle} type="number" min={0} />
+              <select name="status" value={form.status} onChange={handleChange} style={inputStyle}>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Suspended">Suspended</option>
+              </select>
+            </>
+          )}
           {error && <div style={{ color: '#dc2626', fontSize: 13, marginTop: 8 }}>{error}</div>}
           <div style={{ display: 'flex', gap: 12, marginTop: 18, justifyContent: 'flex-end' }}>
             <button type="button" onClick={onClose} style={{ ...buttonStyle, background: '#f3f4f6', color: '#374151' }} disabled={loading}>Cancel</button>

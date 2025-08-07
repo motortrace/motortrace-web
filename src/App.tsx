@@ -35,14 +35,14 @@ import OrderHistory from './pages/ServiceCenter/OrderHistory';
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
 import AdminDashboard from './pages/Admin/Dashboard';
-import UserManagement from './pages/Admin/UserManagement';
+import CarUsers from './pages/Admin/CarUsers';
+import Employees from './pages/Admin/Employees';
 import BookingOversight from './pages/Admin/BookingOversight';
 import RefundManagement from './pages/Admin/RefundManagement';
 import ContentModeration from './pages/Admin/ContentModeration';
 import ViewUserProfile from './components/Admin/ViewUserProfile/UserProfile';
 import AdminSettings from './pages/Admin/AdminSettings';
 import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
-import RegistrationRequests from './components/Admin/UserManagement/RegistrationRequests';
 
 
 import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
@@ -138,9 +138,10 @@ function App() {
           
           <Route path="userManagement">
             <Route index element={<Navigate to="carUsers" replace />} />
-            <Route path=":userType" element={<UserManagement />} />
-            <Route path=":userType/:userId/profile" element={<ViewUserProfile />} />
-            <Route path="pendingApprovals" element={<RegistrationRequests />} />
+            <Route path="carUsers" element={<CarUsers />} />
+            <Route path="carUsers/:userId/profile" element={<ViewUserProfile />} />
+            <Route path="employees/:employeeType" element={<Employees />} />
+            <Route path="employees/:employeeType/:userId/profile" element={<ViewUserProfile />} />
           </Route>
 
           <Route path = "bookingOversight" element = {<BookingOversight />} />
