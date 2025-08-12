@@ -1,0 +1,692 @@
+/* ServicePackageManager.scss */
+
+/* CSS Variables */
+:root {
+    --spm-color-info: #0ea5e9;
+    --spm-color-primary: #000000;
+    --spm-color-secondary: #666666;
+    --spm-color-background: #ffffff;
+    --spm-color-surface: #f8f9fa;
+    --spm-color-border: #e5e7eb;
+    --spm-color-danger: #ef4444;
+    --spm-color-warning: #f59e0b;
+    --spm-color-success: #10b981;
+}
+
+/* Base Styles */
+.spm-app {
+    font-family: 'poppins';
+    background-color: var(--spm-color-background);
+    min-height: 100vh;
+    color: var(--spm-color-primary);
+    padding: 20px 24px;
+}
+
+/* Navigation Tabs */
+.spm-nav-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 0 2rem;
+    border-bottom: 2px solid var(--spm-color-border);
+}
+
+.spm-nav-tab {
+    background: none;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--spm-color-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.spm-nav-tab--active {
+    color: var(--spm-color-info);
+    border-bottom-color: var(--spm-color-info);
+}
+
+.spm-nav-tab:hover {
+    color: var(--spm-color-info);
+}
+
+/* Section Header */
+.spm-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.spm-section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Button Styles */
+.spm-btn {
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    outline: none;
+    min-width: 200px;
+    justify-content: center;
+}
+
+.spm-btn--primary {
+    background: var(--spm-color-info);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    
+}
+
+.spm-btn--primary:hover {
+    background: #0284c7;
+    transform: translateY(-1px);
+}
+
+.spm-btn--secondary {
+    background: var(--spm-color-surface);
+    color: var(--spm-color-primary);
+    border: 1px solid var(--spm-color-border);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.spm-btn--secondary:hover {
+    background: var(--spm-color-border);
+    transform: translateY(-1px);
+}
+
+.spm-btn--danger {
+    background: var(--spm-color-danger);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.spm-btn--danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.spm-btn--warning {
+    background: var(--spm-color-warning);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.spm-btn--warning:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+/* Empty State Styles */
+.spm-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 3.5rem;
+    padding: 4rem 2rem;
+    min-height: 400px;
+    background: var(--spm-color-surface);
+    border-radius: 12px;
+    border: 2px dashed var(--spm-color-border);
+}
+
+.spm-empty-state__icon {
+    margin-bottom: 1.5rem;
+    color: var(--spm-color-secondary);
+    opacity: 0.6;
+}
+
+.spm-empty-state__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--spm-color-primary);
+    margin-bottom: 0.75rem;
+    font-family: 'poppins';
+}
+
+.spm-empty-state__description {
+    color: var(--spm-color-secondary);
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    max-width: 550px;
+}
+
+/* Responsive adjustments for empty state */
+@media (max-width: 768px) {
+    .spm-empty-state {
+        padding: 3rem 1.5rem;
+        min-height: 300px;
+    }
+
+    .spm-empty-state__title {
+        font-size: 1.25rem;
+    }
+
+    .spm-empty-state__description {
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Services Grid */
+.spm-services-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Service Card */
+.spm-service-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: row;
+    min-height: 200px;
+}
+
+.spm-service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.spm-service-card--unavailable {
+    opacity: 0.7;
+}
+
+.spm-service-card__image {
+    position: relative;
+    width: 300px;
+    flex-shrink: 0;
+}
+
+.spm-service-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.spm-service-card__unavailable-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.spm-service-card__content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.spm-service-card__name {
+    font-family: 'poppins';
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--spm-color-primary);
+}
+
+.spm-service-card__description {
+    color: var(--spm-color-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+
+.spm-service-card__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--spm-color-border);
+}
+
+.spm-service-card__price {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--spm-color-info);
+}
+
+.spm-service-card__duration {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--spm-color-secondary);
+    font-size: 0.875rem;
+}
+
+.spm-service-card__actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Package Card Specific Styles */
+.spm-package-card__services {
+    margin-bottom: 1rem;
+}
+
+.spm-package-card__services h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--spm-color-primary);
+}
+
+.spm-package-card__services ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin-left: 0;
+}
+
+.spm-package-card__services li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--spm-color-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.spm-package-card__services li svg {
+    color: var(--spm-color-success);
+}
+
+.spm-package-card__savings {
+    background: var(--spm-color-success);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Modal Styles */
+.spm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.spm-modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.spm-modal-content--large {
+    max-width: 800px;
+}
+
+.spm-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--spm-color-border);
+    position: sticky;   /* This makes it stick */
+    top: 0;             /* Stick to the top */
+    background: white;  /* So it doesn’t show the content underneath */
+    z-index: 2;         /* Ensure it stays above the body content */
+}
+
+.spm-modal__header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.spm-modal__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    color: var(--spm-color-secondary);
+    transition: all 0.3s ease;
+}
+
+.spm-modal__close:hover {
+    background: var(--spm-color-surface);
+    color: var(--spm-color-primary);
+}
+
+.spm-modal__body {
+    padding: 1.5rem;
+}
+
+.spm-modal__image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Service Details */
+.spm-service-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.spm-service-details__description {
+    line-height: 1.6;
+    color: var(--spm-color-secondary);
+}
+
+.spm-service-details__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.spm-service-details__info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--spm-color-secondary);
+}
+
+.spm-service-details__price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--spm-color-info);
+    text-align: center;
+    padding: 1rem;
+    background: var(--spm-color-surface);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.spm-service-details__included {
+    background: var(--spm-color-surface);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.spm-service-details__included h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.spm-service-details__included ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.spm-service-details__included li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.spm-service-details__included li svg {
+    color: var(--spm-color-success);
+}
+
+/* Package Details */
+.spm-package-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.spm-package-details__description {
+    line-height: 1.6;
+    color: var(--spm-color-secondary);
+}
+
+.spm-package-details__services {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.spm-package-details__services h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.spm-package-details__service-item {
+    background: var(--spm-color-surface);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--spm-color-info);
+}
+
+.spm-package-details__service-item h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.spm-package-details__service-item p {
+    font-size: 0.875rem;
+    color: var(--spm-color-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.spm-package-details__individual-price {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--spm-color-info);
+}
+
+/* Form Styles */
+.spm-form-group {
+    margin-bottom: 1rem;
+}
+
+.spm-form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--spm-color-primary);
+}
+
+.spm-form-group input,
+.spm-form-group textarea,
+.spm-form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--spm-color-border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.spm-form-group input:focus,
+.spm-form-group textarea:focus,
+.spm-form-group select:focus {
+    outline: none;
+    border-color: var(--spm-color-info);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.spm-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.spm-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--spm-color-border);
+}
+
+/* Service Selection */
+.spm-service-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--spm-color-border);
+    border-radius: 6px;
+}
+
+.spm-service-checkbox {
+    padding: 0.75rem;
+    border: 1px solid var(--spm-color-border);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.spm-service-checkbox:hover {
+    background: var(--spm-color-surface);
+}
+
+.spm-service-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+.spm-service-checkbox input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.spm-service-checkbox__checkmark {
+    /* Custom checkbox styles can be added here if needed */
+}
+
+.spm-service-checkbox__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+}
+
+.spm-service-checkbox__name {
+    font-weight: 500;
+    color: var(--spm-color-primary);
+}
+
+.spm-service-checkbox__price {
+    font-size: 0.875rem;
+    color: var(--spm-color-info);
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .spm-app {
+        padding: 0;
+    }
+
+    .spm-nav-tabs {
+        padding: 0 1rem;
+    }
+
+    .spm-content {
+        padding: 0 1rem 2rem;
+    }
+
+    .spm-service-card {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .spm-service-card__image {
+        width: 100%;
+        height: 200px;
+    }
+
+    .spm-service-card__actions {
+        justify-content: center;
+    }
+
+    .spm-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .spm-modal-content {
+        margin: 1rem;
+        max-width: none;
+    }
+
+    .spm-form-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .spm-nav-tabs {
+        justify-content: center;
+    }
+
+    .spm-nav-tab {
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .spm-service-card__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .spm-service-card__actions .spm-btn {
+        justify-content: center;
+    }
+
+    .spm-section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+}
