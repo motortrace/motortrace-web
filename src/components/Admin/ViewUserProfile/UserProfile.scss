@@ -131,22 +131,41 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
 
-            &.active {
+            // Updated status colors to match user management styles
+            &.active, &.available {
               background: #d1fae5;
-              color: #065f46;
+              color: #059669;
               border: 1px solid #10b981;
             }
 
             &.suspended {
-              background: #fee2e2;
-              color: #991b1b;
+              background: #fecaca;
+              color: #dc2626;
               border: 1px solid #ef4444;
             }
 
-            &.inactive {
+            &.inactive, &.unavailable {
               background: #f3f4f6;
               color: #6b7280;
               border: 1px solid #d1d5db;
+            }
+
+            &.pending {
+              background: #fef9c3;
+              color: #d97706;
+              border: 1px solid #f59e0b;
+            }
+
+            &.on-work {
+              background: #dbeafe;
+              color: #2563eb;
+              border: 1px solid #3b82f6;
+            }
+
+            &.resigned {
+              background: #fef3c7;
+              color: #d97706;
+              border: 1px solid #f59e0b;
             }
           }
         }
@@ -180,12 +199,12 @@
           font-size: 14px;
 
           &.disable {
-            background: #fee2e2;
-            color: #991b1b;
+            background: #fecaca;
+            color: #dc2626;
             border: 1px solid #ef4444;
 
             &:hover {
-              background: #fecaca;
+              background: #fee2e2;
               transform: translateY(-2px);
               box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
             }
@@ -193,7 +212,7 @@
 
           &.enable {
             background: #d1fae5;
-            color: #065f46;
+            color: #059669;
             border: 1px solid #10b981;
 
             &:hover {
@@ -452,7 +471,7 @@
 
           .status-icon {
             &.active {
-              color: #10b981;
+              color: #059669;
             }
           }
 

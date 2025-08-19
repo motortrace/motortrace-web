@@ -19,7 +19,7 @@
   border-radius: 20px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
   width: 90%;
-  max-width: 1200px;
+  max-width: 1400px;
   max-height: 90vh;
   position: relative;
   overflow: hidden;
@@ -215,6 +215,11 @@
       background: #d1fae5;
       color: #059669;
     }
+
+    &.status--cancelled {
+      background: #fee2e2;
+      color: #dc2626;
+    }
   }
 
   &__payment-status {
@@ -236,56 +241,240 @@
     }
   }
 
-  // Responsive design
-  @media (max-width: 768px) {
-    width: 95%;
-    max-height: 95vh;
+  // Service-specific styles
+  &__services {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__service-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fafafa;
+  }
+
+  &__service-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  &__service-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      font-family: 'Poppins', sans-serif;
+    }
+  }
+
+  &__additional-tag {
+    background: #fbbf24;
+    color: #92400e;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 12px;
+    text-transform: uppercase;
+  }
+
+  &__service-details {
+    display: grid;
+    grid-template-columns: 1.75fr 1.5fr;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px 0px;
+    background: #f8fafc;
+    border-radius: 6px;
+  }
+
+  &__service-description {
+    margin: 8px 0 16px 0;
+    font-size: 14px;
+    color: #333;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  // Sub-task styles
+  &__subtasks {
+    margin-top: 16px;
+  }
+
+  &__subtasks-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 12px 0;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  &__subtask {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__subtask-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  &__subtask-description {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  &__subtask-status {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
     
-    &__header {
-      padding: 20px 24px;
+    &.status--pending {
+      background: #fef3c7;
+      color: #d97706;
     }
     
-    &__title {
-      font-size: 20px;
+    &.status--in-progress {
+      background: #dbeafe;
+      color: #2563eb;
     }
     
-    &__content {
-      padding: 20px 24px;
-      max-height: calc(95vh - 80px);
+    &.status--completed {
+      background: #d1fae5;
+      color: #059669;
     }
-    
-    &__grid {
-      grid-template-columns: 1fr;
-      gap: 20px;
+  }
+
+  &__subtask-details {
+    display: grid;
+    grid-template-columns: 1.8fr 1.5fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  &__technician {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  &__contact {
+    color: #64748b;
+    font-size: 11px;
+  }
+
+  &__cost-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  // Parts styles
+  &__parts {
+    margin-top: 8px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+  }
+
+  &__parts-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  &__parts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__part {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  &__part-name {
+    font-weight: 500;
+    color: #374151;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  &__part-qty {
+    color: #64748b;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  &__part-cost {
+    font-weight: 600;
+    color: #059669;
+    white-space: nowrap;
+  }
+
+  &__part-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  &__part-tag {
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    &.inventory {
+      background: #e0e7ff;
+      color: #3730a3;
     }
-    
-    &__card {
-      padding: 16px;
+
+    &.pending {
+      background: #fef3c7;
+      color: #d97706;
     }
-    
-    &__card-title {
-      font-size: 15px;
-    }
-    
-    &__info-item {
-      grid-template-columns: 1fr;
-      gap: 4px;
-      
-      &--full {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    &__label {
-      font-size: 12px;
-    }
-    
-    &__value {
-      font-size: 13px;
+
+    &.approved {
+      background: #d1fae5;
+      color: #059669;
     }
   }
 }
 
+// Animation keyframes
 @keyframes popupSlideIn {
   from {
     opacity: 0;
@@ -294,5 +483,1024 @@
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+  .booking-popup {
+    width: 95%;
+    max-width: none;
+
+    &__grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    &__content {
+      padding: 20px 24px;
+    }
+
+    &__header {
+      padding: 20px 24px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .booking-popup {
+    width: 98%;
+    max-height: 95vh;
+    border-radius: 12px;
+
+    &__content {
+      padding: 16px 20px;
+    }
+
+    &__header {
+      padding: 16px 20px;
+    }
+
+    &__title {
+      font-size: 20px;
+    }
+
+    &__card {
+      padding: 16px;
+    }
+
+    &__info-item {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    &__subtask-details {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    &__service-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    &__service-meta {
+      align-items: flex-start;
+    }
+
+    &__part {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    &__part-name {
+      min-width: auto;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-popup {
+    width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+
+    &__content {
+      padding: 12px 16px;
+      max-height: calc(100vh - 80px);
+    }
+
+    &__header {
+      padding: 12px 16px;
+    }
+
+    &__title {
+      font-size: 18px;
+    }
+
+    &__card {
+      padding: 12px;
+    }
+
+    &__card-title {
+      font-size: 14px;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .booking-popup-overlay {
+    position: static;
+    background: none;
+    backdrop-filter: none;
+  }
+
+  .booking-popup {
+    box-shadow: none;
+    border: 1px solid #000;
+    border-radius: 0;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+
+    &__header {
+      background: none;
+      border-bottom: 2px solid #000;
+    }
+
+    &__close-btn {
+      display: none;
+    }
+
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+
+    &__card {
+      box-shadow: none;
+      border: 1px solid #ccc;
+      break-inside: avoid;
+    }
+
+    &__status,
+    &__subtask-status,
+    &__part-tag {
+      border: 1px solid currentColor;
+      background: none !important;
+    }
+  }
+}
+
+
+// Additional styles for the updated BookingDetailsPopup component
+
+.booking-popup {
+  // Service category tag
+  &__service-category {
+    background: #e0e7ff;
+    color: #3730a3;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+
+  // Service status (for ongoing bookings)
+  &__service-status {
+    padding: 3px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: capitalize;
+    margin-left: auto;
+    
+    &.status--pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    &.status--in-progress {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+    
+    &.status--completed {
+      background: #d1fae5;
+      color: #059669;
+    }
+  }
+
+  // Additional service specific styles
+  // &__additional-service {
+  //   border-left: 4px solid #f59e0b;
+  //   background: #fffbeb;
+  // }
+
+  // Priority tags for additional services
+  &__priority-tag {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &.priority--critical {
+      background: #fecaca;
+      color: #991b1b;
+    }
+    
+    &.priority--high {
+      background: #fed7aa;
+      color: #c2410c;
+    }
+    
+    &.priority--medium {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    &.priority--low {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+  }
+
+  // Approval status for additional services
+  &__approval-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+    margin-left: auto;
+    
+    &.status--pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    &.status--approved {
+      background: #d1fae5;
+      color: #059669;
+    }
+    
+    &.status--rejected {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+  }
+
+  // Recommendation notes section
+  &__recommendation {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid #64748b;
+  }
+
+  &__recommendation-text {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  // Timing information for ongoing tasks
+  &__timing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  // Progress bar for ongoing bookings
+  &__progress {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  &__progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  &__progress-text {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  // Enhanced part tags for different sources and statuses
+  &__part-tag {
+    &.source-inventory {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+    
+    &.source-ordered {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    &.source-customer-provided {
+      background: #f3e8ff;
+      color: #7c3aed;
+    }
+    
+    &.status-in-stock {
+      background: #d1fae5;
+      color: #059669;
+    }
+    
+    &.status-ordered {
+      background: #fed7aa;
+      color: #c2410c;
+    }
+    
+    &.status-out-of-stock {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    &.status-provided {
+      background: #f3e8ff;
+      color: #7c3aed;
+    }
+  }
+
+  &__part-arrival {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-left: 4px;
+  }
+
+  // Booking notes section
+  &__notes {
+    margin: 0;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.6;
+    border-left: 3px solid #64748b;
+  }
+}
+
+// Responsive adjustments for new elements
+@media (max-width: 768px) {
+  .booking-popup {
+    &__service-title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    &__priority-tag,
+    &__approval-status {
+      margin-left: 0;
+      margin-top: 4px;
+    }
+
+    &__part-arrival {
+      width: 100%;
+      margin-left: 0;
+      margin-top: 4px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-popup {
+    &__progress-bar {
+      height: 6px;
+    }
+
+    &__recommendation {
+      padding: 8px;
+    }
+
+    &__notes {
+      padding: 8px;
+      font-size: 13px;
+    }
+  }
+}
+
+// Additional styles for CompletedBookings component
+// These should be added to your existing SCSS files or imported separately
+
+// Completed date styling
+.completed-date {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .completed-time {
+    font-size: 0.85em;
+    color: #666;
+    font-weight: 400;
+  }
+}
+
+// Amount styling
+.amount {
+  font-weight: 600;
+  color: #16a085;
+}
+
+// Rating stars
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  .star {
+    font-size: 16px;
+    color: #ddd;
+    transition: color 0.2s ease;
+
+    &--filled {
+      color: #f39c12;
+    }
+
+    &--empty {
+      color: #ddd;
+    }
+  }
+
+  .rating-number {
+    font-size: 0.85em;
+    color: #666;
+    margin-left: 4px;
+  }
+}
+
+.no-rating {
+  font-size: 0.85em;
+  color: #999;
+  font-style: italic;
+}
+
+
+// Enhanced popup styles for completed bookings
+.booking-popup {
+  .time-comparison {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+
+    h4 {
+      margin: 0 0 12px 0;
+      font-size: 0.95em;
+      color: #333;
+      font-weight: 600;
+    }
+  }
+
+  .time-over {
+    color: #e74c3c !important;
+    font-weight: 600;
+  }
+
+  .time-under {
+    color: #27ae60 !important;
+    font-weight: 600;
+  }
+
+  // Feedback section
+  .booking-popup__feedback {
+    margin-top: 12px;
+
+    .booking-popup__feedback-text {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 8px 0 0 0;
+      font-style: italic;
+      border-left: 3px solid #64748b;
+    }
+  }
+
+  // Delivery notes
+  .booking-popup__delivery-notes {
+    margin-top: 12px;
+  }
+
+  // Warranty section
+  .booking-popup__warranty-items {
+    margin-top: 16px;
+
+    .booking-popup__warranty-list {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0 0;
+
+      .booking-popup__warranty-item {
+        padding: 6px 0;
+        border-bottom: 1px solid #f0f0f0;
+        position: relative;
+        padding-left: 20px;
+
+        &:before {
+          content: '✓';
+          position: absolute;
+          left: 0;
+          color: #27ae60;
+          font-weight: bold;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  // Enhanced service status styling
+  .booking-popup__service-status {
+    &.status--completed {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+  }
+
+  // Service notes styling
+  .booking-popup__notes {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 8px 0 0 0;
+    font-size: 0.9em;
+    line-height: 1.4;
+    
+  }
+}
+
+// Table enhancements for completed bookings
+.todays-bookings__table {
+  .todays-bookings__row {
+    &:hover {
+      background-color: #f8f9fa;
+      transition: background-color 0.2s ease;
+    }
+  }
+
+  // Status styling improvements
+  .todays-bookings__status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: capitalize;
+
+    &.status--completed {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    &.status--pending {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    &.status--cancelled {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  }
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .rating-stars {
+    .star {
+      font-size: 14px;
+    }
+
+    .rating-number {
+      font-size: 0.8em;
+    }
+  }
+
+  .completed-date {
+    .completed-time {
+      font-size: 0.8em;
+    }
+  }
+
+  .booking-popup__warranty-list {
+    .booking-popup__warranty-item {
+      font-size: 0.9em;
+      padding: 4px 0 4px 16px;
+    }
+  }
+}
+
+// Print styles for completed booking details
+@media print {
+  .booking-popup-overlay {
+    position: static !important;
+    background: transparent !important;
+  }
+
+  .booking-popup {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  .booking-popup__header {
+    .booking-popup__close-btn {
+      display: none !important;
+    }
+  }
+
+  .rating-stars {
+    .star--filled::after {
+      content: '★';
+      color: #000 !important;
+    }
+
+    .star--empty::after {
+      content: '☆';
+      color: #000 !important;
+    }
+  }
+}
+
+
+// Additional styles for CancelledBookingDetailsPopup component
+// These should be added to your existing BookingDetailsPopup.scss file
+
+.booking-popup {
+  // Cancelled service styling
+  &__cancelled-service {
+    border-left: 4px solid #dc2626;
+    background: #fef2f2;
+    opacity: 0.9;
+
+    .booking-popup__service-title h4 {
+      color: #7f1d1d;
+      text-decoration: line-through;
+    }
+  }
+
+  // Cancelled tag for services
+  &__cancelled-tag {
+    background: #fecaca;
+    color: #991b1b;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+  }
+
+  // Cancelled by styling
+  .cancelled-by-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    display: inline-block;
+    border: 1px solid transparent;
+
+    &.cancelled-by--customer {
+      background: #fef3c7;
+      color: #d97706;
+      border-color: #f59e0b;
+    }
+
+    &.cancelled-by--service-center {
+      background: #dbeafe;
+      color: #2563eb;
+      border-color: #3b82f6;
+    }
+  }
+
+  // Customer type styling
+  .customer-type-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    display: inline-block;
+    border: 1px solid transparent;
+
+    &.customer-type--regular {
+      background: #d1fae5;
+      color: #059669;
+      border-color: #10b981;
+    }
+
+    &.customer-type--advance-required {
+      background: #fed7aa;
+      color: #c2410c;
+      border-color: #f97316;
+    }
+
+    &.customer-type--repeat-canceller {
+      background: #fecaca;
+      color: #991b1b;
+      border-color: #ef4444;
+    }
+  }
+
+  // Cancellation notes styling
+  &__cancellation-notes {
+    margin-top: 16px;
+    
+    .booking-popup__label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .booking-popup__notes {
+      margin: 0;
+      padding: 12px;
+      background: #fef2f2;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #7f1d1d;
+      line-height: 1.6;
+      border-left: 3px solid #dc2626;
+    }
+  }
+
+  // Enhanced price styling for cancelled bookings
+  &__price {
+    &--negative {
+      color: #dc2626 !important;
+    }
+
+    &--highlight {
+      color: #059669 !important;
+      background: #f0fdf4;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  }
+
+  // Refund breakdown styling
+  &__refund-breakdown {
+    margin-top: 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+
+  &__breakdown-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 12px 0;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  &__calculation {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__calculation-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    &--negative {
+      color: #dc2626;
+      
+      span:last-child {
+        font-weight: 600;
+      }
+    }
+
+    &--total {
+      border-top: 2px solid #1e293b;
+      padding-top: 12px;
+      margin-top: 4px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #1e293b;
+      
+      span:last-child {
+        color: #059669;
+        background: #f0fdf4;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  // No payment info styling
+  &__no-payment-info {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+  }
+
+  &__info-text {
+    margin: 0;
+    font-size: 13px;
+    color: #166534;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  // Policy card styling
+  &__policy-card {
+    background: #fafafa;
+    border: 1px solid #d1d5db;
+    
+    .booking-popup__card-title {
+      color: #374151;
+      border-bottom-color: #d1d5db;
+    }
+  }
+
+  &__policy-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__policy-section {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+
+  &__policy-subtitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 12px 0;
+    font-family: 'Poppins', sans-serif;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  &__policy-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+
+      &:before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #64748b;
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 1.3;
+      }
+    }
+  }
+
+  // Info item highlight for important refund amounts
+  &__info-item {
+    &--highlight {
+      background: #f0fdf4;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #bbf7d0;
+      margin: 4px 0;
+
+      .booking-popup__label {
+        color: #166534;
+        font-weight: 700;
+      }
+
+      .booking-popup__value {
+        color: #166534;
+        font-weight: 700;
+      }
+    }
+  }
+
+  // Additional status colors for refund statuses
+  &__status {
+    &.status--not-applicable {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    &.status--partially-refunded {
+      background: #fef3c7;
+      color: #d97706;
+    }
+  }
+
+  // Text color utilities used in the component
+  .text-green-600 {
+    color: #059669 !important;
+  }
+
+  .text-red-600 {
+    color: #dc2626 !important;
+  }
+
+  .text-orange-600 {
+    color: #ea580c !important;
+  }
+}
+
+// Responsive adjustments for cancelled booking styles
+@media (max-width: 768px) {
+  .booking-popup {
+    &__refund-breakdown {
+      padding: 12px;
+    }
+
+    &__calculation-row {
+      font-size: 13px;
+      
+      &--total {
+        font-size: 15px;
+      }
+    }
+
+    &__policy-section {
+      padding: 12px;
+    }
+
+    &__policy-list li {
+      font-size: 12px;
+      padding-left: 16px;
+    }
+
+    .cancelled-by-tag,
+    .customer-type-tag {
+      font-size: 11px;
+      padding: 3px 10px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-popup {
+    &__calculation-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      
+      &--total {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    &__policy-info {
+      gap: 16px;
+    }
+
+    &__no-payment-info {
+      padding: 10px;
+    }
+
+    &__info-text {
+      font-size: 12px;
+    }
   }
 }
