@@ -1,0 +1,500 @@
+.transaction-history {
+  // background-color: white;
+  // border-radius: 12px;
+  // padding: 24px;
+  // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  // border: 1px solid #e5e7eb;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  &__title-section {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+}
+
+.export-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #0ea5e9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #0284c7;
+    transform: translateY(-1px);
+  }
+}
+
+.transaction-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  svg {
+    position: absolute;
+    left: 12px;
+    color: #6b7280;
+    z-index: 1;
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background-color: white;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.filter-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background-color: white;
+  cursor: pointer;
+  min-width: 140px;
+
+  &:focus {
+    outline: none;
+    border-color: #0ea5e9;
+  }
+}
+
+.transaction-table-container {
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  
+  // Custom scrollbar styles
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+  
+  &::-webkit-scrollbar-corner {
+    background: #f1f5f9;
+  }
+  
+  // Firefox scrollbar styles
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+
+  th {
+    background-color: #f9fafb;
+    color: #374151;
+    font-weight: 600;
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+    white-space: nowrap;
+    position: relative;
+    
+    &:last-child {
+      border-right: none;
+    }
+    
+    &:first-child {
+      border-top-left-radius: 8px;
+    }
+    
+    &:last-child {
+      border-top-right-radius: 8px;
+    }
+  }
+
+  td {
+    padding: 18px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    border-right: 1px solid #f3f4f6;
+    vertical-align: middle;
+    
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+    
+    &:first-child {
+      border-bottom-left-radius: 8px;
+    }
+    
+    &:last-child {
+      border-bottom-right-radius: 8px;
+    }
+  }
+  
+  // Specific column widths for better grid structure
+  th:nth-child(1), td:nth-child(1) { // Transaction ID
+    width: 140px;
+    min-width: 140px;
+  }
+  
+  th:nth-child(2), td:nth-child(2) { // Customer
+    width: 180px;
+    min-width: 180px;
+  }
+  
+  th:nth-child(3), td:nth-child(3) { // Service
+    width: 160px;
+    min-width: 160px;
+  }
+  
+  th:nth-child(4), td:nth-child(4) { // Booking Date
+    width: 130px;
+    min-width: 130px;
+  }
+  
+  th:nth-child(5), td:nth-child(5) { // Payment Case
+    width: 180px;
+    min-width: 180px;
+  }
+  
+  th:nth-child(6), td:nth-child(6) { // Status
+    width: 120px;
+    min-width: 120px;
+  }
+  
+  th:nth-child(7), td:nth-child(7) { // Estimated Cost
+    width: 130px;
+    min-width: 130px;
+    text-align: right;
+  }
+  
+  th:nth-child(8), td:nth-child(8) { // Final Amount
+    width: 130px;
+    min-width: 130px;
+    text-align: right;
+  }
+  
+  th:nth-child(9), td:nth-child(9) { // Advance
+    width: 120px;
+    min-width: 120px;
+    text-align: right;
+  }
+  
+  th:nth-child(10), td:nth-child(10) { // Penalty
+    width: 120px;
+    min-width: 120px;
+    text-align: right;
+  }
+  
+  th:nth-child(11), td:nth-child(11) { // Refund
+    width: 120px;
+    min-width: 120px;
+    text-align: right;
+  }
+  
+  th:nth-child(12), td:nth-child(12) { // Payment Method
+    width: 140px;
+    min-width: 140px;
+  }
+  
+  th:nth-child(13), td:nth-child(13) { // Invoice
+    width: 100px;
+    min-width: 100px;
+    text-align: center;
+  }
+}
+
+.transaction-row {
+  background-color: white;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+}
+
+.transaction-id {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #0ea5e9;
+}
+
+.customer-info {
+  .customer-name {
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+
+  .customer-id {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+}
+
+.service-type {
+  font-weight: 500;
+  color: #374151;
+}
+
+.date-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &--success {
+    background-color: #ecfdf5;
+    color: #065f46;
+  }
+
+  &--primary {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  &--warning {
+    background-color: #fffbeb;
+    color: #92400e;
+  }
+
+  &--error {
+    background-color: #fef2f2;
+    color: #991b1b;
+  }
+}
+
+.amount {
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+
+  &.final-amount {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  &.penalty {
+    color: #f59e0b;
+  }
+
+  &.refund {
+    color: #ef4444;
+  }
+}
+
+.payment-method {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.invoice-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #0ea5e9;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #0284c7;
+    transform: translateY(-1px);
+  }
+}
+
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+
+  &__content {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  &__icon {
+    color: #d1d5db;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  &__description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 1024px) {
+  .transaction-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    min-width: auto;
+  }
+
+  .filter-group {
+    justify-content: stretch;
+
+    .filter-item {
+      flex: 1;
+    }
+
+    .filter-select {
+      flex: 1;
+      min-width: auto;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .transaction-history {
+    padding: 16px;
+
+    &__header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+  }
+
+  .transaction-table {
+    font-size: 0.75rem;
+
+    th,
+    td {
+      padding: 10px 12px;
+    }
+    
+    // Adjust column widths for mobile
+    th:nth-child(1), td:nth-child(1) { width: 100px; min-width: 100px; }
+    th:nth-child(2), td:nth-child(2) { width: 140px; min-width: 140px; }
+    th:nth-child(3), td:nth-child(3) { width: 120px; min-width: 120px; }
+    th:nth-child(4), td:nth-child(4) { width: 110px; min-width: 110px; }
+    th:nth-child(5), td:nth-child(5) { width: 140px; min-width: 140px; }
+    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 100px; }
+    th:nth-child(7), td:nth-child(7) { width: 110px; min-width: 110px; }
+    th:nth-child(8), td:nth-child(8) { width: 110px; min-width: 110px; }
+    th:nth-child(9), td:nth-child(9) { width: 100px; min-width: 100px; }
+    th:nth-child(10), td:nth-child(10) { width: 100px; min-width: 100px; }
+    th:nth-child(11), td:nth-child(11) { width: 100px; min-width: 100px; }
+    th:nth-child(12), td:nth-child(12) { width: 120px; min-width: 120px; }
+    th:nth-child(13), td:nth-child(13) { width: 80px; min-width: 80px; }
+  }
+
+  .export-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .transaction-table-container {
+    // Make scrollbar even thinner on mobile
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+  }
+}
