@@ -1,7 +1,7 @@
 import DashboardLayout from './layouts/DashboardLayout';
 import PartVendorDashboardLayout from './layouts/PartVendorLayout/PartVendorLayout';
 
-import { BrowserRouter, Routes, Route, Navigate, useNavigate  } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
@@ -34,15 +34,17 @@ import OrderHistory from './pages/ServiceCenter/OrderHistory';
 
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
-import AdminDashboard from './pages/Admin/Dashboard';
+import AdminDashboard from './pages/Admin/AdminDashboard';
 import CarUsers from './pages/Admin/CarUsers';
 import Employees from './pages/Admin/Employees';
 import BookingOversight from './pages/Admin/BookingOversight';
+import CompletedBookings from './pages/Admin/CompletedBookings';
 import RefundManagement from './pages/Admin/RefundManagement';
 import ContentModeration from './pages/Admin/ContentModeration';
 import ViewUserProfile from './components/Admin/ViewUserProfile/UserProfile';
 import AdminSettings from './pages/Admin/AdminSettings';
 import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
+import IncomeManagement from './pages/Admin/IncomeManagement';
 
 
 import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
@@ -61,6 +63,9 @@ import ServiceCenterCustomerDetailsPage from './pages/PartVendor/CustomerPages/S
 import AddProduct from './pages/PartVendor/Products/AddProduct';
 import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
 import ProductList from './pages/PartVendor/Products/ProductList';
+import CancelledBookings from './pages/Admin/CancelledBookings';
+import ServicePackageManager from './pages/Admin/ServicePackageManager';
+
 
 function NotFoundRedirect() {
   const navigate = useNavigate();
@@ -68,7 +73,7 @@ function NotFoundRedirect() {
     let user = null;
     try {
       user = JSON.parse(localStorage.getItem('user') || '{}');
-    } catch {}
+    } catch { }
     if (user && user.role === 'admin') {
       navigate('/admin/dashboard', { replace: true });
     } else if (user && user.role === 'service_center') {
@@ -87,11 +92,11 @@ function App() {
         {/* Root Redirect */}
         <Route path="/" element={<Navigate to="/index" replace />} />
 
-<Route path="/" >
-           <Route index element={<Navigate to="index" replace />} />
-           <Route path="index" element={<LandingPage />} />
-           <Route path="login" element={<LoginPage />} />
-           <Route path="pricing" element={<PricingPage/>} />
+        <Route path="/" >
+          <Route index element={<Navigate to="index" replace />} />
+          <Route path="index" element={<LandingPage />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="pricing" element={<PricingPage />} />
         </Route>
 
         {/* Auth Callback Route */}
@@ -133,9 +138,9 @@ function App() {
         <Route path="admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<Navigate to="login" replace />} />
         <Route path="/admin/*" element={<AdminDashboardLayout />}>
-        
+
           <Route path="dashboard" element={<AdminDashboard />} />
-          
+
           <Route path="userManagement">
             <Route index element={<Navigate to="carUsers" replace />} />
             <Route path="carUsers" element={<CarUsers />} />
@@ -144,12 +149,26 @@ function App() {
             <Route path="employees/:employeeType/:userId/profile" element={<ViewUserProfile />} />
           </Route>
 
-          <Route path = "bookingOversight" element = {<BookingOversight />} />
-          <Route path = "refundManagement" element = {<RefundManagement />} />
-          <Route path = "contentModeration" element = {<ContentModeration />} />
-          <Route path = "revenueAndPayouts" element = {<RevenueAndPayouts />} />
-          <Route path = "settings" element = {<AdminSettings />} />
-          
+          <Route path="offeringManagement">
+            <Route index element={<Navigate to="services" replace />} />
+            <Route path=":tabType" element={<ServicePackageManager />} />
+          </Route>
+
+          <Route path="bookingManagement">
+            <Route index element={<Navigate to="upComing" replace />} />
+            <Route path=":bookingType" element={<BookingOversight />} />
+          </Route>
+
+          <Route path="completedBookings" element={<CompletedBookings />} />
+          <Route path="cancelledBookings" element={<CancelledBookings />} />
+
+          <Route path = "incomeManagement" element = {<IncomeManagement />} />
+
+          <Route path="refundManagement" element={<RefundManagement />} />
+          <Route path="contentModeration" element={<ContentModeration />} />
+          <Route path="revenueAndPayouts" element={<RevenueAndPayouts />} />
+          <Route path="settings" element={<AdminSettings />} />
+
         </Route>
 
         <Route path="*" element={<NotFoundRedirect />} />
@@ -159,21 +178,21 @@ function App() {
           <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
           <Route path="dashboard" element={<PartVendorDashboard />} />
           <Route path="OrderSummary" element={<OrderSummary />} />
-          <Route path="PendingOrderDetails" element={<PendingOrderDetailsPage/>} />
-          <Route path="IncomeSummary" element={<IncomeSummaryPage/>} />
-          <Route path="CustomerSummary" element={<CustomerSummaryPage/>} />
-          <Route path="ReviewPage" element={<ReviewPage/>} />
-          <Route path="CustomerDetails" element={<CustomerDetailsPage/>} />
+          <Route path="PendingOrderDetails" element={<PendingOrderDetailsPage />} />
+          <Route path="IncomeSummary" element={<IncomeSummaryPage />} />
+          <Route path="CustomerSummary" element={<CustomerSummaryPage />} />
+          <Route path="ReviewPage" element={<ReviewPage />} />
+          <Route path="CustomerDetails" element={<CustomerDetailsPage />} />
           <Route path="ServiceCenterCustomerDetails" element={<ServiceCenterCustomerDetailsPage />} />
-          <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage/>} />
-          <Route path="CompletedOrders" element={<CompletedOrderDetailsPage/>} />
-          <Route path="ReportsSummary" element={<ReportPage/>}/>
-          <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage/>}/>
+          <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage />} />
+          <Route path="CompletedOrders" element={<CompletedOrderDetailsPage />} />
+          <Route path="ReportsSummary" element={<ReportPage />} />
+          <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage />} />
           <Route path="FailedOrderDetailsPage" element={<FailedOrderDetailsPage />} />
           <Route path="ProductList" element={<ProductList />} />
           <Route path="AddProduct" element={<AddProduct />} />
           <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
-          
+
         </Route>
       </Routes>
     </BrowserRouter>

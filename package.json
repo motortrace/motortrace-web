@@ -18,6 +18,7 @@
     "@fullcalendar/resource-timeline": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
     "@mui/material": "^7.2.0",
+    "@react-pdf/renderer": "^4.3.0",
     "@tailwindcss/vite": "^4.1.10",
     "boxicons": "^2.1.4",
     "chart.js": "^4.5.0",

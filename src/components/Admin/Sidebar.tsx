@@ -28,7 +28,14 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'User Management',
+      title: 'Manage Offerings',
+      items: [
+        { id: 'servicesManagement', label: 'Services', icon: 'bx bx-briefcase-alt', route: '/admin/offeringManagement/services' },
+        { id: 'packagesManagement', label: 'Packages', icon: 'bx bx-package', route: '/admin/offeringManagement/packages' }
+      ]
+    },
+    {
+      title: 'Manage Users',
       items: [
         { id: 'carUsers', label: 'Car Users', icon: 'bx bx-car', route: '/admin/userManagement/carUsers' },
         { id: 'employees', label: 'Employees', icon: 'bx bx-group', route: '/admin/userManagement/employees/serviceAdvisors' }
@@ -37,25 +44,15 @@ const Sidebar: React.FC = () => {
     {
       title: 'Manage Bookings',
       items: [
-        { id: 'pendingBookings', label: 'Pending Bookings', icon: 'bx bx-time-five', route: '/admin/bookingOversight' },
-        { id: 'approvedBookings', label: 'Approved Bookings', icon: 'bx bx-check', route: '/servicecenter/estimates' },
-        { id: 'confirmedBookings', label: 'Confirmed Bookings', icon: 'bx bx-calendar-check', route: '/admin/refundManagement' },
-        { id: 'confirmedBookings', label: 'In-Progress Bookings', icon: 'bx bx-loader-circle', route: '/admin/refundManagement' }
+        { id: 'activeBookings', label: 'Active Bookings', icon: 'bx bx-loader-circle', route: '/admin/bookingManagement/upComing' },
+        { id: 'completedBookings', label: 'Completed Bookings', icon: 'bx bx-calendar-check', route: '/admin/completedBookings' },
+        { id: 'cancelledBookings', label: 'Cancelled Bookings', icon: 'bx bx-x-circle', route: '/admin/cancelledBookings' }
       ]
     },
     {
-      title: ' Booking History',
+      title: ' Manage Revenue',
       items: [
-        // { id: 'reviewManagement', label: 'Review Management', icon: 'bx bx-star', route: '/admin/viewThread' },
-        { id: 'forumPosts', label: 'Completed Bookings', icon: 'bx bx-check-circle', route: '/admin/contentModeration' },
-      ]
-    },
-    {
-      title: ' Cancellations & Refunds',
-      items: [
-        // { id: 'subscriptionEarnings', label: 'Subscription Earnings', icon: 'bx bx-receipt', route: '/servicecenter/inventory' },
-        { id: 'revenueAndPayouts', label: 'Cancelled Bookings', icon: 'bx bx-x-circle', route: '/admin/revenueAndPayouts' },
-        { id: 'revenueAndPayouts', label: 'Refunds', icon: 'bx bx-undo', route: '/admin/revenueAndPayouts' },
+        { id: 'issueRefund', label: 'Transaction History', icon: 'bx bx-history', route: '/admin/incomeManagement' },
       ]
     },
     {
@@ -89,10 +86,11 @@ const Sidebar: React.FC = () => {
       // Active for employees route
       return location.pathname.startsWith('/admin/userManagement/employees')
     }
-    if (id === 'pendingApprovals') {
+    if (id === 'activeBookings') {
       // Active for pending approvals route
-      return location.pathname === '/admin/userManagement/pendingApprovals';
+      return location.pathname.startsWith('/admin/bookingManagement')
     }
+
     return location.pathname === route;
   };
 

@@ -102,6 +102,34 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Technicians Management',
     description: 'Manage technicians efficiently to ensure high-quality service and task completion',
   },
+  '/admin/offeringManagement/services': {
+    title: 'Services',
+    description: 'Manage and update available service offerings to match customer needs and business goals',
+  },
+  '/admin/offeringManagement/packages': {
+    title: 'Packages',
+    description: 'Create and organize bundled service packages to provide value and convenience for customers',
+  },
+  '/admin/bookingManagement/upComing': {
+    title: 'Upcoming Bookings',
+    description: 'Manage scheduled services and prepare resources',
+  },
+  '/admin/bookingManagement/onGoing': {
+    title: 'Ongoing Bookings',
+    description: 'Track active service jobs and ensure timely completion',
+  },
+  '/admin/completedBookings': {
+    title: 'Completed Bookings',
+    description: 'Review finished service jobs, verify quality, and close records',
+  },
+  '/admin/cancelledBookings': {
+    title: 'Cancelled Bookings',
+    description: 'Track and analyze cancelled bookings to identify patterns and improve service planning',
+  },
+  '/admin/incomeManagement': {
+    title: 'Transction History',
+    description: 'View all transaction information with clear booking details.',
+  },
   '/admin/userManagement/pendingApprovals': {
     title: 'Pending Registration Requests',
     description: 'Quickly review and approve new user registration requests to keep your platform active and up-to-date',
@@ -141,8 +169,8 @@ const Navbar: React.FC = () => {
 
     // Check for dynamic profile routes
     const profileMatch = pathname.match(/^\/admin\/userManagement\/(carUsers)\/\d+\/profile$/) ||
-                         pathname.match(/^\/admin\/userManagement\/employees\/(serviceAdvisors|technicians)\/\d+\/profile$/);
-    
+      pathname.match(/^\/admin\/userManagement\/employees\/(serviceAdvisors|technicians)\/\d+\/profile$/);
+
     if (profileMatch) {
       console.log(profileMatch[1]);
       const userType = profileMatch[1];
