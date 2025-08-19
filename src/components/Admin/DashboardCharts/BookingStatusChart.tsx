@@ -15,15 +15,14 @@ interface BookingStatusChartProps {
 
 const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
   data = [
-    { label: 'Pending', value: 12, color: '#eee' },
-    { label: 'Approved', value: 8, color: '#ccc' },
-    { label: 'Confirmed', value: 15, color: '#999' },
-    { label: 'Checked-in', value: 6, color: '#666' },
-    { label: 'In Progress', value: 4, color: '#333' },
-    { label: 'Completed', value: 25, color: '#000' },
+    { label: 'Up Coming', value: 85, color: '#3b82f6' },
+    { label: 'On Going', value: 45, color: '#f59e0b' },
+    { label: 'Completed', value: 388, color: '#10b981' },
+    { label: 'Cancelled', value: 18, color: '#ef4444' },
+    { label: 'No Show', value: 8, color: '#6b7280' },
   ],
   title = 'Total Bookings by Status',
-  size = 450
+  size = 487.5
 }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const radius = size / 2 - 40;
@@ -71,7 +70,7 @@ const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
 
   return (
     <div className="booking-status-chart">
-      
+
       <h2 className="chart-title">{title}</h2>
 
       <div className="chart-container">
@@ -94,28 +93,31 @@ const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
                 />
               </g>
             ))}
+           
           </svg>
 
           <div className="center-content">
             <div className="total-bookings">{total}</div>
             <div className="total-label">Total Bookings</div>
           </div>
+
+          <div className="legend">
+            {segments.map((segment, index) => (
+              <div key={index} className="legend-item">
+                <div
+                  className="legend-color"
+                  style={{ backgroundColor: segment.color }}
+                ></div>
+                <span className="legend-label">{segment.label}</span>
+                <span className="legend-value">
+                  {segment.value} ({segment.percentage}%)
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="legend">
-          {segments.map((segment, index) => (
-            <div key={index} className="legend-item">
-              <div
-                className="legend-color"
-                style={{ backgroundColor: segment.color }}
-              ></div>
-              <span className="legend-label">{segment.label}</span>
-              <span className="legend-value">
-                {segment.value} ({segment.percentage}%)
-              </span>
-            </div>
-          ))}
-        </div>
+
       </div>
     </div>
   );
