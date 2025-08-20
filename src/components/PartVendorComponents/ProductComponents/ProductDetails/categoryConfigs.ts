@@ -12,7 +12,7 @@ export const categoryConfigs = {
   "Wear & Tear Parts": [
     { key: "id", label: "ID" },
     { key: "productName", label: "Product Name" },
-    { key: "category", label: "Part Category" },
+    { key: "subcategory", label: "Part Category" },
     { key: "position", label: "Position" },
     { key: "brand", label: "Brand" },
     { key: "compatibility", label: "Compatible Models" }
@@ -27,9 +27,10 @@ export const categoryConfigs = {
   ],
   "Paints & Coatings": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Category" },
+    { key: "productName", label: "Product Name" },
+    { key: "subcategory", label: "Sub Category" },
     { key: "color", label: "Color" },
-    { key: "finish", label: "Finish" },
+    
     { key: "type", label: "Type" },
     // { key: "surfaceUse", label: "Surface Use" },
     { key: "brand", label: "Brand" }
@@ -37,7 +38,7 @@ export const categoryConfigs = {
   "Engine & Drivetrain Components": [
     { key: "id", label: "ID" },
     { key: "productName", label: "Product Name" },
-    { key: "category", label: "Category" },
+    { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "position", label: "Position" },
     { key: "brand", label: "Brand" }
@@ -45,7 +46,7 @@ export const categoryConfigs = {
   "Electrical Components": [
     { key: "id", label: "ID" },
     { key: "productName", label: "Product Name" },
-    { key: "category", label: "Category" },
+    { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "position", label: "Position" },
     { key: "brand", label: "Brand" }
@@ -53,7 +54,7 @@ export const categoryConfigs = {
   "Accessories & Add-ons": [
     { key: "id", label: "ID" },
     { key: "productName", label: "Product Name" },
-    { key: "category", label: "Category" },
+    { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "finish", label: "Finish" },
     { key: "brand", label: "Brand" }

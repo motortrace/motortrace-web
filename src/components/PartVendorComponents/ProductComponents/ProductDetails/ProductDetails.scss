@@ -182,6 +182,13 @@
       background: #dbeafe;
       // color: #3b82f6;
       color: #2563eb;
+      svg {
+        stroke: black !important;
+        fill: none !important;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0; // avoid shrinking
+      }
       &:hover {
         background: #bfdbfe;
         color: #2563eb;
@@ -190,6 +197,13 @@
     &--edit {
       background: #fef3c7;
       color: #d97706;
+      svg {
+        stroke: black !important;
+        fill: none !important;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0; // avoid shrinking
+      }
       &:hover {
         background: #fde68a;
         color: #b45309;
@@ -198,6 +212,13 @@
     &--delete {
       background: #fee2e2;
       color: #ef4444;
+      svg {
+        stroke: black !important;
+        fill: none !important;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0; // avoid shrinking
+      }
       &:hover {
         background: #fecaca;
         color: #dc2626;
@@ -285,9 +306,12 @@
     z-index: 1000;
     overflow-y: auto;
     padding: 20px;
+    padding-left: 100px;
+    padding-right: 100px;
   }
   .modal-content {
     background: white;
+    // background: #2563eb;
     border-radius: 16px;
     max-width: 90vw;
     max-height: 90vh;
@@ -295,16 +319,29 @@
     position: relative;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     margin: auto;
+
+    display: flex;
+  flex-direction: column;
   }
   .modal-header {
+    flex-shrink: 0;
     position: sticky;
     top: 0;
     background: white;
     padding: 10px 20px;
     border-bottom: 1px solid #e5e5e5;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     z-index: 10;
+  }
+   .modal-header-title {
+    flex: 1;
+    h2 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 600;
+      color: #111827; // dark neutral, professional
+    }
   }
   .modal-close {
     background: none;
@@ -326,10 +363,14 @@
     }
   }
   .modal-content .edit-product {
+    flex: 1;                // take remaining space
+  overflow-y: auto;  
     margin: 0;
     padding: 20px;
     box-shadow: none;
     border: none;
+    // background: #065f46;
+    
   }
 }
 

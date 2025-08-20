@@ -904,11 +904,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
             <p>Create a comprehensive product record</p>
           </div>
           <div className="modal-actions">
-            {/* <button className="save-btn" onClick={handleSave}>
-              Save Product
-            </button> */}
             <button className="close-btn" onClick={onClose}>
-              <X size={20} />
+              <X size={20}/>
             </button>
           </div>
         </div>
@@ -970,9 +967,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
         </div>
 
         <div className="modal-footer">
-          {/* <button className="cancel-btn" onClick={onClose}>
-            Cancel
-          </button> */}
           <button className="add-btn" onClick={handleSave}>
             Add Product
           </button>

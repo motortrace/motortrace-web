@@ -61,21 +61,6 @@
     align-items: center;
     flex-shrink: 0;
 
-    .save-btn {
-      background: var(--color-neutral-900);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-
-      &:hover {
-        background: var(--color-neutral-700);
-      }
-    }
-
     .close-btn {
       background: var(--color-neutral-100);
       border: none;
@@ -90,10 +75,20 @@
       color: black;
       margin: 0;
 
+      svg {
+        stroke: black !important;
+        fill: none !important;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0; // avoid shrinking
+      }
+
       &:hover {
         background: #e5e7eb;
       }
     }
+
+
   }
 }
 
@@ -272,7 +267,8 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 24px 32px;
+  // padding: 24px 32px;
+  padding: 6px;
   border-top: 1px solid #e5e7eb;
   background: #fafbfc;
   flex-shrink: 0;

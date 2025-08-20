@@ -16,13 +16,36 @@ import {
   Eye,
   Plus,
   Minus,
-  ExternalLink
+  ExternalLink,
+  AlertTriangle 
 } from 'lucide-react';
 
+// interface Product {
+//   id: string;
+//   productName: string;
+//   category: string;
+//   subcategory: string;
+//   description: string;
+//   price: string;
+//   rating: number;
+//   reviewCount: number;
+//   availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
+//   image: string;
+//   stock: number;
+//   compatibility: string;
+//   position: string;
+//   brand: string;
+//   finish: string;
+//   material: string;
+//   surfaceUse: string;
+//   type: string;
+//   color: string;
+//   volume: string;
+// }
 interface Product {
   id: string;
   productName: string;
-  category: string;
+  category: 'Engine & Fluids' | 'Wear & Tear Parts' | 'Exterior & Body Parts' | 'Paints & Coatings' | 'Engine & Drivetrain Components' | 'Electrical Components' | 'Accessories & Add-ons' | 'Tools & Kits',
   subcategory: string;
   description: string;
   price: string;
@@ -40,6 +63,23 @@ interface Product {
   type: string;
   color: string;
   volume: string;
+  mountingFeatures:string;
+  colorCode: string;
+  quantity: number;
+  minQuantity: number;
+  discountType: string;
+  discountValue: number;
+  warranty: string;
+  manufacturer: string;
+  manufacturedDate: string;
+  expiryDate: string;
+  notes: string;
+  resistance: string;
+  dryTime: string;
+  applicationMethod: string;
+  voltage: string;
+  ampRating: string;
+  connectorType: string;
 }
 
 interface ProductViewPanelProps {
@@ -99,6 +139,17 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
     }
   };
 
+  // Helper function to check if product is expiring soon (within 30 days)
+  const isExpiringSoon = (expiryDate: string | null | undefined): boolean => {
+    if (!expiryDate) return false;
+    
+    const expiry = new Date(expiryDate);
+    const today = new Date();
+    const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+    
+    return expiry <= thirtyDaysFromNow && expiry >= today;
+  };
+
   return (
     <div className={`product-view-panel ${isOpen ? 'product-view-panel--open' : ''}`}>
       <div className="product-view-panel__overlay" onClick={onClose} />
@@ -128,31 +179,6 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
             <Download size={16} />
             Export PDF
           </button>
-          <button className="action-btn action-btn--secondary" onClick={handleCopyLink}>
-            <Link size={16} />
-            Copy Link
-          </button>
-          <button 
-            className="action-btn action-btn--secondary"
-            onClick={() => onDuplicate?.(product)}
-          >
-            <Copy size={16} />
-            Duplicate
-          </button>
-          <button 
-            className="action-btn action-btn--warning"
-            onClick={() => onEdit?.(product)}
-          >
-            <Edit size={16} />
-            Edit
-          </button>
-          <button 
-            className="action-btn action-btn--danger"
-            onClick={() => onDelete?.(product.id)}
-          >
-            <Trash2 size={16} />
-            Delete
-          </button>
         </div>
 
         {/* Product Content */}
@@ -179,22 +205,6 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
               <h3 className="product-info__name">{product.productName}</h3>
               <p className="product-info__category">{product.category} • {product.subcategory}</p>
               <p className="product-info__description">{product.description}</p>
-              
-              <div className="product-info__rating">
-                <div className="rating-stars">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      size={16} 
-                      fill={i < Math.floor(product.rating) ? '#fbbf24' : 'none'}
-                      color="#fbbf24"
-                    />
-                  ))}
-                </div>
-                <span className="rating-text">
-                  {product.rating} ({product.reviewCount} reviews)
-                </span>
-              </div>
 
               <div className="product-info__price">
                 <span className="price-current">{product.price}</span>
@@ -236,6 +246,12 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                   <span className="spec-value">{product.color}</span>
                 </div>
               )}
+              {product.colorCode && (
+                <div className="spec-item">
+                  <span className="spec-label">Color code:</span>
+                  <span className="spec-value">{product.colorCode}</span>
+                </div>
+              )}
               {product.finish && (
                 <div className="spec-item">
                   <span className="spec-label">Finish:</span>
@@ -246,6 +262,54 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                 <div className="spec-item">
                   <span className="spec-label">Compatibility:</span>
                   <span className="spec-value">{product.compatibility}</span>
+                </div>
+              )}
+              {product.position && (
+                <div className="spec-item">
+                  <span className="spec-label">Position:</span>
+                  <span className="spec-value">{product.position}</span>
+                </div>
+              )}
+              {product.surfaceUse && (
+                <div className="spec-item">
+                  <span className="spec-label">Surface Use:</span>
+                  <span className="spec-value">{product.surfaceUse}</span>
+                </div>
+              )}
+              {product.resistance && (
+                <div className="spec-item">
+                  <span className="spec-label">Resistance:</span>
+                  <span className="spec-value">{product.resistance}</span>
+                </div>
+              )}
+              {product.dryTime && (
+                <div className="spec-item">
+                  <span className="spec-label">Dry Time:</span>
+                  <span className="spec-value">{product.dryTime}</span>
+                </div>
+              )}
+              {product.applicationMethod && (
+                <div className="spec-item">
+                  <span className="spec-label">Application Method:</span>
+                  <span className="spec-value">{product.applicationMethod}</span>
+                </div>
+              )}
+              {product.voltage && (
+                <div className="spec-item">
+                  <span className="spec-label">Voltage:</span>
+                  <span className="spec-value">{product.voltage}</span>
+                </div>
+              )}
+              {product.ampRating && (
+                <div className="spec-item">
+                  <span className="spec-label">Amp Rating:</span>
+                  <span className="spec-value">{product.ampRating}</span>
+                </div>
+              )}
+              {product.connectorType && (
+                <div className="spec-item">
+                  <span className="spec-label">Connector Type:</span>
+                  <span className="spec-value">{product.connectorType}</span>
                 </div>
               )}
             </div>
@@ -279,11 +343,13 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
 
               <div className="inventory-item">
                 <div className="inventory-item__icon">
-                  <Eye size={20} />
+                  <AlertTriangle size={20} />
                 </div>
                 <div className="inventory-item__info">
-                  <span className="inventory-item__label">Views</span>
-                  <span className="inventory-item__value">1,234</span>
+                  <span className="inventory-item__label">Minimum Stock Level</span>
+                  <span className="inventory-item__value">
+                    {product.minQuantity} units
+                  </span>
                 </div>
               </div>
             </div>
@@ -330,25 +396,99 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
             </div>
           </div>
 
+          {/* Additional Product Details */}
+          <div className="product-details">
+            <h4 className="product-details__title">Additional Details</h4>
+            <div className="product-details__grid">
+              {/* Discount Information */}
+              {(product.discountType || product.discountValue) && (
+                <div className="detail-group">
+                  <h5 className="detail-group__subtitle">Discount Information</h5>
+                  <div className="detail-group__items">
+                    {product.discountType && (
+                      <div className="detail-item">
+                        <span className="detail-label">Discount Type:</span>
+                        <span className="detail-value">{product.discountType}</span>
+                      </div>
+                    )}
+                    {product.discountValue && (
+                      <div className="detail-item">
+                        <span className="detail-label">Discount Value:</span>
+                        <span className="detail-value">
+                          {product.discountType === 'percentage' ? `${product.discountValue}%` : `LKR ${product.discountValue}`}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Manufacturing Information */}
+              {(product.manufacturer || product.manufacturedDate || product.warranty) && (
+                <div className="detail-group">
+                  <h5 className="detail-group__subtitle">Manufacturing Information</h5>
+                  <div className="detail-group__items">
+                    {product.manufacturer && (
+                      <div className="detail-item">
+                        <span className="detail-label">Manufacturer:</span>
+                        <span className="detail-value">{product.manufacturer}</span>
+                      </div>
+                    )}
+                    {product.manufacturedDate && (
+                      <div className="detail-item">
+                        <span className="detail-label">Manufactured Date:</span>
+                        <span className="detail-value">{new Date(product.manufacturedDate).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                    {product.warranty && (
+                      <div className="detail-item">
+                        <span className="detail-label">Warranty:</span>
+                        <span className="detail-value">{product.warranty}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Product Lifecycle */}
+              {product.expiryDate && (
+                <div className="detail-group">
+                  <h5 className="detail-group__subtitle">Product Lifecycle</h5>
+                  <div className="detail-group__items">
+                    <div className="detail-item">
+                      <span className="detail-label">Expiry Date:</span>
+                      <span className={`detail-value ${isExpiringSoon(product.expiryDate) ? 'detail-value--warning' : ''}`}>
+                        {new Date(product.expiryDate).toLocaleDateString()}
+                        {isExpiringSoon(product.expiryDate) && (
+                          <span className="expiry-warning">⚠️ Expiring Soon</span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Notes */}
+              {product.notes && (
+                <div className="detail-group detail-group--full-width">
+                  <h5 className="detail-group__subtitle">Notes</h5>
+                  <div className="detail-group__items">
+                    <div className="detail-item detail-item--notes">
+                      <p className="detail-notes">{product.notes}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Quick Actions */}
           <div className="quick-actions">
             <h4 className="quick-actions__title">Quick Actions</h4>
             <div className="quick-actions__grid">
               <button className="quick-action-btn">
-                <History size={16} />
-                View History
-              </button>
-              <button className="quick-action-btn">
-                <User size={16} />
-                Supplier Info
-              </button>
-              <button className="quick-action-btn">
                 <DollarSign size={16} />
                 Price History
-              </button>
-              <button className="quick-action-btn">
-                <ExternalLink size={16} />
-                View on Site
               </button>
             </div>
           </div>

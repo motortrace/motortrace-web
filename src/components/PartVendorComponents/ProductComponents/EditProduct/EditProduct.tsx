@@ -66,7 +66,7 @@ const EngineFluidsEditForm: React.FC<EditProductProps> = ({ existingData, onSave
 
   return (
     <div className="edit-product">
-      <h2 className="edit-product__title">Edit Product - Engine & Brake Fluids</h2>
+      <h2 className="edit-product__title">Engine & Brake Fluids</h2>
       <div className="edit-product__section">
         <h3>Product Information</h3>
         <div className="form-grid">

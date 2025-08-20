@@ -1,6 +1,6 @@
 // src/components/OrderMetricsCard/OrderMetricsCard.tsx
 import React from 'react';
-import { ShoppingCart, Clock, CheckCircle, DollarSign, XCircle } from 'lucide-react';
+import { ShoppingCart, Clock, CheckCircle, DollarSign, XCircle, PackageCheck  } from 'lucide-react';
 import './OrderMetricCard.scss';
 
 interface OrderMetric {
@@ -14,35 +14,35 @@ interface OrderMetric {
 
 const orderMetrics: OrderMetric[] = [
   {
-    title: 'Total Sales',
-    amount: '12,500 LKR',
+    title: 'Total Issued Parts',
+    amount: '129',
     change: '12%',
     changeType: 'positive',
-    icon: <DollarSign size={24} />
+    icon: <PackageCheck size={24} />
   },
   {
-    title: 'New Orders',
-    amount: '15',
+    title: 'Total Sales',
+    amount: '12,500 LKR',
     change: '3%',
     changeType: 'negative',
-    icon: <ShoppingCart size={24} />
+    icon: <DollarSign   size={24} />
   },
   {
-    title: 'Pending Orders',
+    title: 'Pending Isuuance',
     amount: '5',
     change: '1%',
     changeType: 'negative',
     icon: <Clock size={24} />
   },
   {
-    title: 'Completed Orders',
+    title: 'Completed Issuance',
     amount: '210',
     change: '4%',
     changeType: 'positive',
     icon: <CheckCircle size={24} />
   },
   {
-    title: 'Cancelled Orders',
+    title: 'Returned Parts',
     amount: '15',
     change: '2%',
     changeType: 'negative',
