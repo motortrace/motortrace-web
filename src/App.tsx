@@ -65,6 +65,7 @@ import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
 import ProductList from './pages/PartVendor/Products/ProductList';
 import CancelledBookings from './pages/Admin/CancelledBookings';
 import ServicePackageManager from './pages/Admin/ServicePackageManager';
+import StockLevel from './pages/PartVendor/StockLevel/StockLevel'
 
 
 function NotFoundRedirect() {
@@ -192,6 +193,7 @@ function App() {
           <Route path="ProductList" element={<ProductList />} />
           <Route path="AddProduct" element={<AddProduct />} />
           <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
+          <Route path="StockLevel" element={<StockLevel />} />
 
         </Route>
       </Routes>

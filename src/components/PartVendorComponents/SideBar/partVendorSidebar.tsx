@@ -30,30 +30,31 @@ const menuGroups: MenuGroup[] = [
   {
     title: 'Orders',
     items: [
-      { id: 'orders', label: 'Orders', icon: 'bx bx-shopping-bag', route: '/PartVendor/OrderSummary' },
-      { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/PartVendor/IncomeSummary' },
+      { id: 'orders', label: 'Issuance', icon: 'bx bx-shopping-bag', route: '/PartVendor/OrderSummary' },
+      // { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/PartVendor/IncomeSummary' },
     ]
   },
-  {
-    title: 'Reviews',
-    items: [
-      { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/PartVendor/ReviewPage' },
-      // { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/PartVendor/RatingsPage' },
-    ]
-  },
+  // {
+  //   title: 'Reviews',
+  //   items: [
+  //     { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/PartVendor/ReviewPage' },
+  //     // { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/PartVendor/RatingsPage' },
+  //   ]
+  // },
   {
     title: 'Inventory',
     items: [
       { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/PartVendor/ProductList' },
+      { id: 'stock', label: 'Stock level', icon: 'bx bx-error', route: '/PartVendor/StockLevel' },
       
     ]
   },
-      {
-      title: 'Customers',
-      items: [
-        { id: 'customer', label: 'Customers', icon: 'bx bx-grid-alt', route: '/PartVendor/CustomerSummary' },
-      ]
-    },
+    //   {
+    //   title: 'Customers',
+    //   items: [
+    //     { id: 'customer', label: 'Customers', icon: 'bx bx-grid-alt', route: '/PartVendor/CustomerSummary' },
+    //   ]
+    // },
   {
     title: 'Reports',
     items: [

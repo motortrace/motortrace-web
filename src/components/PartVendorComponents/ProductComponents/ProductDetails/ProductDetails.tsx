@@ -12,7 +12,7 @@ import spark from '../../../../assets/images/spark.png';
 import battery from '../../../../assets/images/battery.png';
 import belt from '../../../../assets/images/timingBelt.png';
 
-interface Product {
+export interface Product {
   id: string;
   productName: string;
   category: 'Engine & Fluids' | 'Wear & Tear Parts' | 'Exterior & Body Parts' | 'Paints & Coatings' | 'Engine & Drivetrain Components' | 'Electrical Components' | 'Accessories & Add-ons' | 'Tools & Kits',
@@ -150,7 +150,7 @@ const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({
   );
 };
 
-const products: Product[] = [
+export const products: Product[] = [
   {
     id: 'PD001',
     productName: 'Castrol GTX Magnatec 10W-30',
@@ -199,7 +199,7 @@ const products: Product[] = [
     price: 'LKR 8,200',
     rating: 4.8,
     reviewCount: 256,
-    availability: 'In Stock',
+    availability: 'Low Stock',
     image: engineOilImg,
     stock: 120,
     compatibility: "Universal (ABS Compatible)",
@@ -213,8 +213,8 @@ const products: Product[] = [
     volume: '500 ml',
     mountingFeatures : '',
     colorCode: '',
-    quantity: 0,
-    minQuantity: 0,
+    quantity: 10,
+    minQuantity: 20,
     discountType: '',
     discountValue: 0,
     warranty: '',
