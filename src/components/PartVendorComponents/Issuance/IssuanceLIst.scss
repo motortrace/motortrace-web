@@ -1,0 +1,148 @@
+@import '../../../styles/variables.scss';
+
+.issuance-list {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  font-family: 'Poppins', sans-serif;
+
+  &__header {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    margin: 0;
+    font-weight: 600;
+    font-size: 18px;
+    color: #111827;
+  }
+
+  &__table {
+    margin-top: 6px;
+  }
+
+  &__table-header {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr 1.5fr 1.6fr 0.8fr 0.8fr;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #656970;
+    text-transform: uppercase;
+  }
+
+  &__header-cell { }
+
+  &__table-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr 1.5fr 1.6fr 0.8fr 0.8fr;
+    gap: 12px;
+    padding: 10px;
+    align-items: center;
+    border-radius: 8px;
+    transition: background 0.12s;
+
+    &:hover {
+      background: #fafafa;
+    }
+  }
+
+  &__cell {
+    font-size: 13px;
+    color: #374151;
+  }
+
+  .issuance-list__product {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    img {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid #e5e7eb;
+    }
+
+    &__product-info {
+      display: flex;
+      flex-direction: column;
+
+      .issuance-list__product-name {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .issuance-list__other-products {
+        font-size: 12px;
+        color: #6b7280;
+      }
+    }
+  }
+
+  &__action-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.12s;
+
+    &:hover {
+      background: rgba(0,0,0,0.04);
+    }
+  }
+
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+    align-items: center;
+
+    &-btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #f3f4f6;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    &-info {
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__table-header, &__row {
+      grid-template-columns: 1fr;
+    }
+
+    &__row {
+      padding: 12px;
+      gap: 6px;
+      border: 1px solid #f3f4f6;
+      margin-bottom: 8px;
+      background: #fff;
+    }
+
+    &, &__cell { text-align: left; }
+  }
+}

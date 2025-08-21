@@ -65,7 +65,9 @@ import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
 import ProductList from './pages/PartVendor/Products/ProductList';
 import CancelledBookings from './pages/Admin/CancelledBookings';
 import ServicePackageManager from './pages/Admin/ServicePackageManager';
-import StockLevel from './pages/PartVendor/StockLevel/StockLevel'
+import StockLevel from './pages/PartVendor/StockLevel/StockLevel';
+import IssuanceDetails from './components/PartVendorComponents/Issuance/IssuanceDetails';
+import IssuanceList from './components/PartVendorComponents/Issuance/IssuanceList';
 
 
 function NotFoundRedirect() {
@@ -179,6 +181,8 @@ function App() {
           <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
           <Route path="dashboard" element={<PartVendorDashboard />} />
           <Route path="OrderSummary" element={<OrderSummary />} />
+          {/* <Route path="/inventory/issuance" element={<IssuanceList />} />
+          <Route path="/inventory/issuance/:id" element={<IssuanceDetails />} /> */}
           <Route path="PendingOrderDetails" element={<PendingOrderDetailsPage />} />
           <Route path="IncomeSummary" element={<IncomeSummaryPage />} />
           <Route path="CustomerSummary" element={<CustomerSummaryPage />} />
@@ -194,6 +198,7 @@ function App() {
           <Route path="AddProduct" element={<AddProduct />} />
           <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
           <Route path="StockLevel" element={<StockLevel />} />
+          <Route path="/partvendor/issuancedetails/:id" element={<IssuanceDetails />} />
 
         </Route>
       </Routes>
