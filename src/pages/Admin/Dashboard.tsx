@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../layouts/DashboardLayout.scss';
 import "./Dashboard.scss"
-import MetricCard from '../../components/Admin/MetricCard/MetricCard';
+// import MetricCard from '../../components/Admin/MetricCard/MetricCard';
 import BookingStatusChart from '../../components/Admin/DashboardCharts/BookingStatusChart';
 import GrowthLineChart from '../../components/Admin/DashboardCharts/GrowthLineChart';
 import MonthlyUsersBarChart from '../../components/Admin/DashboardCharts/MonthlyUsersBarChart';
@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard">
 
-      <div className="dashboard__metrics">
+      {/* <div className="dashboard__metrics">
         <MetricCard
           title="Platform Activity"
           amount={loading ? "..." : dashboardData?.platformActivity.totalUsers.toLocaleString() || "0"}
@@ -157,7 +157,7 @@ const Dashboard: React.FC = () => {
           onClick={() => handleCardClick('urgent')}
           loading={loading}
         />
-      </div>
+      </div> */}
 
       <div className='admin-dashboard__graphs-container '>
         <MonthlyUsersBarChart data={newUsersData} />

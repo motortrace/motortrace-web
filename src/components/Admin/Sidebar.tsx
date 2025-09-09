@@ -28,35 +28,31 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'User Management',
+      title: 'Manage Offerings',
       items: [
-        // { id: 'carUsers', label: 'Car Users', icon: 'bx bx-car', route: '/admin/userManagement/carUsers' },
-        // { id: 'serviceCenters', label: 'Service Centers', icon: 'bx bx-wrench', route: '/admin/userManagement/serviceCenters' },
-        // { id: 'sparePartsSellers', label: 'Spare Parts Sellers', icon: 'bx bx-store', route: '/admin/userManagement/sparePartsSellers' },
-        { id: 'allUsers', label: 'All Users', icon: 'bx bx-group', route: '/admin/userManagement/carUsers' },
-        { id: 'pendingApprovals', label: 'Pending Approvals', icon: 'bx bx-hourglass', route: '/admin/userManagement/pendingApprovals' },
+        { id: 'servicesManagement', label: 'Services', icon: 'bx bx-briefcase-alt', route: '/admin/offeringManagement/services' },
+        { id: 'packagesManagement', label: 'Packages', icon: 'bx bx-package', route: '/admin/offeringManagement/packages' }
       ]
     },
     {
-      title: 'Bookings & Orders',
+      title: 'Manage Users',
       items: [
-        { id: 'bookingOversight', label: 'Booking Oversight', icon: 'bx bx-calendar-check', route: '/admin/bookingOversight' },
-        { id: 'orderManagement', label: 'Order Management', icon: 'bx bx-cart', route: '/servicecenter/estimates' },
-        { id: 'refundsAndCancellations', label: 'Refund Management', icon: 'bx bx-undo', route: '/admin/refundManagement' }
+        { id: 'carUsers', label: 'Car Users', icon: 'bx bx-car', route: '/admin/userManagement/carUsers' },
+        { id: 'employees', label: 'Employees', icon: 'bx bx-group', route: '/admin/userManagement/employees/serviceAdvisors' }
       ]
     },
     {
-      title: ' Content Moderation',
+      title: 'Manage Bookings',
       items: [
-        // { id: 'reviewManagement', label: 'Review Management', icon: 'bx bx-star', route: '/admin/viewThread' },
-        { id: 'forumPosts', label: 'Forum Management', icon: 'bx bx-chat', route: '/admin/contentModeration' },
+        { id: 'activeBookings', label: 'Active Bookings', icon: 'bx bx-loader-circle', route: '/admin/bookingManagement/upComing' },
+        { id: 'completedBookings', label: 'Completed Bookings', icon: 'bx bx-calendar-check', route: '/admin/completedBookings' },
+        { id: 'cancelledBookings', label: 'Cancelled Bookings', icon: 'bx bx-x-circle', route: '/admin/cancelledBookings' }
       ]
     },
     {
-      title: ' Financial Overview',
+      title: ' Manage Revenue',
       items: [
-        // { id: 'subscriptionEarnings', label: 'Subscription Earnings', icon: 'bx bx-receipt', route: '/servicecenter/inventory' },
-        { id: 'revenueAndPayouts', label: 'Revenue & Payouts', icon: 'bx bx-line-chart', route: '/admin/revenueAndPayouts' },
+        { id: 'issueRefund', label: 'Transaction History', icon: 'bx bx-history', route: '/admin/incomeManagement' },
       ]
     },
     {
@@ -76,18 +72,25 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     // Optionally clear other user/session data here
-    window.location.href = '/login';
+    window.location.href = '/admin';
   };
 
   // Helper function to check if a menu item is active
   const isMenuItemActive = (route: string, id?: string) => {
-    if (id === 'allUsers') {
-      // Active for any user management tab except pending approvals
-      return (
-        location.pathname.startsWith('/admin/userManagement/') &&
-        !location.pathname.includes('pendingApprovals')
-      );
+    if (id === 'carUsers') {
+      // Active for car users route
+      return location.pathname.startsWith('/admin/userManagement/carUsers');
+      
     }
+    if (id === 'employees') {
+      // Active for employees route
+      return location.pathname.startsWith('/admin/userManagement/employees')
+    }
+    if (id === 'activeBookings') {
+      // Active for pending approvals route
+      return location.pathname.startsWith('/admin/bookingManagement')
+    }
+
     return location.pathname === route;
   };
 
