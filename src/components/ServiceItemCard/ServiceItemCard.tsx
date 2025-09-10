@@ -49,17 +49,17 @@ const getPriorityIndicator = (priority: WorkOrder['priority']) => {
 
 const getVehicleImage = (vehicle: WorkOrder['vehicle']) => {
   if (!vehicle) return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
-  
-  const make = vehicle.make.toLowerCase();
-  const model = vehicle.model.toLowerCase();
-  
+  if (vehicle.imageUrl && typeof vehicle.imageUrl === 'string' && vehicle.imageUrl.trim() !== '') {
+    return vehicle.imageUrl;
+  }
+  const make = vehicle.make?.toLowerCase() || '';
+  const model = vehicle.model?.toLowerCase() || '';
   if (make.includes('toyota') && model.includes('camry')) return 'https://platform.cstatic-images.com/xxlarge/in/v2/stock_photos/8760bf48-c1a5-42f7-a83b-1cd39e2efbec/57ee2adf-a4a3-4757-8f50-6d85fcf5a351.png';
   if (make.includes('honda') && model.includes('cr-v')) return 'https://di-uploads-pod11.dealerinspire.com/hondaofkirkland/uploads/2019/08/2019-Honda-CR-V-LX-2WD-1.png';
   if (make.includes('ford') && model.includes('f-150')) return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZGOHHY8IeOYnZJ1iILcd8v-8kzs8hZ0QIVg&s';
   if (make.includes('nissan') && model.includes('altima')) return 'https://di-shared-assets.dealerinspire.com/legacy/rackspace/ldm-images/2021-Nissan-Altima-hero.png';
   if (make.includes('bmw') && model.includes('x5')) return 'https://larte-design.com/storage/app/media/models/bmw/x5m-competition-front-site-carbon-gray-donington.webp';
   if (make.includes('audi') && model.includes('a4')) return 'https://images.dealer.com/ddc/vehicles/2025/Audi/A4/Sedan/color/Navarra%20Blue%20Metallic-2D2D-10,33,127-320-en_US.jpg';
-  
   // Default placeholder
   return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
 };

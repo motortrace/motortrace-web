@@ -44,6 +44,7 @@ export interface WorkOrder {
     model: string;
     vin?: string;
     licensePlate?: string;
+    imageUrl?: string;
   };
   serviceAdvisor?: {
     id: string;
