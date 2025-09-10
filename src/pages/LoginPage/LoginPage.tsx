@@ -28,9 +28,11 @@ const LoginPage = () => {
 
         if (userRole === 'admin') {
           navigate('/admin/dashboard');
-        } else if (userRole === 'service_advisor') {
+        } 
+        else if (userRole === 'service_advisor') {
           navigate('/servicecenter/dashboard');
-        } else if (userRole) {
+        } 
+        else if (userRole) {
           // For other roles, redirect to their dashboard
           navigate('/');
         }
@@ -103,6 +105,7 @@ const LoginPage = () => {
         },
         body: JSON.stringify(formData),
       });
+      
       const data = await res.json();
 
       if (!res.ok) {
@@ -111,11 +114,14 @@ const LoginPage = () => {
           throw new Error(data.error === 'Invalid login credentials'
             ? 'Incorrect email or password. Please try again.'
             : 'Authentication failed. Please try again.');
-        } else if (res.status === 400) {
+        } 
+        else if (res.status === 400) {
           throw new Error(data.error || 'Invalid request. Please check your input.');
-        } else if (res.status === 404) {
+        } 
+        else if (res.status === 404) {
           throw new Error('User not found. Please check your email or sign up.');
-        } else {
+        } 
+        else {
           throw new Error(data.error || 'Login failed. Please try again.');
         }
       }
@@ -143,7 +149,6 @@ const LoginPage = () => {
       const user = data.data.user;
 
       const userRole = user?.role;  // Directly from user object, not user_metadata
-
 
       if (!userRole) {
         throw new Error('User role information is missing');
