@@ -66,9 +66,12 @@ const TabNavigation: React.FC<{ activeTab: string; onTabChange: (tab: string) =>
 }) => {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: 'bx-home-circle' },
-    { id: 'services', label: 'Services & Packages', icon: 'bx-wrench' },
-    { id: 'parts', label: 'Parts', icon: 'bx-package' },
+    { id: 'estimates', label: 'Estimates', icon: 'bx-calculator' },
     { id: 'inspections', label: 'Inspections', icon: 'bx-search-alt' },
+    { id: 'services', label: 'Services', icon: 'bx-wrench' },
+    { id: 'labor', label: 'Labor', icon: 'bx-user-voice' },
+    { id: 'parts', label: 'Parts', icon: 'bx-package' },
+    { id: 'invoices', label: 'Invoices', icon: 'bx-receipt' },
     { id: 'notes', label: 'Notes', icon: 'bx-note' },
   ];
 
@@ -84,6 +87,142 @@ const TabNavigation: React.FC<{ activeTab: string; onTabChange: (tab: string) =>
           <span>{tab.label}</span>
         </button>
       ))}
+    </div>
+  );
+};
+// Estimates Tab Content
+import { useEffect } from 'react';
+import { getWorkOrderEstimates, type Estimate } from '../../utils/workOrdersApi';
+
+const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
+  const [estimates, setEstimates] = useState<Estimate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!workOrderId) return;
+    setLoading(true);
+    getWorkOrderEstimates(workOrderId)
+      .then((data) => {
+        // Support both { data: [...] } and [...] response shapes
+        let estimatesArr: any[] = Array.isArray(data) ? data : data.data || [];
+        // Patch each estimate to have a unified estimateItems array for rendering
+        estimatesArr = estimatesArr.map((est: any) => {
+          let estimateItems: any[] = [];
+          if (Array.isArray(est.estimateItems)) {
+            estimateItems = est.estimateItems;
+          } else {
+            // Merge labor and part items if present
+            if (Array.isArray(est.estimateLaborItems)) {
+              estimateItems = estimateItems.concat(
+                est.estimateLaborItems.map((item: any) => ({
+                  ...item,
+                  type: 'LABOR',
+                  quantity: item.hours || 1,
+                  unitPrice: item.rate || item.hourlyRate || 0,
+                  totalPrice: item.subtotal || (item.hours * (item.rate || item.hourlyRate || 0)),
+                }))
+              );
+            }
+            if (Array.isArray(est.estimatePartItems)) {
+              estimateItems = estimateItems.concat(
+                est.estimatePartItems.map((item: any) => ({
+                  ...item,
+                  type: 'PART',
+                  quantity: item.quantity || 1,
+                  unitPrice: item.unitPrice || 0,
+                  totalPrice: item.subtotal || (item.quantity * (item.unitPrice || 0)),
+                }))
+              );
+            }
+          }
+          return { ...est, estimateItems };
+        });
+        setEstimates(estimatesArr);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch estimates');
+        setLoading(false);
+      });
+  }, [workOrderId]);
+
+  if (loading) return <div className="tab-content estimates-tab">Loading estimates...</div>;
+  if (error) return <div className="tab-content estimates-tab" style={{ color: 'red' }}>{error}</div>;
+
+  return (
+    <div className="tab-content estimates-tab">
+      <div className="tab-header">
+        <h3>Estimates</h3>
+        <button className="btn btn--primary">Add Estimate</button>
+      </div>
+      {estimates.length === 0 ? (
+        <div>No estimates found for this work order.</div>
+      ) : (
+        <div className="estimates-list">
+          {estimates.map(est => {
+            const items = Array.isArray(est.estimateItems) ? est.estimateItems : [];
+            return (
+              <div className="estimate-card" key={est.id}>
+                <div className="estimate-header">
+                  <span className="estimate-version">Version {est.version}</span>
+                  <span className={`estimate-status ${est.approved ? 'approved' : 'pending'}`}>{est.approved ? 'Approved' : 'Pending'}</span>
+                  <span className="estimate-date">Created: {new Date(est.createdAt).toLocaleString()}</span>
+                  {est.approved && est.approvedAt && (
+                    <span className="estimate-date">Approved: {new Date(est.approvedAt).toLocaleString()}</span>
+                  )}
+                </div>
+                <div className="estimate-breakdown">
+                  <div><strong>Total:</strong> LKR {Number(est.totalAmount).toFixed(2)}</div>
+                  <div><strong>Labor:</strong> LKR {Number(est.laborAmount ?? 0).toFixed(2)}</div>
+                  <div><strong>Parts:</strong> LKR {Number(est.partsAmount ?? 0).toFixed(2)}</div>
+                  <div><strong>Tax:</strong> LKR {Number(est.taxAmount ?? 0).toFixed(2)}</div>
+                  <div><strong>Discount:</strong> LKR {Number(est.discountAmount ?? 0).toFixed(2)}</div>
+                </div>
+                <div className="estimate-description">{est.description}</div>
+                <div className="estimate-notes">{est.notes}</div>
+                {/* Estimate Items: Labor & Parts */}
+                <div className="estimate-items">
+                  <h4>Labor Items</h4>
+                  <ul>
+                    {items.filter(i => i.type === 'LABOR').map(item => (
+                      <li key={item.id}>
+                        {item.description} — {item.quantity}h x LKR {Number(item.unitPrice).toFixed(2)} = LKR {Number(item.totalPrice).toFixed(2)}
+                        {item.notes && <span className="item-notes"> ({item.notes})</span>}
+                        {typeof item.customerApproved !== 'undefined' && (
+                          <span
+                            className={`approval-badge ${item.customerApproved === true ? 'approved' : item.customerApproved === false ? 'declined' : 'pending'}`}
+                            title={item.customerApproved === true ? 'Approved by customer' : item.customerApproved === false ? 'Declined by customer' : 'Pending customer approval'}
+                          >
+                            {item.customerApproved === true ? 'Approved' : item.customerApproved === false ? 'Declined' : 'Pending'}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  <h4>Part Items</h4>
+                  <ul>
+                    {items.filter(i => i.type === 'PART').map(item => (
+                      <li key={item.id}>
+                        {item.description} — {item.quantity} x LKR {Number(item.unitPrice).toFixed(2)} = LKR {Number(item.totalPrice).toFixed(2)}
+                        {item.notes && <span className="item-notes"> ({item.notes})</span>}
+                        {typeof item.customerApproved !== 'undefined' && (
+                          <span
+                            className={`approval-badge ${item.customerApproved === true ? 'approved' : item.customerApproved === false ? 'declined' : 'pending'}`}
+                            title={item.customerApproved === true ? 'Approved by customer' : item.customerApproved === false ? 'Declined by customer' : 'Pending customer approval'}
+                          >
+                            {item.customerApproved === true ? 'Approved' : item.customerApproved === false ? 'Declined' : 'Pending'}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -800,6 +939,7 @@ const InspectionsTab: React.FC = () => {
 
 // Main Modal Component
 const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder }) => {
+
   const [activeTab, setActiveTab] = useState('overview');
   const [notes, setNotes] = useState('');
 
@@ -809,12 +949,18 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
     switch (activeTab) {
       case 'overview':
         return <OverviewTab />;
-      case 'services':
-        return <ServicesTab />;
-      case 'parts':
-        return <PartsTab />;
+      case 'estimates':
+        return <EstimatesTab workOrderId={workOrder?.id || ''} />;
       case 'inspections':
         return <InspectionsTab />;
+      case 'services':
+        return <ServicesTab />;
+      case 'labor':
+        return <div className="tab-content">Labor tab coming soon...</div>;
+      case 'parts':
+        return <PartsTab />;
+      case 'invoices':
+        return <div className="tab-content">Invoices tab coming soon...</div>;
       case 'notes':
         return <NotesTabContent notes={notes} onNotesChange={setNotes} />;
       default:

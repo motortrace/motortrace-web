@@ -230,7 +230,7 @@ const WorkOrdersPage = () => {
         )}
       </div>
 
-      <ManageWorkOrderModal open={viewModalOpen} onClose={() => setViewModalOpen(false)} />
+  <ManageWorkOrderModal open={viewModalOpen} onClose={() => setViewModalOpen(false)} workOrder={selectedWorkOrder} />
     </div>
   );
 };

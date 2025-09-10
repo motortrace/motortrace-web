@@ -1,3 +1,150 @@
+// Approval badge for estimate items
+.approval-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+  border: 1px solid var(--color-neutral-300);
+  &.approved {
+    background: #e6fbe9;
+    color: var(--color-success);
+    border-color: var(--color-success);
+  }
+  &.declined {
+    background: #fef2f2;
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+  }
+  &.pending {
+    background: #fffbe6;
+    color: var(--color-warning);
+    border-color: var(--color-warning);
+  }
+}
+// --- Estimates Tab Styling ---
+
+.estimates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.estimate-card {
+  background: #fff;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(9, 105, 218, 0.04);
+  padding: 24px;
+  transition: box-shadow 0.2s;
+  &:hover {
+    box-shadow: 0 4px 16px rgba(9, 105, 218, 0.10);
+    border-color: var(--color-primary);
+  }
+}
+
+.estimate-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.estimate-version {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: #eaf4ff;
+  border-radius: 8px;
+  padding: 2px 10px;
+}
+
+.estimate-status {
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 2px 10px;
+  &.approved {
+    background: #e6fbe9;
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+  }
+  &.pending {
+    background: #fffbe6;
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+  }
+}
+
+.estimate-date {
+  font-size: 13px;
+  color: var(--color-neutral-500);
+  background: #f6f8fa;
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-left: 0;
+}
+
+.estimate-breakdown {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  > div {
+    font-size: 14px;
+    color: var(--color-neutral-900);
+    background: #f9fafb;
+    border-radius: 6px;
+    padding: 4px 12px;
+    margin-bottom: 4px;
+  }
+}
+
+.estimate-description {
+  font-size: 14px;
+  color: var(--color-neutral-500);
+  margin-bottom: 6px;
+}
+
+.estimate-notes {
+  font-size: 13px;
+  color: var(--color-neutral-300);
+  margin-bottom: 10px;
+}
+
+.estimate-items {
+  margin-top: 10px;
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 10px 0 6px 0;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    li {
+      font-size: 14px;
+      color: var(--color-neutral-900);
+      background: #f6f8fa;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      .item-notes {
+        font-size: 13px;
+        color: var(--color-neutral-500);
+        margin-left: 8px;
+      }
+    }
+  }
+}
 @import '../../styles/variables.scss';
 @import '../../styles/components/button.scss';
 

@@ -1,4 +1,5 @@
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/work-orders`;
+const API_BASE_2 = `${import.meta.env.VITE_API_BASE_URL}/estimates`;
 
 // Types based on backend API structure
 export interface WorkOrder {
@@ -104,6 +105,8 @@ export interface EstimateItem {
   unitPrice: number;
   totalPrice: number;
   notes?: string;
+  // Added for backend compatibility
+  customerApproved?: boolean | null;
 }
 
 export interface Labor {
@@ -284,7 +287,7 @@ export async function generateEstimate(workOrderId: string) {
 }
 
 export async function getWorkOrderEstimates(workOrderId: string) {
-  const res = await fetch(`${API_BASE}/${workOrderId}/estimates`, {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/estimates?workOrderId=${workOrderId}`, {
     headers: {
       'Content-Type': 'application/json',
       // TODO: Add auth headers if needed
