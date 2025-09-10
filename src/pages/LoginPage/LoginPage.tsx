@@ -141,14 +141,20 @@ const LoginPage = () => {
 
       // Get user for redirection
       const user = data.data.user;
-      if (!user.user_metadata || !user.user_metadata.role) {
+      const userRole =
+        user.user_metadata?.role ||
+        user.role ||
+        (typeof user.getRole === 'function' ? user.getRole() : undefined);
+
+      if (!userRole) {
         throw new Error('User role information is missing');
       }
+
 
       // Redirect based on user role
       console.log('Redirecting user with role:', user.user_metadata.role);
 
-      switch (user.user_metadata.role) {
+      switch (userRole) {
         case 'admin':
           navigate('/admin/dashboard');
           break;
