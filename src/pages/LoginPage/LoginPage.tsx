@@ -19,19 +19,21 @@ const LoginPage = () => {
   useEffect(() => {
     const checkStatus = async () => {
       const status = await fetchUserStatus();
-      if (status) {
-        // Get user from localStorage or status
-        let user = status.user;
-        if (!user) {
-          try {
-            user = JSON.parse(localStorage.getItem('user') || '{}');
-          } catch { }
-        }
-        if (user && user.role === 'admin') {
+      if (status && status.user) {
+
+        const user = status.user;
+
+        // Use the role directly from user object
+        const userRole = user.role;
+
+        if (userRole === 'admin') {
           navigate('/admin/dashboard');
-        } else if (user && user.role === 'service_advisor') {
+        } 
+        else if (userRole === 'service_advisor') {
           navigate('/servicecenter/dashboard');
-        } else {
+        } 
+        else if (userRole) {
+          // For other roles, redirect to their dashboard
           navigate('/');
         }
       } else {
@@ -103,6 +105,7 @@ const LoginPage = () => {
         },
         body: JSON.stringify(formData),
       });
+      
       const data = await res.json();
 
       if (!res.ok) {
@@ -111,11 +114,14 @@ const LoginPage = () => {
           throw new Error(data.error === 'Invalid login credentials'
             ? 'Incorrect email or password. Please try again.'
             : 'Authentication failed. Please try again.');
-        } else if (res.status === 400) {
+        } 
+        else if (res.status === 400) {
           throw new Error(data.error || 'Invalid request. Please check your input.');
-        } else if (res.status === 404) {
+        } 
+        else if (res.status === 404) {
           throw new Error('User not found. Please check your email or sign up.');
-        } else {
+        } 
+        else {
           throw new Error(data.error || 'Login failed. Please try again.');
         }
       }
@@ -141,18 +147,15 @@ const LoginPage = () => {
 
       // Get user for redirection
       const user = data.data.user;
-      const userRole =
-        user.user_metadata?.role ||
-        user.role ||
-        (typeof user.getRole === 'function' ? user.getRole() : undefined);
+
+      const userRole = user?.role;  // Directly from user object, not user_metadata
 
       if (!userRole) {
         throw new Error('User role information is missing');
       }
 
-
       // Redirect based on user role
-      console.log('Redirecting user with role:', user.user_metadata.role);
+      console.log('Redirecting user with role:', userRole);
 
       switch (userRole) {
         case 'admin':
