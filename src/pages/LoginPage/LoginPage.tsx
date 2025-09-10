@@ -19,19 +19,19 @@ const LoginPage = () => {
   useEffect(() => {
     const checkStatus = async () => {
       const status = await fetchUserStatus();
-      if (status) {
-        // Get user from localStorage or status
-        let user = status.user;
-        if (!user) {
-          try {
-            user = JSON.parse(localStorage.getItem('user') || '{}');
-          } catch { }
-        }
-        if (user && user.role === 'admin') {
+      if (status && status.user) {
+
+        const user = status.user;
+
+        // Use the role directly from user object
+        const userRole = user.role;
+
+        if (userRole === 'admin') {
           navigate('/admin/dashboard');
-        } else if (user && user.role === 'service_advisor') {
+        } else if (userRole === 'service_advisor') {
           navigate('/servicecenter/dashboard');
-        } else {
+        } else if (userRole) {
+          // For other roles, redirect to their dashboard
           navigate('/');
         }
       } else {
@@ -141,14 +141,18 @@ const LoginPage = () => {
 
       // Get user for redirection
       const user = data.data.user;
-      if (!user.user_metadata || !user.user_metadata.role) {
+
+      const userRole = user?.role;  // Directly from user object, not user_metadata
+
+
+      if (!userRole) {
         throw new Error('User role information is missing');
       }
 
       // Redirect based on user role
-      console.log('Redirecting user with role:', user.user_metadata.role);
+      console.log('Redirecting user with role:', userRole);
 
-      switch (user.user_metadata.role) {
+      switch (userRole) {
         case 'admin':
           navigate('/admin/dashboard');
           break;
