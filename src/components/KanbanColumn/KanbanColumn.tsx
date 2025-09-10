@@ -1,17 +1,7 @@
 import React from 'react';
 import ServiceItemCard from '../ServiceItemCard/ServiceItemCard';
 import './KanbanColumn.scss';
-
-interface WorkOrder {
-  id: string;
-  workOrderNumber: string;
-  customer: string;
-  vehicle: string;
-  assignedTechnician: string;
-  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
-  description?: string;
-  priority: 'high' | 'medium' | 'low';
-}
+import { type WorkOrder } from '../../utils/workOrdersApi';
 
 interface KanbanColumnProps {
   title: string;

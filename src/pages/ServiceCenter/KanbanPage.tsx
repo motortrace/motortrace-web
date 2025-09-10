@@ -1,103 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import KanbanBoard from '../../components/KanbanBoard/KanbanBoard';
-import { Users, Car, ClipboardList, Wrench, Eye, FileText, AlertCircle, CheckCircle2, Circle, Calendar as CalendarIcon, DollarSign, PackageSearch } from 'lucide-react';
+import { ClipboardList, AlertCircle } from 'lucide-react';
 import './KanbanPage.scss';
 import ManageWorkOrderModal from '../../components/WorkOrderModal/ManageWorkOrderModal';
-
-interface WorkOrder {
-  id: string;
-  workOrderNumber: string;
-  customer: string;
-  vehicle: string;
-  assignedTechnician: string;
-  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
-  description?: string;
-  priority: 'high' | 'medium' | 'low';
-}
+import { type WorkOrder, getWorkOrders, updateWorkOrderStatus } from '../../utils/workOrdersApi';
 
 const KanbanPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState<string>('');
-  const [technicianFilter, setTechnicianFilter] = useState<string>('');
+  const [priorityFilter] = useState<string>('');
+  const [technicianFilter] = useState<string>('');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Sample data for Work Orders
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([
-    {
-      id: 'WO-1001',
-      workOrderNumber: 'WO-1001',
-      customer: 'John Smith',
-      vehicle: '2020 Toyota Camry',
-      assignedTechnician: 'Mike Johnson',
-      status: 'created',
-      description: 'Brake pad replacement and oil change',
-      priority: 'high',
-    },
-    {
-      id: 'WO-1002',
-      workOrderNumber: 'WO-1002',
-      customer: 'Emma Wilson',
-      vehicle: '2019 Honda CR-V',
-      assignedTechnician: 'Sarah Lee',
-      status: 'inspection',
-      description: 'Tire rotation and air filter replacement',
-      priority: 'medium',
-    },
-    {
-      id: 'WO-1003',
-      workOrderNumber: 'WO-1003',
-      customer: 'Alex Brown',
-      vehicle: '2018 Ford F-150',
-      assignedTechnician: 'David Chen',
-      status: 'estimation',
-      description: 'Pre-purchase inspection',
-      priority: 'high',
-    },
-    {
-      id: 'WO-1004',
-      workOrderNumber: 'WO-1004',
-      customer: 'Linda Green',
-      vehicle: '2021 Nissan Altima',
-      assignedTechnician: 'Mike Johnson',
-      status: 'in-progress',
-      description: 'Engine diagnostics',
-      priority: 'medium',
-    },
-    {
-      id: 'WO-1005',
-      workOrderNumber: 'WO-1005',
-      customer: 'Chris Evans',
-      vehicle: '2017 BMW X5',
-      assignedTechnician: 'Sarah Lee',
-      status: 'waiting-for-parts',
-      description: 'Suspension repair',
-      priority: 'high',
-    },
-    {
-      id: 'WO-1006',
-      workOrderNumber: 'WO-1006',
-      customer: 'Sophia Turner',
-      vehicle: '2016 Audi A4',
-      assignedTechnician: 'David Chen',
-      status: 'invoice',
-      description: 'Invoice for completed work',
-      priority: 'low',
-    },
-  ]);
+  // Fetch work orders from backend
+  useEffect(() => {
+    const fetchWorkOrders = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getWorkOrders();
+        setWorkOrders(response.data || response); // Handle different response formats
+      } catch (err) {
+        console.error('Failed to fetch work orders:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch work orders');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkOrders();
+  }, []);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
   };
 
-  const handleCardMove = (cardId: string, newStatus: WorkOrder['status']) => {
-    setWorkOrders(prev =>
-      prev.map(item =>
-        item.id === cardId
-          ? { ...item, status: newStatus }
-          : item
-      )
-    );
+  const handleCardMove = async (cardId: string, newStatus: WorkOrder['status']) => {
+    try {
+      // Update the work order status in the backend
+      await updateWorkOrderStatus(cardId, newStatus);
+      
+      // Update local state optimistically
+      setWorkOrders(prev =>
+        prev.map(item =>
+          item.id === cardId
+            ? { ...item, status: newStatus, workflowStep: newStatus }
+            : item
+        )
+      );
+    } catch (err) {
+      console.error('Failed to update work order status:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update work order status');
+    }
   };
 
   const handleCardClick = (workOrder: WorkOrder) => {
@@ -115,26 +72,48 @@ const KanbanPage: React.FC = () => {
   const getTypeColor = () => '#3b82f6';
   const getPriorityColor = (priority: WorkOrder['priority']) => {
     switch (priority) {
-      case 'high':
+      case 'HIGH':
         return '#ef4444';
-      case 'medium':
+      case 'MEDIUM':
         return '#f59e0b';
-      case 'low':
+      case 'LOW':
         return '#10b981';
+      case 'NORMAL':
+        return '#6b7280';
       default:
         return '#6b7280';
     }
   };
 
-  // Kanban columns for work order stages
+  // Kanban columns for work order stages (mapped to backend statuses)
   const columns: { id: WorkOrder['status']; title: string; color: string }[] = [
-    { id: 'created', title: 'Created', color: '#6B7280' },
-    { id: 'inspection', title: 'Inspection', color: '#10B981' },
-    { id: 'estimation', title: 'Estimation', color: '#f59e0b' },
-    { id: 'in-progress', title: 'In Progress', color: '#3B82F6' },
-    { id: 'waiting-for-parts', title: 'Waiting for Parts', color: '#8b5cf6' },
-    { id: 'invoice', title: 'Invoice', color: '#ef4444' },
+    { id: 'RECEIVED', title: 'Received', color: '#6B7280' },
+    { id: 'ESTIMATE', title: 'Estimate', color: '#f59e0b' },
+    { id: 'APPROVAL', title: 'Approval', color: '#10B981' },
+    { id: 'IN_PROGRESS', title: 'In Progress', color: '#3B82F6' },
+    { id: 'WAITING_FOR_PARTS', title: 'Waiting for Parts', color: '#8b5cf6' },
+    { id: 'COMPLETED', title: 'Completed', color: '#059669' },
   ];
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">Loading work orders...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <div className="error-message">
+          <AlertCircle size={24} />
+          <span>{error}</span>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

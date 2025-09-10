@@ -1,17 +1,7 @@
 import React from 'react';
 import KanbanColumn from '../KanbanColumn/KanbanColumn';
 import './KanbanBoard.scss';
-
-interface WorkOrder {
-  id: string;
-  workOrderNumber: string;
-  customer: string;
-  vehicle: string;
-  assignedTechnician: string;
-  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
-  description?: string;
-  priority: 'high' | 'medium' | 'low';
-}
+import { type WorkOrder } from '../../utils/workOrdersApi';
 
 interface KanbanColumnDef {
   id: WorkOrder['status'];
@@ -47,13 +37,19 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const filterWorkOrders = (items: WorkOrder[], status: WorkOrder['status']) => {
     return items.filter(item => {
       const matchesStatus = item.status === status;
+      const customerName = item.customer ? `${item.customer.firstName} ${item.customer.lastName}` : '';
+      const vehicleInfo = item.vehicle ? `${item.vehicle.year} ${item.vehicle.make} ${item.vehicle.model}` : '';
+      const serviceAdvisorName = item.serviceAdvisor ? `${item.serviceAdvisor.userProfile.firstName} ${item.serviceAdvisor.userProfile.lastName}` : '';
+      
       const matchesSearch = searchTerm === '' ||
         item.workOrderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.assignedTechnician.toLowerCase().includes(searchTerm.toLowerCase());
+        customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vehicleInfo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        serviceAdvisorName.toLowerCase().includes(searchTerm.toLowerCase());
+      
       const matchesPriority = priorityFilter === '' || item.priority === priorityFilter;
-      const matchesTechnician = technicianFilter === '' || item.assignedTechnician.toLowerCase().includes(technicianFilter.toLowerCase());
+      const matchesTechnician = technicianFilter === '' || serviceAdvisorName.toLowerCase().includes(technicianFilter.toLowerCase());
+      
       return matchesStatus && matchesSearch && matchesPriority && matchesTechnician;
     });
   };
