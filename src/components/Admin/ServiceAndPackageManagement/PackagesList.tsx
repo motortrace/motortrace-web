@@ -1,3 +1,4 @@
+// src/components/Admin/ServiceAndPackageManagement/PackageList.tsx
 import React, { useState, useEffect } from 'react';
 import { Plus, Layers, Search } from 'lucide-react';
 import type { Package, Service } from '../../../types/ServicesAndPackages';
@@ -5,10 +6,12 @@ import { PackageCard } from './PackageCard';
 
 interface PackagesListProps {
   packages: Package[];
+  loading?: boolean;
   services: Service[];
   onAddNew: () => void;
   onView: (pkg: Package) => void;
   onEdit: (pkg: Package) => void;
+  onToggleAvailability: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -19,7 +22,7 @@ const EmptyState: React.FC<{ onAddNew: () => void }> = ({ onAddNew }) => (
     </div>
     <h3 className="spm-empty-state__title">No Packages Created Yet</h3>
     <p className="spm-empty-state__description">
-      Bundle your services into a package to offer more value. 
+      Bundle your services into a package to offer more value.
       Combine multiple services, set a special price, and make it easier for customers to book everything they need in one go.
     </p>
     <button className="spm-btn spm-btn--primary" onClick={onAddNew}>
@@ -30,19 +33,24 @@ const EmptyState: React.FC<{ onAddNew: () => void }> = ({ onAddNew }) => (
 
 export const PackagesList: React.FC<PackagesListProps> = ({
   packages,
+  loading,
   services,
   onAddNew,
   onView,
   onEdit,
+  onToggleAvailability,
   onDelete
 }) => {
+  // Filter out any undefined/null packages first
+  const validPackages = packages.filter(pkg => pkg != null);
+  
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [serviceCountFilter, setServiceCountFilter] = useState('All');
   const [sortBy, setSortBy] = useState('');
 
   // Pagination state
-  const itemsPerPage = 6; // Adjust based on your grid layout
+  const itemsPerPage = 6;
   const [displayCount, setDisplayCount] = useState(itemsPerPage);
 
   // Reset display count when filters change
@@ -52,11 +60,13 @@ export const PackagesList: React.FC<PackagesListProps> = ({
 
   // Helper function to get service count for a package
   const getServiceCount = (pkg: Package): number => {
-    return pkg.serviceIds.length;
+    return pkg?.serviceIds?.length || 0;
   };
 
   // Helper function to get included service names for search
   const getIncludedServiceNames = (pkg: Package): string => {
+    if (!pkg || !pkg.serviceIds) return '';
+    
     return pkg.serviceIds
       .map(serviceId => {
         const service = services.find(s => s.id === serviceId);
@@ -66,20 +76,22 @@ export const PackagesList: React.FC<PackagesListProps> = ({
       .join(' ');
   };
 
-  // Filter and search logic
-  const filteredPackages = packages.filter(pkg => {
+  // Filter and search logic - use validPackages instead of packages
+  const filteredPackages = validPackages.filter(pkg => {
     const matchesSearch = pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pkg.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         getIncludedServiceNames(pkg).toLowerCase().includes(searchTerm.toLowerCase());
-    
+      (pkg.description && pkg.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      getIncludedServiceNames(pkg).toLowerCase().includes(searchTerm.toLowerCase());
+      
     const serviceCount = getServiceCount(pkg);
-    const matchesServiceCount = serviceCountFilter === 'All' || 
-                               (serviceCountFilter === '1' && serviceCount === 1) ||
-                               (serviceCountFilter === '2-3' && serviceCount >= 2 && serviceCount <= 3) ||
-                               (serviceCountFilter === '4+' && serviceCount >= 4);
-    
+    const matchesServiceCount = serviceCountFilter === 'All' ||
+      (serviceCountFilter === '1' && serviceCount === 1) ||
+      (serviceCountFilter === '2-3' && serviceCount >= 2 && serviceCount <= 3) ||
+      (serviceCountFilter === '4+' && serviceCount >= 4);
+
     return matchesSearch && matchesServiceCount;
   });
+
+  
 
   // Sort logic
   const sortedPackages = [...filteredPackages].sort((a, b) => {
@@ -103,13 +115,13 @@ export const PackagesList: React.FC<PackagesListProps> = ({
 
   const displayedPackages = sortedPackages.slice(0, displayCount);
   const hasMore = displayCount < sortedPackages.length;
-  
+
   const handleLoadMore = () => {
     setDisplayCount(prev => Math.min(prev + itemsPerPage, sortedPackages.length));
   };
 
   // Show empty state when no packages exist at all
-  if (packages.length === 0) {
+  if (packages.length === 0 && !loading) {
     return <EmptyState onAddNew={onAddNew} />;
   }
 
@@ -195,6 +207,7 @@ export const PackagesList: React.FC<PackagesListProps> = ({
                 services={services}
                 onView={onView}
                 onEdit={onEdit}
+                onToggleAvailability={onToggleAvailability}
                 onDelete={onDelete}
               />
             ))}
@@ -235,7 +248,7 @@ export const PackagesList: React.FC<PackagesListProps> = ({
           <div className="no-data-description" style={{ fontSize: '14px', color: '#64748b', marginBottom: 20, maxWidth: 400, margin: '0 auto 20px' }}>
             No packages match your current search and filter criteria. Try adjusting your filters or search term.
           </div>
-          <button 
+          <button
             className="no-data-action"
             onClick={() => {
               setSearchTerm('');
