@@ -398,8 +398,42 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
   if (loading) return <div className="tab-content estimates-tab">Loading estimates...</div>;
   if (error) return <div className="tab-content estimates-tab" style={{ color: 'red' }}>{error}</div>;
 
+  // Summary calculations for estimates
+  // const totalEstimates = estimates.length;
+  const totalEstimateAmount = estimates.reduce((sum, est) => sum + (Number(est.totalAmount) || 0), 0);
+  const totalLaborAmount = estimates.reduce((sum, est) => sum + (Number(est.laborAmount) || 0), 0);
+  const totalPartsAmount = estimates.reduce((sum, est) => sum + (Number(est.partsAmount) || 0), 0);
+  const totalTaxAmount = estimates.reduce((sum, est) => sum + (Number(est.taxAmount) || 0), 0);
+  const totalDiscountAmount = estimates.reduce((sum, est) => sum + (Number(est.discountAmount) || 0), 0);
+
   return (
     <div className="tab-content estimates-tab">
+      <div className="estimates-summary-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20, marginBottom: 24, width: '100%' }}>
+        {/* <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}># Estimates</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{totalEstimates}</div>
+        </div> */}
+        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Amount</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalEstimateAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Labor</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalLaborAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Parts</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalPartsAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Tax</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalTaxAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Discount</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalDiscountAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+      </div>
       <div className="tab-header">
         <h3>Estimates</h3>
         <button className="btn btn--primary">Add Estimate</button>
@@ -407,283 +441,260 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
       {estimates.length === 0 ? (
         <div>No estimates found for this work order.</div>
       ) : (
-        <div className="estimates-list">
-          {estimates.map(est => {
-            const items = Array.isArray(est.estimateItems) ? est.estimateItems : [];
-            return (
-              <div className="estimate-card" key={est.id}>
-                <div className="estimate-header">
-                  <span className="estimate-version">Version {est.version}</span>
-                  <span className={`estimate-status ${est.approved ? 'approved' : 'pending'}`}>{est.approved ? 'Approved' : 'Pending'}</span>
-                  <span className="estimate-date">Created: {new Date(est.createdAt).toLocaleString()}</span>
-                  {est.approved && est.approvedAt && (
-                    <span className="estimate-date">Approved: {new Date(est.approvedAt).toLocaleString()}</span>
-                  )}
-                </div>
-                <div className="estimate-breakdown">
-                  <div><strong>Total:</strong> LKR {Number(est.totalAmount).toFixed(2)}</div>
-                  <div><strong>Labor:</strong> LKR {Number(est.laborAmount ?? 0).toFixed(2)}</div>
-                  <div><strong>Parts:</strong> LKR {Number(est.partsAmount ?? 0).toFixed(2)}</div>
-                  <div><strong>Tax:</strong> LKR {Number(est.taxAmount ?? 0).toFixed(2)}</div>
-                  <div><strong>Discount:</strong> LKR {Number(est.discountAmount ?? 0).toFixed(2)}</div>
-                </div>
-                <div className="estimate-description">{est.description}</div>
-                <div className="estimate-notes">{est.notes}</div>
-                {/* Estimate Items: Labor & Parts */}
-                <div className="estimate-items">
-                  <h4>Labor Items</h4>
-                  <ul>
-                    {items.filter(i => i.type === 'LABOR').map(item => (
-                      <li key={item.id}>
-                        {item.description} — {item.quantity}h x LKR {Number(item.unitPrice).toFixed(2)} = LKR {Number(item.totalPrice).toFixed(2)}
-                        {item.notes && <span className="item-notes"> ({item.notes})</span>}
-                        {typeof item.customerApproved !== 'undefined' && (
-                          <span
-                            className={`approval-badge ${item.customerApproved === true ? 'approved' : item.customerApproved === false ? 'declined' : 'pending'}`}
-                            title={item.customerApproved === true ? 'Approved by customer' : item.customerApproved === false ? 'Declined by customer' : 'Pending customer approval'}
-                          >
-                            {item.customerApproved === true ? 'Approved' : item.customerApproved === false ? 'Declined' : 'Pending'}
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                  <h4>Part Items</h4>
-                  <ul>
-                    {items.filter(i => i.type === 'PART').map(item => (
-                      <li key={item.id}>
-                        {item.description} — {item.quantity} x LKR {Number(item.unitPrice).toFixed(2)} = LKR {Number(item.totalPrice).toFixed(2)}
-                        {item.notes && <span className="item-notes"> ({item.notes})</span>}
-                        {typeof item.customerApproved !== 'undefined' && (
-                          <span
-                            className={`approval-badge ${item.customerApproved === true ? 'approved' : item.customerApproved === false ? 'declined' : 'pending'}`}
-                            title={item.customerApproved === true ? 'Approved by customer' : item.customerApproved === false ? 'Declined by customer' : 'Pending customer approval'}
-                          >
-                            {item.customerApproved === true ? 'Approved' : item.customerApproved === false ? 'Declined' : 'Pending'}
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
+        <div className="estimates-table-container" style={{ overflowX: 'auto', padding: 0 }}>
+          <table className="estimates-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
+            <thead>
+              <tr style={{ background: '#f9fafb' }}>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Version</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Created</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Total</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Labor</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Parts</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Tax</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Discount</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Description</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Notes</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {estimates.map(est => (
+                <tr key={est.id}>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{est.version}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    <span className={`estimate-status ${est.approved ? 'approved' : 'pending'}`}>{est.approved ? 'Approved' : 'Pending'}</span>
+                  </td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{new Date(est.createdAt).toLocaleString()}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>LKR {Number(est.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.laborAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.partsAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.taxAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.discountAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.description || '-'}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.notes || '-'}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px #0001' }}>View</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
   );
 };
 
-// Sidebar Component
-const Sidebar: React.FC = () => {
-  const mockWorkOrderStatus = 'Estimation';
-  const estimateSent = false;
-  // New mock data for demonstration
-  const workOrderId = 'WO-2024-001257';
-  const createdDate = 'June 30, 2024';
-  const businessLocation = 'Downtown Service Center';
+// // Sidebar Component
+// const Sidebar: React.FC = () => {
+//   const mockWorkOrderStatus = 'Estimation';
+//   const estimateSent = false;
+//   // New mock data for demonstration
+//   const workOrderId = 'WO-2024-001257';
+//   const createdDate = 'June 30, 2024';
+//   const businessLocation = 'Downtown Service Center';
 
-  // Timeline mock data
-  const timelineEvents = [
-    { label: 'Appointment Booked', date: 'June 25, 2024, 10:00 AM' },
-    { label: 'Scheduled Date', date: 'July 1, 2024, 9:00 AM' },
-    { label: 'Work Order Created', date: 'June 30, 2024, 4:30 PM' },
-    { label: 'Inspection Report Sent', date: 'July 1, 2024, 11:00 AM' },
-    { label: 'Estimate Sent', date: 'July 1, 2024, 12:00 PM' },
-    { label: 'Estimate Finalized', date: 'July 1, 2024, 2:00 PM' },
-    { label: 'Invoice Created', date: 'July 1, 2024, 2:30 PM' },
-    { label: 'Payment Made', date: 'July 1, 2024, 3:00 PM' },
-  ];
+//   // Timeline mock data
+//   const timelineEvents = [
+//     { label: 'Appointment Booked', date: 'June 25, 2024, 10:00 AM' },
+//     { label: 'Scheduled Date', date: 'July 1, 2024, 9:00 AM' },
+//     { label: 'Work Order Created', date: 'June 30, 2024, 4:30 PM' },
+//     { label: 'Inspection Report Sent', date: 'July 1, 2024, 11:00 AM' },
+//     { label: 'Estimate Sent', date: 'July 1, 2024, 12:00 PM' },
+//     { label: 'Estimate Finalized', date: 'July 1, 2024, 2:00 PM' },
+//     { label: 'Invoice Created', date: 'July 1, 2024, 2:30 PM' },
+//     { label: 'Payment Made', date: 'July 1, 2024, 3:00 PM' },
+//   ];
 
-  return (
-    <div className="modal-sidebar">
-      {/* Work Order Info Section */}
-      <div className="sidebar-section">
-        <div className="sidebar-section-header">
-          <h4><i className="bx bx-file"></i> Work Order Info</h4>
-        </div>
-        <div className="sidebar-section-content">
-          <div className="workorder-info">
-            <div className="workorder-row">
-              <span className="workorder-label">ID:</span>
-              <span className="workorder-value">{workOrderId}</span>
-            </div>
-            <div className="workorder-row">
-              <span className="workorder-label">Created:</span>
-              <span className="workorder-value">{createdDate}</span>
-            </div>
-            <div className="workorder-row">
-              <span className="workorder-label">Location:</span>
-              <span className="workorder-value">{businessLocation}</span>
-            </div>
-          </div>
-          {/* Timeline Section */}
-          <div className="workorder-timeline">
-            <h5 className="timeline-title"><i className="bx bx-timeline"></i> Timeline</h5>
-            <ul className="timeline-list">
-              {timelineEvents.map((event, idx) => (
-                <li className="timeline-event" key={idx}>
-                  <span className="timeline-event-label">{event.label}</span>
-                  <span className="timeline-event-date">{event.date}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
+//   return (
+//     <div className="modal-sidebar">
+//       {/* Work Order Info Section */}
+//       <div className="sidebar-section">
+//         <div className="sidebar-section-header">
+//           <h4><i className="bx bx-file"></i> Work Order Info</h4>
+//         </div>
+//         <div className="sidebar-section-content">
+//           <div className="workorder-info">
+//             <div className="workorder-row">
+//               <span className="workorder-label">ID:</span>
+//               <span className="workorder-value">{workOrderId}</span>
+//             </div>
+//             <div className="workorder-row">
+//               <span className="workorder-label">Created:</span>
+//               <span className="workorder-value">{createdDate}</span>
+//             </div>
+//             <div className="workorder-row">
+//               <span className="workorder-label">Location:</span>
+//               <span className="workorder-value">{businessLocation}</span>
+//             </div>
+//           </div>
+//           {/* Timeline Section */}
+//           <div className="workorder-timeline">
+//             <h5 className="timeline-title"><i className="bx bx-timeline"></i> Timeline</h5>
+//             <ul className="timeline-list">
+//               {timelineEvents.map((event, idx) => (
+//                 <li className="timeline-event" key={idx}>
+//                   <span className="timeline-event-label">{event.label}</span>
+//                   <span className="timeline-event-date">{event.date}</span>
+//                 </li>
+//               ))}
+//             </ul>
+//           </div>
+//         </div>
+//       </div>
 
-      {/* Status Section */}
-      <div className="sidebar-section">
-        <div className="sidebar-section-header">
-          <h4><i className="bx bx-info-circle"></i> Status</h4>
-        </div>
-        <div className="sidebar-section-content">
-          <div className="status-display">
-            <span className={`status-badge status-badge--${mockWorkOrderStatus.toLowerCase().replace(/ /g, '-')}`}>{mockWorkOrderStatus}</span>
-          </div>
-        </div>
-      </div>
+//       {/* Status Section */}
+//       <div className="sidebar-section">
+//         <div className="sidebar-section-header">
+//           <h4><i className="bx bx-info-circle"></i> Status</h4>
+//         </div>
+//         <div className="sidebar-section-content">
+//           <div className="status-display">
+//             <span className={`status-badge status-badge--${mockWorkOrderStatus.toLowerCase().replace(/ /g, '-')}`}>{mockWorkOrderStatus}</span>
+//           </div>
+//         </div>
+//       </div>
 
-      {/* Customer Info */}
-      <div className="sidebar-section">
-        <div className="sidebar-section-header">
-          <h4><i className="bx bx-user"></i> Customer</h4>
-        </div>
-        <div className="sidebar-section-content">
-          <div className="customer-info">
-            <div className="customer-avatar">
-              <i className="bx bx-user-circle"></i>
-            </div>
-            <div className="customer-details">
-              <div className="customer-name">John Anderson</div>
-              <div className="customer-contact">
-                <div className="contact-item">
-                  <i className="bx bx-phone"></i>
-                  <span>(555) 123-4567</span>
-                </div>
-                <div className="contact-item">
-                  <i className="bx bx-envelope"></i>
-                  <span>john.anderson@email.com</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+//       {/* Customer Info */}
+//       <div className="sidebar-section">
+//         <div className="sidebar-section-header">
+//           <h4><i className="bx bx-user"></i> Customer</h4>
+//         </div>
+//         <div className="sidebar-section-content">
+//           <div className="customer-info">
+//             <div className="customer-avatar">
+//               <i className="bx bx-user-circle"></i>
+//             </div>
+//             <div className="customer-details">
+//               <div className="customer-name">John Anderson</div>
+//               <div className="customer-contact">
+//                 <div className="contact-item">
+//                   <i className="bx bx-phone"></i>
+//                   <span>(555) 123-4567</span>
+//                 </div>
+//                 <div className="contact-item">
+//                   <i className="bx bx-envelope"></i>
+//                   <span>john.anderson@email.com</span>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
 
-      {/* Vehicle Info */}
-      <div className="sidebar-section">
-        <div className="sidebar-section-header">
-          <h4><i className="bx bx-car"></i> Vehicle</h4>
-        </div>
-        <div className="sidebar-section-content">
-          <div className="vehicle-info">
-            <div className="vehicle-image">
-              <img 
-                src="https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg?auto=compress&w=200" 
-                alt="Vehicle" 
-              />
-            </div>
-            <div className="vehicle-details">
-              <div className="vehicle-name">2022 Toyota Camry</div>
-              <div className="vehicle-plate">ABC-1234</div>
-              <div className="vehicle-specs">
-                <div className="spec-item">
-                  <span className="spec-label">VIN:</span>
-                  <span className="spec-value">1HGCM82633A123456</span>
-                </div>
-                <div className="spec-item">
-                  <span className="spec-label">Mileage:</span>
-                  <span className="spec-value">47,850 miles</span>
-                </div>
-                <div className="spec-item">
-                  <span className="spec-label">Color:</span>
-                  <span className="spec-value">Silver Metallic</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+//       {/* Vehicle Info */}
+//       <div className="sidebar-section">
+//         <div className="sidebar-section-header">
+//           <h4><i className="bx bx-car"></i> Vehicle</h4>
+//         </div>
+//         <div className="sidebar-section-content">
+//           <div className="vehicle-info">
+//             <div className="vehicle-image">
+//               <img 
+//                 src="https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg?auto=compress&w=200" 
+//                 alt="Vehicle" 
+//               />
+//             </div>
+//             <div className="vehicle-details">
+//               <div className="vehicle-name">2022 Toyota Camry</div>
+//               <div className="vehicle-plate">ABC-1234</div>
+//               <div className="vehicle-specs">
+//                 <div className="spec-item">
+//                   <span className="spec-label">VIN:</span>
+//                   <span className="spec-value">1HGCM82633A123456</span>
+//                 </div>
+//                 <div className="spec-item">
+//                   <span className="spec-label">Mileage:</span>
+//                   <span className="spec-value">47,850 miles</span>
+//                 </div>
+//                 <div className="spec-item">
+//                   <span className="spec-label">Color:</span>
+//                   <span className="spec-value">Silver Metallic</span>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
 
-      {/* Job Progress */}
-      <div className="sidebar-section">
-        <div className="sidebar-section-header">
-          <h4><i className="bx bx-timer"></i> Progress</h4>
-        </div>
-        <div className="sidebar-section-content">
-          <div className="progress-info">
-            <div className="progress-bar-container">
-              <div className="progress-bar">
-                <div className="progress-fill" style={{ width: '65%' }}></div>
-              </div>
-              <span className="progress-text">65% Complete</span>
-            </div>
-            <div className="timeline-info">
-              <div className="timeline-item">
-                <span className="timeline-label">Started</span>
-                <span className="timeline-value">July 1, 2024</span>
-              </div>
-              <div className="timeline-item">
-                <span className="timeline-label">Est. Completion</span>
-                <span className="timeline-value">July 2, 2024</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+//       {/* Job Progress */}
+//       <div className="sidebar-section">
+//         <div className="sidebar-section-header">
+//           <h4><i className="bx bx-timer"></i> Progress</h4>
+//         </div>
+//         <div className="sidebar-section-content">
+//           <div className="progress-info">
+//             <div className="progress-bar-container">
+//               <div className="progress-bar">
+//                 <div className="progress-fill" style={{ width: '65%' }}></div>
+//               </div>
+//               <span className="progress-text">65% Complete</span>
+//             </div>
+//             <div className="timeline-info">
+//               <div className="timeline-item">
+//                 <span className="timeline-label">Started</span>
+//                 <span className="timeline-value">July 1, 2024</span>
+//               </div>
+//               <div className="timeline-item">
+//                 <span className="timeline-label">Est. Completion</span>
+//                 <span className="timeline-value">July 2, 2024</span>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
 
-      {/* Assignments */}
-      <div className="sidebar-section">
-        <div className="sidebar-section-header">
-          <h4><i className="bx bx-group"></i> Assignments</h4>
-        </div>
-        <div className="sidebar-section-content">
-          <div className="assignment-info">
-            <div className="assignment-item">
-              <span className="assignment-label">Technician</span>
-              <div className="tech-assignment">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Mike Smith" />
-                <span>Mike Smith</span>
-              </div>
-            </div>
-            <div className="assignment-item">
-              <span className="assignment-label">Created By</span>
-              <span className="assignment-value">Amber Miller</span>
-            </div>
-          </div>
-        </div>
-      </div>
+//       {/* Assignments */}
+//       <div className="sidebar-section">
+//         <div className="sidebar-section-header">
+//           <h4><i className="bx bx-group"></i> Assignments</h4>
+//         </div>
+//         <div className="sidebar-section-content">
+//           <div className="assignment-info">
+//             <div className="assignment-item">
+//               <span className="assignment-label">Technician</span>
+//               <div className="tech-assignment">
+//                 <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Mike Smith" />
+//                 <span>Mike Smith</span>
+//               </div>
+//             </div>
+//             <div className="assignment-item">
+//               <span className="assignment-label">Created By</span>
+//               <span className="assignment-value">Amber Miller</span>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
 
-      {/* Quick Actions */}
-      <div className="sidebar-section">
-        <div className="sidebar-section-header">
-          <h4><i className="bx bx-bolt-circle"></i> Actions</h4>
-        </div>
-        <div className="sidebar-section-content">
-          <div className="quick-actions">
-            {!estimateSent ? (
-              <button className="action-btn action-btn--primary">
-                <i className="bx bx-send"></i>
-                Send Estimate
-              </button>
-            ) : (
-              <button className="action-btn action-btn--primary">
-                <i className="bx bx-receipt"></i>
-                Generate Invoice
-              </button>
-            )}
-            <button className="action-btn action-btn--secondary">
-              <i className="bx bx-printer"></i>
-              Print Work Order
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+//       {/* Quick Actions */}
+//       <div className="sidebar-section">
+//         <div className="sidebar-section-header">
+//           <h4><i className="bx bx-bolt-circle"></i> Actions</h4>
+//         </div>
+//         <div className="sidebar-section-content">
+//           <div className="quick-actions">
+//             {!estimateSent ? (
+//               <button className="action-btn action-btn--primary">
+//                 <i className="bx bx-send"></i>
+//                 Send Estimate
+//               </button>
+//             ) : (
+//               <button className="action-btn action-btn--primary">
+//                 <i className="bx bx-receipt"></i>
+//                 Generate Invoice
+//               </button>
+//             )}
+//             <button className="action-btn action-btn--secondary">
+//               <i className="bx bx-printer"></i>
+//               Print Work Order
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 // Overview Tab Content
 const OverviewTab: React.FC = () => {
@@ -835,30 +846,59 @@ const ServicesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
   if (error) return <div className="tab-content services-tab" style={{ color: 'red' }}>{error}</div>;
   if (!services || services.length === 0) return <div className="tab-content services-tab">No services found for this work order.</div>;
 
+  // Summary calculations for services
+  const totalServiceCount = services.length;
+  const totalServiceQty = services.reduce((sum, s) => sum + (s.quantity || 0), 0);
+  const totalServiceCost = services.reduce((sum, s) => sum + (s.subtotal || 0), 0);
+  // const totalUnitPrice = services.reduce((sum, s) => sum + (s.unitPrice || 0), 0);
+  // If you want to add more metrics, add here
+
   return (
     <div className="tab-content services-tab">
+      <div className="services-summary-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20, marginBottom: 24, width: '100%' }}>
+        <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}># Services</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{totalServiceCount}</div>
+        </div>
+        <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Qty</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{totalServiceQty}</div>
+        </div>
+        {/* <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Unit Price</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalUnitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div> */}
+        <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Cost</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalServiceCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+      </div>
       <div className="tab-header">
         <h3>Services</h3>
       </div>
-      <div className="services-table-container">
-        <table className="services-table styled-table" style={{ width: '100%', minWidth: 700 }}>
+      <div className="services-table-container" style={{ overflowX: 'auto', padding: 0 }}>
+        <table className="services-table styled-table" style={{ width: '100%', minWidth: 700, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
           <thead>
-            <tr>
-              <th>Service Name</th>
-              <th>Description</th>
-              <th>Unit Price</th>
-              <th>Quantity</th>
-              <th>Subtotal</th>
+            <tr style={{ background: '#f9fafb' }}>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Service Name</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Description</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Unit Price</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Quantity</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Subtotal</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
             </tr>
           </thead>
           <tbody>
             {services.map(service => (
               <tr key={service.id}>
-                <td>{service.cannedService?.name || '-'}</td>
-                <td>{service.description || service.cannedService?.description || '-'}</td>
-                <td>LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                <td>{service.quantity}</td>
-                <td>LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '6px 10px', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid #e5e7eb' }}>{service.cannedService?.name || '-'}</td>
+                <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{service.description || service.cannedService?.description || '-'}</td>
+                <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{service.quantity}</td>
+                <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                  <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px #0001' }}>View</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -971,6 +1011,8 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
   const [inspections, setInspections] = useState<WorkOrderInspection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [attachments, setAttachments] = useState<Record<string, any[]>>({}); // inspectionId -> attachments
+  const [loadingAttachments, setLoadingAttachments] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!workOrderId) return;
@@ -978,10 +1020,23 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
     fetch(`http://localhost:3000/inspection-templates/work-orders/inspections?workOrderId=${workOrderId}`)
       .then(res => res.json())
       .then(apiRes => {
-        // Support both wrapped and unwrapped responses
         let inspectionsArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
         setInspections(inspectionsArr || []);
         setLoading(false);
+        // Fetch attachments for each inspection
+        inspectionsArr.forEach((inspection: any) => {
+          setLoadingAttachments(prev => ({ ...prev, [inspection.id]: true }));
+          fetch(`http://localhost:3000/inspection-templates/inspections/${inspection.id}/attachments`)
+            .then(res => res.json())
+            .then(data => {
+              setAttachments(prev => ({ ...prev, [inspection.id]: data.data || [] }));
+              setLoadingAttachments(prev => ({ ...prev, [inspection.id]: false }));
+            })
+            .catch(() => {
+              setAttachments(prev => ({ ...prev, [inspection.id]: [] }));
+              setLoadingAttachments(prev => ({ ...prev, [inspection.id]: false }));
+            });
+        });
       })
       .catch(() => {
         setError('Failed to fetch inspections');
@@ -993,53 +1048,107 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
   if (error) return <div className="tab-content inspections-tab" style={{ color: 'red' }}>{error}</div>;
   if (!inspections || inspections.length === 0) return <div className="tab-content inspections-tab">No inspections found.</div>;
 
-  // Helper to get technician name
+  // Helper to get technician name and image
   const getTechnicianName = (inspector: any) => {
     if (!inspector) return '-';
     if (typeof inspector.name === 'string') return inspector.name;
     if (inspector.userProfile && inspector.userProfile.name) return inspector.userProfile.name;
     return '-';
   };
+  const getTechnicianImage = (inspector: any) => {
+    if (!inspector) return null;
+    if (inspector.userProfile && inspector.userProfile.profileImage) return inspector.userProfile.profileImage;
+    return null;
+  };
+
+  // Summary cards
+  const totalInspections = inspections.length;
+  const completedInspections = inspections.filter(i => i.isCompleted).length;
 
   return (
     <div className="tab-content inspections-tab">
-      <div className="tab-header">
+      <div className="inspections-summary-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20, marginBottom: 24, width: '100%' }}>
+        <div className="inspections-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Inspections</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{totalInspections}</div>
+        </div>
+        <div className="inspections-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Completed</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{completedInspections}</div>
+        </div>
+      </div>
+      <div className="tab-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h3>Inspections</h3>
+        <button className="btn btn--primary" style={{ minWidth: 140 }} onClick={() => alert('Add Inspection')}>Add Inspection</button>
       </div>
       <div className="inspection-summary-table-container full-width-table">
-        <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900 }}>
+        <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
           <thead>
-            <tr>
-              <th>Technician</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Template Name</th>
-              <th>Template Description</th>
-              <th>Template Category</th>
-              <th>Notes</th>
-              <th>Action</th>
+            <tr style={{ background: '#f9fafb' }}>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Date</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Name</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Category</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
             </tr>
           </thead>
           <tbody>
             {inspections.map((inspection) => {
               const template: Partial<InspectionTemplate> = inspection.template || {};
               return (
-                <tr key={inspection.id}>
-                  <td>{getTechnicianName(inspection.inspector)}</td>
-                  <td>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
-                  <td>
-                    <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
-                  </td>
-                  <td>{template?.name || '-'}</td>
-                  <td>{template?.description || '-'}</td>
-                  <td>{template?.category || '-'}</td>
-                  <td>{inspection.notes || '-'}</td>
-                  <td>
-                    <button className="btn btn--primary btn--sm" style={{ padding: '4px 12px', fontSize: 14 }} onClick={() => alert(`View details for inspection ${inspection.id}`)}>
-                      View
-                    </button>
-                  </td>
-                </tr>
+                <React.Fragment key={inspection.id}>
+                  <tr>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                        {getTechnicianImage(inspection.inspector) ? (
+                          <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
+                        ) : (
+                          <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
+                            {getTechnicianName(inspection.inspector)?.[0] || '?'}
+                          </div>
+                        )}
+                        <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                      <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
+                    </td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                      <button className="btn btn--primary btn--sm" style={{ padding: '4px 12px', fontSize: 14 }} onClick={() => alert(`View details for inspection ${inspection.id}`)}>
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                  {/* Attachments section for this inspection */}
+                  <tr>
+                    <td colSpan={6} style={{ padding: '12px 10px', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
+                      <div style={{ marginTop: 8 }}>
+                        <div style={{ fontWeight: 600, color: '#374151', marginBottom: 8 }}>Attachments</div>
+                        {loadingAttachments[inspection.id] ? (
+                          <div>Loading attachments...</div>
+                        ) : (attachments[inspection.id] && attachments[inspection.id].length > 0 ? (
+                          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                            {attachments[inspection.id].map(att => (
+                              <div key={att.id} style={{ width: 100, textAlign: 'center', background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', padding: 8 }}>
+                                <div style={{ width: 80, height: 80, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: 6, overflow: 'hidden' }}>
+                                  <img src={att.fileUrl} alt={att.fileName || 'Attachment'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </div>
+                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>{att.fileName || 'Image'}</div>
+                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{att.uploadedAt ? new Date(att.uploadedAt).toLocaleString() : ''}</div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div style={{ color: '#9ca3af', fontSize: 13 }}>No attachments found.</div>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                </React.Fragment>
               );
             })}
           </tbody>
@@ -1100,12 +1209,12 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         {/* Modal Body */}
         <div className="modal-body">
           {/* Main Content Area */}
-          <div className="main-content">
+          <div className="main-content" style={{ overflowY: 'auto', maxHeight: 'calc(95vh - 120px)' }}>
             {renderTabContent()}
           </div>
 
           {/* Sidebar */}
-          <Sidebar />
+          {/* <Sidebar /> */}
         </div>
       </div>
     </div>
