@@ -78,11 +78,6 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
 
   const priorityIndicator = getPriorityIndicator(serviceItem.priority);
 
-  // Debug logging
-  console.log('ServiceItemCard serviceItem:', serviceItem);
-  console.log('ServiceAdvisor:', serviceItem.serviceAdvisor);
-  console.log('UserProfile:', serviceItem.serviceAdvisor?.userProfile);
-
   return (
     <div
       className="service-item-card"
