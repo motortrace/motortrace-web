@@ -141,20 +141,9 @@ const LoginPage = () => {
 
       // Get user for redirection
       const user = data.data.user;
-      const userRole =
-        user.user_metadata?.role ||
-        user.role ||
-        (typeof user.getRole === 'function' ? user.getRole() : undefined);
-
-      if (!userRole) {
-        throw new Error('User role information is missing');
-      }
-
-
-      // Redirect based on user role
-      console.log('Redirecting user with role:', user.user_metadata.role);
-
-      switch (userRole) {
+      // Redirect based on role
+      console.log('Redirecting user with role:', user.role);
+      switch (user.role) {
         case 'admin':
           navigate('/admin/dashboard');
           break;
@@ -163,15 +152,6 @@ const LoginPage = () => {
           break;
         case 'manager':
           window.location.href = '/manager/dashboard';
-          break;
-        case 'technician':
-          window.location.href = '/technician/dashboard';
-          break;
-        case 'inventory_manager':
-          window.location.href = '/inventory/dashboard';
-          break;
-        case 'customer':
-          window.location.href = '/customer/dashboard';
           break;
         default:
           window.location.href = '/';
