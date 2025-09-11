@@ -1,3 +1,196 @@
+// --- Labor Tab Content (API-based, styled table, new structure) ---
+interface LaborCatalog {
+  id: string;
+  code: string;
+  name: string;
+  description?: string;
+  estimatedHours: number;
+  hourlyRate: number;
+  category?: string;
+}
+
+
+interface UserProfile {
+  id: string;
+  name: string;
+  profileImage?: string | null;
+  phone?: string;
+}
+
+interface TechnicianProfile {
+  id: string;
+  userProfileId?: string;
+  employeeId?: string;
+  specialization?: string;
+  certifications?: string[];
+  userProfile?: UserProfile | null;
+}
+
+interface WorkOrderLabor {
+  id: string;
+  workOrderId: string;
+  laborCatalog?: LaborCatalog | null;
+  laborCatalogId?: string | null;
+  description: string;
+  hours: number;
+  rate: number;
+  technician?: TechnicianProfile | null;
+  technicianId?: string | null;
+  subtotal: number;
+  startTime?: string | null;
+  endTime?: string | null;
+  notes?: string | null;
+  cannedServiceId?: string | null;
+  serviceDiscountAmount?: number | null;
+  serviceDiscountType?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const LaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
+  const [labor, setLabor] = useState<WorkOrderLabor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  React.useEffect(() => {
+    if (!workOrderId) return;
+    setLoading(true);
+    fetch(`http://localhost:3000/labor/work-order?workOrderId=${workOrderId}`)
+      .then(res => res.json())
+      .then(apiRes => {
+        let laborArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
+        setLabor(laborArr || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch labor records');
+        setLoading(false);
+      });
+  }, [workOrderId]);
+
+  if (loading) return <div className="tab-content labor-tab">Loading labor records...</div>;
+  if (error) return <div className="tab-content labor-tab" style={{ color: 'red' }}>{error}</div>;
+  if (!labor || labor.length === 0) return <div className="tab-content labor-tab">No labor records found for this work order.</div>;
+
+  // Summary calculations
+  const totalEstimatedHours = labor.reduce((sum, l) => sum + (l.laborCatalog?.estimatedHours || 0), 0);
+  const totalCost = labor.reduce((sum, l) => sum + (l.subtotal || 0), 0);
+  const totalDiscount = labor.reduce((sum, l) => sum + (l.serviceDiscountAmount || 0), 0);
+  const technicianIds = new Set(labor.map(l => l.technicianId).filter(Boolean));
+  const numTechnicians = technicianIds.size;
+  // Total time elapsed (sum of all (endTime - startTime) in hours)
+  const totalTimeElapsed = labor.reduce((sum, l) => {
+    if (l.startTime && l.endTime) {
+      const start = new Date(l.startTime).getTime();
+      const end = new Date(l.endTime).getTime();
+      if (!isNaN(start) && !isNaN(end) && end > start) {
+        return sum + (end - start) / (1000 * 60 * 60);
+      }
+    }
+    return sum;
+  }, 0);
+
+  return (
+    <div className="tab-content labor-tab">
+      <div className="labor-summary-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20, marginBottom: 24, width: '100%' }}>
+        <div className="labor-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total est. hours</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{totalEstimatedHours.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+        </div>
+        <div className="labor-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total cost</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+        <div className="labor-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total discount</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalDiscount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
+        </div>
+        <div className="labor-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}># Technicians</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{numTechnicians}</div>
+        </div>
+        <div className="labor-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total time elapsed</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{totalTimeElapsed.toLocaleString(undefined, { minimumFractionDigits: 2 })} h</div>
+        </div>
+      </div>
+      <div className="tab-header">
+        <h3>Labor</h3>
+      </div>
+      <div className="labor-table-container" style={{ overflowX: 'auto', padding: 0 }}>
+        <table className="labor-table styled-table" style={{ width: '100%', minWidth: 700, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
+          <thead>
+            <tr style={{ background: '#f9fafb' }}>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Name</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Rate</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Hours</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Discount</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Discount Type</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Total</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Category</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Start Time</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>End Time</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {labor.map(item => {
+              // Technician display logic
+              const tech = item.technician;
+              const userProfile = tech?.userProfile;
+              const techAssigned = !!tech && !!userProfile;
+              return (
+                <tr key={item.id}>
+                  <td style={{ padding: '6px 10px', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid #e5e7eb' }}>{item.laborCatalog?.name || item.description || '-'}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(item.rate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{Number(item.hours).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{typeof item.serviceDiscountAmount === 'number' ? `LKR ${Number(item.serviceDiscountAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '-'}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{item.serviceDiscountType || '-'}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>LKR {Number(item.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{item.laborCatalog?.category || '-'}</td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    {techAssigned ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                        {userProfile.profileImage ? (
+                          <img src={userProfile.profileImage} alt={userProfile.name} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
+                        ) : (
+                          <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
+                            {userProfile.name?.[0] || '?'}
+                          </div>
+                        )}
+                        <span style={{ fontWeight: 500 }}>{userProfile.name}</span>
+                      </div>
+                    ) : (
+                      <span style={{ background: '#fef2f2', color: '#b91c1c', borderRadius: 8, padding: '2px 8px', fontSize: 12, fontWeight: 500 }}>Technician not assigned</span>
+                    )}
+                  </td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    {item.startTime ? (
+                      new Date(item.startTime).toLocaleString()
+                    ) : (
+                      <span style={{ background: '#fef9c3', color: '#b45309', borderRadius: 8, padding: '2px 8px', fontSize: 12, fontWeight: 500 }}>Not started</span>
+                    )}
+                  </td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    {item.endTime ? (
+                      new Date(item.endTime).toLocaleString()
+                    ) : (
+                      <span style={{ background: '#f3f4f6', color: '#6b7280', borderRadius: 8, padding: '2px 8px', fontSize: 12, fontWeight: 500 }}>Not finished</span>
+                    )}
+                  </td>
+                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px #0001' }}>View</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 import React, { useState } from 'react';
 import NotesTab from '../../pages/ServiceCenter/JobCard/tabs/NotesTab';
 import './ManageWorkOrderModal.scss';
@@ -549,36 +742,6 @@ const OverviewTab: React.FC = () => {
 };
 
 // Mock data
-const mockServices: ServiceLine[] = [
-  {
-    id: 'svc-1',
-    name: 'Brake Pad Replacement',
-    description: 'Replace front brake pads with premium ceramic pads',
-    price: 189.99,
-    qty: 1,
-    hours: 1.5,
-    discount: 10,
-    tax: 15,
-    status: 'In Progress',
-    technician: { id: 'tech-1', name: 'Mike Smith', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    type: 'service',
-    customerAccepted: true, // accepted
-  },
-  {
-    id: 'pkg-1',
-    name: 'Oil Change Package',
-    description: 'Full synthetic oil change + filter',
-    price: 89.99,
-    qty: 1,
-    hours: 0.5,
-    discount: 0,
-    tax: 8,
-    status: 'Completed',
-    technician: { id: 'tech-2', name: 'Sara Lee', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    type: 'package',
-    customerAccepted: false, // declined
-  },
-];
 
 const mockParts: PartItem[] = [
   {
@@ -619,150 +782,87 @@ const sourceColors: Record<PartItem['source'], string> = {
   customer: '#28a745',
 };
 
-// Services Tab Content
-const ServicesTab: React.FC = () => {
-  const subtotal = mockServices.reduce((sum, s) => sum + s.price * s.qty, 0);
-  const totalDiscount = mockServices.reduce((sum, s) => sum + s.discount, 0);
-  const totalTax = mockServices.reduce((sum, s) => sum + s.tax, 0);
-  const total = subtotal - totalDiscount + totalTax;
 
-  const packages = mockServices.filter(s => s.type === 'package');
-  const services = mockServices.filter(s => s.type === 'service');
+// --- Services Tab Content (API-based, flat table, new structure) ---
+
+interface CannedService {
+  id: string;
+  code: string;
+  name: string;
+  description?: string;
+  duration: number;
+  price: number;
+}
+
+interface WorkOrderService {
+  id: string;
+  workOrderId: string;
+  cannedService: CannedService;
+  cannedServiceId: string;
+  description?: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  status: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const ServicesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
+  const [services, setServices] = useState<WorkOrderService[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!workOrderId) return;
+    setLoading(true);
+    fetch(`http://localhost:3000/work-orders/${workOrderId}/services`)
+      .then(res => res.json())
+      .then(apiRes => {
+        // Support both wrapped and unwrapped responses
+        let servicesArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
+        setServices(servicesArr || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch services');
+        setLoading(false);
+      });
+  }, [workOrderId]);
+
+  if (loading) return <div className="tab-content services-tab">Loading services...</div>;
+  if (error) return <div className="tab-content services-tab" style={{ color: 'red' }}>{error}</div>;
+  if (!services || services.length === 0) return <div className="tab-content services-tab">No services found for this work order.</div>;
 
   return (
     <div className="tab-content services-tab">
       <div className="tab-header">
-        <h3>Services & Packages</h3>
-        <div className="tab-actions">
-          <button className="btn btn--primary">
-            <i className="bx bx-plus"></i> Add Service
-          </button>
-          <button className="btn btn--secondary">
-            <i className="bx bx-package"></i> Add Package
-          </button>
-        </div>
+        <h3>Services</h3>
       </div>
-
       <div className="services-table-container">
-        <table className="services-table">
+        <table className="services-table styled-table" style={{ width: '100%', minWidth: 700 }}>
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Service Name</th>
               <th>Description</th>
-              <th>Price</th>
-              <th>Qty/Hours</th>
-              <th>Discount</th>
-              <th>Tax</th>
-              <th>Status</th>
-              <th>Type</th>
-              <th>Customer Response</th>
-              <th>Actions</th>
+              <th>Unit Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
             </tr>
           </thead>
           <tbody>
-            {/* List all packages as single rows */}
-            {packages.map(pkg => (
-              <tr key={pkg.id} className="package-header-row">
-                <td className="service-name">{pkg.name}</td>
-                <td>{pkg.description}</td>
-                <td>LKR {pkg.price.toFixed(2)}</td>
-                <td>{pkg.qty} / {pkg.hours}h</td>
-                <td>LKR {pkg.discount.toFixed(2)}</td>
-                <td>LKR {pkg.tax.toFixed(2)}</td>
-                <td>
-                  <span className={`status-badge--custom status-badge--${pkg.customerAccepted === false ? 'declined' : (pkg.status.toLowerCase().replace(/ /g, '-') || 'default')}`}> 
-                    {pkg.customerAccepted === false ? 'Declined' : pkg.status}
-                  </span>
-                </td>
-                <td>
-                  <span className="type-badge type-badge--package">Package</span>
-                </td>
-                <td>
-                  {pkg.customerAccepted === true && (
-                    <span className="customer-accepted-badge">
-                      <i className="bx bx-check-circle"></i> Accepted
-                    </span>
-                  )}
-                  {pkg.customerAccepted === false && (
-                    <span className="customer-declined-badge">
-                      <i className="bx bx-x-circle"></i> Declined
-                    </span>
-                  )}
-                  {(pkg.customerAccepted === undefined || pkg.customerAccepted === null) && (
-                    <span className="customer-pending-badge">
-                      <i className="bx bx-time"></i> Pending
-                    </span>
-                  )}
-                </td>
-                <td className="action-cell">
-                  <button className="btn-icon btn-danger" title="Remove">
-                    <i className="bx bx-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {/* List all services as single rows */}
             {services.map(service => (
-              <tr key={service.id} className="service-in-package-row">
-                <td className="service-name">{service.name}</td>
-                <td>{service.description}</td>
-                <td>LKR {service.price.toFixed(2)}</td>
-                <td>{service.qty} / {service.hours}h</td>
-                <td>LKR {service.discount.toFixed(2)}</td>
-                <td>LKR {service.tax.toFixed(2)}</td>
-                <td>
-                  <span className={`status-badge--custom status-badge--${service.customerAccepted === false ? 'declined' : (service.status.toLowerCase().replace(/ /g, '-') || 'default')}`}> 
-                    {service.customerAccepted === false ? 'Declined' : service.status}
-                  </span>
-                </td>
-                <td>
-                  <span className="type-badge type-badge--service">Service</span>
-                </td>
-                <td>
-                  {service.customerAccepted === true && (
-                    <span className="customer-accepted-badge">
-                      <i className="bx bx-check-circle"></i> Accepted
-                    </span>
-                  )}
-                  {service.customerAccepted === false && (
-                    <span className="customer-declined-badge">
-                      <i className="bx bx-x-circle"></i> Declined
-                    </span>
-                  )}
-                  {(service.customerAccepted === undefined || service.customerAccepted === null) && (
-                    <span className="customer-pending-badge">
-                      <i className="bx bx-time"></i> Pending
-                    </span>
-                  )}
-                </td>
-                <td className="action-cell">
-                  <button className="btn-icon btn-danger" title="Remove">
-                    <i className="bx bx-trash"></i>
-                  </button>
-                </td>
+              <tr key={service.id}>
+                <td>{service.cannedService?.name || '-'}</td>
+                <td>{service.description || service.cannedService?.description || '-'}</td>
+                <td>LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td>{service.quantity}</td>
+                <td>LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-
-      <div className="services-summary">
-        <div className="summary-row">
-          <span>Subtotal:</span>
-          <span>LKR {subtotal.toFixed(2)}</span>
-        </div>
-        <div className="summary-row">
-          <span>Total Discount:</span>
-          <span>-LKR {totalDiscount.toFixed(2)}</span>
-        </div>
-        <div className="summary-row">
-          <span>Total Tax:</span>
-          <span>LKR {totalTax.toFixed(2)}</span>
-        </div>
-        <div className="summary-row summary-row--total">
-          <span>Total:</span>
-          <span>LKR {total.toFixed(2)}</span>
-        </div>
       </div>
     </div>
   );
@@ -966,9 +1066,9 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       case 'inspections':
         return <InspectionsTab workOrderId={workOrder?.id || ''} />;
       case 'services':
-        return <ServicesTab />;
+        return <ServicesTab workOrderId={workOrder?.id || ''} />;
       case 'labor':
-        return <div className="tab-content">Labor tab coming soon...</div>;
+        return <LaborTab workOrderId={workOrder?.id || ''} />;
       case 'parts':
         return <PartsTab />;
       case 'invoices':
