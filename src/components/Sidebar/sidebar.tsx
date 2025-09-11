@@ -40,8 +40,14 @@ const Sidebar: React.FC = () => {
         // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
         { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
         { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
-        { id: 'inspections', label: 'Inspections', icon: 'bx bx-search-alt', route: '/servicecenter/inspections' },
         { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+      ]
+    },
+    {
+      title: 'Inspections',
+      items: [
+        { id: 'inspection-templates', label: 'Templates', icon: 'bx bx-folder', route: '/servicecenter/inspection-templates' },
+        { id: 'inspection-records', label: 'Records', icon: 'bx bx-clipboard', route: '/servicecenter/inspection-records' },
       ]
     },
     {
