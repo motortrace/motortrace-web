@@ -35,22 +35,77 @@ interface PartItem {
   source: 'ordered' | 'inventory' | 'customer';
 }
 
-// Inspection-related types based on InspectionModal
-interface InspectionChecklistItem {
-    id: string;
-    title: string;
-    description?: string;
-    priority: 'critical' | 'high' | 'medium' | 'low';
-    required: boolean;
-    status: 'pass' | 'fail' | 'warning' | 'na' | 'pending';
-    notes?: string;
-    completedAt?: string;
+
+// --- Inspection Types (based on new models) ---
+interface InspectionTemplateItem {
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  sortOrder?: number;
+  isRequired: boolean;
+  allowsNotes: boolean;
 }
 
 interface InspectionTemplate {
-    id: string;
-    name: string;
-    items: InspectionChecklistItem[];
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  sortOrder?: number;
+  templateItems: InspectionTemplateItem[];
+}
+
+type ChecklistStatus = 'GREEN' | 'YELLOW' | 'RED';
+
+interface InspectionChecklistItem {
+  id: string;
+  inspectionId: string;
+  templateItemId?: string;
+  category?: string;
+  item: string;
+  status: ChecklistStatus;
+  notes?: string;
+  requiresFollowUp: boolean;
+  createdAt: string;
+}
+
+interface TireInspection {
+  id: string;
+  inspectionId: string;
+  position: string;
+  brand?: string;
+  model?: string;
+  size?: string;
+  psi?: number;
+  treadDepth?: number;
+  damageNotes?: string;
+  createdAt: string;
+}
+
+interface WorkOrderInspectionAttachment {
+  id: string;
+  inspectionId: string;
+  fileUrl: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  description?: string;
+  uploadedAt: string;
+}
+
+interface WorkOrderInspection {
+  id: string;
+  workOrderId: string;
+  inspector: { id: string; name: string };
+  template?: InspectionTemplate;
+  templateId?: string;
+  date: string;
+  notes?: string;
+  isCompleted: boolean;
+  checklistItems: InspectionChecklistItem[];
+  tireChecks: TireInspection[];
+  attachments: WorkOrderInspectionAttachment[];
 }
 
 interface ManageWorkOrderModalProps {
@@ -806,135 +861,92 @@ const NotesTabContent: React.FC<{ notes: string; onNotesChange: (notes: string) 
   );
 };
 
-// Dummy data for inspections (new structure)
-const mockInspectionTemplates: InspectionTemplate[] = [
-  {
-    id: 'insp-1',
-    name: 'Standard Brake Inspection',
-    items: [
-      { id: 'item-1-1', title: 'Check Front Brake Pad Thickness', description: 'Measure pad thickness and compare to manufacturer specifications.', priority: 'critical', required: true, status: 'pass', notes: 'Pads at 8mm, well above minimum.', completedAt: '2024-07-01T10:30:00Z' },
-      { id: 'item-1-2', title: 'Check Rear Brake Pad Thickness', description: 'Measure pad thickness and compare to manufacturer specifications.', priority: 'critical', required: true, status: 'warning', notes: 'Pads at 4mm, nearing replacement recommendation.', completedAt: '2024-07-01T10:32:00Z' },
-      { id: 'item-1-3', title: 'Inspect Rotors for Scoring or Warping', description: 'Visually and mechanically check rotor surfaces for damage.', priority: 'high', required: true, status: 'fail', notes: 'Front rotors show significant scoring. Recommend replacement.', completedAt: '2024-07-01T10:35:00Z' },
-      { id: 'item-1-4', title: 'Inspect Brake Fluid Level and Condition', priority: 'medium', required: true, status: 'pass', completedAt: '2024-07-01T10:36:00Z' },
-      { id: 'item-1-5', title: 'Check for Brake Fluid Leaks', description: 'Inspect lines, calipers, and master cylinder for any signs of leakage.', priority: 'high', required: true, status: 'pending' },
-    ],
-  },
-  {
-    id: 'insp-2',
-    name: 'Comprehensive Fluid Check',
-    items: [
-      { id: 'item-2-1', title: 'Engine Oil Level and Condition', priority: 'high', required: true, status: 'pass', completedAt: '2024-07-01T11:05:00Z' },
-      { id: 'item-2-2', title: 'Coolant Level and Condition', priority: 'medium', required: true, status: 'na' },
-      { id: 'item-2-3', title: 'Transmission Fluid Level', priority: 'low', required: false, status: 'pending' },
-    ],
-  },
-];
 
-// Inspections Tab Content (New Structure)
-const InspectionsTab: React.FC = () => {
-    const [inspections, setInspections] = useState<InspectionTemplate[]>(mockInspectionTemplates);
 
-    const handleStatusChange = (templateId: string, itemId: string, newStatus: InspectionChecklistItem['status']) => {
-        setInspections(prevInspections =>
-            prevInspections.map(template => {
-                if (template.id === templateId) {
-                    return {
-                        ...template,
-                        items: template.items.map(item =>
-                            item.id === itemId
-                                ? { ...item, status: newStatus, completedAt: new Date().toISOString() }
-                                : item
-                        ),
-                    };
-                }
-                return template;
-            })
-        );
-    };
 
-    const getStatusClass = (status: InspectionChecklistItem['status']) => `status-${status}`;
-    const getPriorityClass = (priority: InspectionChecklistItem['priority']) => `priority-${priority}`;
+// --- Inspections Tab (API-based, new structure) ---
 
-    return (
-        <div className="tab-content inspections-tab">
-            <div className="tab-header">
-                <h3>Inspections</h3>
-                <div className="tab-actions">
-                    <button className="btn btn--primary">
-                        <i className="bx bx-plus"></i> Add Inspection
+
+const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
+  const [inspections, setInspections] = useState<WorkOrderInspection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!workOrderId) return;
+    setLoading(true);
+    fetch(`http://localhost:3000/inspection-templates/work-orders/inspections?workOrderId=${workOrderId}`)
+      .then(res => res.json())
+      .then(apiRes => {
+        // Support both wrapped and unwrapped responses
+        let inspectionsArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
+        setInspections(inspectionsArr || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch inspections');
+        setLoading(false);
+      });
+  }, [workOrderId]);
+
+  if (loading) return <div className="tab-content inspections-tab">Loading inspections...</div>;
+  if (error) return <div className="tab-content inspections-tab" style={{ color: 'red' }}>{error}</div>;
+  if (!inspections || inspections.length === 0) return <div className="tab-content inspections-tab">No inspections found.</div>;
+
+  // Helper to get technician name
+  const getTechnicianName = (inspector: any) => {
+    if (!inspector) return '-';
+    if (typeof inspector.name === 'string') return inspector.name;
+    if (inspector.userProfile && inspector.userProfile.name) return inspector.userProfile.name;
+    return '-';
+  };
+
+  return (
+    <div className="tab-content inspections-tab">
+      <div className="tab-header">
+        <h3>Inspections</h3>
+      </div>
+      <div className="inspection-summary-table-container full-width-table">
+        <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900 }}>
+          <thead>
+            <tr>
+              <th>Technician</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Template Name</th>
+              <th>Template Description</th>
+              <th>Template Category</th>
+              <th>Notes</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inspections.map((inspection) => {
+              const template: Partial<InspectionTemplate> = inspection.template || {};
+              return (
+                <tr key={inspection.id}>
+                  <td>{getTechnicianName(inspection.inspector)}</td>
+                  <td>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
+                  <td>
+                    <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
+                  </td>
+                  <td>{template?.name || '-'}</td>
+                  <td>{template?.description || '-'}</td>
+                  <td>{template?.category || '-'}</td>
+                  <td>{inspection.notes || '-'}</td>
+                  <td>
+                    <button className="btn btn--primary btn--sm" style={{ padding: '4px 12px', fontSize: 14 }} onClick={() => alert(`View details for inspection ${inspection.id}`)}>
+                      View
                     </button>
-                </div>
-            </div>
-
-            {inspections.map(template => (
-                <div key={template.id} className="checklist-section">
-                    <h3>{template.name}</h3>
-                    <div className="checklist-items">
-                        {template.items.map(item => (
-                            <div key={item.id} className={`checklist-item ${getStatusClass(item.status)}`}>
-                                <div className="item-header">
-                                    <div className="item-info">
-                                        <h4 className="item-title">
-                                            {item.title}
-                                            {item.required && <span className="required-badge">Required</span>}
-                                            <span className={`priority-badge ${getPriorityClass(item.priority)}`}>
-                                                {item.priority}
-                                            </span>
-                                        </h4>
-                                        {item.description && (
-                                            <p className="item-description">{item.description}</p>
-                                        )}
-                                    </div>
-                                    <div className="item-status">
-                                        <div className="status-buttons">
-                                            <button
-                                                className={`status-btn status-pass ${item.status === 'pass' ? 'active' : ''}`}
-                                                onClick={() => handleStatusChange(template.id, item.id, 'pass')}
-                                                title="Pass"
-                                            >
-                                                <i className='bx bx-check'></i>
-                                            </button>
-                                            <button
-                                                className={`status-btn status-warning ${item.status === 'warning' ? 'active' : ''}`}
-                                                onClick={() => handleStatusChange(template.id, item.id, 'warning')}
-                                                title="Warning"
-                                            >
-                                                <i className='bx bx-error'></i>
-                                            </button>
-                                            <button
-                                                className={`status-btn status-fail ${item.status === 'fail' ? 'active' : ''}`}
-                                                onClick={() => handleStatusChange(template.id, item.id, 'fail')}
-                                                title="Fail"
-                                            >
-                                                <i className='bx bx-x'></i>
-                                            </button>
-                                            <button
-                                                className={`status-btn status-na ${item.status === 'na' ? 'active' : ''}`}
-                                                onClick={() => handleStatusChange(template.id, item.id, 'na')}
-                                                title="Not Applicable"
-                                            >
-                                                <i className='bx bx-minus'></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {item.notes && (
-                                    <div className="item-notes">
-                                        <strong>Notes:</strong> {item.notes}
-                                    </div>
-                                )}
-                                {item.completedAt && (
-                                    <div className="item-completion">
-                                        <small>Completed: {new Date(item.completedAt).toLocaleString()}</small>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 // Main Modal Component
@@ -952,7 +964,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       case 'estimates':
         return <EstimatesTab workOrderId={workOrder?.id || ''} />;
       case 'inspections':
-        return <InspectionsTab />;
+        return <InspectionsTab workOrderId={workOrder?.id || ''} />;
       case 'services':
         return <ServicesTab />;
       case 'labor':

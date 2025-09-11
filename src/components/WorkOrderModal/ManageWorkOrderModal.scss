@@ -1,3 +1,56 @@
+// Inspection Summary Table Styles
+
+.inspection-summary-table-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(9, 105, 218, 0.04);
+  border: 1px solid var(--color-neutral-300);
+  padding: 0 0 24px 0;
+  margin-bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.inspection-summary-table-container.full-width-table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.inspection-summary-table.styled-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0;
+  table-layout: auto;
+}
+.inspection-summary-table.styled-table th,
+.inspection-summary-table.styled-table td {
+  padding: 16px 18px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
+}
+.inspection-summary-table.styled-table th {
+  background: #f6f8fa;
+  color: #1f2937;
+  font-weight: 600;
+  width: 180px;
+  border-right: 1px solid #f1f5f9;
+}
+.inspection-summary-table.styled-table td {
+  color: #374151;
+  background: #fff;
+}
+.inspection-summary-table.styled-table tr:last-child th,
+.inspection-summary-table.styled-table tr:last-child td {
+  border-bottom: none;
+}
 // Approval badge for estimate items
 .approval-badge {
   display: inline-block;
