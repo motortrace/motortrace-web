@@ -5,7 +5,7 @@ import type {
   UpdateTemplateRequest 
 } from '../types/InspectionTemplate';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/inspection-templates`;
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/inspection-templates/templates`;
 
 export const inspectionTemplatesApi = {
   // Get all templates
@@ -23,7 +23,14 @@ export const inspectionTemplatesApi = {
         throw new Error(`Failed to fetch templates: ${response.statusText}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      
+      // Handle the API response structure with success/data wrapper
+      if (result.success && result.data) {
+        return result.data;
+      } else {
+        throw new Error('Invalid response format from API');
+      }
     } catch (error) {
       console.error('Error fetching templates:', error);
       throw error;
@@ -45,7 +52,13 @@ export const inspectionTemplatesApi = {
         throw new Error(`Failed to fetch template: ${response.statusText}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        return result.data;
+      } else {
+        throw new Error('Invalid response format from API');
+      }
     } catch (error) {
       console.error('Error fetching template:', error);
       throw error;
@@ -68,7 +81,13 @@ export const inspectionTemplatesApi = {
         throw new Error(`Failed to create template: ${response.statusText}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        return result.data;
+      } else {
+        throw new Error('Invalid response format from API');
+      }
     } catch (error) {
       console.error('Error creating template:', error);
       throw error;
@@ -91,7 +110,13 @@ export const inspectionTemplatesApi = {
         throw new Error(`Failed to update template: ${response.statusText}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        return result.data;
+      } else {
+        throw new Error('Invalid response format from API');
+      }
     } catch (error) {
       console.error('Error updating template:', error);
       throw error;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import DashboardHeader from '../../layouts/DashboardHeader/DashboardHeader';
 import { inspectionTemplatesApi } from '../../utils/inspectionTemplatesApi';
 import type { InspectionTemplate } from '../../types/InspectionTemplate';
 import './InspectionTemplates.scss';
@@ -12,128 +11,17 @@ const InspectionTemplates: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [expandedTemplates, setExpandedTemplates] = useState<Set<string>>(new Set());
 
-  // Sample data for development
-  const sampleTemplates: InspectionTemplate[] = [
-    {
-      id: '1',
-      name: 'Engine (Mechanical Condition)',
-      description: 'Comprehensive engine mechanical inspection covering all major components',
-      category: 'Mechanical',
-      isActive: true,
-      sortOrder: 1,
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-15T10:00:00Z',
-      templateItems: [
-        {
-          id: '1-1',
-          templateId: '1',
-          name: 'Oil in air cleaner',
-          description: 'Check for oil contamination in the air cleaner element',
-          category: 'Engine Oil',
-          sortOrder: 1,
-          isRequired: true,
-          allowsNotes: true,
-          createdAt: '2024-01-15T10:00:00Z',
-          updatedAt: '2024-01-15T10:00:00Z'
-        },
-        {
-          id: '1-2',
-          templateId: '1',
-          name: 'Water in oil',
-          description: 'Inspect for water contamination in engine oil',
-          category: 'Engine Oil',
-          sortOrder: 2,
-          isRequired: true,
-          allowsNotes: true,
-          createdAt: '2024-01-15T10:00:00Z',
-          updatedAt: '2024-01-15T10:00:00Z'
-        },
-        {
-          id: '1-3',
-          templateId: '1',
-          name: 'Coolant level',
-          description: 'Check coolant level and condition',
-          category: 'Cooling System',
-          sortOrder: 3,
-          isRequired: true,
-          allowsNotes: true,
-          createdAt: '2024-01-15T10:00:00Z',
-          updatedAt: '2024-01-15T10:00:00Z'
-        }
-      ]
-    },
-    {
-      id: '2',
-      name: 'Cooling System',
-      description: 'Complete cooling system inspection including radiator, hoses, and thermostat',
-      category: 'Mechanical',
-      isActive: true,
-      sortOrder: 2,
-      createdAt: '2024-01-16T10:00:00Z',
-      updatedAt: '2024-01-16T10:00:00Z',
-      templateItems: [
-        {
-          id: '2-1',
-          templateId: '2',
-          name: 'Radiator condition',
-          description: 'Visual inspection of radiator for leaks and damage',
-          category: 'Radiator',
-          sortOrder: 1,
-          isRequired: true,
-          allowsNotes: true,
-          createdAt: '2024-01-16T10:00:00Z',
-          updatedAt: '2024-01-16T10:00:00Z'
-        },
-        {
-          id: '2-2',
-          templateId: '2',
-          name: 'Hose condition',
-          description: 'Check all coolant hoses for cracks and leaks',
-          category: 'Hoses',
-          sortOrder: 2,
-          isRequired: true,
-          allowsNotes: true,
-          createdAt: '2024-01-16T10:00:00Z',
-          updatedAt: '2024-01-16T10:00:00Z'
-        }
-      ]
-    },
-    {
-      id: '3',
-      name: 'Electrical System',
-      description: 'Battery, alternator, and electrical component inspection',
-      category: 'Electrical',
-      isActive: true,
-      sortOrder: 3,
-      createdAt: '2024-01-17T10:00:00Z',
-      updatedAt: '2024-01-17T10:00:00Z',
-      templateItems: [
-        {
-          id: '3-1',
-          templateId: '3',
-          name: 'Battery voltage',
-          description: 'Test battery voltage and charging system',
-          category: 'Battery',
-          sortOrder: 1,
-          isRequired: true,
-          allowsNotes: true,
-          createdAt: '2024-01-17T10:00:00Z',
-          updatedAt: '2024-01-17T10:00:00Z'
-        }
-      ]
-    }
-  ];
 
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
         setLoading(true);
-        // For now, use sample data. Replace with actual API call later
-        // const data = await inspectionTemplatesApi.getTemplates();
-        setTemplates(sampleTemplates);
         setError(null);
+        const response = await inspectionTemplatesApi.getTemplates();
+        setTemplates(response);
       } catch (err) {
-        setError('Failed to load inspection templates');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load inspection templates';
+        setError(errorMessage);
         console.error('Error fetching templates:', err);
       } finally {
         setLoading(false);
