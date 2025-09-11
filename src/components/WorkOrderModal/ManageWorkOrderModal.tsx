@@ -460,23 +460,57 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
             </thead>
             <tbody>
               {estimates.map(est => (
-                <tr key={est.id}>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{est.version}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                    <span className={`estimate-status ${est.approved ? 'approved' : 'pending'}`}>{est.approved ? 'Approved' : 'Pending'}</span>
-                  </td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{new Date(est.createdAt).toLocaleString()}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>LKR {Number(est.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.laborAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.partsAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.taxAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.discountAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.description || '-'}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.notes || '-'}</td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                    <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px #0001' }}>View</button>
-                  </td>
-                </tr>
+                <React.Fragment key={est.id}>
+                  <tr>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{est.version}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                      <span className={`estimate-status ${est.approved ? 'approved' : 'pending'}`}>{est.approved ? 'Approved' : 'Pending'}</span>
+                    </td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{new Date(est.createdAt).toLocaleString()}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>LKR {Number(est.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.laborAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.partsAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.taxAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.discountAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.description || '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.notes || '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                      <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px #0001' }}>View</button>
+                    </td>
+                  </tr>
+                  {/* Show estimate labor items if present */}
+                  {Array.isArray(est.estimateLaborItems) && est.estimateLaborItems.length > 0 && (
+                    <tr>
+                      <td colSpan={11} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
+                        <div style={{ padding: '12px 18px' }}>
+                          <div style={{ fontWeight: 600, color: '#2563eb', marginBottom: 6 }}>Labor Items</div>
+                          <table style={{ width: '100%', fontSize: 13, background: '#f6f8fa' }}>
+                            <thead>
+                              <tr>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Description</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Hours</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Rate</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Subtotal</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Notes</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {est.estimateLaborItems.map((item: any) => (
+                                <tr key={item.id}>
+                                  <td style={{ padding: '4px 8px' }}>{item.description}</td>
+                                  <td style={{ padding: '4px 8px' }}>{item.hours}</td>
+                                  <td style={{ padding: '4px 8px' }}>LKR {Number(item.rate ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                  <td style={{ padding: '4px 8px' }}>LKR {Number(item.subtotal ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                  <td style={{ padding: '4px 8px' }}>{item.notes || '-'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
