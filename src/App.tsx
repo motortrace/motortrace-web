@@ -20,7 +20,7 @@ import PricingPage from './pages/PricingPage/PricingPage';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
 import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
 import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
-import DigitalInspections from './pages/ServiceCenter/DigitalInspections';
+import InspectionTemplates from './pages/ServiceCenter/InspectionTemplates';
 import Calendar from './pages/ServiceCenter/Calendar';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
@@ -124,7 +124,7 @@ function App() {
           <Route path="parts-order" element={<PartsSearch />} />
           <Route path="order-history" element={<OrderHistory />} />
           <Route path="reports" element={<EstimatesInvoices />} />
-          <Route path="inspections" element={<DigitalInspections />} />
+          <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<CannedServices />} />

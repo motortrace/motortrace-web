@@ -40,6 +40,10 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Order Parts',
     description: 'Manage your parts',
   },
+  '/servicecenter/inspection-templates': {
+    title: 'Inspection Templates',
+    description: 'Manage your inspection templates',
+  },
 };
 
 const Navbar: React.FC = () => {

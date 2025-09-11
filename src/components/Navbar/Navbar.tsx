@@ -56,9 +56,9 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Reports',
     description: 'Manage your estimates and invoices',
   },
-  '/servicecenter/inspections': {
-    title: 'Digital Inspections',
-    description: 'Manage vehicle inspections and checklists',
+  '/servicecenter/inspection-templates': {
+    title: 'Inspection Templates',
+    description: 'Manage your inspection templates',
   },
   '/servicecenter/calendar': {
     title: 'Calendar',
