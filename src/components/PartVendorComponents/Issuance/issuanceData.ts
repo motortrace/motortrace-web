@@ -6,6 +6,7 @@ export interface IssuedPart {
   imageUrl?: string;
   qty: number;
   notes?: string;
+  price?: number;
 }
 
 export interface Issuance {
@@ -18,6 +19,8 @@ export interface Issuance {
   parts: IssuedPart[];
   notes?: string;
   issuedBy?: string; // who created the issuance
+  serviceJob?: string;
+  carDetails?: string;
 }
 
 export const issuances: Issuance[] = [

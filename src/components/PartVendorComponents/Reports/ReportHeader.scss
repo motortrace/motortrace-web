@@ -1,0 +1,72 @@
+@import '../../../styles/variables.scss';
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 32px;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .header-icon {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-text {
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0 0 4px 0;
+      }
+
+      p {
+        font-size: 16px;
+        color: #64748b;
+        margin: 0;
+      }
+    }
+  }
+
+  .header-stats {
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      color: #475569;
+      font-weight: 500;
+
+      svg {
+        color: #667eea;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .report-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .header-content {
+      .header-text h1 {
+        font-size: 24px;
+      }
+    }
+  }
+}
