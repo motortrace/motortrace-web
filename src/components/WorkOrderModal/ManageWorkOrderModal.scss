@@ -643,6 +643,51 @@ $grey-na: #e5e7eb;
       }
     }
     
+    .modal-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        
+        &.btn--primary {
+          background: #3b82f6;
+          color: white;
+          
+          &:hover {
+            background: #2563eb;
+          }
+        }
+        
+        &.btn--secondary {
+          background: #f8fafc;
+          color: #374151;
+          border: 1px solid #d1d5db;
+          
+          &:hover {
+            background: #f1f5f9;
+            border-color: #9ca3af;
+          }
+        }
+        
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+    
     .close-btn {
       background: none;
       border: none;

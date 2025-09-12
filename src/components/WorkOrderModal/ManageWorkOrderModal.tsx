@@ -298,7 +298,6 @@ const TabNavigation: React.FC<{ activeTab: string; onTabChange: (tab: string) =>
     { id: 'services', label: 'Services', icon: 'bx-wrench' },
     { id: 'labor', label: 'Labor', icon: 'bx-user-voice' },
     { id: 'parts', label: 'Parts', icon: 'bx-package' },
-    { id: 'invoices', label: 'Invoices', icon: 'bx-receipt' },
     { id: 'notes', label: 'Notes', icon: 'bx-note' },
   ];
 
@@ -1490,8 +1489,6 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         return <LaborTab workOrderId={workOrder?.id || ''} />;
       case 'parts':
         return <PartsTab />;
-      case 'invoices':
-        return <div className="tab-content">Invoices tab coming soon...</div>;
       case 'notes':
         return <NotesTabContent notes={notes} onNotesChange={setNotes} />;
       default:
@@ -1519,9 +1516,27 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               </span>
             </div>
           </div>
-          <button className="close-btn" onClick={onClose} title="Close">
-            <i className="bx bx-x"></i>
-          </button>
+          <div className="modal-header-actions">
+            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-file-blank"></i>
+              Publish Inspection Report
+            </button>
+            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-calculator"></i>
+              Publish Estimate
+            </button>
+            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-receipt"></i>
+              Generate Invoice
+            </button>
+            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-send"></i>
+              Publish Invoice
+            </button>
+            <button className="close-btn" onClick={onClose} title="Close">
+              <i className="bx bx-x"></i>
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation */}
