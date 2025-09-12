@@ -103,51 +103,86 @@ const InspectionDetailPage = () => {
     <div className="inspection-detail-page">
       {/* Header */}
       <div className="page-header">
-        <button className="back-btn" onClick={handleBack}>
-          <i className="bx bx-arrow-back"></i>
-          Back to Records
-        </button>
         <div className="header-content">
           <h1 className="page-title">Inspection Details</h1>
           <p className="page-subtitle">Work Order: {inspection.workOrderNumber}</p>
         </div>
+        <button className="back-btn" onClick={handleBack}>
+          <i className="bx bx-arrow-back"></i>
+          Back to Records
+        </button>
       </div>
 
-      {/* Inspection Overview */}
-      <div className="inspection-overview">
-        <div className="overview-card">
-          <div className="card-header">
-            <h3>Inspection Overview</h3>
-            <div className={`status-indicator ${inspection.isCompleted ? 'completed' : 'in-progress'}`}>
-              {inspection.isCompleted ? 'Completed' : 'In Progress'}
-            </div>
+      {/* Summary Cards */}
+      <div className="summary-cards">
+        <div className="summary-card-item">
+          <div className="card-icon green">
+            <i className="bx bx-check-circle"></i>
           </div>
-          <div className="overview-grid">
-            <div className="overview-item">
-              <label>Template</label>
-              <span>{inspection.template?.name || 'No Template'}</span>
-            </div>
-            <div className="overview-item">
-              <label>Inspector</label>
-              <span>{inspection.inspector?.userProfile?.name || 'Unknown'}</span>
-            </div>
-            <div className="overview-item">
-              <label>Date</label>
-              <span>{new Date(inspection.date).toLocaleDateString()}</span>
-            </div>
-            <div className="overview-item">
-              <label>Items Checked</label>
-              <span>{inspection.checklistItems?.length || 0}</span>
-            </div>
+          <div className="card-content">
+            <div className="card-number">{sortedChecklistItems.filter(item => item.status === 'GREEN').length}</div>
+            <div className="card-label">Items Passed</div>
           </div>
-          {inspection.notes && (
-            <div className="inspection-notes">
-              <label>Notes</label>
-              <p>{inspection.notes}</p>
-            </div>
-          )}
+        </div>
+        
+        <div className="summary-card-item">
+          <div className="card-icon yellow">
+            <i className="bx bx-error-circle"></i>
+          </div>
+          <div className="card-content">
+            <div className="card-number">{sortedChecklistItems.filter(item => item.status === 'YELLOW').length}</div>
+            <div className="card-label">Need Attention</div>
+          </div>
+        </div>
+        
+        <div className="summary-card-item">
+          <div className="card-icon red">
+            <i className="bx bx-x-circle"></i>
+          </div>
+          <div className="card-content">
+            <div className="card-number">{sortedChecklistItems.filter(item => item.status === 'RED').length}</div>
+            <div className="card-label">Critical Issues</div>
+          </div>
+        </div>
+        
+        <div className="summary-card-item">
+          <div className="card-icon follow-up">
+            <i className="bx bx-alarm-exclamation"></i>
+          </div>
+          <div className="card-content">
+            <div className="card-number">{sortedChecklistItems.filter(item => item.requiresFollowUp).length}</div>
+            <div className="card-label">Follow-up Required</div>
+          </div>
         </div>
       </div>
+
+      {/* Inspector Profile Card */}
+      <div className="inspector-profile-card">
+        <div className="profile-header">
+          <div className="profile-photo">
+            {inspection.inspector?.userProfile?.profilePhoto ? (
+              <img 
+                src={inspection.inspector.userProfile.profilePhoto} 
+                alt={inspection.inspector.userProfile.name || 'Inspector'} 
+                className="profile-image"
+              />
+            ) : (
+              <div className="profile-placeholder">
+                <i className="bx bx-user"></i>
+              </div>
+            )}
+          </div>
+          <div className="profile-info">
+            <h3 className="inspector-name">{inspection.inspector?.userProfile?.name || 'Unknown Inspector'}</h3>
+            <p className="template-name">{inspection.template?.name || 'No Template'}</p>
+            <div className="inspection-number">
+              <span className="number-label">Inspection #</span>
+              <span className="number-value">{inspection.id}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
       {/* Checklist Items */}
       <div className="checklist-section">
@@ -176,6 +211,32 @@ const InspectionDetailPage = () => {
                       )}
                     </div>
                   </div>
+                  
+                  {/* Status Buttons */}
+                  <div className="status-buttons">
+                    <button 
+                      className={`status-btn green ${item.status === 'GREEN' ? 'active' : ''}`}
+                      onClick={() => {/* Handle status change */}}
+                      title="Good"
+                    >
+                      <i className="bx bx-check-circle"></i>
+                    </button>
+                    <button 
+                      className={`status-btn yellow ${item.status === 'YELLOW' ? 'active' : ''}`}
+                      onClick={() => {/* Handle status change */}}
+                      title="Needs Attention"
+                    >
+                      <i className="bx bx-error-circle"></i>
+                    </button>
+                    <button 
+                      className={`status-btn red ${item.status === 'RED' ? 'active' : ''}`}
+                      onClick={() => {/* Handle status change */}}
+                      title="Critical Issue"
+                    >
+                      <i className="bx bx-x-circle"></i>
+                    </button>
+                  </div>
+
                   {item.notes && (
                     <div className="item-notes">
                       <label>Notes:</label>
@@ -189,30 +250,6 @@ const InspectionDetailPage = () => {
         ))}
       </div>
 
-      {/* Summary */}
-      <div className="inspection-summary">
-        <div className="summary-card">
-          <h3>Inspection Summary</h3>
-          <div className="summary-stats">
-            <div className="stat-item">
-              <span className="stat-number green">{sortedChecklistItems.filter(item => item.status === 'GREEN').length}</span>
-              <span className="stat-label">Good</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number yellow">{sortedChecklistItems.filter(item => item.status === 'YELLOW').length}</span>
-              <span className="stat-label">Needs Attention</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number red">{sortedChecklistItems.filter(item => item.status === 'RED').length}</span>
-              <span className="stat-label">Critical Issues</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number follow-up">{sortedChecklistItems.filter(item => item.requiresFollowUp).length}</span>
-              <span className="stat-label">Follow-up Required</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Attachments */}
       {inspection.attachments && inspection.attachments.length > 0 && (
