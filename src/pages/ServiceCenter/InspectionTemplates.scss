@@ -59,6 +59,143 @@
   }
 }
 
+// Page header styles (matching KanbanPage structure)
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  
+  .header-content {
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 4px 0;
+    }
+    
+    .page-subtitle {
+      font-size: 18px;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    
+    .search-container {
+      .search-input {
+        padding: 8px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 300px;
+        transition: all 0.2s ease;
+        
+        &:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        &::placeholder {
+          color: #9ca3af;
+        }
+      }
+    }
+    
+    .category-filter {
+      .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+      }
+    }
+    
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &.primary {
+        background: #3b82f6;
+        color: white;
+        
+        &:hover {
+          background: #2563eb;
+        }
+      }
+      
+      &.secondary {
+        background: #f8fafc;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        
+        &:hover {
+          background: #f1f5f9;
+          border-color: #9ca3af;
+        }
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// Responsive design for page header
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    
+    .header-content {
+      text-align: center;
+    }
+    
+    .header-actions {
+      flex-direction: column;
+      gap: 12px;
+      
+      .search-container .search-input {
+        width: 100%;
+      }
+      
+      .category-filter .filter-select {
+        width: 100%;
+      }
+      
+      .action-btn {
+        justify-content: center;
+      }
+    }
+  }
+}
+
 .templates-container {
   padding: 2rem;
 //   max-width: 1200px;

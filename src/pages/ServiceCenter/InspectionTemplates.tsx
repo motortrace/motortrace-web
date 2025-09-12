@@ -84,35 +84,26 @@ const InspectionTemplates: React.FC = () => {
 
   return (
     <div className="inspection-templates-page">
-      
-      <div className="templates-container">
-        {/* Header Section */}
-        <div className="templates-header">
-          <div className="header-content">
-            <h1></h1>
-            <p></p>
-          </div>
-
+      <div className="page-header">
+        <div className="header-content">
+          <h1 className="page-title">Inspection Templates</h1>
+          <p className="page-subtitle">Create and manage inspection templates</p>
         </div>
-
-        {/* Filters Section */}
-        <div className="filters-section">
-          <div className="search-box">
-            <i className="bx bx-search"></i>
+        <div className="header-actions">
+          <div className="search-container">
             <input
               type="text"
               placeholder="Search templates..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
             />
           </div>
-          
           <div className="category-filter">
-            <label htmlFor="category-select">Category:</label>
             <select
-              id="category-select"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
+              className="filter-select"
             >
               <option value="all">All Categories</option>
               {categories.map(category => (
@@ -120,13 +111,14 @@ const InspectionTemplates: React.FC = () => {
               ))}
             </select>
           </div>
-
-          <button style={{ marginLeft: 'auto' }} className="create-template-btn">
+          <button className="action-btn primary">
             <i className="bx bx-plus"></i>
             Create Template
           </button>
         </div>
+      </div>
 
+      <div className="templates-container">
         {/* Templates List */}
         <div className="templates-list">
           {filteredTemplates.length === 0 ? (
