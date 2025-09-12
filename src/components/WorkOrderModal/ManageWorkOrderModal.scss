@@ -170,6 +170,7 @@ $grey-na: #e5e7eb;
           }
         }
       }
+      
       // Make services tab content scrollable
       .tab-content.services-tab {
         flex: 1 1 auto;
@@ -1248,4 +1249,198 @@ $grey-na: #e5e7eb;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   display: block;
   margin: 0 auto;
+}
+
+
+
+
+
+
+
+/* Additional styles for the updated InspectionsTab component */
+
+.template-preview {
+  // background: #f8f9fa;
+  // border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.template-preview-header {
+  display: flex;
+  justify-content: between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 15px;
+}
+
+.template-preview-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  flex: 1;
+  font-size: 1.2rem;
+}
+
+.template-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.template-description {
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  margin-top: 8px;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category-badge.category-mechanical {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.category-badge.category-electrical {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.category-badge.category-cooling {
+  background: #e8f5e8;
+  color: #388e3c;
+}
+
+.category-badge.category-steering {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.category-badge.category-suspension {
+  background: #fce4ec;
+  color: #c2185b;
+}
+
+.item-count-badge {
+  background: #e9ecef;
+  color: #495057;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.checklist-section.preview {
+  background: white;
+  // border: 1px solid #dee2e6;
+  padding-left: 0;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.checklist-item.preview-item {
+  border-left: 3px solid #6c757d;
+  background: #ffffff;
+}
+
+.checklist-item.preview-item:hover {
+  background: #f8f9fa;
+}
+
+.notes-indicator {
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.template-select {
+  min-width: 200px;
+  margin-right: 8px;
+}
+
+.checklist-header .template-info {
+  flex: 1;
+}
+
+.checklist-header .template-info h3 {
+  margin: 0 0 4px 0;
+}
+
+.checklist-header .template-info .template-description {
+  margin: 4px 0 8px 0;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.available-templates-hint {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.template-categories {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* Sort order visual indicator */
+.checklist-item::before {
+  content: attr(data-sort-order);
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #e9ecef;
+  color: #6c757d;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.checklist-items {
+  position: relative;
+  padding-left: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .template-preview-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .template-meta {
+    align-self: flex-start;
+  }
+  
+  .template-categories {
+    justify-content: flex-start;
+  }
+  
+  .template-select {
+    min-width: 150px;
+    margin-bottom: 8px;
+  }
 }
