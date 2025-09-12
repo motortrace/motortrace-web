@@ -196,27 +196,6 @@ import NotesTab from '../../pages/ServiceCenter/JobCard/tabs/NotesTab';
 import './ManageWorkOrderModal.scss';
 
 // Mock types for demonstration
-interface Technician {
-  id: string;
-  name: string;
-  avatar: string;
-}
-
-interface ServiceLine {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  qty: number;
-  hours: number;
-  discount: number;
-  tax: number;
-  status: string;
-  technician: Technician | null;
-  type: 'package' | 'service';
-  customerAccepted?: boolean | null; // true: accepted, false: declined, null/undefined: pending
-}
-
 interface PartItem {
   id:string;
   name: string;
@@ -408,6 +387,56 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
 
   return (
     <div className="tab-content estimates-tab">
+      {/* Header with search and action buttons */}
+      <div className="estimates-header" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
+        <div className="search-container" style={{ width: '100%' }}>
+          <input
+            type="text"
+            placeholder="Search estimates..."
+            className="search-input"
+            style={{
+              width: '100%',
+              padding: '8px 16px',
+              border: '1px solid #d1d5db',
+              borderRadius: '6px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s ease'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          />
+        </div>
+        <div className="status-and-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+          <div className="status-info" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500' }}>Status:</span>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <span className="status-badge" style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500', background: '#f3f4f6', color: '#374151' }}>All</span>
+              <span className="status-badge" style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500', background: '#fef3c7', color: '#92400e' }}>Pending</span>
+              <span className="status-badge" style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500', background: '#d1fae5', color: '#065f46' }}>Approved</span>
+            </div>
+          </div>
+          <div className="action-buttons" style={{ display: 'flex', gap: '12px' }}>
+            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-plus"></i>
+              Add Canned Service
+            </button>
+            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-wrench"></i>
+              Add Labor
+            </button>
+            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-file-blank"></i>
+              Generate Estimate
+            </button>
+            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-file"></i>
+              View Full Report
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="estimates-summary-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20, marginBottom: 24, width: '100%' }}>
         {/* <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}># Estimates</div>
@@ -434,10 +463,6 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalDiscountAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
         </div>
       </div>
-      <div className="tab-header">
-        <h3>Estimates</h3>
-        <button className="btn btn--primary">Add Estimate</button>
-      </div>
       {estimates.length === 0 ? (
         <div>No estimates found for this work order.</div>
       ) : (
@@ -449,10 +474,6 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
                 <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
                 <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Created</th>
                 <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Total</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Labor</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Parts</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Tax</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Discount</th>
                 <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Description</th>
                 <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Notes</th>
                 <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
@@ -463,25 +484,36 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
                 <React.Fragment key={est.id}>
                   <tr>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{est.version}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                       <span className={`estimate-status ${est.approved ? 'approved' : 'pending'}`}>{est.approved ? 'Approved' : 'Pending'}</span>
                     </td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{new Date(est.createdAt).toLocaleString()}</td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>LKR {Number(est.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.laborAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.partsAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.taxAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>LKR {Number(est.discountAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.description || '-'}</td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{est.notes || '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                      <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px #0001' }}>View</button>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                      <div className="estimate-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                        <button 
+                          className="view-btn"
+                          title="View Estimate"
+                        >
+                          <i className="bx bx-box"></i>
+                        </button>
+                        <button 
+                          className={`send-btn ${est.approved ? 'approved' : 'pending'}`}
+                          disabled={!est.approved}
+                          title={est.approved ? "Send to Customer" : "Estimate must be approved to send"}
+                        >
+                          <i className="bx bx-send"></i>
+                          Send
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {/* Show estimate labor items if present */}
-                  {Array.isArray(est.estimateLaborItems) && est.estimateLaborItems.length > 0 && (
+                  {Array.isArray(est.estimateItems) && est.estimateItems.filter((item: any) => item.type === 'LABOR').length > 0 && (
                     <tr>
-                      <td colSpan={11} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
+                      <td colSpan={7} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
                         <div style={{ padding: '12px 18px' }}>
                           <div style={{ fontWeight: 600, color: '#2563eb', marginBottom: 6 }}>Labor Items</div>
                           <table style={{ width: '100%', fontSize: 13, background: '#f6f8fa' }}>
@@ -495,7 +527,7 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
                               </tr>
                             </thead>
                             <tbody>
-                              {est.estimateLaborItems.map((item: any) => (
+                              {est.estimateItems.filter((item: any) => item.type === 'LABOR').map((item: any) => (
                                 <tr key={item.id}>
                                   <td style={{ padding: '4px 8px' }}>{item.description}</td>
                                   <td style={{ padding: '4px 8px' }}>{item.hours}</td>

@@ -1,3 +1,146 @@
+// Estimates Tab Header Styles
+.estimates-header {
+  .search-container {
+    .search-input {
+      &:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+    }
+  }
+  
+  .status-and-actions {
+    .status-info {
+      .status-badge {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+    
+    .action-buttons {
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &.btn--primary {
+          background: #3b82f6;
+          color: white;
+          
+          &:hover {
+            background: #2563eb;
+          }
+        }
+        
+        &.btn--secondary {
+          background: #f8fafc;
+          color: #374151;
+          border: 1px solid #d1d5db;
+          
+          &:hover {
+            background: #f1f5f9;
+            border-color: #9ca3af;
+          }
+        }
+        
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+// Estimate Action Buttons
+.estimate-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  
+  .view-btn {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+  
+  .send-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &.approved {
+      background: #10b981;
+      color: #fff;
+      
+      &:hover {
+        background: #059669;
+      }
+    }
+    
+    &.pending {
+      background: #9ca3af;
+      color: #fff;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    i {
+      margin-right: 4px;
+    }
+  }
+}
+
+// Estimate Status Badge Styles
+.estimate-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  
+  &.approved {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  &.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+}
+
 // Inspection Summary Table Styles
 
 .inspection-summary-table-container {
