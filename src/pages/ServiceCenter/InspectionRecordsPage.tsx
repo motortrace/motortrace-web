@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
-import './RecordsPage.scss';
+import './InspectionRecordsPage.scss';
 import { getWorkOrderInspections } from '../../utils/workOrderInspectionsApi';
 import type { WorkOrderInspection } from '../../types/WorkOrderInspection';
 
@@ -11,6 +12,7 @@ const getStatusBadge = (isCompleted: boolean) => {
 };
 
 const InspectionRecordsPage = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterInspector, setFilterInspector] = useState('all');
@@ -64,8 +66,10 @@ const InspectionRecordsPage = () => {
   });
 
   const handleView = (id: string) => {
-    console.log('View inspection:', id);
-    // TODO: Implement view functionality (could navigate to detail page, etc.)
+    const inspection = inspections.find((i: WorkOrderInspection) => i.id === id);
+    if (inspection?.workOrderId) {
+      navigate(`/servicecenter/inspection-detail/${inspection.workOrderId}`);
+    }
   };
 
   const columns: TableColumn<WorkOrderInspection>[] = [

@@ -22,6 +22,7 @@ import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDet
 import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
 import InspectionTemplates from './pages/ServiceCenter/InspectionTemplates';
 import InspectionRecordsPage from './pages/ServiceCenter/InspectionRecordsPage';
+import InspectionDetailPage from './pages/ServiceCenter/InspectionDetailPage';
 import Calendar from './pages/ServiceCenter/Calendar';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
@@ -127,6 +128,7 @@ function App() {
           <Route path="reports" element={<EstimatesInvoices />} />
           <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
+          <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<CannedServices />} />

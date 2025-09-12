@@ -15,14 +15,25 @@ export async function getWorkOrderInspections(params?: Record<string, any>) {
   return res.json();
 }
 
-export async function getWorkOrderInspection(id: string) {
-  const res = await fetch(`${API_BASE}/${id}`, {
+export async function getWorkOrderInspection(inspectionId: string) {
+  const res = await fetch(`${API_BASE}/${inspectionId}`, {
     headers: {
       'Content-Type': 'application/json',
       // TODO: Add auth headers if needed
     },
   });
   if (!res.ok) throw new Error('Failed to fetch work order inspection');
+  return res.json();
+}
+
+export async function getWorkOrderInspectionsByWorkOrder(workOrderId: string) {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inspection-templates/work-orders/${workOrderId}/inspections`, {
+    headers: {
+      'Content-Type': 'application/json',
+      // TODO: Add auth headers if needed
+    },
+  });
+  if (!res.ok) throw new Error('Failed to fetch work order inspections');
   return res.json();
 }
 

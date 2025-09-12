@@ -45,19 +45,21 @@ export interface WorkOrderInspection {
     };
   };
   checklistItems?: InspectionChecklistItem[];
+  tireChecks?: TireInspection[];
+  attachments?: WorkOrderInspectionAttachment[];
 }
 
 export interface InspectionChecklistItem {
   id: string;
   inspectionId: string;
-  templateItemId: string;
-  category: string;
+  templateItemId?: string;
+  category?: string;
   item: string;
   status: 'GREEN' | 'YELLOW' | 'RED';
   notes?: string;
   requiresFollowUp: boolean;
   createdAt: string;
-  templateItem: {
+  templateItem?: {
     id: string;
     templateId: string;
     name: string;
@@ -69,4 +71,28 @@ export interface InspectionChecklistItem {
     createdAt: string;
     updatedAt: string;
   };
+}
+
+export interface TireInspection {
+  id: string;
+  inspectionId: string;
+  position: 'LF' | 'RF' | 'LR' | 'RR' | 'SPARE';
+  brand?: string;
+  model?: string;
+  size?: string;
+  psi?: number;
+  treadDepth?: number;
+  damageNotes?: string;
+  createdAt: string;
+}
+
+export interface WorkOrderInspectionAttachment {
+  id: string;
+  inspectionId: string;
+  fileUrl: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  description?: string;
+  uploadedAt: string;
 }
