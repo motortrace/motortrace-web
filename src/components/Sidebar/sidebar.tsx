@@ -67,13 +67,6 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'Customer Interaction',
-      items: [
-        { id: 'reviews', label: 'Reviews', icon: 'bx bx-star', route: '/servicecenter/reviews' },
-        { id: 'chat', label: 'Chat', icon: 'bx bx-chat', route: '/servicecenter/chat' },
-      ]
-    },
-    {
       title: 'Settings',
       items: [
         { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/servicecenter/settings' },
