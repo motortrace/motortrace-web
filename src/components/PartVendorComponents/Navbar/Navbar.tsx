@@ -32,14 +32,6 @@ const pageInfo: Record<string, { title: string; description: string }> = {
     title: 'Parts Inventory',
     description: 'Manage your vehicle parts',
   },
-  '/servicecenter/suppliers': {
-    title: 'Supplier Connection',
-    description: 'Manage your suppliers',
-  },
-  '/servicecenter/parts-order': {
-    title: 'Order Parts',
-    description: 'Manage your parts',
-  },
   '/servicecenter/inspection-templates': {
     title: 'Inspection Templates',
     description: 'Manage your inspection templates',

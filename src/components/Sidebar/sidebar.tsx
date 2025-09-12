@@ -54,9 +54,6 @@ const Sidebar: React.FC = () => {
       title: 'Spare Parts',
       items: [
         { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
-        { id: 'suppliers', label: 'Find Sellers', icon: 'bx bx-user', route: '/servicecenter/suppliers' },
-        { id: 'order', label: 'Order Parts', icon: 'bx bx-cube', route: '/servicecenter/parts-order' },
-        { id: 'orderHistory', label: 'Order History', icon: 'bx bx-history', route: '/servicecenter/order-history' },
       ]
     },
     {

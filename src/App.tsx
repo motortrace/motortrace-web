@@ -12,8 +12,6 @@ import TestTablePage from './pages/ServiceCenter/TestTablePage';
 import JobCard from './pages/ServiceCenter/JobCard/JobCard';
 import TechnicianSchedulingPage from './pages/ServiceCenter/TechnicianScheduling/TechnicianSchedulingPage';
 import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
-import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConnectionPage';
-import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import PricingPage from './pages/PricingPage/PricingPage';
@@ -29,7 +27,6 @@ import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
-import OrderHistory from './pages/ServiceCenter/OrderHistory';
 
 
 import AdminLogin from './pages/Admin/AdminLogin';
@@ -120,9 +117,6 @@ function App() {
           <Route path="jobcard" element={<JobCard />} />
           <Route path="scheduling" element={<TechnicianSchedulingPage />} />
           <Route path="inventory" element={<PartsInventory />} />
-          <Route path="suppliers" element={<SupplierConnectionPage />} />
-          <Route path="parts-order" element={<PartsSearch />} />
-          <Route path="order-history" element={<OrderHistory />} />
           <Route path="reports" element={<EstimatesInvoices />} />
           <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="inspection-records" element={<InspectionRecordsPage />} />

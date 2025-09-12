@@ -3,7 +3,6 @@ import DashboardHeader from '../../layouts/DashboardHeader/DashboardHeader';
 import MetricCard from '../../components/MetricCard/MetricCard';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './EstimatesInvoices.scss';
-import EstimateInvoiceModal from '../../components/EstimateInvoiceModal/EstimateInvoiceModal';
 
 interface EstimateInvoice {
   id: string;
@@ -77,9 +76,6 @@ const EstimatesInvoices = () => {
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('all');
   const [filterDateRange, setFilterDateRange] = useState('all');
 
-  // Modal state
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
 
   // Sample data with realistic estimates and invoices
   const [documents, setDocuments] = useState<EstimateInvoice[]>([
@@ -258,8 +254,7 @@ const EstimatesInvoices = () => {
   });
 
   const handleViewDocument = (docId: string) => {
-    setSelectedDocId(docId);
-    setModalOpen(true);
+    console.log('View document:', docId);
   };
 
   const handleEditDocument = (docId: string) => {
@@ -510,7 +505,6 @@ const EstimatesInvoices = () => {
         onRowClick={(doc) => handleViewDocument(doc.id)}
         emptyMessage="No documents found matching your search criteria."
       />
-      <EstimateInvoiceModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 };
