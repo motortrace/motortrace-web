@@ -111,7 +111,7 @@ function Table<T extends { [key: string]: any }>({
         {columns.map((column) => (
         <div
             key={String(column.key)}
-            className="table-header-cell"
+            className={`table-header-cell ${column.align ? `align-${column.align}` : ''}`}
             onClick={() => handleSort(column.key)}
         >
             {column.label}
@@ -130,7 +130,7 @@ function Table<T extends { [key: string]: any }>({
             onClick={() => handleRowClick(row)}
         >
             {columns.map((col) => (
-            <div key={String(col.key)} className="table-cell">
+            <div key={String(col.key)} className={`table-cell ${col.align ? `align-${col.align}` : ''}`}>
                 {renderCell(col, row)}
             </div>
             ))}

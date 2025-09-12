@@ -77,6 +77,14 @@
         align-items: center;
         gap: 4px;
   
+        &.align-right {
+          justify-content: flex-end;
+        }
+  
+        &.align-center {
+          justify-content: center;
+        }
+  
         .sort-icon {
           font-size: 9px;
           color: #9ca3af;
