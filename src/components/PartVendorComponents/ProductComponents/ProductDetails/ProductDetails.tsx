@@ -1129,11 +1129,21 @@ const ProductDetails: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleSaveProduct = () => {
-    // Add your save logic here
-    console.log('Product saved!');
-    // You can add the new product to your products array here
-  };
+  // const handleSaveProduct = () => {
+  //   // Add your save logic here
+  //   console.log('Product saved!');
+  //   // You can add the new product to your products array here
+  // };
+
+  const handleSaveProduct = (productData: any) => {
+    console.log('Product saved:', productData);
+    // Here you would typically update your local state or refetch products
+    // For example:
+    // setProducts([...products, productData]);
+    
+    // Show success message
+    alert('Product added successfully!');
+};
 
   const handleViewProduct = (product: Product) => {
     setSelectedProduct(product);
