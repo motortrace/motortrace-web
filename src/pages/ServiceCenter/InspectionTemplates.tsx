@@ -141,6 +141,11 @@ const InspectionTemplates: React.FC = () => {
             filteredTemplates.map(template => (
               <div key={template.id} className="template-card">
                 <div className="template-header" onClick={() => toggleTemplateExpansion(template.id)}>
+                  {template.imageUrl && (
+                    <div className="template-thumbnail">
+                      <img src={template.imageUrl} alt={template.name} />
+                    </div>
+                  )}
                   <div className="template-info">
                     <div className="template-title">
                       <h3>{template.name}</h3>

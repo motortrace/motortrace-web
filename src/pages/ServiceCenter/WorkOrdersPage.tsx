@@ -149,7 +149,7 @@ const WorkOrdersPage = () => {
   return (
     <div className="work-orders-page">
       <div className="page-header">
-        <h2 className="page-title"></h2>
+        <h2 className="page-title">Work Orders</h2>
         <button className="btn btn--primary" style={{ marginLeft: 'auto' }}>
           <i className='bx bx-plus'></i>
           Create Work Order

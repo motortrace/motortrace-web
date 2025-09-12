@@ -9,6 +9,7 @@ export interface InspectionTemplate {
   updatedAt: string;
   templateItems: InspectionTemplateItem[];
   workOrderInspections?: any[]; // We'll define this later if needed
+  imageUrl?: string;
 }
 
 export interface InspectionTemplateItem {
