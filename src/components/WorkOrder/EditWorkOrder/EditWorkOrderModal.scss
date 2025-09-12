@@ -1,0 +1,897 @@
+// src/components/WorkOrderModal/EditWorkOrderModal.scss
+// Edit Work Order Modal Styles
+$ewo-primary: #1a1a1a;
+$ewo-secondary: #2563eb;
+$ewo-accent: #3b82f6;
+$ewo-surface: #ffffff;
+$ewo-surface-secondary: #f8fafc;
+$ewo-surface-tertiary: #f1f5f9;
+$ewo-border: #e2e8f0;
+$ewo-border-focus: #3b82f6;
+$ewo-text-primary: #0f172a;
+$ewo-text-secondary: #475569;
+$ewo-text-muted: #64748b;
+
+// Status Colors
+$ewo-success: #059669;
+$ewo-error: #dc2626;
+$ewo-warning: #d97706;
+$ewo-info: #0284c7;
+
+// Shadows
+$ewo-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$ewo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$ewo-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$ewo-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$ewo-shadow-overlay: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// Transitions
+$ewo-transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+$ewo-transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+$ewo-transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// Border Radius
+$ewo-radius-sm: 0.375rem;
+$ewo-radius-md: 0.5rem;
+$ewo-radius-lg: 0.75rem;
+$ewo-radius-xl: 1rem;
+
+.ewo-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  opacity: 0;
+  animation: ewo-fade-in 0.2s ease-out forwards;
+}
+
+@keyframes ewo-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ewo-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ewo-modal-container {
+  background: $ewo-surface;
+  border-radius: $ewo-radius-xl;
+  box-shadow: $ewo-shadow-overlay;
+  width: 100%;
+  max-width: 56rem;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid $ewo-border;
+  animation: ewo-slide-up 0.3s ease-out;
+
+  .ewo-modal-header {
+    padding: 2rem 2rem 1.5rem;
+    background: linear-gradient(135deg, $ewo-surface-secondary, $ewo-surface-tertiary);
+    border-bottom: 1px solid $ewo-border;
+    position: relative;
+
+    .ewo-header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ewo-modal-title {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: $ewo-text-primary;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      &::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: $ewo-secondary;
+        border-radius: 50%;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      }
+    }
+
+    .ewo-close-button {
+      background: $ewo-surface;
+      border: 1px solid $ewo-border;
+      border-radius: $ewo-radius-md;
+      font-size: 1.25rem;
+      color: $ewo-text-secondary;
+      cursor: pointer;
+      padding: 0.75rem;
+      transition: $ewo-transition-base;
+      box-shadow: $ewo-shadow-sm;
+
+      &:hover {
+        background: $ewo-surface-tertiary;
+        color: $ewo-text-primary;
+        transform: translateY(-1px);
+        box-shadow: $ewo-shadow-md;
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: $ewo-shadow-sm;
+      }
+    }
+  }
+
+  .ewo-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    background: $ewo-surface;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $ewo-surface-secondary;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $ewo-border;
+      border-radius: 4px;
+      
+      &:hover {
+        background: $ewo-text-muted;
+      }
+    }
+
+    .ewo-error-alert {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border: 1px solid #fca5a5;
+      border-left: 4px solid $ewo-error;
+      color: #991b1b;
+      padding: 1rem 1.25rem;
+      border-radius: $ewo-radius-md;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      box-shadow: $ewo-shadow-sm;
+
+      .ewo-error-icon {
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+      }
+
+      .ewo-error-text {
+        font-weight: 500;
+      }
+    }
+
+    .ewo-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .ewo-form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      &.ewo-field-full {
+        grid-column: 1 / -1;
+      }
+
+      .ewo-field-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: $ewo-text-primary;
+        margin-bottom: 0.25rem;
+
+        .ewo-required {
+          color: $ewo-error;
+          margin-left: 2px;
+        }
+      }
+
+      .ewo-field-input,
+      .ewo-field-select,
+      .ewo-field-textarea {
+        padding: 0.875rem 1rem;
+        border: 2px solid $ewo-border;
+        border-radius: $ewo-radius-md;
+        background: $ewo-surface;
+        font-size: 0.875rem;
+        color: $ewo-text-primary;
+        font-family: inherit;
+        transition: $ewo-transition-base;
+        box-shadow: $ewo-shadow-sm;
+        
+        &:focus {
+          outline: none;
+          border-color: $ewo-border-focus;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), $ewo-shadow-sm;
+          background: $ewo-surface;
+        }
+
+        &:disabled {
+          background: $ewo-surface-secondary;
+          color: $ewo-text-muted;
+          cursor: not-allowed;
+          border-color: $ewo-border;
+        }
+
+        &::placeholder {
+          color: $ewo-text-muted;
+          opacity: 1;
+        }
+      }
+
+      .ewo-field-textarea {
+        resize: vertical;
+        min-height: 5rem;
+        line-height: 1.5;
+        resize: none;
+      }
+
+      .ewo-field-select {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5rem 1.5rem;
+        padding-right: 2.5rem;
+        
+        // Hide native dropdown arrow
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        
+        // For Internet Explorer
+        &::-ms-expand {
+          display: none;
+        }
+
+        &:disabled {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+      }
+    }
+
+    .ewo-services-section {
+      margin-bottom: 2.5rem;
+
+      .ewo-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, $ewo-surface-secondary, $ewo-surface-tertiary);
+        border-radius: $ewo-radius-lg;
+        border: 1px solid $ewo-border;
+
+        .ewo-section-title {
+          margin: 0;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: $ewo-text-primary;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &::before {
+            content: '⚙️';
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .ewo-service-item {
+        display: grid;
+        grid-template-columns: 2fr 100px 120px 1.5fr 48px;
+        gap: 1rem;
+        align-items: end;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, $ewo-surface, $ewo-surface-secondary);
+        border: 2px solid $ewo-border;
+        border-radius: $ewo-radius-lg;
+        margin-bottom: 1rem;
+        transition: $ewo-transition-base;
+        box-shadow: $ewo-shadow-sm;
+
+        &:hover {
+          box-shadow: $ewo-shadow-md;
+          border-color: $ewo-accent;
+        }
+
+        .ewo-service-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+
+          .ewo-service-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $ewo-text-secondary;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+          }
+        }
+
+        .ewo-remove-service {
+          padding: 0.75rem;
+          border: 2px solid transparent;
+          border-radius: $ewo-radius-md;
+          background: linear-gradient(135deg, #fef2f2, #fee2e2);
+          color: $ewo-error;
+          cursor: pointer;
+          transition: $ewo-transition-base;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: $ewo-shadow-sm;
+
+          &:hover {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-color: $ewo-error;
+            transform: translateY(-1px);
+            box-shadow: $ewo-shadow-md;
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+
+          i {
+            font-size: 1.125rem;
+          }
+        }
+      }
+    }
+
+    .ewo-notes-section {
+      margin-bottom: 2.5rem;
+
+      .ewo-notes-header {
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, $ewo-surface-secondary, $ewo-surface-tertiary);
+        border-radius: $ewo-radius-lg;
+        border: 1px solid $ewo-border;
+
+        .ewo-notes-title {
+          margin: 0;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: $ewo-text-primary;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &::before {
+            content: '📝';
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .ewo-notes-grid {
+        display: grid;
+        gap: 1.5rem;
+      }
+    }
+
+    .ewo-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding-top: 2rem;
+      border-top: 2px solid $ewo-border;
+      margin-top: 1rem;
+    }
+  }
+}
+
+// Enhanced Button Styles
+.ewo-button {
+  padding: 0.875rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: $ewo-radius-md;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $ewo-transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  min-height: 44px;
+  box-shadow: $ewo-shadow-sm;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  &.ewo-btn-primary {
+    background: linear-gradient(135deg, $ewo-secondary, $ewo-accent);
+    color: $ewo-surface;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, $ewo-primary, $ewo-secondary);
+      transform: translateY(-1px);
+      box-shadow: $ewo-shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: $ewo-shadow-sm;
+    }
+  }
+
+  &.ewo-btn-secondary {
+    background: $ewo-surface;
+    color: $ewo-text-primary;
+    border-color: $ewo-border;
+
+    &:hover:not(:disabled) {
+      background: $ewo-surface-tertiary;
+      border-color: $ewo-text-secondary;
+      transform: translateY(-1px);
+      box-shadow: $ewo-shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: $ewo-shadow-sm;
+    }
+  }
+
+  &.ewo-btn-add {
+    background: linear-gradient(135deg, $ewo-success, #059669);
+    color: $ewo-surface;
+    border: none;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #047857, $ewo-success);
+      transform: translateY(-1px);
+      box-shadow: $ewo-shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: $ewo-shadow-sm;
+    }
+  }
+
+  .ewo-button-spinner {
+    animation: ewo-spin 1s linear infinite;
+  }
+}
+
+@keyframes ewo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .ewo-modal-overlay {
+    padding: 1rem;
+  }
+
+  .ewo-modal-container {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+
+    .ewo-modal-header {
+      padding: 1.5rem 1rem 1rem;
+
+      .ewo-modal-title {
+        font-size: 1.5rem;
+      }
+
+      .ewo-close-button {
+        padding: 0.5rem;
+      }
+    }
+
+    .ewo-modal-body {
+      padding: 1.5rem 1rem;
+
+      .ewo-form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .ewo-services-section {
+        .ewo-service-item {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          padding: 1rem;
+
+          .ewo-service-field .ewo-service-label {
+            display: inline-block;
+          }
+
+          .ewo-remove-service {
+            margin-top: 0.5rem;
+            width: 100%;
+          }
+        }
+      }
+
+      .ewo-notes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ewo-modal-footer {
+      flex-direction: column-reverse;
+      gap: 0.75rem;
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .ewo-modal-container {
+    border: 2px solid $ewo-text-primary;
+    
+    .ewo-modal-header {
+      border-bottom: 2px solid $ewo-text-primary;
+    }
+
+    .ewo-field-input,
+    .ewo-field-select,
+    .ewo-field-textarea {
+      border-width: 2px;
+    }
+
+    .ewo-button {
+      border-width: 2px;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .ewo-modal-overlay,
+  .ewo-modal-container,
+  .ewo-button,
+  .ewo-field-input,
+  .ewo-field-select,
+  .ewo-field-textarea,
+  .ewo-service-item {
+    animation: none;
+    transition: none;
+  }
+}
+
+
+// Add these styles to the existing SCSS file
+
+// Work Order Status Badges
+.ewo-status-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: $ewo-radius-md;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}
+
+.ewo-status-pending {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+  
+  &::before {
+    background: #d97706;
+  }
+}
+
+.ewo-status-progress {
+  background: linear-gradient(135deg, #dbeafe, #93c5fd);
+  color: #1e40af;
+  border: 1px solid #3b82f6;
+  
+  &::before {
+    background: #2563eb;
+  }
+}
+
+.ewo-status-completed {
+  background: linear-gradient(135deg, #dcfce7, #86efac);
+  color: #166534;
+  border: 1px solid #22c55e;
+  
+  &::before {
+    background: #16a34a;
+  }
+}
+
+.ewo-status-cancelled {
+  background: linear-gradient(135deg, #fee2e2, #fca5a5);
+  color: #991b1b;
+  border: 1px solid #ef4444;
+  
+  &::before {
+    background: #dc2626;
+  }
+}
+
+.ewo-status-hold {
+  background: linear-gradient(135deg, #f3e8ff, #d8b4fe);
+  color: #7e22ce;
+  border: 1px solid #a855f7;
+  
+  &::before {
+    background: #9333ea;
+  }
+}
+
+.ewo-status-default {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #475569;
+  border: 1px solid #94a3b8;
+  
+  &::before {
+    background: #64748b;
+  }
+}
+
+// Read-only Section Styles
+.ewo-readonly-section {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, $ewo-surface-secondary, $ewo-surface-tertiary);
+  border-radius: $ewo-radius-lg;
+  border: 1px solid $ewo-border;
+  
+  .ewo-section-title {
+    margin: 0 0 1.25rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $ewo-text-primary;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    &::before {
+      content: '👤';
+      font-size: 1rem;
+    }
+  }
+  
+  .ewo-readonly-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  .ewo-readonly-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .ewo-readonly-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $ewo-text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    
+    .ewo-readonly-value {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: $ewo-text-primary;
+      font-weight: 500;
+      
+      i {
+        font-size: 1.125rem;
+        color: $ewo-text-secondary;
+        flex-shrink: 0;
+      }
+      
+      .ewo-readonly-secondary {
+        color: $ewo-text-muted;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+// Form Section Styles
+.ewo-form-section {
+  margin-bottom: 2.5rem;
+  
+  .ewo-section-title {
+    margin: 0 0 1.25rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $ewo-text-primary;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    &::before {
+      content: '📋';
+      font-size: 1rem;
+    }
+  }
+}
+
+// Title Section in Header
+.ewo-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ewo-work-order-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.ewo-work-order-number {
+  font-size: 0.875rem;
+  color: $ewo-text-secondary;
+  font-weight: 500;
+  background: $ewo-surface;
+  padding: 0.25rem 0.75rem;
+  border-radius: $ewo-radius-md;
+  border: 1px solid $ewo-border;
+}
+
+// Service Item States
+.ewo-service-new {
+  border: 2px dashed $ewo-accent !important;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.1)) !important;
+  
+  &:hover {
+    border: 2px solid $ewo-accent !important;
+  }
+}
+
+// Section Header with Add Button
+.ewo-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, $ewo-surface-secondary, $ewo-surface-tertiary);
+  border-radius: $ewo-radius-lg;
+  border: 1px solid $ewo-border;
+}
+
+// Responsive adjustments for the service items
+@media (max-width: 1024px) {
+  .ewo-service-item {
+    grid-template-columns: 1fr 80px 100px 1fr 48px !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .ewo-service-item {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    
+    .ewo-service-field .ewo-service-label {
+      display: block !important;
+    }
+    
+    .ewo-remove-service {
+      margin-top: 0.5rem;
+      width: 100% !important;
+      justify-content: center;
+    }
+  }
+  
+  .ewo-readonly-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .ewo-section-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+    
+    .ewo-btn-add {
+      align-self: flex-start;
+    }
+  }
+}
+
+// Dark mode support (optional enhancement)
+@media (prefers-color-scheme: dark) {
+  .ewo-modal-container {
+    background: #1a1a1a;
+    color: #e5e5e5;
+    border-color: #404040;
+    
+    .ewo-modal-header {
+      background: linear-gradient(135deg, #262626, #404040);
+      border-color: #525252;
+    }
+    
+    .ewo-field-input,
+    .ewo-field-select,
+    .ewo-field-textarea {
+      background: #262626;
+      color: #e5e5e5;
+      border-color: #404040;
+      
+      &:focus {
+        border-color: $ewo-border-focus;
+        background: #262626;
+      }
+    }
+    
+    .ewo-readonly-section,
+    .ewo-section-header {
+      background: linear-gradient(135deg, #262626, #404040);
+      border-color: #525252;
+    }
+    
+    .ewo-service-item {
+      background: linear-gradient(135deg, #262626, #404040);
+      border-color: #525252;
+    }
+  }
+}
