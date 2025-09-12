@@ -5,6 +5,8 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
+import ToastContainer from './components/ToastContainer/ToastContainer';
+
 import Dashboard from './pages/ServiceCenter/Dashboard';
 import KanbanPage from './pages/ServiceCenter/KanbanPage';
 import AppointmentPage from './pages/ServiceCenter/Appointment/AppointmentPage';
@@ -25,6 +27,7 @@ import Calendar from './pages/ServiceCenter/Calendar';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
+// import WorkOrders from './pages/ServiceCenter/WorkOrders';
 import AutoRepairReviews from './pages/ServiceCenter/Reviews/AutoRepairReviews';
 import AutoRepairChat from './pages/ServiceCenter/AutoRepairChat/AutoRepairChat';
 import EditProfile from './pages/ServiceCenter/EditProfile';
@@ -45,6 +48,8 @@ import ViewUserProfile from './components/Admin/ViewUserProfile/UserProfile';
 import AdminSettings from './pages/Admin/AdminSettings';
 import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
 import IncomeManagement from './pages/Admin/IncomeManagement';
+import CancelledBookings from './pages/Admin/CancelledBookings';
+import ServicePackageManager from './pages/Admin/ServicePackageManager';
 
 
 import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
@@ -63,8 +68,7 @@ import ServiceCenterCustomerDetailsPage from './pages/PartVendor/CustomerPages/S
 import AddProduct from './pages/PartVendor/Products/AddProduct';
 import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
 import ProductList from './pages/PartVendor/Products/ProductList';
-import CancelledBookings from './pages/Admin/CancelledBookings';
-import ServicePackageManager from './pages/Admin/ServicePackageManager';
+
 
 
 function NotFoundRedirect() {
@@ -194,7 +198,9 @@ function App() {
           <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
 
         </Route>
+
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
   );
 }
