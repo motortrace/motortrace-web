@@ -1,0 +1,809 @@
+// Enhanced Create Work Order Modal Styles
+// Modern Color Palette
+$cwo-primary: #1a1a1a;
+$cwo-secondary: #2563eb;
+$cwo-accent: #3b82f6;
+$cwo-surface: #ffffff;
+$cwo-surface-secondary: #f8fafc;
+$cwo-surface-tertiary: #f1f5f9;
+$cwo-border: #e2e8f0;
+$cwo-border-focus: #3b82f6;
+$cwo-text-primary: #0f172a;
+$cwo-text-secondary: #475569;
+$cwo-text-muted: #64748b;
+
+// Status Colors
+$cwo-success: #059669;
+$cwo-error: #dc2626;
+$cwo-warning: #d97706;
+$cwo-info: #0284c7;
+
+// Shadows
+$cwo-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$cwo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$cwo-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$cwo-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$cwo-shadow-overlay: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// Transitions
+$cwo-transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+$cwo-transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+$cwo-transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// Border Radius
+$cwo-radius-sm: 0.375rem;
+$cwo-radius-md: 0.5rem;
+$cwo-radius-lg: 0.75rem;
+$cwo-radius-xl: 1rem;
+
+.cwo-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  opacity: 0;
+  animation: cwo-fade-in 0.2s ease-out forwards;
+}
+
+@keyframes cwo-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cwo-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cwo-modal-container {
+  background: $cwo-surface;
+  border-radius: $cwo-radius-xl;
+  box-shadow: $cwo-shadow-overlay;
+  width: 100%;
+  max-width: 56rem;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid $cwo-border;
+  animation: cwo-slide-up 0.3s ease-out;
+
+  .cwo-modal-header {
+    padding: 2rem 2rem 1.5rem;
+    background: linear-gradient(135deg, $cwo-surface-secondary, $cwo-surface-tertiary);
+    border-bottom: 1px solid $cwo-border;
+    position: relative;
+
+    .cwo-header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cwo-modal-title {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: $cwo-text-primary;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      &::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: $cwo-secondary;
+        border-radius: 50%;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      }
+    }
+
+    .cwo-close-button {
+      background: $cwo-surface;
+      border: 1px solid $cwo-border;
+      border-radius: $cwo-radius-md;
+      font-size: 1.25rem;
+      color: $cwo-text-secondary;
+      cursor: pointer;
+      padding: 0.75rem;
+      transition: $cwo-transition-base;
+      box-shadow: $cwo-shadow-sm;
+
+      &:hover {
+        background: $cwo-surface-tertiary;
+        color: $cwo-text-primary;
+        transform: translateY(-1px);
+        box-shadow: $cwo-shadow-md;
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: $cwo-shadow-sm;
+      }
+    }
+  }
+
+  .cwo-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    background: $cwo-surface;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $cwo-surface-secondary;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $cwo-border;
+      border-radius: 4px;
+      
+      &:hover {
+        background: $cwo-text-muted;
+      }
+    }
+
+    .cwo-error-alert {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border: 1px solid #fca5a5;
+      border-left: 4px solid $cwo-error;
+      color: #991b1b;
+      padding: 1rem 1.25rem;
+      border-radius: $cwo-radius-md;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      box-shadow: $cwo-shadow-sm;
+
+      .cwo-error-icon {
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+      }
+
+      .cwo-error-text {
+        font-weight: 500;
+      }
+    }
+
+    .cwo-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .cwo-form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      &.cwo-field-full {
+        grid-column: 1 / -1;
+      }
+
+      .cwo-field-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: $cwo-text-primary;
+        margin-bottom: 0.25rem;
+
+        .cwo-required {
+          color: $cwo-error;
+          margin-left: 2px;
+        }
+      }
+
+      .cwo-field-input,
+      .cwo-field-select,
+      .cwo-field-textarea {
+        padding: 0.875rem 1rem;
+        border: 2px solid $cwo-border;
+        border-radius: $cwo-radius-md;
+        background: $cwo-surface;
+        font-size: 0.875rem;
+        color: $cwo-text-primary;
+        font-family: inherit;
+        transition: $cwo-transition-base;
+        box-shadow: $cwo-shadow-sm;
+        
+
+        &:focus {
+          outline: none;
+          border-color: $cwo-border-focus;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), $cwo-shadow-sm;
+          background: $cwo-surface;
+        }
+
+        &:disabled {
+          background: $cwo-surface-secondary;
+          color: $cwo-text-muted;
+          cursor: not-allowed;
+          border-color: $cwo-border;
+        }
+
+        &::placeholder {
+          color: $cwo-text-muted;
+          opacity: 1;
+        }
+      }
+
+      .cwo-field-textarea {
+        resize: vertical;
+        min-height: 5rem;
+        line-height: 1.5;
+        resize: none;
+      }
+
+      .cwo-field-select {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5rem 1.5rem;
+        padding-right: 2.5rem;
+        
+        // Hide native dropdown arrow
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        
+        // For Internet Explorer
+        &::-ms-expand {
+          display: none;
+        }
+
+        &:disabled {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+      }
+    }
+
+    .cwo-services-section {
+      margin-bottom: 2.5rem;
+
+      .cwo-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, $cwo-surface-secondary, $cwo-surface-tertiary);
+        border-radius: $cwo-radius-lg;
+        border: 1px solid $cwo-border;
+
+        .cwo-section-title {
+          margin: 0;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: $cwo-text-primary;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &::before {
+            content: '⚙️';
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .cwo-service-item {
+        display: grid;
+        grid-template-columns: 2fr 100px 120px 1.5fr 48px;
+        gap: 1rem;
+        align-items: end;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, $cwo-surface, $cwo-surface-secondary);
+        border: 2px solid $cwo-border;
+        border-radius: $cwo-radius-lg;
+        margin-bottom: 1rem;
+        transition: $cwo-transition-base;
+        box-shadow: $cwo-shadow-sm;
+
+        &:hover {
+          box-shadow: $cwo-shadow-md;
+        }
+
+        .cwo-service-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+
+          .cwo-service-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $cwo-text-secondary;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+          }
+        }
+
+        .cwo-remove-service {
+          padding: 0.75rem;
+          border: 2px solid transparent;
+          border-radius: $cwo-radius-md;
+          background: linear-gradient(135deg, #fef2f2, #fee2e2);
+          color: $cwo-error;
+          cursor: pointer;
+          transition: $cwo-transition-base;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: $cwo-shadow-sm;
+
+          &:hover {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-color: $cwo-error;
+            transform: translateY(-1px);
+            box-shadow: $cwo-shadow-md;
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+
+          i {
+            font-size: 1.125rem;
+          }
+        }
+      }
+    }
+
+    .cwo-notes-section {
+      margin-bottom: 2.5rem;
+
+      .cwo-notes-header {
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, $cwo-surface-secondary, $cwo-surface-tertiary);
+        border-radius: $cwo-radius-lg;
+        border: 1px solid $cwo-border;
+
+        .cwo-notes-title {
+          margin: 0;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: $cwo-text-primary;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &::before {
+            content: '📝';
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .cwo-notes-grid {
+        display: grid;
+        gap: 1.5rem;
+      }
+    }
+
+    .cwo-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding-top: 2rem;
+      border-top: 2px solid $cwo-border;
+      margin-top: 1rem;
+    }
+  }
+}
+
+// Enhanced Button Styles
+.cwo-button {
+  padding: 0.875rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: $cwo-radius-md;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $cwo-transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  min-height: 44px;
+  box-shadow: $cwo-shadow-sm;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  &.cwo-btn-primary {
+    background: linear-gradient(135deg, $cwo-secondary, $cwo-accent);
+    color: $cwo-surface;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, $cwo-primary, $cwo-secondary);
+      transform: translateY(-1px);
+      box-shadow: $cwo-shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: $cwo-shadow-sm;
+    }
+  }
+
+  &.cwo-btn-secondary {
+    background: $cwo-surface;
+    color: $cwo-text-primary;
+    border-color: $cwo-border;
+
+    &:hover:not(:disabled) {
+      background: $cwo-surface-tertiary;
+      border-color: $cwo-text-secondary;
+      transform: translateY(-1px);
+      box-shadow: $cwo-shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: $cwo-shadow-sm;
+    }
+  }
+
+  &.cwo-btn-add {
+    background: linear-gradient(135deg, $cwo-success, #059669);
+    color: $cwo-surface;
+    border: none;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #047857, $cwo-success);
+      transform: translateY(-1px);
+      box-shadow: $cwo-shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: $cwo-shadow-sm;
+    }
+  }
+
+  .cwo-button-spinner {
+    animation: cwo-spin 1s linear infinite;
+  }
+}
+
+@keyframes cwo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .cwo-modal-overlay {
+    padding: 1rem;
+  }
+
+  .cwo-modal-container {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+
+    .cwo-modal-header {
+      padding: 1.5rem 1rem 1rem;
+
+      .cwo-modal-title {
+        font-size: 1.5rem;
+      }
+
+      .cwo-close-button {
+        padding: 0.5rem;
+      }
+    }
+
+    .cwo-modal-body {
+      padding: 1.5rem 1rem;
+
+      .cwo-form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .cwo-services-section {
+        .cwo-service-item {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          padding: 1rem;
+
+          .cwo-service-field .cwo-service-label {
+            display: inline-block;
+            margin-bottom: 0.25rem;
+          }
+
+          .cwo-remove-service {
+            justify-self: center;
+            width: fit-content;
+            padding: 0.5rem 1rem;
+          }
+        }
+      }
+
+      .cwo-modal-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+
+        .cwo-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .cwo-modal-container {
+    .cwo-modal-body {
+      .cwo-services-section .cwo-service-item {
+        padding: 0.75rem;
+      }
+    }
+  }
+}
+
+// Focus styles for accessibility
+.cwo-button:focus,
+.cwo-field-input:focus,
+.cwo-field-select:focus,
+.cwo-field-textarea:focus,
+.cwo-close-button:focus,
+.cwo-remove-service:focus {
+  outline: 2px solid $cwo-accent;
+  outline-offset: 2px;
+}
+
+// Animation for adding services
+.cwo-service-item {
+  animation: cwo-slide-in 0.3s ease-out;
+}
+
+@keyframes cwo-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* ==========================================================================
+   SERVICES SUMMARY COMPONENT
+   ========================================================================== */
+
+.cwo-services-summary {
+  // background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  background: linear-gradient(135deg, $cwo-surface, $cwo-surface-secondary);
+  border: 2px solid $cwo-border;
+  border-radius: $cwo-radius-lg;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  box-shadow: $cwo-shadow-md;
+  transition: $cwo-transition-base;
+
+  &:hover {
+    box-shadow: $cwo-shadow-lg;
+    transform: translateY(-1px);
+  }
+
+  .cwo-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(2, 132, 199, 0.2);
+
+    .cwo-summary-icon {
+      background: $cwo-info;
+      color: white;
+      border-radius: 50%;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: $cwo-shadow-sm;
+    }
+
+    .cwo-summary-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #0c4a6e;
+      margin: 0;
+    }
+  }
+
+  .cwo-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .cwo-summary-item {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    border-radius: $cwo-radius-md;
+    border: 1px solid rgba(2, 132, 199, 0.1);
+    transition: $cwo-transition-base;
+    backdrop-filter: blur(4px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(2, 132, 199, 0.2);
+      transform: translateY(-1px);
+      box-shadow: $cwo-shadow-sm;
+    }
+
+    .cwo-summary-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .cwo-summary-value {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0c4a6e;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .cwo-currency {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #475569;
+      }
+
+      .cwo-amount {
+        color: #0284c7;
+      }
+    }
+
+    &.cwo-summary-total {
+      background: linear-gradient(135deg, #dcfdf7, #a7f3d0);
+      border-color: $cwo-success;
+
+      .cwo-summary-value {
+        color: #047857;
+        font-size: 1.25rem;
+
+        .cwo-amount {
+          color: $cwo-success;
+        }
+      }
+    }
+  }
+
+  // Animation for when summary appears
+  animation: cwo-summary-slide-up 0.4s ease-out;
+}
+
+@keyframes cwo-summary-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Responsive adjustments for services summary
+@media (max-width: 768px) {
+  .cwo-services-summary {
+    padding: 1rem;
+
+    .cwo-summary-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .cwo-summary-item {
+      padding: 0.75rem;
+
+      .cwo-summary-value {
+        font-size: 1rem;
+
+        &.cwo-summary-total .cwo-summary-value {
+          font-size: 1.125rem;
+        }
+      }
+    }
+  }
+}
+
+// Enhanced field hint styling (for estimated total field)
+.cwo-field-hint {
+  font-size: 0.75rem;
+  color: $cwo-text-muted;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-style: italic;
+
+  &::before {
+    content: 'ℹ️';
+    font-style: normal;
+    font-size: 0.875rem;
+  }
+
+  &.cwo-hint-warning {
+    color: $cwo-warning;
+
+    &::before {
+      content: '⚠️';
+    }
+  }
+
+  &.cwo-hint-success {
+    color: $cwo-success;
+
+    &::before {
+      content: '✅';
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
