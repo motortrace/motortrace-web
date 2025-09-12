@@ -92,12 +92,11 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
       />
 
       {/* Vehicle Image */}
-      <div className="vehicle-image-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '8px 0' }}>
+      <div className="vehicle-image-wrapper">
         <img
           src={getVehicleImage(serviceItem.vehicle)}
           alt={serviceItem.vehicle ? `${serviceItem.vehicle.year} ${serviceItem.vehicle.make} ${serviceItem.vehicle.model}` : 'Vehicle'}
           className="vehicle-image"
-          style={{ width: 200, height: 200, objectFit: 'contain', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
         />
       </div>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import KanbanBoard from '../../components/KanbanBoard/KanbanBoard';
 import { ClipboardList, AlertCircle } from 'lucide-react';
 import './KanbanPage.scss';
@@ -6,6 +7,7 @@ import ManageWorkOrderModal from '../../components/WorkOrderModal/ManageWorkOrde
 import { type WorkOrder, getWorkOrders, updateWorkOrderStatus } from '../../utils/workOrdersApi';
 
 const KanbanPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter] = useState<string>('');
   const [technicianFilter] = useState<string>('');
@@ -67,6 +69,10 @@ const KanbanPage: React.FC = () => {
     setSelectedWorkOrder(null);
   };
 
+  const handleViewHistory = () => {
+    navigate('/servicecenter/work-order');
+  };
+
   // Icon/color helpers for work order (optional, can be customized)
   const getTypeIcon = () => <ClipboardList size={16} />;
   const getTypeColor = () => '#3b82f6';
@@ -119,19 +125,28 @@ const KanbanPage: React.FC = () => {
     <>
       {/* Page Header */}
       <div className="page-header">
-        <div className="page-controls">
-          <div className="search-and-filters">
-            <div className="search-container">
-              <input
-                type="text"
-                placeholder="Search work orders..."
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="search-input"
-              />
-            </div>
-            {/* You can add more filters here if needed */}
+        <div className="header-content">
+          <h1 className="page-title">Work Orders</h1>
+          <p className="page-subtitle">Manage and track work order progress</p>
+        </div>
+        <div className="header-actions">
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search work orders..."
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="search-input"
+            />
           </div>
+          <button className="action-btn secondary" onClick={handleViewHistory}>
+            <i className="bx bx-history"></i>
+            View History
+          </button>
+          <button className="action-btn primary" onClick={() => {/* Handle create work order */}}>
+            <i className="bx bx-plus"></i>
+            Create Work Order
+          </button>
         </div>
       </div>
 
