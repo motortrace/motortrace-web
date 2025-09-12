@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './EmployeeManagement.scss';
 
 interface Technician {
   id: string;
@@ -157,22 +158,36 @@ const EmployeeManagement: React.FC = () => {
   });
 
   return (
-    <div className="employee-management" style={{ background: 'white', borderRadius: 20, padding: 24, minHeight: 600 }}>
-      {/* Search, Sort, Filter Bar */}
-      <div className="search-bar" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
-        <div className="search-content" style={{ flex: 1 }}>
-          <div className="search-input-container" style={{ display: 'flex', alignItems: 'center', border: 'none', borderRadius: 12, padding: 0, background: 'white', marginTop: 8, marginBottom: 0 }}>
-            <span className="search-icon" style={{ marginLeft: 6, marginRight: 6, color: '#9ca3af' }}>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search"><circle cx="8" cy="8" r="7"/><path d="m16 16-3.5-3.5"/></svg>
-            </span>
+    <div className="employee-management">
+      {/* Add Boxicons CSS */}
+      <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
+      
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="header-content">
+          <h1 className="page-title">Technician Management</h1>
+          <p className="page-subtitle">Manage technician profiles, skills, and availability</p>
+        </div>
+        <div className="header-actions">
+          <div className="search-container">
             <input
               type="text"
               placeholder="Search technicians..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              style={{ flex: 1, border: '2px solid #e5e7eb', outline: 'none', fontSize: 15, fontFamily: 'Poppins', background: 'transparent', color: '#374151', padding: '8px 40px' }}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
             />
           </div>
+          <button className="action-btn primary" onClick={handleOpenAddModal}>
+            <i className="bx bx-plus"></i>
+            Add Technician
+          </button>
+        </div>
+      </div>
+
+      {/* Search, Sort, Filter Bar */}
+      {/* <div className="search-bar" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
+        <div className="search-content" style={{ flex: 1 }}>
           <div className="filters" style={{ display: 'flex', gap: 12, marginTop: 8 }}>
             <select
               value={sortOption}
@@ -203,7 +218,7 @@ const EmployeeManagement: React.FC = () => {
         >
           + Add New Technician
         </button>
-      </div>
+      </div> */}
       <div className="employee-management__table" style={{ width: '100%', border: '2px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
         <div className="employee-management__table-header" style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr 1.2fr 1.2fr 1fr 1.5fr 1.5fr', background: '#f8f9fa', padding: '16px 20px', gap: 16, fontWeight: 600, color: '#656970', fontFamily: 'Poppins', fontSize: 13 }}>
           <div>Name</div>
