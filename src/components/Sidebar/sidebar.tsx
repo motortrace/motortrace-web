@@ -28,10 +28,9 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'Technicians',
+      title: 'Staff',
       items: [
-        { id: 'manage-technicians', label: 'Manage Technicians', icon: 'bx bx-id-card', route: '/servicecenter/employee-management' },
-        { id: 'schedule-technicians', label: 'Schedule Technicians', icon: 'bx bx-calendar-check', route: '/servicecenter/scheduling' },
+        { id: 'manage-technicians', label: 'Technicians', icon: 'bx bx-id-card', route: '/servicecenter/employee-management' },
       ]
     },
     {

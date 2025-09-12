@@ -9,7 +9,6 @@ import Dashboard from './pages/ServiceCenter/Dashboard';
 import KanbanPage from './pages/ServiceCenter/KanbanPage';
 import TestTablePage from './pages/ServiceCenter/TestTablePage';
 import JobCard from './pages/ServiceCenter/JobCard/JobCard';
-import TechnicianSchedulingPage from './pages/ServiceCenter/TechnicianScheduling/TechnicianSchedulingPage';
 import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
 import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
@@ -108,7 +107,6 @@ function App() {
           <Route path="workorders" element={<WorkOrdersPage />} />
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
-          <Route path="scheduling" element={<TechnicianSchedulingPage />} />
           <Route path="inventory" element={<PartsInventory />} />
           <Route path="reports" element={<EstimatesInvoices />} />
           <Route path="inspection-templates" element={<InspectionTemplates />} />
