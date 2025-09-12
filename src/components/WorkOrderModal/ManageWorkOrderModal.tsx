@@ -1325,6 +1325,48 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
 
   return (
     <div className="tab-content inspections-tab">
+      {/* Header with search and action buttons */}
+      <div className="inspections-header" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
+        <div className="search-container" style={{ width: '100%' }}>
+          <input
+            type="text"
+            placeholder="Search inspections..."
+            className="search-input"
+            style={{
+              width: '100%',
+              padding: '8px 16px',
+              border: '1px solid #d1d5db',
+              borderRadius: '6px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s ease'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          />
+        </div>
+        <div className="status-and-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+          <div className="status-info" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500' }}>Status:</span>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <span className="status-badge" style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500', background: '#f3f4f6', color: '#374151' }}>All</span>
+              <span className="status-badge" style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500', background: '#fef3c7', color: '#92400e' }}>In Progress</span>
+              <span className="status-badge" style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500', background: '#d1fae5', color: '#065f46' }}>Completed</span>
+            </div>
+          </div>
+          <div className="action-buttons" style={{ display: 'flex', gap: '12px' }}>
+            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-plus"></i>
+              Add Inspection
+            </button>
+            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="bx bx-file"></i>
+              View Full Report
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="inspections-summary-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20, marginBottom: 24, width: '100%' }}>
         <div className="inspections-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Inspections</div>
@@ -1334,10 +1376,6 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Completed</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{completedInspections}</div>
         </div>
-      </div>
-      <div className="tab-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h3>Inspections</h3>
-        <button className="btn btn--primary" style={{ minWidth: 140 }} onClick={() => alert('Add Inspection')}>Add Inspection</button>
       </div>
       <div className="inspection-summary-table-container full-width-table">
         <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
@@ -1370,15 +1408,29 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
                       </div>
                     </td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                       <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
                     </td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                      <button className="btn btn--primary btn--sm" style={{ padding: '4px 12px', fontSize: 14 }} onClick={() => alert(`View details for inspection ${inspection.id}`)}>
-                        View
-                      </button>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                      <div className="inspection-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                        <button 
+                          className="view-btn"
+                          title="View Inspection"
+                          onClick={() => alert(`View details for inspection ${inspection.id}`)}
+                        >
+                          <i className="bx bx-box"></i>
+                        </button>
+                        <button 
+                          className={`send-btn ${inspection.isCompleted ? 'approved' : 'pending'}`}
+                          disabled={!inspection.isCompleted}
+                          title={inspection.isCompleted ? "Send Report" : "Inspection must be completed to send"}
+                        >
+                          <i className="bx bx-send"></i>
+                          Send
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {/* Attachments section for this inspection */}
