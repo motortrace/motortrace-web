@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 
 import Dashboard from './pages/ServiceCenter/Dashboard';
 import KanbanPage from './pages/ServiceCenter/KanbanPage';
-import AppointmentPage from './pages/ServiceCenter/Appointment/AppointmentPage';
 import TestTablePage from './pages/ServiceCenter/TestTablePage';
 import JobCard from './pages/ServiceCenter/JobCard/JobCard';
 import TechnicianSchedulingPage from './pages/ServiceCenter/TechnicianScheduling/TechnicianSchedulingPage';
@@ -16,12 +15,10 @@ import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import PricingPage from './pages/PricingPage/PricingPage';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
-import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
 import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
 import InspectionTemplates from './pages/ServiceCenter/InspectionTemplates';
 import InspectionRecordsPage from './pages/ServiceCenter/InspectionRecordsPage';
 import InspectionDetailPage from './pages/ServiceCenter/InspectionDetailPage';
-import Calendar from './pages/ServiceCenter/Calendar';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
@@ -109,10 +106,6 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="workflow" element={<KanbanPage />} />
           <Route path="workorders" element={<WorkOrdersPage />} />
-          <Route path="appointments">
-            <Route index element={<AppointmentPage />} />
-            <Route path="details" element={<AppointmentDetails />} />
-          </Route>
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
           <Route path="scheduling" element={<TechnicianSchedulingPage />} />
@@ -121,7 +114,6 @@ function App() {
           <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
-          <Route path="calendar" element={<Calendar />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<CannedServices />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
