@@ -20,58 +20,66 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Get the base path from current location (e.g., '/serviceadvisor', '/manager', etc.)
+  const getBasePath = () => {
+    const pathSegments = location.pathname.split('/');
+    return `/${pathSegments[1]}`; // Gets the first segment after the root
+  };
+
+  const basePath = getBasePath();
+
   const menuGroups: MenuGroup[] = [
     {
       title: 'Dashboard',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: '/servicecenter/dashboard' },
+        { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: `${basePath}/dashboard` },
       ]
     },
     {
       title: 'Appointments',
       items: [
-        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar', route: '/servicecenter/appointments' },
+        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar', route: `${basePath}/appointments` },
       ]
     },
     {
       title: 'Staff',
       items: [
-        { id: 'manage-technicians', label: 'Technicians', icon: 'bx bx-id-card', route: '/servicecenter/employee-management' },
+        { id: 'manage-technicians', label: 'Technicians', icon: 'bx bx-id-card', route: `${basePath}/employee-management` },
       ]
     },
     {
       title: 'Operations',
       items: [
-        // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: '/servicecenter/calendar' },
-        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: '/servicecenter/workflow' },
-        // { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: '/servicecenter/work-order' },
-        // { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: '/servicecenter/services' },
+        // { id: 'calendar', label: 'Calendar', icon: 'bx bx-calendar-week', route: `${basePath}/calendar` },
+        { id: 'Workflow', label: 'Workflow', icon: 'bx bx-briefcase', route: `${basePath}/workflow` },
+        // { id: 'work-orders', label: 'Work Orders', icon: 'bx bx-briefcase', route: `${basePath}/work-order` },
+        // { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: `${basePath}/services` },
       ]
     },
     {
       title: 'Inspections',
       items: [
-        { id: 'inspection-templates', label: 'Templates', icon: 'bx bx-folder', route: '/servicecenter/inspection-templates' },
-        { id: 'inspection-records', label: 'Records', icon: 'bx bx-clipboard', route: '/servicecenter/inspection-records' },
+        { id: 'inspection-templates', label: 'Templates', icon: 'bx bx-folder', route: `${basePath}/inspection-templates` },
+        { id: 'inspection-records', label: 'Records', icon: 'bx bx-clipboard', route: `${basePath}/inspection-records` },
       ]
     },
     {
       title: 'Spare Parts',
       items: [
-        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: '/servicecenter/inventory' },
+        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: `${basePath}/inventory` },
       ]
     },
     {
       title: 'Business',
       items: [
-        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: '/servicecenter/reports' },
-        { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: '/servicecenter/payments' },
+        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: `${basePath}/reports` },
+        { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: `${basePath}/payments` },
       ]
     },
     {
       title: 'Settings',
       items: [
-        { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/servicecenter/settings' },
+        { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: `${basePath}/settings` },
       ]
     }
   ];

@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
 import Dashboard from './pages/ServiceCenter/Dashboard';
+import ServiceAdvisorDashboard from './pages/ServiceCenter/ServiceAdvisorDashboard';
 import KanbanPage from './pages/ServiceCenter/KanbanPage';
 import TestTablePage from './pages/ServiceCenter/TestTablePage';
 import JobCard from './pages/ServiceCenter/JobCard/JobCard';
@@ -68,10 +69,15 @@ function NotFoundRedirect() {
     try {
       user = JSON.parse(localStorage.getItem('user') || '{}');
     } catch { }
+    
+    console.log('User role:', user?.role); // Debug log to see actual role
+    
     if (user && user.role === 'admin') {
       navigate('/admin/dashboard', { replace: true });
-    } else if (user && user.role === 'service_center') {
-      navigate('/servicecenter/dashboard', { replace: true });
+    } else if (user && (user.role === 'serviceadvisor' || user.role === 'service_advisor' || user.role === 'advisor')) {
+      navigate('/serviceadvisor/dashboard', { replace: true });
+    } else if (user && user.role === 'manager') {
+      navigate('/manager/dashboard', { replace: true });
     } else {
       navigate('/index', { replace: true });
     }
@@ -96,8 +102,33 @@ function App() {
         {/* Auth Callback Route */}
         <Route path="/auth/callback" element={<AuthCallback />} />
 
-        {/* Protected Dashboard Routes */}
-        <Route path="/servicecenter" element={
+        {/* Service Advisor Dashboard Routes */}
+        <Route path="/serviceadvisor" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<ServiceAdvisorDashboard />} />
+          <Route path="workflow" element={<KanbanPage />} />
+          <Route path="workorders" element={<WorkOrdersPage />} />
+          <Route path="table" element={<TestTablePage />} />
+          <Route path="jobcard" element={<JobCard />} />
+          <Route path="inventory" element={<PartsInventory />} />
+          <Route path="reports" element={<EstimatesInvoices />} />
+          <Route path="inspection-templates" element={<InspectionTemplates />} />
+          <Route path="inspection-records" element={<InspectionRecordsPage />} />
+          <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
+          <Route path="timeline-board" element={<TimelineBoardPage />} />
+          <Route path="services" element={<CannedServices />} />
+          <Route path="work-order" element={<WorkOrdersPage />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
+          <Route path="profile" element={<EditProfile />} />
+          <Route path="employee-management" element={<EmployeeManagement />} />
+        </Route>
+
+        {/* Manager Dashboard Routes */}
+        <Route path="/manager" element={
           <ProtectedRoute>
             <DashboardLayout />
           </ProtectedRoute>
