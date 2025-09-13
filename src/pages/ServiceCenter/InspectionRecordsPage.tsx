@@ -21,6 +21,12 @@ const InspectionRecordsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Get the base path from current location (e.g., '/serviceadvisor', '/manager', etc.)
+  const getBasePath = () => {
+    const pathSegments = window.location.pathname.split('/');
+    return `/${pathSegments[1]}`; // Gets the first segment after the root
+  };
+
 
   useEffect(() => {
     setLoading(true);
@@ -68,7 +74,8 @@ const InspectionRecordsPage = () => {
   const handleView = (id: string) => {
     const inspection = inspections.find((i: WorkOrderInspection) => i.id === id);
     if (inspection?.workOrderId) {
-      navigate(`/servicecenter/inspection-detail/${inspection.workOrderId}`);
+      const basePath = getBasePath();
+      navigate(`${basePath}/inspection-detail/${inspection.workOrderId}`);
     }
   };
 

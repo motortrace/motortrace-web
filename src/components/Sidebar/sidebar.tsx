@@ -28,7 +28,21 @@ const Sidebar: React.FC = () => {
 
   const basePath = getBasePath();
 
-  const menuGroups: MenuGroup[] = [
+  // Get user role from localStorage
+  const getUserRole = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user?.role || 'serviceadvisor';
+    } catch {
+      return 'serviceadvisor';
+    }
+  };
+
+  const userRole = getUserRole();
+  const isServiceAdvisor = userRole === 'serviceadvisor' || userRole === 'service_advisor' || userRole === 'advisor';
+
+  // Define all menu groups
+  const allMenuGroups: MenuGroup[] = [
     {
       title: 'Dashboard',
       items: [
@@ -83,6 +97,27 @@ const Sidebar: React.FC = () => {
       ]
     }
   ];
+
+  // Filter menu groups based on user role
+  const menuGroups = isServiceAdvisor 
+    ? allMenuGroups.filter(group => {
+        // For service advisors, exclude: Appointments, Staff, Templates under Inspections, Business
+        const excludedTitles = ['Appointments', 'Staff', 'Business'];
+        const excludedItems = ['inspection-templates']; // Templates under Inspections
+        
+        if (excludedTitles.includes(group.title || '')) {
+          return false;
+        }
+        
+        // Filter out specific items within allowed groups
+        if (group.title === 'Inspections') {
+          group.items = group.items.filter(item => !excludedItems.includes(item.id));
+          return group.items.length > 0; // Only include if there are remaining items
+        }
+        
+        return true;
+      })
+    : allMenuGroups; // Managers see all menu groups
 
   const handleMenuClick = useCallback((item: MenuItem) => {
     navigate(item.route);

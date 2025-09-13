@@ -27,6 +27,12 @@ const InspectionDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Get the base path from current location (e.g., '/serviceadvisor', '/manager', etc.)
+  const getBasePath = () => {
+    const pathSegments = window.location.pathname.split('/');
+    return `/${pathSegments[1]}`; // Gets the first segment after the root
+  };
+
   useEffect(() => {
     if (!workOrderId) {
       setError('Work Order ID is required');
@@ -52,7 +58,8 @@ const InspectionDetailPage = () => {
   }, [workOrderId]);
 
   const handleBack = () => {
-    navigate('/servicecenter/inspection-records');
+    const basePath = getBasePath();
+    navigate(`${basePath}/inspection-records`);
   };
 
   if (loading) {

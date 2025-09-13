@@ -17,6 +17,12 @@ const KanbanPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Get the base path from current location (e.g., '/serviceadvisor', '/manager', etc.)
+  const getBasePath = () => {
+    const pathSegments = window.location.pathname.split('/');
+    return `/${pathSegments[1]}`; // Gets the first segment after the root
+  };
+
   // Fetch work orders from backend
   useEffect(() => {
     const fetchWorkOrders = async () => {
@@ -70,7 +76,8 @@ const KanbanPage: React.FC = () => {
   };
 
   const handleViewHistory = () => {
-    navigate('/servicecenter/work-order');
+    const basePath = getBasePath();
+    navigate(`${basePath}/work-order`);
   };
 
   // Icon/color helpers for work order (optional, can be customized)
