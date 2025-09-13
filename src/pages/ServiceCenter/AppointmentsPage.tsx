@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './AppointmentsPage.scss';
 import { useAuth } from '../../hooks/useAuth';
@@ -24,6 +24,7 @@ interface Appointment {
     name: string;
     email?: string;
     phone?: string;
+    profileImage?: string;
   };
   vehicle?: {
     id: string;
@@ -35,6 +36,13 @@ interface Appointment {
   assignedTo?: {
     id: string;
     supabaseUserId?: string;
+    userProfile?: {
+      id: string;
+      name: string;
+      phone: string;
+      profileImage?: string;
+      role: string;
+    };
   };
   cannedServices?: Array<{
     id: string;
@@ -45,6 +53,25 @@ interface Appointment {
     quantity: number;
     notes?: string;
   }>;
+}
+
+interface ServiceAdvisor {
+  id: string;
+  userProfileId: string;
+  employeeId: string;
+  department: string;
+  createdAt: string;
+  updatedAt: string;
+  userProfile: {
+    id: string;
+    name: string;
+    phone: string;
+    profileImage?: string;
+    role: string;
+  };
+  workOrdersCount: number;
+  appointmentsCount: number;
+  estimatesCount: number;
 }
 
 const getStatusBadge = (status: string) => {
@@ -61,18 +88,68 @@ const getStatusBadge = (status: string) => {
 };
 
 const getPriorityBadge = (priority: string) => {
-  const badgeClass = {
-    'LOW': 'status-badge status-in-stock',
-    'NORMAL': 'status-badge status-overstock',
-    'HIGH': 'status-badge status-low-stock',
-    'URGENT': 'status-badge status-out-of-stock',
-  }[priority] || 'status-badge';
   const priorityText = priority.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  return <span className={badgeClass}>{priorityText}</span>;
+  
+  const getPriorityStyle = (priority: string) => {
+    switch (priority) {
+      case 'LOW':
+        return {
+          backgroundColor: '#10b981',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          display: 'inline-block'
+        };
+      case 'NORMAL':
+        return {
+          backgroundColor: '#3b82f6',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          display: 'inline-block'
+        };
+      case 'HIGH':
+        return {
+          backgroundColor: '#f59e0b',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          display: 'inline-block'
+        };
+      case 'URGENT':
+        return {
+          backgroundColor: '#ef4444',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          display: 'inline-block'
+        };
+      default:
+        return {
+          backgroundColor: '#6b7280',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          display: 'inline-block'
+        };
+    }
+  };
+
+  return <span style={getPriorityStyle(priority)}>{priorityText}</span>;
 };
 
 const AppointmentsPage = () => {
-  const { user, token, loading: authLoading } = useAuth();
+  const { token, loading: authLoading } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCustomer, setFilterCustomer] = useState('all');
@@ -80,10 +157,67 @@ const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [serviceAdvisors, setServiceAdvisors] = useState<ServiceAdvisor[]>([]);
+  const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
 
   // Modal state
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmingAppointment, setConfirmingAppointment] = useState<Appointment | null>(null);
+  
+  // Confirmation form state
+  const [confirmationForm, setConfirmationForm] = useState({
+    priority: 'NORMAL' as 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT',
+    notes: '',
+    assignedToId: ''
+  });
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
+
+  // Fetch service advisors from backend
+  const fetchServiceAdvisors = async () => {
+    if (!token) {
+      console.log('No token available for service advisors fetch');
+      return;
+    }
+
+    setServiceAdvisorsLoading(true);
+    console.log('Fetching service advisors...');
+
+    try {
+      const response = await fetch('http://localhost:3000/service-advisors', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Service advisors response status:', response.status);
+      console.log('Service advisors response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Service advisors error response:', errorText);
+        throw new Error(`Failed to fetch service advisors: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Service advisors data:', data);
+      
+      if (data.success) {
+        setServiceAdvisors(data.data);
+        console.log('Service advisors set successfully:', data.data.length, 'advisors');
+      } else {
+        console.error('Service advisors API returned success: false');
+      }
+    } catch (err) {
+      console.error('Error fetching service advisors:', err);
+    } finally {
+      setServiceAdvisorsLoading(false);
+    }
+  };
 
   // Fetch appointments from backend
   const fetchAppointments = async () => {
@@ -144,6 +278,7 @@ const AppointmentsPage = () => {
   useEffect(() => {
     if (!authLoading && token) {
       fetchAppointments();
+      fetchServiceAdvisors();
     }
   }, [token, authLoading]);
 
@@ -172,16 +307,144 @@ const AppointmentsPage = () => {
   };
 
   const handleConfirm = (id: string) => {
-    console.log('Confirm appointment', id);
-    // TODO: Implement confirm logic
+    const appointment = appointments.find((a: Appointment) => a.id === id);
+    if (appointment) {
+      setConfirmingAppointment(appointment);
+      setConfirmationForm({
+        priority: appointment.priority,
+        notes: appointment.notes || '',
+        assignedToId: appointment.assignedToId || ''
+      });
+      setConfirmModalOpen(true);
+      setConfirmError('');
+    }
   };
 
-  const handleCancel = (id: string) => {
-    console.log('Cancel appointment', id);
-    // TODO: Implement cancel logic
+  const handleConfirmSubmit = async () => {
+    if (!confirmingAppointment || !token) {
+      setConfirmError('Missing appointment or authentication token');
+      return;
+    }
+
+    setConfirmLoading(true);
+    setConfirmError('');
+
+    try {
+      const updateData: any = {
+        status: 'CONFIRMED',
+        priority: confirmationForm.priority,
+        notes: confirmationForm.notes
+      };
+
+      // Add optional fields if provided
+      if (confirmationForm.assignedToId) {
+        updateData.assignedToId = confirmationForm.assignedToId;
+      }
+
+      const response = await fetch(`http://localhost:3000/appointments/${confirmingAppointment.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to confirm appointment: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update the appointment in the local state
+        setAppointments(prev => 
+          prev.map(apt => 
+            apt.id === confirmingAppointment.id 
+              ? { ...apt, ...result.data }
+              : apt
+          )
+        );
+        
+        // Close modals and reset form
+        setConfirmModalOpen(false);
+        setViewModalOpen(false);
+        setConfirmingAppointment(null);
+        setConfirmationForm({
+          priority: 'NORMAL',
+          notes: '',
+          assignedToId: ''
+        });
+      } else {
+        throw new Error(result.message || 'Failed to confirm appointment');
+      }
+    } catch (err) {
+      console.error('Error confirming appointment:', err);
+      setConfirmError(err instanceof Error ? err.message : 'Failed to confirm appointment');
+    } finally {
+      setConfirmLoading(false);
+    }
   };
 
-  const columns: TableColumn<Appointment>[] = [
+  const handleCancel = async (id: string) => {
+    if (!token) {
+      setError('No access token available');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const updateData = {
+        status: 'CANCELLED'
+      };
+
+      const response = await fetch(`http://localhost:3000/appointments/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to cancel appointment: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update the appointment in the local state
+        setAppointments(prev => 
+          prev.map(apt => 
+            apt.id === id 
+              ? { ...apt, ...result.data }
+              : apt
+          )
+        );
+        
+        // Close any open modals
+        setViewModalOpen(false);
+        setConfirmModalOpen(false);
+        
+        console.log('Appointment cancelled successfully');
+      } else {
+        throw new Error(result.message || 'Failed to cancel appointment');
+      }
+    } catch (err) {
+      console.error('Error cancelling appointment:', err);
+      setError(err instanceof Error ? err.message : 'Failed to cancel appointment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Columns for incoming appointment requests (simplified)
+  const incomingColumns: TableColumn<Appointment>[] = [
     {
       key: 'id',
       label: 'Appointment ID',
@@ -274,6 +537,141 @@ const AppointmentsPage = () => {
       )
     },
     {
+      key: 'actions',
+      label: 'Actions',
+      align: 'center' as const,
+      render: (_: any, row: Appointment) => (
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
+            <i className='bx bx-show'></i>
+          </button>
+          <button className="btn-icon" title="Confirm" onClick={e => { e.stopPropagation(); handleConfirm(row.id); }}>
+            <i className='bx bx-check'></i>
+          </button>
+          <button className="btn-icon btn-danger" title="Cancel" onClick={e => { e.stopPropagation(); handleCancel(row.id); }}>
+            <i className='bx bx-x'></i>
+          </button>
+        </div>
+      )
+    },
+  ];
+
+  // Columns for confirmed appointments (full details)
+  const confirmedColumns: TableColumn<Appointment>[] = [
+    {
+      key: 'id',
+      label: 'Appointment ID',
+      sortable: true,
+      render: (value: any) => {
+        const fullId = String(value);
+        const shortId = fullId.substring(0, 8) + '...';
+        return (
+          <strong title={fullId} style={{ cursor: 'help' }}>
+            {shortId}
+          </strong>
+        );
+      }
+    },
+    {
+      key: 'customer',
+      label: 'Customer',
+      sortable: true,
+      render: (_: any, row: Appointment) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {row.customer?.profileImage ? (
+            <img 
+              src={row.customer.profileImage} 
+              alt={row.customer.name}
+              style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                objectFit: 'cover' 
+              }}
+            />
+          ) : (
+            <div style={{ 
+              width: '32px', 
+              height: '32px', 
+              borderRadius: '50%', 
+              backgroundColor: '#e5e7eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#6b7280'
+            }}>
+              {(row.customer?.name || row.customerId || 'C').charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div style={{ fontWeight: '500' }}>
+            {row.customer?.name || row.customerId}
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'vehicle',
+      label: 'Vehicle',
+      sortable: true,
+      render: (_: any, row: Appointment) => (
+        <div>
+          <div style={{ fontWeight: '500' }}>
+            {row.vehicle ? `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}` : row.vehicleId}
+          </div>
+          {row.vehicle?.licensePlate && (
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+              {row.vehicle.licensePlate}
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'startTime',
+      label: 'Appointment Time',
+      sortable: true,
+      render: (value: any) => {
+        if (!value) return <span style={{ color: '#aaa', fontStyle: 'italic' }}>Not scheduled</span>;
+        const date = new Date(value);
+        return (
+          <div>
+            <div style={{ fontWeight: '500' }}>
+              {date.toLocaleDateString()}
+            </div>
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+              {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+            </div>
+          </div>
+        );
+      }
+    },
+    // {
+    //   key: 'cannedServices',
+    //   label: 'Services',
+    //   render: (_: any, row: Appointment) => (
+    //     <div>
+    //       {row.cannedServices && row.cannedServices.length > 0 ? (
+    //         <div>
+    //           {row.cannedServices.slice(0, 2).map((service, index) => (
+    //             <div key={index} style={{ fontSize: '12px', marginBottom: '2px' }}>
+    //               {service.name}
+    //             </div>
+    //           ))}
+    //           {row.cannedServices.length > 2 && (
+    //             <div style={{ fontSize: '11px', color: '#6b7280' }}>
+    //               +{row.cannedServices.length - 2} more
+    //             </div>
+    //           )}
+    //         </div>
+    //       ) : (
+    //         <span style={{ color: '#6b7280', fontStyle: 'italic', fontSize: '12px' }}>No services</span>
+    //       )}
+    //     </div>
+    //   )
+    // },
+    {
       key: 'priority',
       label: 'Priority',
       sortable: true,
@@ -281,20 +679,57 @@ const AppointmentsPage = () => {
       render: (priority: any) => getPriorityBadge(priority)
     },
     {
-      key: 'status',
-      label: 'Status',
-      sortable: true,
-      align: 'center' as const,
-      render: (status: any) => getStatusBadge(status)
-    },
-    {
       key: 'assignedTo',
       label: 'Service Advisor',
       render: (_: any, row: Appointment) => {
-        return row.assignedTo ? (
-          <span>Assigned</span>
-        ) : (
-          <span style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Unassigned</span>
+        if (!row.assignedToId) {
+          return (
+            <span style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Unassigned</span>
+          );
+        }
+        
+        // Find the service advisor by assignedToId
+        const serviceAdvisor = serviceAdvisors.find(advisor => advisor.id === row.assignedToId);
+        
+        if (!serviceAdvisor) {
+          return (
+            <span style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Unassigned</span>
+          );
+        }
+        
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {serviceAdvisor.userProfile.profileImage ? (
+              <img 
+                src={serviceAdvisor.userProfile.profileImage} 
+                alt={serviceAdvisor.userProfile.name}
+                style={{ 
+                  width: '32px', 
+                  height: '32px', 
+                  borderRadius: '50%', 
+                  objectFit: 'cover' 
+                }}
+              />
+            ) : (
+              <div style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                backgroundColor: '#e5e7eb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#6b7280'
+              }}>
+                {serviceAdvisor.userProfile.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div style={{ fontWeight: '500' }}>
+              {serviceAdvisor.userProfile.name}
+            </div>
+          </div>
         );
       }
     },
@@ -307,16 +742,6 @@ const AppointmentsPage = () => {
           <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
             <i className='bx bx-show'></i>
           </button>
-          {row.status === 'PENDING' && (
-            <>
-              <button className="btn-icon" title="Confirm" onClick={e => { e.stopPropagation(); handleConfirm(row.id); }}>
-                <i className='bx bx-check'></i>
-              </button>
-              <button className="btn-icon btn-danger" title="Cancel" onClick={e => { e.stopPropagation(); handleCancel(row.id); }}>
-                <i className='bx bx-x'></i>
-              </button>
-            </>
-          )}
         </div>
       )
     },
@@ -330,10 +755,15 @@ const AppointmentsPage = () => {
     <div className="appointments-page">
       <div className="page-header">
         <h2 className="page-title">Appointments</h2>
-        <button className="btn btn--primary" style={{ marginLeft: 'auto' }}>
-          <i className='bx bx-plus'></i>
-          New Appointment
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
+          <span style={{ fontSize: '12px', color: '#6b7280' }}>
+            Service Advisors: {serviceAdvisors.length} {serviceAdvisorsLoading && '(Loading...)'}
+          </span>
+          <button className="btn btn--primary">
+            <i className='bx bx-plus'></i>
+            New Appointment
+          </button>
+        </div>
       </div>
 
       <div className="inventory-controls">
@@ -383,14 +813,6 @@ const AppointmentsPage = () => {
           </select>
         </div>
         <div className="quick-actions">
-          <button className="btn btn--ghost">
-            <i className='bx bx-filter'></i>
-            Advanced Filters
-          </button>
-          <button className="btn btn--ghost" onClick={fetchAppointments}>
-            <i className='bx bx-refresh'></i>
-            Refresh
-          </button>
         </div>
       </div>
 
@@ -407,7 +829,7 @@ const AppointmentsPage = () => {
             <div style={{ color: 'red' }}>{error}</div>
           ) : (
             <Table
-              columns={columns}
+              columns={incomingColumns}
               data={pendingAppointments.map(apt => ({ ...apt, uniqueKey: `pending-${apt.id}` }))}
               onRowClick={(appointment) => handleView(appointment.id)}
               emptyMessage="No pending appointment requests found."
@@ -429,7 +851,7 @@ const AppointmentsPage = () => {
             <div style={{ color: 'red' }}>{error}</div>
           ) : (
             <Table
-              columns={columns}
+              columns={confirmedColumns}
               data={confirmedAppointments.map(apt => ({ ...apt, uniqueKey: `confirmed-${apt.id}` }))}
               onRowClick={(appointment) => handleView(appointment.id)}
               emptyMessage="No confirmed appointments found."
@@ -496,7 +918,10 @@ const AppointmentsPage = () => {
               </button>
               {selectedAppointment.status === 'PENDING' && (
                 <>
-                  <button className="btn btn--success" onClick={() => handleConfirm(selectedAppointment.id)}>
+                  <button className="btn btn--success" onClick={() => {
+                    setViewModalOpen(false);
+                    handleConfirm(selectedAppointment.id);
+                  }}>
                     Confirm Appointment
                   </button>
                   <button className="btn btn--danger" onClick={() => handleCancel(selectedAppointment.id)}>
@@ -504,6 +929,114 @@ const AppointmentsPage = () => {
                   </button>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmModalOpen && confirmingAppointment && (
+        <div className="modal-overlay" onClick={() => setConfirmModalOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Confirm Appointment</h3>
+              <button className="btn-icon" onClick={() => setConfirmModalOpen(false)}>
+                <i className='bx bx-x'></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="detail-section">
+                <h4>Appointment Details</h4>
+                <p><strong>Customer:</strong> {confirmingAppointment.customer?.name || confirmingAppointment.customerId}</p>
+                <p><strong>Vehicle:</strong> {confirmingAppointment.vehicle ? `${confirmingAppointment.vehicle.year} ${confirmingAppointment.vehicle.make} ${confirmingAppointment.vehicle.model}` : confirmingAppointment.vehicleId}</p>
+                <p><strong>Requested At:</strong> {new Date(confirmingAppointment.requestedAt).toLocaleString()}</p>
+              </div>
+
+              <div className="form-section">
+                <h4>Confirm Appointment</h4>
+                
+                <div className="form-group">
+                  <label htmlFor="serviceAdvisor">Service Advisor</label>
+                  <select
+                    id="serviceAdvisor"
+                    value={confirmationForm.assignedToId}
+                    onChange={(e) => setConfirmationForm(prev => ({ ...prev, assignedToId: e.target.value }))}
+                    className="form-select"
+                    disabled={serviceAdvisorsLoading}
+                  >
+                    <option value="">Select Service Advisor</option>
+                    {serviceAdvisors.map(advisor => (
+                      <option key={advisor.id} value={advisor.id}>
+                        {advisor.userProfile.name} ({advisor.employeeId})
+                      </option>
+                    ))}
+                  </select>
+                  {serviceAdvisorsLoading && (
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                      Loading service advisors...
+                    </div>
+                  )}
+                  {!serviceAdvisorsLoading && serviceAdvisors.length === 0 && (
+                    <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>
+                      No service advisors found. Click "Refresh Service Advisors" to retry.
+                    </div>
+                  )}
+                  {!serviceAdvisorsLoading && serviceAdvisors.length > 0 && (
+                    <div style={{ fontSize: '12px', color: '#10b981', marginTop: '4px' }}>
+                      {serviceAdvisors.length} service advisor(s) loaded
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="priority">Priority</label>
+                  <select
+                    id="priority"
+                    value={confirmationForm.priority}
+                    onChange={(e) => setConfirmationForm(prev => ({ ...prev, priority: e.target.value as 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT' }))}
+                    className="form-select"
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="NORMAL">Normal</option>
+                    <option value="HIGH">High</option>
+                    <option value="URGENT">Urgent</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="notes">Notes</label>
+                  <textarea
+                    id="notes"
+                    value={confirmationForm.notes}
+                    onChange={(e) => setConfirmationForm(prev => ({ ...prev, notes: e.target.value }))}
+                    className="form-textarea"
+                    rows={3}
+                    placeholder="Add any additional notes..."
+                  />
+                </div>
+
+                {confirmError && (
+                  <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>
+                    {confirmError}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn btn--secondary" 
+                onClick={() => setConfirmModalOpen(false)}
+                disabled={confirmLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn--success" 
+                onClick={handleConfirmSubmit}
+                disabled={confirmLoading}
+              >
+                {confirmLoading ? 'Confirming...' : 'Confirm Appointment'}
+              </button>
             </div>
           </div>
         </div>
