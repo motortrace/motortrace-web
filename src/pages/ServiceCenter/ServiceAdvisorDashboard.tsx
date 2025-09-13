@@ -215,28 +215,92 @@ const ServiceAdvisorDashboard = () => {
   return (
     <div style={{
       padding: '16px',
-      backgroundColor: '#f8fafc',
+    //   backgroundColor: '#f8fafc',
       minHeight: '100vh'
     }}>
       {/* Page Header */}
       <div style={{
-        marginBottom: '24px'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '1rem',
+        marginBottom: '2rem'
       }}>
-        <h1 style={{
-          fontSize: '24px',
-          fontWeight: '700',
-          color: '#1e293b',
-          margin: '0 0 8px 0'
+        <div style={{
+          flex: 1
         }}>
-          Service Advisor Dashboard
-        </h1>
-        <p style={{
-          fontSize: '14px',
-          color: '#64748b',
-          margin: 0
+          <h1 style={{
+            fontSize: '28px',
+            fontWeight: '600',
+            color: '#1e293b',
+            margin: '0 0 0.25rem 0'
+          }}>
+            Service Advisor Dashboard
+          </h1>
+          <p style={{
+            color: '#64748b',
+            fontSize: '16px',
+            margin: 0
+          }}>
+            Welcome back! Here's your overview for today.
+          </p>
+        </div>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
         }}>
-          Welcome back! Here's your overview for today.
-        </p>
+          {/* Service Advisor Profile */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '12px 16px',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+          }}>
+            {/* Profile Image */}
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              backgroundColor: '#2563eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '18px',
+              fontWeight: '600'
+            }}>
+              JD
+            </div>
+            
+            {/* Profile Info */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2px'
+            }}>
+              <div style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1e293b',
+                lineHeight: '1.2'
+              }}>
+                John Doe
+              </div>
+              <div style={{
+                fontSize: '14px',
+                color: '#64748b',
+                lineHeight: '1.2'
+              }}>
+                john.doe@motortrace.com
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Layout - Two Sections */}
