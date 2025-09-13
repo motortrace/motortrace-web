@@ -207,7 +207,7 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
               <p className="product-info__description">{product.description}</p>
 
               <div className="product-info__price">
-                <span className="price-current">{product.price}</span>
+                <span className="price-current">LKR {product.price}</span>
               </div>
             </div>
           </div>
@@ -325,7 +325,7 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                 </div>
                 <div className="inventory-item__info">
                   <span className="inventory-item__label">Current Stock</span>
-                  <span className="inventory-item__value">{product.stock} units</span>
+                  <span className="inventory-item__value">{product.quantity} units</span>
                 </div>
               </div>
 
@@ -336,7 +336,7 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                 <div className="inventory-item__info">
                   <span className="inventory-item__label">Total Value</span>
                   <span className="inventory-item__value">
-                    LKR {(parseFloat(product.price.replace(/[^\d.]/g, '')) * product.stock).toLocaleString()}
+                    LKR {(parseFloat(product.price.replace(/[^\d.]/g, '')) * product.quantity).toLocaleString()}
                   </span>
                 </div>
               </div>

@@ -2,7 +2,7 @@
 export const categoryConfigs = {
   "Engine & Fluids": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "subcategory", label: "Fluid Type" },
     { key: "compatibility", label: "Compatibility" },
     { key: "brand", label: "Brand" },
@@ -11,7 +11,7 @@ export const categoryConfigs = {
   ],
   "Wear & Tear Parts": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "subcategory", label: "Part Category" },
     { key: "position", label: "Position" },
     { key: "brand", label: "Brand" },
@@ -19,7 +19,7 @@ export const categoryConfigs = {
   ],
   "Exterior & Body Parts": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "position", label: "Position" },
     { key: "finish", label: "Finish" },
     { key: "brand", label: "Brand" },
@@ -27,7 +27,7 @@ export const categoryConfigs = {
   ],
   "Paints & Coatings": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "subcategory", label: "Sub Category" },
     { key: "color", label: "Color" },
     
@@ -37,7 +37,7 @@ export const categoryConfigs = {
   ],
   "Engine & Drivetrain Components": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "position", label: "Position" },
@@ -45,7 +45,7 @@ export const categoryConfigs = {
   ],
   "Electrical Components": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "position", label: "Position" },
@@ -53,7 +53,7 @@ export const categoryConfigs = {
   ],
   "Accessories & Add-ons": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "finish", label: "Finish" },

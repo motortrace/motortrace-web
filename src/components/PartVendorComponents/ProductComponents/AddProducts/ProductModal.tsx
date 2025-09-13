@@ -5,18 +5,17 @@ import './ProductModal.scss';
 import './AddProduct.scss'
 
 interface ProductModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-//   onSave: () => void;
+    isOpen: boolean;
+    onClose: () => void;
     onSave: (productData: any) => void;
 }
 
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) => {
-  const [activeTab, setActiveTab] = useState('engine-fluids');
-  const [image, setImage] = useState<File | null>(null);
+    const [activeTab, setActiveTab] = useState('engine-fluids');
+    const [image, setImage] = useState<File | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Add comprehensive form state
-  const [formData, setFormData] = useState({
+ const [formData, setFormData] = useState({
     // Common fields
     productName: '',
     category: 'Engine & Fluids',
@@ -27,8 +26,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
     brand: '',
     compatibility: '',
     image: '',
-    
-    // Category-specific fields with defaults
+    stock: 0,
+    minQuantity: 1,
+
     fluidType: '',
     specification: '',
     volume: '',
@@ -57,20 +57,25 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
     notes: '',
     discountType: '',
     discountValue: 0,
-    minQuantity: 1,
     type: ''
   });
 
-  const handleInputChange = (field: string, value: any) => {
+  React.useEffect(() => {
+    if (isOpen) {
+      setActiveTab('engine-fluids');
+    }
+  }, [isOpen]);
+
+
+ const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ 
       ...prev, 
       [field]: value,
-      // Set category based on active tab
       category: getCategoryFromTab(activeTab)
     }));
   };
 
-  const getCategoryFromTab = (tab: string): string => {
+const getCategoryFromTab = (tab: string): string => {
     const tabMap: {[key: string]: string} = {
       'engine-fluids': 'Engine & Fluids',
       'wear-tear': 'Wear & Tear Parts',
@@ -83,83 +88,82 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
     return tabMap[tab] || 'Engine & Fluids';
   };
 
-  // Reset tab to Engine & Fluids every time modal opens
-  React.useEffect(() => {
-    if (isOpen) {
-      setActiveTab('engine-fluids');
-    }
-  }, [isOpen]);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setImage(file);
+    if (file) {
+      setImage(file);
+      handleInputChange('image', URL.createObjectURL(file));
+    }
   };
 
-//   const handleSave = () => {
-//     onSave();
-//     onClose();
-//   };
 
-  const handleSave = async () => {
-  // Validate form
-    if (!validateForm()) return;
-  
-    try {
-        // Prepare the data for API
-        const productToSave = {
-        ...formData,
-        // Ensure category is set correctly
-        category: getCategoryFromTab(activeTab),
-        // Set default values for required fields
-        rating: 0,
-        reviewCount: 0,
-        availability: formData.quantity > formData.minQuantity ? 'In Stock' : formData.quantity == 0 ? 'Out of Stock' : 'Low Stock',
-        // Add image handling if needed
-        };
-        
-        // Call your API endpoint
-        const response = await fetch('https://localhost/inventory/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productToSave),
-        });
-        
-        if (response.ok) {
-        const savedProduct = await response.json();
-        // Pass the saved product data to parent component
-        onSave(savedProduct);
-        onClose();
-        } else {
-        throw new Error('Failed to save product');
-        }
-    } catch (error) {
-        console.error('Error saving product:', error);
-        alert('Error saving product. Please try again.');
+const validateForm = (): boolean => {
+    const requiredFields = ['productName', 'brand', 'price', 'quantity'];
+    
+    
+    for (const field of requiredFields) {
+      if (!formData[field as keyof typeof formData]) {
+        alert(`Please fill in the ${field} field`);
+        return false;
+      }
     }
-};
-
-  const validateForm = (): boolean => {
-  const requiredFields = ['productName', 'subcategory', 'price', 'quantity'];
-  
-//   // Add category-specific required fields
-//   if (activeTab === 'engine-fluids') {
-//     requiredFields.push('fluidType', 'specification', 'volume');
-//   } else if (activeTab === 'wear-tear') {
-//     requiredFields.push('partType');
-//   }
-//   // Add similar conditions for other categories
-  
-  for (const field of requiredFields) {
-    if (!formData[field as keyof typeof formData]) {
-      alert(`Please fill in the ${field} field`);
+    if (formData.quantity < 0) {
+      alert('Quantity cannot be negative');
       return false;
     }
-  }
-  
-  return true;
-};
+    
+    if (parseFloat(formData.price) <= 0) {
+      alert('Price must be greater than 0');
+      return false;
+    }
+    
+    return true;
+  };
+
+const handleSave = async () => {
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Prepare the data for API - clean up empty values
+      const productToSave = Object.fromEntries(
+        Object.entries(formData).filter(([_, value]) => 
+          value !== '' && value !== null && value !== undefined
+        )
+      );
+      // Add default values
+      productToSave.rating = 0;
+      productToSave.reviewCount = 0;
+      productToSave.availability = formData.quantity > formData.minQuantity 
+        ? 'In Stock' 
+        : formData.quantity === 0 
+          ? 'Out of Stock' 
+          : 'Low Stock';
+      
+      // Call your API endpoint - use the correct endpoint
+      const response = await fetch('http://localhost:3000/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productToSave),
+      });
+      if (response.ok) {
+        const savedProduct = await response.json();
+        onSave(savedProduct);
+        onClose();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server error: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error saving product:', error);
+    //   alert(`Error saving product: ${error.message}. Please try again.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -169,131 +173,161 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
         return (
         <div className="tab-content">
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Product Information</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>Product Name *</label>
-                        <input type="text"
-                            value={formData.productName}
-                            onChange={(e) => handleInputChange('productName', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Fluid Type *</label>
-                        <select
-                            value={formData.fluidType}
-                            onChange={(e) => {
-                                handleInputChange('subcategory', e.target.value);
-                            }}
-                            required
-                        >                  
-                            <option value="">Select</option>
-                            <option value="Engine Oil">Engine Oil</option>
-                            <option value="Transmission Fluid">Transmission Fluid</option>
-                            <option value="Brake Fluid">Brake Fluid</option>
-                            <option value="Coolant">Coolant</option>
-                            <option value="Power Steering Fluid">Power Steering Fluid</option>
-                            <option value="Windshield Washer Fluid">Windshield Washer Fluid</option>
-                        </select>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Specification</label>
-                        <input type="text" placeholder='e.g., 5W-30, DOT 4, OAT'
-                            value={formData.specification}
-                            onChange={(e) => handleInputChange('description', e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Brand *</label>
-                        <input type="text" 
-                            value={formData.brand}
-                            onChange={(e) => handleInputChange('brand', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Volume *</label>
-                        <input type="text" placeholder='e.g., 500ml, 1L, 4L'
-                            value={formData.volume}
-                            onChange={(e) => handleInputChange('volume', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Compatibility</label>
-                        <input type='text' placeholder='System/vehicle/hydraulic compatibility'
-                            value={formData.compatibility}
-                            onChange={(e) => handleInputChange('compatibility', e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Replacement Cycle</label>
-                        <input type='text' placeholder='like per 5000 km or per 6 months'
-                            value={formData.replacementCycle}
-                            onChange={(e) => handleInputChange('notes', e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Type</label>
-                        <input type="text" placeholder='e.g., Synthetic oil, Manual Gear Oil'
-                            value={formData.fluidType}
-                            onChange={(e) => handleInputChange('type', e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group full">
-                        <label>Notes</label>
-                        <textarea placeholder="Maximum 60 words" rows={3} 
-                            value={formData.notes}
-                            onChange={(e) => handleInputChange('notes', e.target.value)}
-                        />
-                    </div>
+              <h3 className="add-product__section-title">Product Information</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Product Name *</label>
+                  <input 
+                    type="text"
+                    value={formData.productName}
+                    onChange={(e) => handleInputChange('productName', e.target.value)}
+                    required
+                  />
                 </div>
-            </div>
-            <div className="add-product__section">
-                <h3 className="add-product__section-title">Pricing & Stocks</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>Quantity *</label>
-                        <input type="number" 
-                            value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Price *</label>
-                        <input type="text" 
-                            value={formData.price}
-                            onChange={(e) => handleInputChange('price', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Minimum Quantity *</label>
-                        <input type="number" 
-                            value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', e.target.value)}
-                            required
-                        />
-                    </div>
+                <div className="form-group">
+                  <label>Fluid Type *</label>
+                  <select
+                    value={formData.subcategory}
+                    onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                    required
+                  >                  
+                    <option value="">Select</option>
+                    <option value="Engine Oil">Engine Oil</option>
+                    <option value="Transmission Fluid">Transmission Fluid</option>
+                    <option value="Brake Fluid">Brake Fluid</option>
+                    <option value="Coolant">Coolant</option>
+                    <option value="Power Steering Fluid">Power Steering Fluid</option>
+                    <option value="Windshield Washer Fluid">Windshield Washer Fluid</option>
+                  </select>
                 </div>
+                {/* <div className="form-group">
+                  <label>Specification</label>
+                  <input 
+                    type="text" 
+                    placeholder='e.g., 5W-30, DOT 4, OAT'
+                    value={formData.specification}
+                    onChange={(e) => handleInputChange('specification', e.target.value)}
+                  />
+                </div> */}
+                <div className="form-group">
+                  <label>Brand *</label>
+                  <input 
+                    type="text" 
+                    value={formData.brand}
+                    onChange={(e) => handleInputChange('brand', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Volume *</label>
+                  <input 
+                    type="text" 
+                    placeholder='e.g., 500ml, 1L, 4L'
+                    value={formData.volume}
+                    onChange={(e) => handleInputChange('volume', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Compatibility</label>
+                  <input 
+                    type='text' 
+                    placeholder='System/vehicle/hydraulic compatibility'
+                    value={formData.compatibility}
+                    onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                  />
+                </div>
+                {/* <div className="form-group">
+                  <label>Replacement Cycle</label>
+                  <input 
+                    type='text' 
+                    placeholder='like per 5000 km or per 6 months'
+                    value={formData.replacementCycle}
+                    onChange={(e) => handleInputChange('replacementCycle', e.target.value)}
+                  />
+                </div> */}
+                <div className="form-group">
+                  <label>Type</label>
+                  <input 
+                    type="text" 
+                    placeholder='e.g., Synthetic oil, Manual Gear Oil'
+                    value={formData.type}
+                    onChange={(e) => handleInputChange('type', e.target.value)}
+                  />
+                </div>
+                <div className="form-group full">
+                  <label>Description</label>
+                  <textarea 
+                    placeholder="Product description" 
+                    rows={3} 
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                  />
+                </div>
+                <div className="form-group full">
+                  <label>Notes</label>
+                  <textarea 
+                    placeholder="Additional notes" 
+                    rows={2} 
+                    value={formData.notes}
+                    onChange={(e) => handleInputChange('notes', e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
 
+            {/* Pricing & Stocks Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Image</h3>
-                <div className="add-product__image-upload">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minQuantity}
+                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
                 <label className="image-box">
-                    {image ? (
+                  {image ? (
                     <img src={URL.createObjectURL(image)} alt="Product" />
-                    ) : (
+                  ) : (
                     <span>Add Image</span>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                </div>
+              </div>
             </div>
+
 
             <div className="add-product__section">
                 <h3 className="add-product__section-title">Custom Fields</h3>
@@ -349,11 +383,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Part Type *</label>
                         <select
                             value={formData.subcategory}
-                            onChange={(e) => {
-                                handleInputChange('subcategory', e.target.value);
-                            }}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
                             required
-                        >
+                        > 
                             <option value="">Select</option>
                             <option value="Brake Pads">Brake Pads</option>
                             <option value="Brake Rotors">Brake Rotors</option>
@@ -399,13 +431,13 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                             onChange={(e) => handleInputChange('compatibility', e.target.value)}
                         />
                     </div>
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label>Replacement Interval</label>
                         <input type='text' placeholder='Time or mileage'
                             value={formData.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
                         />
-                    </div>
+                    </div> */}
                     <div className="form-group full">
                         <label>Notes</label>
                         <textarea placeholder="Maximum 60 words" rows={3} 
@@ -416,49 +448,58 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                 </div>
             </div>
 
+            {/* Pricing & Stocks Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Pricing & Stocks</h3>
-                    <div className="form-grid">
-                        <div className="form-group">
-                            <label>Quantity *</label>
-                            <input type="number" 
-                                value={formData.quantity}
-                                onChange={(e) => handleInputChange('quantity', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Price *</label>
-                            <input type="text" 
-                                value={formData.price}
-                                onChange={(e) => handleInputChange('price', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Minimum Quantity *</label>
-                            <input type="number" 
-                                value={formData.minQuantity}
-                                onChange={(e) => handleInputChange('minQuantity', e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minQuantity}
+                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
+
+            {/* Image Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Image</h3>
-                <div className="add-product__image-upload">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
                 <label className="image-box">
-                    {image ? (
+                  {image ? (
                     <img src={URL.createObjectURL(image)} alt="Product" />
-                    ) : (
+                  ) : (
                     <span>Add Image</span>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                </div>
+              </div>
             </div>
+
 
             <div className="add-product__section">
                 <h3 className="add-product__section-title">Custom Fields</h3>
@@ -493,6 +534,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                     </div>
                 </div>
             </div>
+
+            
           </div>
         );
       case 'exterior-body':
@@ -512,10 +555,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                     <div className="form-group">
                         <label>Part Type *</label>
                         <select
-                            value={formData.fluidType}
-                            onChange={(e) => {
-                                handleInputChange('subcategory', e.target.value);
-                            }}
+                            value={formData.subcategory}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
                             required
                         >
                             <option value="">Select</option>
@@ -557,7 +598,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         />
                     </div>
                     <div className="form-group">
-                        <label>Electronic</label>
+                        <label>Type</label>
                         <input type="text" placeholder='Heating, Indicator Light, Power Folding' 
                             value={formData.type}
                             onChange={(e) => handleInputChange('type', e.target.value)}
@@ -585,6 +626,13 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                             onChange={(e) => handleInputChange('compatibility', e.target.value)}
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type='text' placeholder=''
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
                     <div className="form-group full">
                         <label>Notes</label>
                         <textarea placeholder="Maximum 60 words" rows={3} 
@@ -595,49 +643,58 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                 </div>
             </div>
 
+            {/* Pricing & Stocks Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Pricing & Stocks</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>Quantity *</label>
-                        <input type="number" 
-                            value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Price *</label>
-                        <input type="text" 
-                            value={formData.price}
-                            onChange={(e) => handleInputChange('price', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Minimum Quantity *</label>
-                        <input type="number" 
-                            value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', e.target.value)}
-                            required
-                        />
-                    </div>
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
                 </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minQuantity}
+                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
+
+            {/* Image Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Image</h3>
-                <div className="add-product__image-upload">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
                 <label className="image-box">
-                    {image ? (
+                  {image ? (
                     <img src={URL.createObjectURL(image)} alt="Product" />
-                    ) : (
+                  ) : (
                     <span>Add Image</span>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                </div>
+              </div>
             </div>
+
 
             <div className="add-product__section">
                 <h3 className="add-product__section-title">Custom Fields</h3>
@@ -691,10 +748,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                     <div className="form-group">
                         <label>Category *</label>
                         <select
-                            value={formData.fluidType}
-                            onChange={(e) => {
-                                handleInputChange('subcategory', e.target.value);
-                            }}
+                            value={formData.subcategory}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
                             required
                         >
                             <option value="">Select</option>
@@ -707,7 +762,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                     </div>
                     <div className="form-group">
                         <label>Color</label>
-                        <input type="text" placeholder='e.g., Silver, Black, Custom (with code)'/>
+                        <input type="text" placeholder='e.g., Silver, Black, Custom'
+                            value={formData.color}
+                            onChange={(e) => handleInputChange('color', e.target.value)}
+                        />
                     </div>
                     <div className="form-group">
                         <label>Color Code</label>
@@ -748,7 +806,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Dry Time</label>
                         <input type="text" placeholder='Fast Dry / Regular' 
                             value={formData.dryTime}
-                            onChange={(e) => handleInputChange('deyTime', e.target.value)}
+                            onChange={(e) => handleInputChange('dryTime', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -779,6 +837,13 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                             onChange={(e) => handleInputChange('compatibility', e.target.value)}
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type='text' placeholder=''
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
                     <div className="form-group full">
                         <label>Notes</label>
                         <textarea placeholder="Maximum 60 words" rows={3} 
@@ -788,50 +853,58 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                     </div>
                 </div>
             </div>
-
+            {/* Pricing & Stocks Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Pricing & Stocks</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>Quantity *</label>
-                        <input type="number" 
-                            value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Price *</label>
-                        <input type="text" 
-                            value={formData.price}
-                            onChange={(e) => handleInputChange('price', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Minimum Quantity *</label>
-                        <input type="number" 
-                            value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', e.target.value)}
-                            required
-                        />
-                    </div>
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
                 </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minQuantity}
+                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
+
+            {/* Image Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Image</h3>
-                <div className="add-product__image-upload">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
                 <label className="image-box">
-                    {image ? (
+                  {image ? (
                     <img src={URL.createObjectURL(image)} alt="Product" />
-                    ) : (
+                  ) : (
                     <span>Add Image</span>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                </div>
+              </div>
             </div>
+
 
             <div className="add-product__section">
                 <h3 className="add-product__section-title">Custom Fields</h3>
@@ -866,6 +939,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                     </div>
                 </div>
             </div>
+            
           </div>
         );
       case 'engine-drivetrain':
@@ -957,7 +1031,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Quantity *</label>
                         <input type="number" 
                             value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', e.target.value)}
+                            onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
                             required
                         />
                     </div>
@@ -973,7 +1047,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Minimum Quantity *</label>
                         <input type="number" 
                             value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', e.target.value)}
+                            onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
                             required
                         />
                     </div>
@@ -1126,7 +1200,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Quantity *</label>
                         <input type="number" 
                             value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', e.target.value)}
+                            onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
                             required
                         />
                     </div>
@@ -1142,7 +1216,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Minimum Quantity *</label>
                         <input type="number" 
                             value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', e.target.value)}
+                            onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
                             required
                         />
                     </div>
@@ -1281,7 +1355,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Quantity *</label>
                         <input type="number" 
                             value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', e.target.value)}
+                            onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
                             required
                         />
                     </div>
@@ -1297,7 +1371,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
                         <label>Minimum Quantity *</label>
                         <input type="number" 
                             value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', e.target.value)}
+                            onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
                             required
                         />
                     </div>

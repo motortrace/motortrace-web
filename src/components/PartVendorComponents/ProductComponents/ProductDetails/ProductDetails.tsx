@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ProductDetails.scss';
 import { Pencil, Trash2, Eye } from 'lucide-react';
 import { categoryConfigs } from './categoryConfigs';
@@ -1103,23 +1103,78 @@ const ProductDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewPanelOpen, setIsViewPanelOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  
-  // Edit functionality state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
-
-  // Delete confirmation state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
+  // Add state for products and loading
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch products from API
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // const fetchProducts = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await apiRequest('http://localhost:3000/api/products');
+      
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+      
+  //     const data = await response.json();
+  //     setProducts(data);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError('Failed to fetch products. Please try again later.');
+  //     console.error('Error fetching products:', err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  //the product filtering logic -not updated but looks same
   const currentColumns = categoryConfigs[selectedCategory] || [];
   const filteredProducts = products.filter(
-    (product) => product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+    // (product) => product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+    (product) => 
+    product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase() &&
+    (searchTerm === '' || 
+     product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     product.compatibility.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedProducts = filteredProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+  const fetchProducts = async () => {
+  try {
+    setLoading(true);
+    // apiRequest already parses the JSON, so no need for response.json()
+    const data = await apiRequest('http://localhost:3000/api/products');
+    setProducts(data);
+    setError(null);
+  } catch (err) {
+    setError('Failed to fetch products. Please try again later.');
+    console.error('Error fetching products:', err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  //the refresh functionality
+  const handleRefresh = () => {
+    fetchProducts();
+  };
 
   const handleAddProduct = () => {
     setIsModalOpen(true);
@@ -1138,12 +1193,52 @@ const ProductDetails: React.FC = () => {
   const handleSaveProduct = (productData: any) => {
     console.log('Product saved:', productData);
     // Here you would typically update your local state or refetch products
-    // For example:
-    // setProducts([...products, productData]);
-    
-    // Show success message
+    fetchProducts();
     alert('Product added successfully!');
+  };
+
+  // Add this function outside your component
+// const apiRequest = async (url: string, options: RequestInit = {}) => {
+//   try {
+//     const response = await fetch(url, {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         ...options.headers,
+//       },
+//       ...options,
+//     });
+    
+//     if (!response.ok) {
+//       throw new Error(`API error: ${response.status} ${response.statusText}`);
+//     }
+    
+//     return await response.json();
+//   } catch (error) {
+//     console.error('API request failed:', error);
+//     throw error;
+//   }
+// };
+const apiRequest = async (url: string, options: RequestInit = {}) => {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json(); // This returns the parsed JSON
+  } catch (error) {
+    console.error('API request failed:', error);
+    throw error;
+  }
 };
+
 
   const handleViewProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -1303,13 +1398,37 @@ const ProductDetails: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="product-details">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="product-details">
+        <div className="error-message">
+          <p>{error}</p>
+          <button onClick={fetchProducts} className="btn retry">
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="product-details">
       <div className="product-details__header">
         <h2 className="product-details__title">Product List</h2>
         <div className="product-details__actions">
           <button className="btn pdf">PDF</button>
-          <button className="btn refresh">⟳</button>
+          <button className="btn refresh" onClick={handleRefresh}>⟳</button>
           <button className="btn sort">⇅</button>
           <button className="btn add" onClick={handleAddProduct}>
             + Add Product
@@ -1318,7 +1437,10 @@ const ProductDetails: React.FC = () => {
       </div>
 
       <div className="product-details__filters">
-        <input className="filter-input" placeholder="Search..." />
+        <input className="filter-input" placeholder="Search..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <select
           className="filter-select"
           value={selectedCategory}
@@ -1360,7 +1482,7 @@ const ProductDetails: React.FC = () => {
                 </div>
               ))}
               <div className="product-details__cell">{product.price}</div>
-              <div className="product-details__cell">{product.stock}</div>
+              <div className="product-details__cell">{product.quantity}</div>
               <div className="product-details__cell">
                 <span className={`product-details__status product-details__status--${product.availability.toLowerCase().replace(/\s+/g, '-')}`}>
                   {product.availability}
