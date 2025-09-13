@@ -1506,7 +1506,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         {/* Modal Body */}
         <div className="modal-body">
           {/* Main Content Area */}
-          <div className="main-content" style={{ overflowY: 'auto', maxHeight: 'calc(95vh - 120px)' }}>
+          <div className="main-content" style={{ overflowY: 'auto', maxHeight: 'calc(95vh - 180px)' }}>
             {renderTabContent()}
           </div>
 
