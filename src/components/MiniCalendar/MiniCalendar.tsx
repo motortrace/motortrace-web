@@ -113,7 +113,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
       <div style={{
         padding: '12px 16px',
         borderBottom: '1px solid #e2e8f0',
-        backgroundColor: '#f8fafc'
+        backgroundColor: 'white'
       }}>
         <div style={{
           display: 'flex',

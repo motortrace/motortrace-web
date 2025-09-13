@@ -408,7 +408,7 @@ const AppointmentsPage = () => {
           ) : (
             <Table
               columns={columns}
-              data={pendingAppointments}
+              data={pendingAppointments.map(apt => ({ ...apt, uniqueKey: `pending-${apt.id}` }))}
               onRowClick={(appointment) => handleView(appointment.id)}
               emptyMessage="No pending appointment requests found."
             />
@@ -430,7 +430,7 @@ const AppointmentsPage = () => {
           ) : (
             <Table
               columns={columns}
-              data={confirmedAppointments}
+              data={confirmedAppointments.map(apt => ({ ...apt, uniqueKey: `confirmed-${apt.id}` }))}
               onRowClick={(appointment) => handleView(appointment.id)}
               emptyMessage="No confirmed appointments found."
             />
@@ -474,21 +474,21 @@ const AppointmentsPage = () => {
                 )}
               </div>
 
-              {selectedAppointment.cannedServices && selectedAppointment.cannedServices.length > 0 && (
-                <div className="detail-section">
-                  <h4>Services</h4>
-                  {selectedAppointment.cannedServices.map((service, index) => (
-                    <div key={index} className="service-item">
-                      <p><strong>{service.name}</strong></p>
-                      <p>Code: {service.code}</p>
-                      <p>Duration: {service.duration} minutes</p>
-                      <p>Quantity: {service.quantity}</p>
-                      <p>Price: LKR {service.price.toFixed(2)}</p>
-                      {service.notes && <p>Notes: {service.notes}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
+                     {selectedAppointment.cannedServices && selectedAppointment.cannedServices.length > 0 && (
+                       <div className="detail-section">
+                         <h4>Services</h4>
+                         {selectedAppointment.cannedServices.map((service, index) => (
+                           <div key={`${selectedAppointment.id}-service-${index}`} className="service-item">
+                             <p><strong>{service.name}</strong></p>
+                             <p>Code: {service.code}</p>
+                             <p>Duration: {service.duration} minutes</p>
+                             <p>Quantity: {service.quantity}</p>
+                             <p>Price: LKR {typeof service.price === 'number' ? service.price.toFixed(2) : service.price}</p>
+                             {service.notes && <p>Notes: {service.notes}</p>}
+                           </div>
+                         ))}
+                       </div>
+                     )}
             </div>
             <div className="modal-footer">
               <button className="btn btn--secondary" onClick={() => setViewModalOpen(false)}>
