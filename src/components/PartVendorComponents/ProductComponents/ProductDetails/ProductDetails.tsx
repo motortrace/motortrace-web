@@ -1184,12 +1184,6 @@ const ProductDetails: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  // const handleSaveProduct = () => {
-  //   // Add your save logic here
-  //   console.log('Product saved!');
-  //   // You can add the new product to your products array here
-  // };
-
   const handleSaveProduct = (productData: any) => {
     console.log('Product saved:', productData);
     // Here you would typically update your local state or refetch products
@@ -1197,27 +1191,7 @@ const ProductDetails: React.FC = () => {
     alert('Product added successfully!');
   };
 
-  // Add this function outside your component
-// const apiRequest = async (url: string, options: RequestInit = {}) => {
-//   try {
-//     const response = await fetch(url, {
-//       headers: {
-//         'Content-Type': 'application/json',
-//         ...options.headers,
-//       },
-//       ...options,
-//     });
-    
-//     if (!response.ok) {
-//       throw new Error(`API error: ${response.status} ${response.statusText}`);
-//     }
-    
-//     return await response.json();
-//   } catch (error) {
-//     console.error('API request failed:', error);
-//     throw error;
-//   }
-// };
+ 
 const apiRequest = async (url: string, options: RequestInit = {}) => {
   try {
     const response = await fetch(url, {
@@ -1251,12 +1225,18 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
   };
 
   // Updated edit handler to open edit modal
+  // const handleEditProduct = (product: Product) => {
+  //   setProductToEdit(product);
+  //   setIsEditModalOpen(true);
+  //   // Close view panel if it's open
+  //   setIsViewPanelOpen(false);
+  // };
+
+  //changed here
   const handleEditProduct = (product: Product) => {
-    setProductToEdit(product);
-    setIsEditModalOpen(true);
-    // Close view panel if it's open
-    setIsViewPanelOpen(false);
-  };
+  setProductToEdit(product);
+  setIsEditModalOpen(true);
+};
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
@@ -1364,25 +1344,39 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
     image: product.image,
   });
 
-  const handleSaveEditedProduct = (updatedData: EngineFluidProduct) => {
-    // Here you would update your products array or make an API call
-    console.log('Updated product data:', updatedData);
+  // const handleSaveEditedProduct = (updatedData: EngineFluidProduct) => {
+  //   // Here you would update your products array or make an API call
+  //   console.log('Updated product data:', updatedData);
     
-    // Example: Update the products array (you'll need to implement proper state management)
-    // const updatedProducts = products.map(product => 
-    //   product.id === productToEdit?.id 
-    //     ? { ...product, ...updatedData } 
-    //     : product
-    // );
+  //   // Example: Update the products array (you'll need to implement proper state management)
+  //   // const updatedProducts = products.map(product => 
+  //   //   product.id === productToEdit?.id 
+  //   //     ? { ...product, ...updatedData } 
+  //   //     : product
+  //   // );
     
-    // Close the edit modal
-    setIsEditModalOpen(false);
-    setProductToEdit(null);
+  //   // Close the edit modal
+  //   setIsEditModalOpen(false);
+  //   setProductToEdit(null);
     
-    // Show success message or refresh the data
-    alert('Product updated successfully!');
-  };
+  //   // Show success message or refresh the data
+  //   alert('Product updated successfully!');
+  // };
 
+  const handleSaveEditedProduct = (updatedProduct: any) => {
+  // Update your local state or refetch products
+  console.log('Product updated:', updatedProduct);
+  
+  // Example: Update the products array
+  // const updatedProducts = products.map(p => 
+  //   p.id === updatedProduct.id ? updatedProduct : p
+  // );
+  // setProducts(updatedProducts);
+  
+  setIsEditModalOpen(false);
+  setProductToEdit(null);
+  alert('Product updated successfully!');
+};
   const handleDuplicateProduct = (product: Product) => {
     // Implement duplicate logic
     console.log('Duplicating product:', product);
@@ -1531,7 +1525,7 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
         onSave={handleSaveProduct}
       />
 
-      {/* Edit Product Modal */}
+      {/* Edit Product Modal
       {isEditModalOpen && productToEdit && (
         <div className="modal-overlay" onClick={handleCloseEditModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -1558,7 +1552,20 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
+
+      
+{isEditModalOpen && productToEdit && (
+  <div className="modal-overlay" onClick={handleCloseEditModal}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <EditProduct 
+        category={productToEdit.category}
+        existingData={productToEdit} // Pass the entire product object
+        onSave={handleSaveEditedProduct}
+      />
+    </div>
+  </div>
+)}
 
       {/* Product View Panel */}
       <ProductViewPanel
