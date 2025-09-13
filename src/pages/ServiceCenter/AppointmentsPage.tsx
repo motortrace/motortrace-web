@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './AppointmentsPage.scss';
+import { useAuth } from '../../hooks/useAuth';
 
-// Types based on the Prisma schema
+// Types based on the backend API response
 interface Appointment {
   id: string;
   customerId: string;
   vehicleId: string;
-  requestedAt: Date;
-  startTime?: Date;
-  endTime?: Date;
+  requestedAt: string;
+  startTime?: string;
+  endTime?: string;
   status: 'PENDING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
   priority: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
   notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   assignedToId?: string;
   
   // Relations
   customer?: {
     id: string;
-    firstName: string;
-    lastName: string;
-    phone?: string;
+    name: string;
     email?: string;
+    phone?: string;
   };
   vehicle?: {
     id: string;
@@ -34,20 +34,15 @@ interface Appointment {
   };
   assignedTo?: {
     id: string;
-    userProfile?: {
-      firstName: string;
-      lastName: string;
-    };
+    supabaseUserId?: string;
   };
   cannedServices?: Array<{
     id: string;
-    cannedService: {
-      id: string;
-      name: string;
-      description?: string;
-    };
-    quantity: number;
+    code: string;
+    name: string;
+    duration: number;
     price: number;
+    quantity: number;
     notes?: string;
   }>;
 }
@@ -77,6 +72,7 @@ const getPriorityBadge = (priority: string) => {
 };
 
 const AppointmentsPage = () => {
+  const { user, token, loading: authLoading } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCustomer, setFilterCustomer] = useState('all');
@@ -89,159 +85,75 @@ const AppointmentsPage = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
-  // Sample data - replace with actual API calls
-  useEffect(() => {
+  // Fetch appointments from backend
+  const fetchAppointments = async () => {
+    if (!token) {
+      setError('No access token available');
+      return;
+    }
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const sampleAppointments: Appointment[] = [
-        {
-          id: '1',
-          customerId: 'cust1',
-          vehicleId: 'veh1',
-          requestedAt: new Date('2024-01-15T09:00:00'),
-          startTime: new Date('2024-01-15T09:00:00'),
-          endTime: new Date('2024-01-15T10:00:00'),
-          status: 'PENDING',
-          priority: 'NORMAL',
-          notes: 'Regular maintenance',
-          createdAt: new Date('2024-01-14T10:00:00'),
-          updatedAt: new Date('2024-01-14T10:00:00'),
-          customer: {
-            id: 'cust1',
-            firstName: 'John',
-            lastName: 'Smith',
-            phone: '+94 77 123 4567',
-            email: 'john.smith@email.com'
-          },
-          vehicle: {
-            id: 'veh1',
-            make: 'Toyota',
-            model: 'Camry',
-            year: 2020,
-            licensePlate: 'ABC-1234'
-          },
-          cannedServices: [
-            {
-              id: '1',
-              cannedService: {
-                id: 'svc1',
-                name: 'Oil Change',
-                description: 'Regular oil change service'
-              },
-              quantity: 1,
-              price: 5000,
-              notes: 'Synthetic oil'
-            }
-          ]
+    setError('');
+
+    try {
+      // Fetch unassigned appointments (pending requests)
+      const unassignedResponse = await fetch('http://localhost:3000/appointments/unassigned', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        {
-          id: '2',
-          customerId: 'cust2',
-          vehicleId: 'veh2',
-          requestedAt: new Date('2024-01-15T14:00:00'),
-          startTime: new Date('2024-01-15T14:00:00'),
-          endTime: new Date('2024-01-15T15:30:00'),
-          status: 'CONFIRMED',
-          priority: 'HIGH',
-          notes: 'Brake inspection needed',
-          createdAt: new Date('2024-01-14T11:00:00'),
-          updatedAt: new Date('2024-01-14T11:00:00'),
-          assignedToId: 'advisor1',
-          customer: {
-            id: 'cust2',
-            firstName: 'Sarah',
-            lastName: 'Johnson',
-            phone: '+94 77 234 5678',
-            email: 'sarah.johnson@email.com'
-          },
-          vehicle: {
-            id: 'veh2',
-            make: 'Honda',
-            model: 'Civic',
-            year: 2019,
-            licensePlate: 'DEF-5678'
-          },
-          assignedTo: {
-            id: 'advisor1',
-            userProfile: {
-              firstName: 'Mike',
-              lastName: 'Wilson'
-            }
-          },
-          cannedServices: [
-            {
-              id: '2',
-              cannedService: {
-                id: 'svc2',
-                name: 'Brake Inspection',
-                description: 'Complete brake system inspection'
-              },
-              quantity: 1,
-              price: 3000
-            }
-          ]
+      });
+
+      if (!unassignedResponse.ok) {
+        throw new Error(`Failed to fetch unassigned appointments: ${unassignedResponse.statusText}`);
+      }
+
+      const unassignedData = await unassignedResponse.json();
+
+      // Fetch confirmed appointments
+      const confirmedResponse = await fetch('http://localhost:3000/appointments?status=CONFIRMED', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        {
-          id: '3',
-          customerId: 'cust3',
-          vehicleId: 'veh3',
-          requestedAt: new Date('2024-01-16T10:00:00'),
-          startTime: new Date('2024-01-16T10:00:00'),
-          endTime: new Date('2024-01-16T11:00:00'),
-          status: 'IN_PROGRESS',
-          priority: 'URGENT',
-          notes: 'Engine repair',
-          createdAt: new Date('2024-01-15T08:00:00'),
-          updatedAt: new Date('2024-01-15T08:00:00'),
-          assignedToId: 'advisor2',
-          customer: {
-            id: 'cust3',
-            firstName: 'Mike',
-            lastName: 'Davis',
-            phone: '+94 77 345 6789',
-            email: 'mike.davis@email.com'
-          },
-          vehicle: {
-            id: 'veh3',
-            make: 'Ford',
-            model: 'Focus',
-            year: 2021,
-            licensePlate: 'GHI-9012'
-          },
-          assignedTo: {
-            id: 'advisor2',
-            userProfile: {
-              firstName: 'Sarah',
-              lastName: 'Brown'
-            }
-          },
-          cannedServices: [
-            {
-              id: '3',
-              cannedService: {
-                id: 'svc3',
-                name: 'Engine Diagnostic',
-                description: 'Complete engine diagnostic check'
-              },
-              quantity: 1,
-              price: 8000
-            }
-          ]
-        }
+      });
+
+      if (!confirmedResponse.ok) {
+        throw new Error(`Failed to fetch confirmed appointments: ${confirmedResponse.statusText}`);
+      }
+
+      const confirmedData = await confirmedResponse.json();
+
+      // Combine both datasets
+      const allAppointments = [
+        ...(unassignedData.success ? unassignedData.data : []),
+        ...(confirmedData.success ? confirmedData.data : [])
       ];
-      setAppointments(sampleAppointments);
+
+      setAppointments(allAppointments);
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch appointments');
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+    }
+  };
+
+  useEffect(() => {
+    if (!authLoading && token) {
+      fetchAppointments();
+    }
+  }, [token, authLoading]);
 
   // Unique filter values
-  const uniqueCustomers = [...new Set(appointments.map((a: Appointment) => a.customer?.firstName ? `${a.customer.firstName} ${a.customer.lastName}` : a.customerId))];
+  const uniqueCustomers = [...new Set(appointments.map((a: Appointment) => a.customer?.name || a.customerId))];
   const uniqueVehicles = [...new Set(appointments.map((a: Appointment) => a.vehicle?.make ? `${a.vehicle.year} ${a.vehicle.make} ${a.vehicle.model}` : a.vehicleId))];
 
   // Filtering logic
   const filteredAppointments = appointments.filter((appointment: Appointment) => {
-    const customerName = appointment.customer?.firstName ? `${appointment.customer.firstName} ${appointment.customer.lastName}` : appointment.customerId;
+    const customerName = appointment.customer?.name || appointment.customerId;
     const vehicleName = appointment.vehicle?.make ? `${appointment.vehicle.year} ${appointment.vehicle.make} ${appointment.vehicle.model}` : appointment.vehicleId;
     const notes = appointment.notes || '';
     const matchesSearch = notes.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -274,19 +186,49 @@ const AppointmentsPage = () => {
       key: 'id',
       label: 'Appointment ID',
       sortable: true,
-      render: (value: any) => <strong>{String(value)}</strong>
+      render: (value: any) => {
+        const fullId = String(value);
+        const shortId = fullId.substring(0, 8) + '...';
+        return (
+          <strong title={fullId} style={{ cursor: 'help' }}>
+            {shortId}
+          </strong>
+        );
+      }
     },
     {
       key: 'customer',
       label: 'Customer',
       sortable: true,
-      render: (_: any, row: Appointment) => <span>{row.customer?.firstName ? `${row.customer.firstName} ${row.customer.lastName}` : row.customerId}</span>
+      render: (_: any, row: Appointment) => (
+        <div>
+          <div style={{ fontWeight: '500' }}>
+            {row.customer?.name || row.customerId}
+          </div>
+          {row.customer?.phone && (
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+              {row.customer.phone}
+            </div>
+          )}
+        </div>
+      )
     },
     {
       key: 'vehicle',
       label: 'Vehicle',
       sortable: true,
-      render: (_: any, row: Appointment) => <span>{row.vehicle?.make ? `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}` : row.vehicleId}</span>
+      render: (_: any, row: Appointment) => (
+        <div>
+          <div style={{ fontWeight: '500' }}>
+            {row.vehicle ? `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}` : row.vehicleId}
+          </div>
+          {row.vehicle?.licensePlate && (
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+              {row.vehicle.licensePlate}
+            </div>
+          )}
+        </div>
+      )
     },
     {
       key: 'startTime',
@@ -295,8 +237,41 @@ const AppointmentsPage = () => {
       render: (value: any) => {
         if (!value) return <span style={{ color: '#aaa', fontStyle: 'italic' }}>Not scheduled</span>;
         const date = new Date(value);
-        return <span>{date.toLocaleString()}</span>;
+        return (
+          <div>
+            <div style={{ fontWeight: '500' }}>
+              {date.toLocaleDateString()}
+            </div>
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+              {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+            </div>
+          </div>
+        );
       }
+    },
+    {
+      key: 'cannedServices',
+      label: 'Services',
+      render: (_: any, row: Appointment) => (
+        <div>
+          {row.cannedServices && row.cannedServices.length > 0 ? (
+            <div>
+              {row.cannedServices.slice(0, 2).map((service, index) => (
+                <div key={index} style={{ fontSize: '12px', marginBottom: '2px' }}>
+                  {service.name}
+                </div>
+              ))}
+              {row.cannedServices.length > 2 && (
+                <div style={{ fontSize: '11px', color: '#6b7280' }}>
+                  +{row.cannedServices.length - 2} more
+                </div>
+              )}
+            </div>
+          ) : (
+            <span style={{ color: '#6b7280', fontStyle: 'italic', fontSize: '12px' }}>No services</span>
+          )}
+        </div>
+      )
     },
     {
       key: 'priority',
@@ -316,9 +291,8 @@ const AppointmentsPage = () => {
       key: 'assignedTo',
       label: 'Service Advisor',
       render: (_: any, row: Appointment) => {
-        const advisor = row.assignedTo?.userProfile;
-        return advisor ? (
-          <span>{advisor.firstName} {advisor.lastName}</span>
+        return row.assignedTo ? (
+          <span>Assigned</span>
         ) : (
           <span style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Unassigned</span>
         );
@@ -413,7 +387,7 @@ const AppointmentsPage = () => {
             <i className='bx bx-filter'></i>
             Advanced Filters
           </button>
-          <button className="btn btn--ghost" onClick={() => window.location.reload()}>
+          <button className="btn btn--ghost" onClick={fetchAppointments}>
             <i className='bx bx-refresh'></i>
             Refresh
           </button>
@@ -477,7 +451,7 @@ const AppointmentsPage = () => {
             <div className="modal-body">
               <div className="detail-section">
                 <h4>Customer Information</h4>
-                <p><strong>Name:</strong> {selectedAppointment.customer?.firstName} {selectedAppointment.customer?.lastName}</p>
+                <p><strong>Name:</strong> {selectedAppointment.customer?.name || 'N/A'}</p>
                 <p><strong>Phone:</strong> {selectedAppointment.customer?.phone || 'N/A'}</p>
                 <p><strong>Email:</strong> {selectedAppointment.customer?.email || 'N/A'}</p>
               </div>
@@ -494,9 +468,7 @@ const AppointmentsPage = () => {
                 <p><strong>Scheduled Time:</strong> {selectedAppointment.startTime ? new Date(selectedAppointment.startTime).toLocaleString() : 'Not scheduled'}</p>
                 <p><strong>Status:</strong> {getStatusBadge(selectedAppointment.status)}</p>
                 <p><strong>Priority:</strong> {getPriorityBadge(selectedAppointment.priority)}</p>
-                <p><strong>Service Advisor:</strong> {selectedAppointment.assignedTo?.userProfile ? 
-                  `${selectedAppointment.assignedTo.userProfile.firstName} ${selectedAppointment.assignedTo.userProfile.lastName}` : 
-                  'Unassigned'}</p>
+                <p><strong>Service Advisor:</strong> {selectedAppointment.assignedTo ? 'Assigned' : 'Unassigned'}</p>
                 {selectedAppointment.notes && (
                   <p><strong>Notes:</strong> {selectedAppointment.notes}</p>
                 )}
@@ -507,7 +479,9 @@ const AppointmentsPage = () => {
                   <h4>Services</h4>
                   {selectedAppointment.cannedServices.map((service, index) => (
                     <div key={index} className="service-item">
-                      <p><strong>{service.cannedService.name}</strong></p>
+                      <p><strong>{service.name}</strong></p>
+                      <p>Code: {service.code}</p>
+                      <p>Duration: {service.duration} minutes</p>
                       <p>Quantity: {service.quantity}</p>
                       <p>Price: LKR {service.price.toFixed(2)}</p>
                       {service.notes && <p>Notes: {service.notes}</p>}
