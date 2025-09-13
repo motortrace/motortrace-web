@@ -1434,6 +1434,8 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   const [cannedServices, setCannedServices] = useState<any[]>([]);
   const [selectedEstimateId, setSelectedEstimateId] = useState('');
   const [estimatesList, setEstimatesList] = useState<any[]>([]);
+  const [showPublishEstimateModal, setShowPublishEstimateModal] = useState(false);
+  const [selectedPublishEstimateId, setSelectedPublishEstimateId] = useState('');
 
   // Fetch estimates when component mounts or workOrder changes
   useEffect(() => {
@@ -1579,6 +1581,45 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
     fetchEstimates();
   };
 
+  // Open Publish Estimate Modal
+  const openPublishEstimateModal = () => {
+    setShowPublishEstimateModal(true);
+    fetchEstimates();
+  };
+
+  // Publish Estimate Function
+  const handlePublishEstimate = async () => {
+    if (!selectedPublishEstimateId || !token) {
+      console.error('Missing estimate ID or token');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/estimates/${selectedPublishEstimateId}/toggle-visibility`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          isVisible: true
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to publish estimate: ${response.statusText}`);
+      }
+
+      console.log('Estimate published successfully');
+      // Close modal and refresh page
+      setShowPublishEstimateModal(false);
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error publishing estimate:', error);
+    }
+  };
+
   // Get user role from localStorage
   const getUserRole = () => {
     try {
@@ -1650,7 +1691,11 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
             </button>
-            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button 
+              className="btn btn--primary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={openPublishEstimateModal}
+            >
               <i className="bx bx-calculator"></i>
               Publish Estimate
             </button>
@@ -1781,6 +1826,76 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Publish Estimate Modal */}
+      {showPublishEstimateModal && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowPublishEstimateModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <div className="modal-title">
+                <h2>Publish Estimate</h2>
+                <p className="modal-subtitle">Select an estimate to publish</p>
+              </div>
+              <button className="close-btn" onClick={() => setShowPublishEstimateModal(false)} title="Close">
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="modal-body">
+              <div className="main-content" style={{ padding: '24px' }}>
+                {/* Estimate Selection */}
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                    Select Estimate to Publish:
+                  </label>
+                  <select 
+                    value={selectedPublishEstimateId} 
+                    onChange={(e) => setSelectedPublishEstimateId(e.target.value)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '8px 12px', 
+                      border: '1px solid #d1d5db', 
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      marginBottom: '20px'
+                    }}
+                  >
+                    <option value="">Select an estimate...</option>
+                    {estimatesList.map((estimate: any) => (
+                      <option key={estimate.id} value={estimate.id}>
+                        Estimate v{estimate.version || 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button 
+                    className="btn btn--secondary"
+                    onClick={() => setShowPublishEstimateModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="btn btn--primary"
+                    onClick={handlePublishEstimate}
+                    disabled={!selectedPublishEstimateId}
+                    style={{ 
+                      opacity: selectedPublishEstimateId ? 1 : 0.5,
+                      cursor: selectedPublishEstimateId ? 'pointer' : 'not-allowed'
+                    }}
+                  >
+                    Publish Estimate
+                  </button>
                 </div>
               </div>
             </div>
