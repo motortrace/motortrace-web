@@ -47,7 +47,7 @@ interface WorkOrderLabor {
   updatedAt: string;
 }
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NotesTab from '../../pages/ServiceCenter/JobCard/tabs/NotesTab';
 import { useAuth } from '../../hooks/useAuth';
 import './ManageWorkOrderModal.scss';
@@ -173,10 +173,14 @@ const TabNavigation: React.FC<{ activeTab: string; onTabChange: (tab: string) =>
   );
 };
 // Estimates Tab Content
-import { useEffect } from 'react';
 import { getWorkOrderEstimates, type Estimate } from '../../utils/workOrdersApi';
 
-const EstimatesTab: React.FC<{ workOrderId: string; onGenerateEstimate: () => void }> = ({ workOrderId, onGenerateEstimate }) => {
+const EstimatesTab: React.FC<{ 
+  workOrderId: string; 
+  onGenerateEstimate: () => void;
+  onOpenCannedServicesModal: () => void;
+  estimatesList: any[];
+}> = ({ workOrderId, onGenerateEstimate, onOpenCannedServicesModal, estimatesList }) => {
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -261,7 +265,11 @@ const EstimatesTab: React.FC<{ workOrderId: string; onGenerateEstimate: () => vo
             </div>
           </div>
           <div className="action-buttons" style={{ display: 'flex', gap: '12px' }}>
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button 
+              className="btn btn--secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={onOpenCannedServicesModal}
+            >
               <i className="bx bx-plus"></i>
               Add Canned Service
             </button>
@@ -1422,6 +1430,17 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   const [activeTab, setActiveTab] = useState('overview');
   const [notes, setNotes] = useState('');
   const [isGeneratingEstimate, setIsGeneratingEstimate] = useState(false);
+  const [showCannedServicesModal, setShowCannedServicesModal] = useState(false);
+  const [cannedServices, setCannedServices] = useState<any[]>([]);
+  const [selectedEstimateId, setSelectedEstimateId] = useState('');
+  const [estimatesList, setEstimatesList] = useState<any[]>([]);
+
+  // Fetch estimates when component mounts or workOrder changes
+  useEffect(() => {
+    if (workOrder?.id && token) {
+      fetchEstimates();
+    }
+  }, [workOrder?.id, token]);
 
   // Generate Estimate Function
   const handleGenerateEstimate = async () => {
@@ -1472,6 +1491,94 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
     }
   };
 
+  // Fetch Canned Services Function
+  const fetchCannedServices = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/canned-services', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch canned services: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setCannedServices(Array.isArray(data) ? data : data.data || []);
+    } catch (error) {
+      console.error('Error fetching canned services:', error);
+    }
+  };
+
+  // Add Canned Service to Estimate Function
+  const handleAddCannedServiceToEstimate = async (cannedServiceId: string) => {
+    if (!selectedEstimateId || !token) {
+      console.error('Missing estimate ID or token');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/estimates/${selectedEstimateId}/add-canned-service`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cannedServiceId: cannedServiceId
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to add canned service: ${response.statusText}`);
+      }
+
+      console.log('Canned service added successfully');
+      // Close modal and refresh page
+      setShowCannedServicesModal(false);
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error adding canned service:', error);
+    }
+  };
+
+  // Fetch Estimates Function
+  const fetchEstimates = async () => {
+    if (!workOrder?.id || !token) return;
+    
+    try {
+      const response = await fetch(`http://localhost:3000/estimates/?workOrderId=${workOrder.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch estimates: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setEstimatesList(Array.isArray(data) ? data : data.data || []);
+    } catch (error) {
+      console.error('Error fetching estimates:', error);
+    }
+  };
+
+  // Open Canned Services Modal
+  const openCannedServicesModal = () => {
+    setShowCannedServicesModal(true);
+    fetchCannedServices();
+    fetchEstimates();
+  };
+
   // Get user role from localStorage
   const getUserRole = () => {
     try {
@@ -1497,7 +1604,12 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       case 'overview':
         return <OverviewTab workOrder={workOrder} />;
       case 'estimates':
-        return <EstimatesTab workOrderId={workOrder?.id || ''} onGenerateEstimate={handleGenerateEstimate} />;
+        return <EstimatesTab 
+          workOrderId={workOrder?.id || ''} 
+          onGenerateEstimate={handleGenerateEstimate}
+          onOpenCannedServicesModal={openCannedServicesModal}
+          estimatesList={estimatesList}
+        />;
       case 'inspections':
         return <InspectionsTab workOrderId={workOrder?.id || ''} />;
       case 'services':
@@ -1575,6 +1687,106 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
           {/* <Sidebar /> */}
         </div>
       </div>
+
+      {/* Canned Services Modal */}
+      {showCannedServicesModal && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowCannedServicesModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <div className="modal-title">
+                <h2>Add Canned Service to Estimate</h2>
+                <p className="modal-subtitle">Select a canned service to add to the estimate</p>
+              </div>
+              <button className="close-btn" onClick={() => setShowCannedServicesModal(false)} title="Close">
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="modal-body">
+              <div className="main-content" style={{ padding: '24px' }}>
+                {/* Estimate Selection */}
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                    Select Estimate:
+                  </label>
+                  <select 
+                    value={selectedEstimateId} 
+                    onChange={(e) => setSelectedEstimateId(e.target.value)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '8px 12px', 
+                      border: '1px solid #d1d5db', 
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <option value="">Select an estimate...</option>
+                    {estimatesList.map((estimate: any) => (
+                      <option key={estimate.id} value={estimate.id}>
+                        Estimate v{estimate.version || 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Canned Services List */}
+                <div>
+                  <h3 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600', color: '#1f2937' }}>
+                    Available Canned Services
+                  </h3>
+                  <div style={{ display: 'grid', gap: '12px', maxHeight: '400px', overflowY: 'auto' }}>
+                    {cannedServices.map((service: any) => (
+                      <div 
+                        key={service.id}
+                        style={{
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                          padding: '16px',
+                          background: '#fff',
+                          cursor: selectedEstimateId ? 'pointer' : 'not-allowed',
+                          opacity: selectedEstimateId ? 1 : 0.5,
+                          transition: 'all 0.2s ease'
+                        }}
+                        onClick={() => selectedEstimateId && handleAddCannedServiceToEstimate(service.id)}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div style={{ flex: 1 }}>
+                            <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
+                              {service.name}
+                            </h4>
+                            <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#6b7280' }}>
+                              {service.description}
+                            </p>
+                            <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#9ca3af' }}>
+                              <span>Code: {service.code}</span>
+                              <span>Price: ${service.price || '0.00'}</span>
+                              <span>Duration: {service.estimatedDuration || 'N/A'}</span>
+                            </div>
+                          </div>
+                          <button 
+                            className="btn btn--primary"
+                            disabled={!selectedEstimateId}
+                            style={{ 
+                              padding: '8px 16px',
+                              fontSize: '14px',
+                              opacity: selectedEstimateId ? 1 : 0.5,
+                              cursor: selectedEstimateId ? 'pointer' : 'not-allowed'
+                            }}
+                          >
+                            Add to Estimate
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
