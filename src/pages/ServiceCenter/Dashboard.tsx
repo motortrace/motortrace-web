@@ -1,146 +1,48 @@
 import React from 'react';
-import TechniciansTableCard from '../../components/TechniciansTableCard/TechniciansTableCard';
 import DailyCustomersLineChart from '../../components/DailyCustomersLineChart/DailyCustomersLineChart';
+import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
 
 // MetricCard Component
 interface MetricCardProps {
   title: string;
   amount: string;
-  change: string;
-  changeType: 'positive' | 'negative';
-  period?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({
   title,
-  amount,
-  change,
-  changeType,
-  period = 'vs last month'
+  amount
 }) => {
   return (
     <div style={{
       backgroundColor: 'white',
-      padding: '24px',
-      borderRadius: '12px',
+      padding: '12px',
+      borderRadius: '6px',
       border: '1px solid #e2e8f0',
       position: 'relative'
     }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '16px'
+      <h3 style={{
+        fontSize: '10px',
+        fontWeight: '500',
+        color: '#64748b',
+        margin: '0 0 6px 0'
       }}>
-        <h3 style={{
-          fontSize: '14px',
-          fontWeight: '500',
-          color: '#64748b',
-          margin: 0
-        }}>
-          {title}
-        </h3>
-        <button style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: '4px',
-          borderRadius: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <i className='bx bx-right-top-arrow-circle' style={{
-            fontSize: '20px',
-            color: '#64748b'
-          }}></i>
-        </button>
-      </div>
+        {title}
+      </h3>
       
       <div style={{
-        fontSize: '28px',
+        fontSize: '16px',
         fontWeight: '700',
         color: '#1e293b',
-        marginBottom: '12px'
+        marginBottom: '6px'
       }}>
         {amount}
       </div>
       
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontSize: '14px'
-      }}>
-        <span style={{
-          color: changeType === 'positive' ? '#10b981' : '#ef4444',
-          fontWeight: '500'
-        }}>
-          {changeType === 'positive' ? '↑' : '↓'} {change}
-        </span>
-        <span style={{
-          color: '#64748b'
-        }}>
-          {period}
-        </span>
-      </div>
     </div>
   );
 };
 
 const Dashboard = () => {
-  // Fake data for technicians
-  const techniciansData = [
-    {
-      id: '1',
-      name: 'Mike Johnson',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      currentWorkOrder: {
-        id: 'WO-001',
-        title: 'Brake Pad Replacement',
-        customer: 'John Smith',
-        vehicle: 'Toyota Camry 2020',
-        taskType: 'Labor' as const
-      }
-    },
-    {
-      id: '2',
-      name: 'Sarah Wilson',
-      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-      currentWorkOrder: {
-        id: 'WO-002',
-        title: 'Battery Replacement',
-        customer: 'Alice Johnson',
-        vehicle: 'Honda Civic 2019',
-        taskType: 'Labor' as const
-      }
-    },
-    {
-      id: '3',
-      name: 'David Brown',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      currentWorkOrder: {
-        id: 'WO-003',
-        title: 'Spark Plug Replacement',
-        customer: 'Robert Davis',
-        vehicle: 'Ford Focus 2021',
-        taskType: 'Labor' as const
-      }
-    },
-    {
-      id: '4',
-      name: 'Alex Green',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      currentWorkOrder: {
-        id: 'WO-004',
-        title: 'Transmission Service',
-        customer: 'Lisa Anderson',
-        vehicle: 'Nissan Altima 2018',
-        taskType: 'Inspection' as const
-      }
-    }
-  ];
-
   // Fake data for daily customers
   const dailyCustomersData = [
     { date: '2024-01-15', customers: 15 },
@@ -152,62 +54,192 @@ const Dashboard = () => {
     { date: '2024-01-21', customers: 19 }
   ];
 
+  // Sample appointment data for September 13, 2025
+  const sampleAppointments = [
+    {
+      id: '1',
+      customerId: 'cust1',
+      vehicleId: 'veh1',
+      requestedAt: new Date(),
+      startTime: new Date(2025, 8, 13, 9, 0), // Sep 13, 2025 at 9:00 AM
+      endTime: new Date(2025, 8, 13, 10, 0), // Sep 13, 2025 at 10:00 AM
+      status: 'CONFIRMED' as const,
+      priority: 'NORMAL' as const,
+      notes: 'Regular maintenance',
+      customer: {
+        firstName: 'John',
+        lastName: 'Smith'
+      },
+      vehicle: {
+        make: 'Toyota',
+        model: 'Camry',
+        year: 2020
+      },
+      assignedTo: {
+        name: 'Mike Johnson'
+      },
+      cannedServices: [
+        { name: 'Oil Change' },
+        { name: 'Filter Replacement' }
+      ]
+    },
+    {
+      id: '2',
+      customerId: 'cust2',
+      vehicleId: 'veh2',
+      requestedAt: new Date(),
+      startTime: new Date(2025, 8, 13, 14, 0), // Sep 13, 2025 at 2:00 PM
+      endTime: new Date(2025, 8, 13, 15, 30), // Sep 13, 2025 at 3:30 PM
+      status: 'PENDING' as const,
+      priority: 'HIGH' as const,
+      notes: 'Brake inspection',
+      customer: {
+        firstName: 'Sarah',
+        lastName: 'Johnson'
+      },
+      vehicle: {
+        make: 'Honda',
+        model: 'Civic',
+        year: 2019
+      },
+      cannedServices: [
+        { name: 'Brake Inspection' },
+        { name: 'Brake Pad Replacement' }
+      ]
+    },
+    {
+      id: '3',
+      customerId: 'cust3',
+      vehicleId: 'veh3',
+      requestedAt: new Date(),
+      startTime: new Date(2025, 8, 13, 11, 0), // Sep 13, 2025 at 11:00 AM
+      endTime: new Date(2025, 8, 13, 12, 0), // Sep 13, 2025 at 12:00 PM
+      status: 'IN_PROGRESS' as const,
+      priority: 'URGENT' as const,
+      notes: 'Engine repair',
+      customer: {
+        firstName: 'Mike',
+        lastName: 'Davis'
+      },
+      vehicle: {
+        make: 'Ford',
+        model: 'Focus',
+        year: 2021
+      },
+      assignedTo: {
+        name: 'Sarah Wilson'
+      },
+      cannedServices: [
+        { name: 'Engine Diagnostic' },
+        { name: 'Engine Repair' }
+      ]
+    },
+    {
+      id: '4',
+      customerId: 'cust4',
+      vehicleId: 'veh4',
+      requestedAt: new Date(),
+      startTime: new Date(2025, 8, 13, 16, 0), // Sep 13, 2025 at 4:00 PM
+      endTime: new Date(2025, 8, 13, 17, 0), // Sep 13, 2025 at 5:00 PM
+      status: 'CONFIRMED' as const,
+      priority: 'NORMAL' as const,
+      notes: 'Tire rotation',
+      customer: {
+        firstName: 'Lisa',
+        lastName: 'Anderson'
+      },
+      vehicle: {
+        make: 'Nissan',
+        model: 'Altima',
+        year: 2018
+      },
+      assignedTo: {
+        name: 'David Brown'
+      },
+      cannedServices: [
+        { name: 'Tire Rotation' },
+        { name: 'Wheel Alignment' }
+      ]
+    },
+    {
+      id: '5',
+      customerId: 'cust5',
+      vehicleId: 'veh5',
+      requestedAt: new Date(),
+      startTime: new Date(2025, 8, 13, 8, 0), // Sep 13, 2025 at 8:00 AM
+      endTime: new Date(2025, 8, 13, 8, 45), // Sep 13, 2025 at 8:45 AM
+      status: 'PENDING' as const,
+      priority: 'LOW' as const,
+      notes: 'AC check',
+      customer: {
+        firstName: 'Robert',
+        lastName: 'Wilson'
+      },
+      vehicle: {
+        make: 'Chevrolet',
+        model: 'Malibu',
+        year: 2020
+      },
+      cannedServices: [
+        { name: 'AC System Check' },
+        { name: 'Refrigerant Top-up' }
+      ]
+    }
+  ];
+
   return (
     <div style={{
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       backgroundColor: '#f8fafc',
       minHeight: '100vh',
-      padding: '24px'
+      padding: '12px'
     }}>
       {/* Add Boxicons CSS */}
       <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
       
-      {/* Metrics Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '24px',
-        marginBottom: '32px'
-      }}>
-        <MetricCard
-          title="Revenue"
-          amount="30,000 LKR"
-          change="12%"
-          changeType="positive"
-          period="vs last month"
-        />
-        <MetricCard
-          title="Daily Sales"
-          amount="10,000 LKR"
-          change="8%"
-          changeType="positive"
-          period="vs last month"
-        />
-        <MetricCard
-          title="Average Appointment Time"
-          amount="3 hrs"
-          change="5%"
-          changeType="negative"
-          period="vs last month"
-        />
-        <MetricCard
-          title="Customer Ratings"
-          amount="4.27/5"
-          change="2%"
-          changeType="positive"
-          period="vs last month"
-        />
-      </div>
-
-      {/* Charts Row */}
+      {/* Main Layout - Two Sections */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: '24px',
-        marginBottom: '32px'
+        gap: '12px',
+        alignItems: 'start'
       }}>
-        <TechniciansTableCard technicians={techniciansData} />
-        <DailyCustomersLineChart data={dailyCustomersData} />
+        {/* Left Section */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          {/* Top 3 Metric Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '12px'
+          }}>
+            <MetricCard
+              title="Revenue"
+              amount="30,000 LKR"
+            />
+            <MetricCard
+              title="Daily Sales"
+              amount="10,000 LKR"
+            />
+            <MetricCard
+              title="Average Appointment Time"
+              amount="3 hrs"
+            />
+          </div>
+          
+          {/* Daily Customers Chart */}
+          <DailyCustomersLineChart data={dailyCustomersData} />
+        </div>
+
+        {/* Right Section - Calendar */}
+        <div style={{
+          height: '100%'
+        }}>
+          <MiniCalendar appointments={sampleAppointments} />
+        </div>
       </div>
     </div>
   );

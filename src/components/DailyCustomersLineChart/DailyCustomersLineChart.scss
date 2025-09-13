@@ -2,9 +2,9 @@
 
 .daily-customers-line-chart {
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1px solid #e2e8f0;
-  padding: 24px;
+  padding: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   height: 100%;
 
@@ -12,31 +12,31 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
     border-bottom: 1px solid #e2e8f0;
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
 
   &__period {
-    font-size: 14px;
+    font-size: 10px;
     font-weight: 500;
     color: #64748b;
     background: #f1f5f9;
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 4px 8px;
+    border-radius: 12px;
   }
 
   &__content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
   }
 
   &__chart {
@@ -77,36 +77,36 @@
   &__stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    padding: 16px;
+    gap: 8px;
+    padding: 8px;
     background: #f8fafc;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid #e2e8f0;
   }
 
   &__stat {
     text-align: center;
-    padding: 12px;
+    padding: 8px;
     background: white;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid #e2e8f0;
     transition: all 0.2s;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
   }
 
   &__stat-value {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     color: #1e293b;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   &__stat-label {
-    font-size: 12px;
+    font-size: 10px;
     color: #64748b;
     font-weight: 500;
     text-transform: uppercase;
