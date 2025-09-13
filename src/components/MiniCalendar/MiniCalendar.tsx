@@ -111,7 +111,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
     }}>
       {/* Header */}
       <div style={{
-        padding: '8px 12px',
+        padding: '12px 16px',
         borderBottom: '1px solid #e2e8f0',
         backgroundColor: '#f8fafc'
       }}>
@@ -121,7 +121,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
           justifyContent: 'space-between'
         }}>
           <h2 style={{
-            fontSize: '14px',
+            fontSize: '16px',
             fontWeight: '600',
             color: '#1e293b',
             margin: 0
@@ -131,10 +131,10 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px'
+            gap: '8px'
           }}>
             <span style={{
-              fontSize: '10px',
+              fontSize: '12px',
               fontWeight: '500',
               color: '#64748b'
             }}>
@@ -142,14 +142,14 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
             </span>
             <div style={{
               display: 'flex',
-              gap: '1px'
+              gap: '2px'
             }}>
               <button
                 onClick={handlePreviousWeek}
                 style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '3px',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
                   border: '1px solid #e2e8f0',
                   backgroundColor: 'white',
                   display: 'flex',
@@ -167,14 +167,14 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
                   e.currentTarget.style.borderColor = '#e2e8f0';
                 }}
               >
-                <ChevronLeft size={10} color="#64748b" />
+                <ChevronLeft size={12} color="#64748b" />
               </button>
               <button
                 onClick={handleNextWeek}
                 style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '3px',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
                   border: '1px solid #e2e8f0',
                   backgroundColor: 'white',
                   display: 'flex',
@@ -192,7 +192,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
                   e.currentTarget.style.borderColor = '#e2e8f0';
                 }}
               >
-                <ChevronRight size={10} color="#64748b" />
+                <ChevronRight size={12} color="#64748b" />
               </button>
             </div>
           </div>
@@ -201,22 +201,22 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
 
       {/* Calendar Grid */}
       <div style={{
-        padding: '8px 12px',
+        padding: '12px 16px',
         borderBottom: '1px solid #e2e8f0'
       }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '2px',
-          marginBottom: '6px'
+          gap: '4px',
+          marginBottom: '8px'
         }}>
           {calendarDays.map((day, index) => (
             <div key={index} style={{
               textAlign: 'center',
-              fontSize: '8px',
+              fontSize: '10px',
               fontWeight: '500',
               color: '#64748b',
-              padding: '2px 0'
+              padding: '4px 0'
             }}>
               {day.day}
             </div>
@@ -225,7 +225,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '2px',
+          gap: '4px',
           justifyContent: 'center'
         }}>
           {calendarDays.map((day, index) => (
@@ -236,11 +236,11 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
               <button
                 onClick={() => handleDateClick(day.fullDate)}
                 style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '6px',
                   border: 'none',
-                  fontSize: '10px',
+                  fontSize: '12px',
                   fontWeight: '500',
                   display: 'flex',
                   alignItems: 'center',
@@ -270,30 +270,30 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
 
       {/* Schedule */}
       <div style={{
-        padding: '8px 12px',
+        padding: '12px 16px',
         flex: 1,
         overflowY: 'auto'
       }}>
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px'
+          gap: '12px'
         }}>
           {selectedDateAppointments.length > 0 ? (
             selectedDateAppointments.map((appointment) => (
               <div key={appointment.id} style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '8px'
+                gap: '12px'
               }}>
                 {/* Time */}
                 <div style={{
-                  fontSize: '8px',
+                  fontSize: '10px',
                   fontWeight: '500',
                   color: '#64748b',
-                  width: '40px',
+                  width: '50px',
                   flexShrink: 0,
-                  paddingTop: '1px'
+                  paddingTop: '2px'
                 }}>
                   {formatTime(appointment.startTime)}
                 </div>
@@ -302,20 +302,20 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
                 <div style={{
                   flex: 1,
                   backgroundColor: '#f8fafc',
-                  borderRadius: '4px',
-                  padding: '6px 8px',
+                  borderRadius: '6px',
+                  padding: '8px 12px',
                   border: '1px solid #e2e8f0'
                 }}>
                   <h3 style={{
-                    fontSize: '10px',
+                    fontSize: '12px',
                     fontWeight: '600',
                     color: '#1e293b',
-                    margin: '0 0 1px 0'
+                    margin: '0 0 2px 0'
                   }}>
                     {appointment.customer.firstName} {appointment.customer.lastName}
                   </h3>
                   <p style={{
-                    fontSize: '8px',
+                    fontSize: '10px',
                     color: '#64748b',
                     margin: 0
                   }}>
@@ -327,11 +327,11 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
           ) : (
             <div style={{
               textAlign: 'center',
-              padding: '16px',
+              padding: '20px',
               color: '#64748b'
             }}>
               <p style={{
-                fontSize: '10px',
+                fontSize: '12px',
                 margin: 0
               }}>
                 No appointments scheduled

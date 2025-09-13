@@ -28,6 +28,12 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
+      title: 'Appointments',
+      items: [
+        { id: 'appointments', label: 'Appointments', icon: 'bx bx-calendar', route: '/servicecenter/appointments' },
+      ]
+    },
+    {
       title: 'Staff',
       items: [
         { id: 'manage-technicians', label: 'Technicians', icon: 'bx bx-id-card', route: '/servicecenter/employee-management' },

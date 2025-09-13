@@ -23,6 +23,7 @@ import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
+import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
 
 
 import AdminLogin from './pages/Admin/AdminLogin';
@@ -115,6 +116,7 @@ function App() {
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<CannedServices />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
         </Route>

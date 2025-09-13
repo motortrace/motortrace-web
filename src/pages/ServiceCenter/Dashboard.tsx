@@ -15,25 +15,25 @@ const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <div style={{
       backgroundColor: 'white',
-      padding: '12px',
-      borderRadius: '6px',
+      padding: '16px',
+      borderRadius: '8px',
       border: '1px solid #e2e8f0',
       position: 'relative'
     }}>
       <h3 style={{
-        fontSize: '10px',
+        fontSize: '12px',
         fontWeight: '500',
         color: '#64748b',
-        margin: '0 0 6px 0'
+        margin: '0 0 8px 0'
       }}>
         {title}
       </h3>
       
       <div style={{
-        fontSize: '16px',
+        fontSize: '22px',
         fontWeight: '700',
         color: '#1e293b',
-        marginBottom: '6px'
+        marginBottom: '8px'
       }}>
         {amount}
       </div>
@@ -192,7 +192,7 @@ const Dashboard = () => {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       backgroundColor: '#f8fafc',
       minHeight: '100vh',
-      padding: '12px'
+      padding: '16px'
     }}>
       {/* Add Boxicons CSS */}
       <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
@@ -201,20 +201,20 @@ const Dashboard = () => {
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: '12px',
+        gap: '16px',
         alignItems: 'start'
       }}>
         {/* Left Section */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px'
+          gap: '16px'
         }}>
           {/* Top 3 Metric Cards */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '12px'
+            gap: '16px'
           }}>
             <MetricCard
               title="Revenue"
