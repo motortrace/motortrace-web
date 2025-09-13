@@ -1446,13 +1446,22 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
 
   // Generate Estimate Function
   const handleGenerateEstimate = async () => {
+    console.log('=== GENERATE ESTIMATE FUNCTION STARTED ===');
+    console.log('Work Order:', workOrder);
+    console.log('Token available:', !!token);
+    
     if (!workOrder?.id || !token) {
       console.error('Missing workOrder ID or token');
+      console.error('Work Order ID:', workOrder?.id);
+      console.error('Token:', token);
       return;
     }
 
+    console.log('Setting loading state...');
     setIsGeneratingEstimate(true);
+    
     try {
+      console.log('Creating estimate data...');
       const estimateData = {
         workOrderId: workOrder.id,
         description: "Initial estimate for vehicle service",
@@ -1465,6 +1474,9 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         createdById: workOrder.advisorId || "sa_93405c38-b518-4a55-a0a2-d724f329d392" // Use advisor ID or fallback
       };
 
+      console.log('Estimate data:', estimateData);
+      console.log('Making API request to create estimate...');
+
       const response = await fetch('http://localhost:3000/estimates', {
         method: 'POST',
         headers: {
@@ -1474,12 +1486,51 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         body: JSON.stringify(estimateData),
       });
 
+      console.log('Estimate creation response status:', response.status);
+      console.log('Estimate creation response ok:', response.ok);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Estimate creation failed:', response.statusText);
+        console.error('Error response:', errorText);
         throw new Error(`Failed to create estimate: ${response.statusText}`);
       }
 
       const result = await response.json();
       console.log('Estimate created successfully:', result);
+      
+      // Update work order status to ESTIMATE
+      console.log('Attempting to update work order status to ESTIMATE...');
+      console.log('Work Order ID:', workOrder.id);
+      console.log('Token available:', !!token);
+      
+      try {
+        const updateResponse = await fetch(`http://localhost:3000/work-orders/${workOrder.id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: 'ESTIMATE'
+          }),
+        });
+
+        console.log('Update response status:', updateResponse.status);
+        console.log('Update response ok:', updateResponse.ok);
+
+        if (!updateResponse.ok) {
+          const errorText = await updateResponse.text();
+          console.error('Failed to update work order status:', updateResponse.statusText);
+          console.error('Error response:', errorText);
+        } else {
+          const successData = await updateResponse.json();
+          console.log('Work order status updated to ESTIMATE successfully:', successData);
+        }
+      } catch (updateError) {
+        console.error('Error updating work order status:', updateError);
+        console.error('Error details:', updateError.message);
+      }
       
       // Refresh the page to show the new estimate
       window.location.reload();
