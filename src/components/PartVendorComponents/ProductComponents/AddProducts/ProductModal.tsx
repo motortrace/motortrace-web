@@ -960,11 +960,9 @@ const handleSave = async () => {
                         <label>Category *</label>
                         <select
                             value={formData.subcategory}
-                            onChange={(e) => {
-                                handleInputChange('subcategory', e.target.value);
-                            }}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
                             required
-                        >
+                        > 
                             <option value="">Select</option>
                             <option value="Engine Components">Engine Components</option>
                             <option value="Transmission Components">Transmission Components</option>
@@ -1014,6 +1012,13 @@ const handleSave = async () => {
                             onChange={(e) => handleInputChange('brand', e.target.value)}
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type="text" 
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
                     <div className="form-group full">
                         <label>Notes</label>
                         <textarea placeholder="Maximum 60 words" rows={3} 
@@ -1024,49 +1029,58 @@ const handleSave = async () => {
                 </div>
             </div>
 
+            {/* Pricing & Stocks Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Pricing & Stocks</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>Quantity *</label>
-                        <input type="number" 
-                            value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Price *</label>
-                        <input type="text" 
-                            value={formData.price}
-                            onChange={(e) => handleInputChange('price', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Minimum Quantity *</label>
-                        <input type="number" 
-                            value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
-                            required
-                        />
-                    </div>
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
                 </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minQuantity}
+                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
+
+            {/* Image Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Image</h3>
-                <div className="add-product__image-upload">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
                 <label className="image-box">
-                    {image ? (
+                  {image ? (
                     <img src={URL.createObjectURL(image)} alt="Product" />
-                    ) : (
+                  ) : (
                     <span>Add Image</span>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                </div>
+              </div>
             </div>
+
 
             <div className="add-product__section">
                 <h3 className="add-product__section-title">Custom Fields</h3>
@@ -1121,9 +1135,7 @@ const handleSave = async () => {
                         <label>Category *</label>
                         <select
                             value={formData.subcategory}
-                            onChange={(e) => {
-                                handleInputChange('subcategory', e.target.value);
-                            }}
+                            onChange={(e) => {handleInputChange('subcategory', e.target.value);}}
                             required
                         >
                             <option value="">Select</option>
@@ -1183,6 +1195,13 @@ const handleSave = async () => {
                             onChange={(e) => handleInputChange('brand', e.target.value)}
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type="text" 
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
                     <div className="form-group full">
                         <label>Notes</label>
                         <textarea placeholder="Maximum 60 words" rows={3} 
@@ -1193,49 +1212,58 @@ const handleSave = async () => {
                 </div>
             </div>
 
+            {/* Pricing & Stocks Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Pricing & Stocks</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>Quantity *</label>
-                        <input type="number" 
-                            value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Price *</label>
-                        <input type="text" 
-                            value={formData.price}
-                            onChange={(e) => handleInputChange('price', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Minimum Quantity *</label>
-                        <input type="number" 
-                            value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
-                            required
-                        />
-                    </div>
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
                 </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minQuantity}
+                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
+
+            {/* Image Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Image</h3>
-                <div className="add-product__image-upload">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
                 <label className="image-box">
-                    {image ? (
+                  {image ? (
                     <img src={URL.createObjectURL(image)} alt="Product" />
-                    ) : (
+                  ) : (
                     <span>Add Image</span>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                </div>
+              </div>
             </div>
+
 
             <div className="add-product__section">
                 <h3 className="add-product__section-title">Custom Fields</h3>
@@ -1289,10 +1317,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Category *</label>
                         <select
-                            value={formData.fluidType}
-                            onChange={(e) => {
-                                handleInputChange('subcategory', e.target.value);
-                            }}
+                            value={formData.subcategory}
+                            onChange={(e) => {handleInputChange('subcategory', e.target.value); }}
                             required
                         >
                             <option value="">Select</option>
@@ -1338,6 +1364,13 @@ const handleSave = async () => {
                             onChange={(e) => handleInputChange('brand', e.target.value)}
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type="text" 
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
                     <div className="form-group full">
                         <label>Notes</label>
                         <textarea placeholder="Maximum 60 words" rows={3} 
@@ -1348,49 +1381,58 @@ const handleSave = async () => {
                 </div>
             </div>
 
+           {/* Pricing & Stocks Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Pricing & Stocks</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>Quantity *</label>
-                        <input type="number" 
-                            value={formData.quantity}
-                            onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Price *</label>
-                        <input type="text" 
-                            value={formData.price}
-                            onChange={(e) => handleInputChange('price', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Minimum Quantity *</label>
-                        <input type="number" 
-                            value={formData.minQuantity}
-                            onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
-                            required
-                        />
-                    </div>
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
                 </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minQuantity}
+                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
+
+            {/* Image Section */}
             <div className="add-product__section">
-                <h3 className="add-product__section-title">Image</h3>
-                <div className="add-product__image-upload">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
                 <label className="image-box">
-                    {image ? (
+                  {image ? (
                     <img src={URL.createObjectURL(image)} alt="Product" />
-                    ) : (
+                  ) : (
                     <span>Add Image</span>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                </div>
+              </div>
             </div>
+
 
             <div className="add-product__section">
                 <h3 className="add-product__section-title">Custom Fields</h3>
