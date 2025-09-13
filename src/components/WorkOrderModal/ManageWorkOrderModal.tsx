@@ -134,11 +134,25 @@ const TabNavigation: React.FC<{ activeTab: string; onTabChange: (tab: string) =>
   activeTab, 
   onTabChange 
 }) => {
+  // Get user role from localStorage
+  const getUserRole = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user?.role || 'serviceadvisor';
+    } catch {
+      return 'serviceadvisor';
+    }
+  };
+
+  const userRole = getUserRole();
+  const isServiceAdvisor = userRole === 'serviceadvisor' || userRole === 'service_advisor' || userRole === 'advisor';
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: 'bx-home-circle' },
     { id: 'estimates', label: 'Estimates', icon: 'bx-calculator' },
     { id: 'inspections', label: 'Inspections', icon: 'bx-search-alt' },
-    { id: 'services', label: 'Services & Labor', icon: 'bx-wrench' },
+    // Only show Services & Labor tab for manager/admin roles, not for service advisors
+    ...(isServiceAdvisor ? [] : [{ id: 'services', label: 'Services & Labor', icon: 'bx-wrench' }]),
     { id: 'notes', label: 'Notes', icon: 'bx-note' },
   ];
 
@@ -1397,6 +1411,24 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   const [activeTab, setActiveTab] = useState('overview');
   const [notes, setNotes] = useState('');
 
+  // Get user role from localStorage
+  const getUserRole = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user?.role || 'serviceadvisor';
+    } catch {
+      return 'serviceadvisor';
+    }
+  };
+
+  const userRole = getUserRole();
+  const isServiceAdvisor = userRole === 'serviceadvisor' || userRole === 'service_advisor' || userRole === 'advisor';
+
+  // If service advisor tries to access services tab, redirect to overview
+  if (isServiceAdvisor && activeTab === 'services') {
+    setActiveTab('overview');
+  }
+
   if (!open) return null;
 
   const renderTabContent = () => {
@@ -1408,6 +1440,10 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       case 'inspections':
         return <InspectionsTab workOrderId={workOrder?.id || ''} />;
       case 'services':
+        // Only show services tab content for manager/admin roles
+        if (isServiceAdvisor) {
+          return <OverviewTab workOrder={workOrder} />;
+        }
         return <ServicesAndLaborTab workOrderId={workOrder?.id || ''} />;
       case 'notes':
         return <NotesTabContent notes={notes} onNotesChange={setNotes} />;
@@ -1441,18 +1477,23 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
             </button>
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="bx bx-calculator"></i>
               Publish Estimate
             </button>
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <i className="bx bx-receipt"></i>
-              Generate Invoice
-            </button>
-            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <i className="bx bx-send"></i>
-              Publish Invoice
-            </button>
+            {/* Only show invoice buttons for manager/admin roles, not for service advisors */}
+            {!isServiceAdvisor && (
+              <>
+                <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <i className="bx bx-receipt"></i>
+                  Generate Invoice
+                </button>
+                <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <i className="bx bx-send"></i>
+                  Publish Invoice
+                </button>
+              </>
+            )}
             <button className="close-btn" onClick={onClose} title="Close">
               <i className="bx bx-x"></i>
             </button>

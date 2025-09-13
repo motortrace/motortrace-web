@@ -76,6 +76,19 @@ const EstimatesInvoices = () => {
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('all');
   const [filterDateRange, setFilterDateRange] = useState('all');
 
+  // Get user role from localStorage
+  const getUserRole = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user?.role || 'serviceadvisor';
+    } catch {
+      return 'serviceadvisor';
+    }
+  };
+
+  const userRole = getUserRole();
+  const isServiceAdvisor = userRole === 'serviceadvisor' || userRole === 'service_advisor' || userRole === 'advisor';
+
 
   // Sample data with realistic estimates and invoices
   const [documents, setDocuments] = useState<EstimateInvoice[]>([
@@ -367,7 +380,7 @@ const EstimatesInvoices = () => {
           >
             <i className='bx bx-edit'></i>
           </button>
-          {row.type === 'invoice' && row.paymentStatus === 'pending' && (
+          {row.type === 'invoice' && row.paymentStatus === 'pending' && !isServiceAdvisor && (
             <button 
               className="btn-icon" 
               title="Record Payment" 
