@@ -49,6 +49,7 @@ interface WorkOrderLabor {
 
 import React, { useState } from 'react';
 import NotesTab from '../../pages/ServiceCenter/JobCard/tabs/NotesTab';
+import { useAuth } from '../../hooks/useAuth';
 import './ManageWorkOrderModal.scss';
 
 // Mock types for demonstration
@@ -175,7 +176,7 @@ const TabNavigation: React.FC<{ activeTab: string; onTabChange: (tab: string) =>
 import { useEffect } from 'react';
 import { getWorkOrderEstimates, type Estimate } from '../../utils/workOrdersApi';
 
-const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
+const EstimatesTab: React.FC<{ workOrderId: string; onGenerateEstimate: () => void }> = ({ workOrderId, onGenerateEstimate }) => {
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -268,7 +269,11 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
               <i className="bx bx-wrench"></i>
               Add Labor
             </button>
-            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button 
+              className="btn btn--primary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={onGenerateEstimate}
+            >
               <i className="bx bx-file-blank"></i>
               Generate Estimate
             </button>
@@ -307,7 +312,12 @@ const EstimatesTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
         </div>
       </div>
       {estimates.length === 0 ? (
-        <div>No estimates found for this work order.</div>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
+          <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>No estimates found for this work order.</div>
+          <div style={{ fontSize: 48, color: '#d1d5db' }}>
+            <i className="bx bx-package"></i>
+          </div>
+        </div>
       ) : (
         <div className="estimates-table-container" style={{ overflowX: 'auto', padding: 0 }}>
           <table className="estimates-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
@@ -1408,8 +1418,59 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
 // Main Modal Component
 const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder }) => {
 
+  const { token } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [notes, setNotes] = useState('');
+  const [isGeneratingEstimate, setIsGeneratingEstimate] = useState(false);
+
+  // Generate Estimate Function
+  const handleGenerateEstimate = async () => {
+    if (!workOrder?.id || !token) {
+      console.error('Missing workOrder ID or token');
+      return;
+    }
+
+    setIsGeneratingEstimate(true);
+    try {
+      const estimateData = {
+        workOrderId: workOrder.id,
+        description: "Initial estimate for vehicle service",
+        totalAmount: 0.00,
+        laborAmount: 0.00,
+        partsAmount: 0.00,
+        taxAmount: 0.00,
+        discountAmount: 0.00,
+        notes: "Initial estimate - will add services",
+        createdById: workOrder.advisorId || "sa_93405c38-b518-4a55-a0a2-d724f329d392" // Use advisor ID or fallback
+      };
+
+      const response = await fetch('http://localhost:3000/estimates', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(estimateData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create estimate: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Estimate created successfully:', result);
+      
+      // Refresh the page to show the new estimate
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error creating estimate:', error);
+      // Refresh the page even on error to ensure consistency
+      window.location.reload();
+    } finally {
+      setIsGeneratingEstimate(false);
+    }
+  };
 
   // Get user role from localStorage
   const getUserRole = () => {
@@ -1436,7 +1497,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       case 'overview':
         return <OverviewTab workOrder={workOrder} />;
       case 'estimates':
-        return <EstimatesTab workOrderId={workOrder?.id || ''} />;
+        return <EstimatesTab workOrderId={workOrder?.id || ''} onGenerateEstimate={handleGenerateEstimate} />;
       case 'inspections':
         return <InspectionsTab workOrderId={workOrder?.id || ''} />;
       case 'services':
