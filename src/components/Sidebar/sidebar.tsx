@@ -84,13 +84,6 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'Business',
-      items: [
-        { id: 'estimates', label: 'Estimates', icon: 'bx bx-calculator', route: `${basePath}/reports` },
-        { id: 'payments', label: 'Payments', icon: 'bx bx-credit-card', route: `${basePath}/payments` },
-      ]
-    },
-    {
       title: 'Settings',
       items: [
         { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: `${basePath}/settings` },

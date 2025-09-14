@@ -15,7 +15,6 @@ import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import PricingPage from './pages/PricingPage/PricingPage';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
-import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
 import InspectionTemplates from './pages/ServiceCenter/InspectionTemplates';
 import InspectionRecordsPage from './pages/ServiceCenter/InspectionRecordsPage';
 import InspectionDetailPage from './pages/ServiceCenter/InspectionDetailPage';
@@ -50,7 +49,6 @@ import CustomerSummaryPage from './pages/PartVendor/CustomerPages/CustomerSummar
 import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
 import CustomerDetailsPage from './pages/PartVendor/CustomerPages/CustomerDetailsPage';
 import AcceptedOrderDetailsPage from './pages/PartVendor/OrderPages/AcceptedOrderDetailsPage';
-import ReportPage from './pages/PartVendor/ReportPages/ReportPage';
 import DeclinedOrderDetailsPage from './pages/PartVendor/OrderPages/DeclinedOrderDetailsPage';
 import CompletedOrderDetailsPage from './pages/PartVendor/OrderPages/CompletedOrderDetailsPage';
 import FailedOrderDetailsPage from './pages/PartVendor/OrderPages/FailedOrderDetailsPage';
@@ -115,7 +113,6 @@ function App() {
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
           <Route path="inventory" element={<PartsInventory />} />
-          <Route path="reports" element={<EstimatesInvoices />} />
           <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
@@ -140,7 +137,6 @@ function App() {
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
           <Route path="inventory" element={<PartsInventory />} />
-          <Route path="reports" element={<EstimatesInvoices />} />
           <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
@@ -203,7 +199,6 @@ function App() {
           <Route path="ServiceCenterCustomerDetails" element={<ServiceCenterCustomerDetailsPage />} />
           <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage />} />
           <Route path="CompletedOrders" element={<CompletedOrderDetailsPage />} />
-          <Route path="ReportsSummary" element={<ReportPage />} />
           <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage />} />
           <Route path="FailedOrderDetailsPage" element={<FailedOrderDetailsPage />} />
           <Route path="ProductList" element={<ProductList />} />
