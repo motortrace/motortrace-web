@@ -899,6 +899,14 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>('');
   const [assigningTechnician, setAssigningTechnician] = useState(false);
   
+  // Edit labor modal state
+  const [showEditLaborModal, setShowEditLaborModal] = useState(false);
+  const [selectedLaborItem, setSelectedLaborItem] = useState<WorkOrderLabor | null>(null);
+  const [editSubtotal, setEditSubtotal] = useState<string>('');
+  const [editStatus, setEditStatus] = useState<string>('');
+  const [editEndTime, setEditEndTime] = useState<string>('');
+  const [updatingLabor, setUpdatingLabor] = useState(false);
+  
   // WorkOrderServices data state
   const [workOrderServices, setWorkOrderServices] = useState<any[]>([]);
   
@@ -1038,6 +1046,114 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       return `${technician.firstName} ${technician.lastName}`;
     }
     return 'Unknown Technician';
+  };
+
+  // Handle opening edit labor modal
+  const handleOpenEditLaborModal = (laborItem: WorkOrderLabor) => {
+    setSelectedLaborItem(laborItem);
+    setEditSubtotal(laborItem.subtotal.toString());
+    setEditStatus(laborItem.status || '');
+    setEditEndTime(laborItem.endTime ? new Date(laborItem.endTime).toISOString().slice(0, 16) : '');
+    setShowEditLaborModal(true);
+  };
+
+  // Handle updating labor item
+  const handleUpdateLabor = async () => {
+    if (!selectedLaborItem || !editSubtotal) return;
+    
+    setUpdatingLabor(true);
+    try {
+      const payload: any = {
+        subtotal: parseFloat(editSubtotal)
+      };
+      
+      // Add optional fields if they have values
+      if (editStatus) {
+        payload.status = editStatus;
+      }
+      if (editEndTime) {
+        payload.endTime = new Date(editEndTime).toISOString();
+      }
+
+      const response = await fetch(`http://localhost:3000/work-orders/labor/${selectedLaborItem.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update labor item');
+      }
+
+      // Refresh labor data
+      const laborResponse = await fetch(`http://localhost:3000/labor/work-order?workOrderId=${workOrderId}`);
+      if (laborResponse.ok) {
+        const laborData = await laborResponse.json();
+        setLabor(Array.isArray(laborData) ? laborData : (Array.isArray(laborData.data) ? laborData.data : []));
+      }
+
+      // Update WorkOrderService subtotal
+      await updateWorkOrderServiceSubtotal(selectedLaborItem.cannedServiceId);
+
+      setShowEditLaborModal(false);
+      setSelectedLaborItem(null);
+      setEditSubtotal('');
+      setEditStatus('');
+      setEditEndTime('');
+    } catch (error) {
+      console.error('Error updating labor item:', error);
+      setError('Failed to update labor item');
+    } finally {
+      setUpdatingLabor(false);
+    }
+  };
+
+  // Update WorkOrderService subtotal based on labor items
+  const updateWorkOrderServiceSubtotal = async (cannedServiceId: string | null | undefined) => {
+    if (!cannedServiceId) return;
+    
+    try {
+      // Find the WorkOrderService for this canned service
+      const workOrderService = workOrderServices.find(service => service.cannedServiceId === cannedServiceId);
+      if (!workOrderService) return;
+
+      // Calculate new subtotal from all labor items for this service
+      const serviceLaborItems = labor.filter(item => item.cannedServiceId === cannedServiceId);
+      const newSubtotal = serviceLaborItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+      // Update the WorkOrderService
+      const response = await fetch(`http://localhost:3000/work-orders/services/${workOrderService.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subtotal: newSubtotal
+        }),
+      });
+
+      if (response.ok) {
+        // Refresh WorkOrderServices data
+        const servicesResponse = await fetch(`http://localhost:3000/work-orders/${workOrderId}/services`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (servicesResponse.ok) {
+          const servicesData = await servicesResponse.json();
+          const servicesDataArray = Array.isArray(servicesData) ? servicesData : (Array.isArray(servicesData.data) ? servicesData.data : []);
+          setWorkOrderServices(servicesDataArray);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating WorkOrderService subtotal:', error);
+    }
   };
 
   if (loading) return <div className="tab-content services-labor-tab">Loading services and labor...</div>;
@@ -1296,37 +1412,68 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                         </td>
                                         <td style={{ padding: '12px 16px', color: '#6b7280', fontSize: '12px' }}>{laborItem.notes || '-'}</td>
                                         <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                                          <button 
-                                            className="assign-technician-btn"
-                                            title="Assign Technician"
-                                            onClick={() => handleOpenAssignTechnicianModal(laborItem.id)}
-                                            style={{ 
-                                              background: '#10b981', 
-                                              color: '#fff', 
-                                              border: 'none', 
-                                              borderRadius: '6px', 
-                                              padding: '8px', 
-                                              fontSize: '14px', 
-                                              cursor: 'pointer', 
-                                              display: 'flex', 
-                                              alignItems: 'center', 
-                                              justifyContent: 'center', 
-                                              width: '32px', 
-                                              height: '32px', 
-                                              transition: 'all 0.2s ease',
-                                              margin: '0 auto'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                              e.currentTarget.style.background = '#059669';
-                                              e.currentTarget.style.transform = 'scale(1.05)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                              e.currentTarget.style.background = '#10b981';
-                                              e.currentTarget.style.transform = 'scale(1)';
-                                            }}
-                                          >
-                                            <i className="bx bx-user-plus"></i>
-                                          </button>
+                                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
+                                            <button 
+                                              className="assign-technician-btn"
+                                              title="Assign Technician"
+                                              onClick={() => handleOpenAssignTechnicianModal(laborItem.id)}
+                                              style={{ 
+                                                background: '#10b981', 
+                                                color: '#fff', 
+                                                border: 'none', 
+                                                borderRadius: '6px', 
+                                                padding: '8px', 
+                                                fontSize: '14px', 
+                                                cursor: 'pointer', 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                justifyContent: 'center', 
+                                                width: '32px', 
+                                                height: '32px', 
+                                                transition: 'all 0.2s ease'
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = '#059669';
+                                                e.currentTarget.style.transform = 'scale(1.05)';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = '#10b981';
+                                                e.currentTarget.style.transform = 'scale(1)';
+                                              }}
+                                            >
+                                              <i className="bx bx-user-plus"></i>
+                                            </button>
+                                            <button 
+                                              className="edit-labor-btn"
+                                              title="Edit Labor"
+                                              onClick={() => handleOpenEditLaborModal(laborItem)}
+                                              style={{ 
+                                                background: '#3b82f6', 
+                                                color: '#fff', 
+                                                border: 'none', 
+                                                borderRadius: '6px', 
+                                                padding: '8px', 
+                                                fontSize: '14px', 
+                                                cursor: 'pointer', 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                justifyContent: 'center', 
+                                                width: '32px', 
+                                                height: '32px', 
+                                                transition: 'all 0.2s ease'
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = '#2563eb';
+                                                e.currentTarget.style.transform = 'scale(1.05)';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = '#3b82f6';
+                                                e.currentTarget.style.transform = 'scale(1)';
+                                              }}
+                                            >
+                                              <i className="bx bx-edit"></i>
+                                            </button>
+                                          </div>
                                         </td>
                                       </tr>
                                     ))}
@@ -1438,6 +1585,152 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                       <>
                         <i className="bx bx-check"></i>
                         Assign Technician
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Labor Modal */}
+      {showEditLaborModal && selectedLaborItem && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowEditLaborModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #e5e7eb' }}>
+              <h3 style={{ margin: 0, color: '#374151', fontSize: '18px', fontWeight: '600' }}>
+                <i className="bx bx-edit" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
+                Edit Labor Item
+              </h3>
+              <button 
+                onClick={() => setShowEditLaborModal(false)}
+                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}
+              >
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="main-content" style={{ padding: '24px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                    Labor Description
+                  </label>
+                  <div style={{ padding: '12px', background: '#f9fafb', borderRadius: '6px', color: '#6b7280', fontSize: '14px' }}>
+                    {selectedLaborItem.description}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                    Subtotal (LKR) *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editSubtotal}
+                    onChange={(e) => setEditSubtotal(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      background: '#fff',
+                      color: '#374151'
+                    }}
+                    placeholder="Enter subtotal amount"
+                  />
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                    Status (Optional)
+                  </label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      background: '#fff',
+                      color: '#374151'
+                    }}
+                  >
+                    <option value="">Select status...</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                    End Time (Optional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={editEndTime}
+                    onChange={(e) => setEditEndTime(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      background: '#fff',
+                      color: '#374151'
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setShowEditLaborModal(false)}
+                    style={{
+                      padding: '10px 20px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      background: '#fff',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateLabor}
+                    disabled={!editSubtotal || updatingLabor}
+                    style={{
+                      padding: '10px 20px',
+                      border: 'none',
+                      borderRadius: '6px',
+                      background: !editSubtotal || updatingLabor ? '#9ca3af' : '#3b82f6',
+                      color: '#fff',
+                      cursor: !editSubtotal || updatingLabor ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {updatingLabor ? (
+                      <>
+                        <i className="bx bx-loader-alt bx-spin"></i>
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bx bx-save"></i>
+                        Update Labor
                       </>
                     )}
                   </button>
