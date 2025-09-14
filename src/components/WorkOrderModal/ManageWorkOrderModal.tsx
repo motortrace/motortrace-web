@@ -1049,6 +1049,13 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       laborItem.cannedServiceId === workOrderService.cannedServiceId
     );
     
+    // Calculate expected subtotal from unit price and quantity
+    const expectedSubtotal = (workOrderService.unitPrice || workOrderService.cannedService?.price || 0) * (workOrderService.quantity || 1);
+    const actualSubtotal = workOrderService.subtotal || expectedSubtotal;
+    
+    // Check if pricing matches (with small tolerance for floating point)
+    const isCustomPricing = Math.abs(actualSubtotal - expectedSubtotal) > 0.01;
+    
     return {
       id: workOrderService.id,
       cannedServiceId: workOrderService.cannedServiceId,
@@ -1056,18 +1063,23 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       description: workOrderService.cannedService?.name || workOrderService.description || 'Service',
       quantity: workOrderService.quantity || 1,
       unitPrice: workOrderService.unitPrice || workOrderService.cannedService?.price || 0,
-      subtotal: workOrderService.subtotal || (workOrderService.unitPrice * (workOrderService.quantity || 1)),
+      subtotal: actualSubtotal,
+      discount: workOrderService.discount || 0,
+      tax: workOrderService.tax || 0,
       status: workOrderService.status || 'active',
       notes: workOrderService.notes || workOrderService.cannedService?.description || '',
       createdAt: workOrderService.createdAt,
       updatedAt: workOrderService.updatedAt,
-      linkedLabor: linkedLabor // Store linked labor for display
+      linkedLabor: linkedLabor, // Store linked labor for display
+      isCustomPricing: isCustomPricing // Flag for pricing validation
     };
   });
 
   // Summary calculations for services
   const totalServiceCount = services.length;
   const totalServiceCost = services.reduce((sum, s) => sum + (s.subtotal || 0), 0);
+  const totalDiscount = services.reduce((sum, s) => sum + (s.discount || 0), 0);
+  const totalTax = services.reduce((sum, s) => sum + (s.tax || 0), 0);
 
   // Summary calculations for labor
   const totalEstimatedHours = labor.reduce((sum, l) => sum + (l.laborCatalog?.estimatedHours || 0), 0);
@@ -1128,7 +1140,9 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Unit Price</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Quantity</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Subtotal</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Linked Labor</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Discount</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Tax</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Pricing Status</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Actions</th>
                 </tr>
               </thead>
@@ -1154,13 +1168,21 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                         LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                        {linkedLabor.length > 0 ? (
-                          <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
-                              {linkedLabor.length} labor items
+                        LKR {Number(service.discount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
+                        LKR {Number(service.tax).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
+                        {service.isCustomPricing ? (
+                          <span style={{ background: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
+                            <i className="bx bx-error" style={{ marginRight: '4px' }}></i>
+                            CUSTOM PRICING
                           </span>
                         ) : (
-                          <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
-                            No labor
+                          <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
+                            <i className="bx bx-check" style={{ marginRight: '4px' }}></i>
+                            STANDARD
                           </span>
                         )}
                       </td>
@@ -1193,26 +1215,26 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                       {/* Show labor items for this service */}
                       {linkedLabor.length > 0 && (
                         <tr>
-                          <td colSpan={7} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
+                          <td colSpan={9} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
                             <div style={{ padding: '16px 20px' }}>
                               <div style={{ fontWeight: 600, color: '#2563eb', marginBottom: 12, fontSize: 14 }}>
                                 <i className="bx bx-wrench" style={{ marginRight: '6px' }}></i>
                                 Labor Items ({linkedLabor.length})
-          </div>
+                              </div>
                               <div style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
                                 <table style={{ width: '100%', fontSize: 13, background: '#fff', borderCollapse: 'collapse' }}>
-              <thead>
+                                  <thead>
                                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
-                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</th>
-                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hours</th>
-                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rate</th>
-                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Subtotal</th>
-                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Technician</th>
-                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Notes</th>
-                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '20%' }}>Description</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Hours</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '12%' }}>Rate</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '12%' }}>Subtotal</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '15%' }}>Technician</th>
+                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '15%' }}>Notes</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
                                     {linkedLabor.map((laborItem: WorkOrderLabor, index: number) => (
                                       <tr key={laborItem.id} style={{ borderBottom: index < linkedLabor.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
                                         <td style={{ padding: '12px 16px', fontWeight: '500', color: '#1f2937' }}>{laborItem.description}</td>
@@ -1231,14 +1253,14 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                               ) : (
                                                 <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: '600', fontSize: 12 }}>
                                                   {laborItem.technician.userProfile.name[0]}
-                              </div>
-                            )}
+                                                </div>
+                                              )}
                                               <span style={{ fontWeight: '500', color: '#374151', fontSize: '12px' }}>{laborItem.technician.userProfile.name}</span>
-                          </div>
-                        ) : (
+                                            </div>
+                                          ) : (
                                             <span style={{ color: '#9ca3af', fontStyle: 'italic', fontSize: '12px' }}>Unassigned</span>
-                        )}
-                      </td>
+                                          )}
+                                        </td>
                                         <td style={{ padding: '12px 16px', color: '#6b7280', fontSize: '12px' }}>{laborItem.notes || '-'}</td>
                                         <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                                           <button 
@@ -1278,9 +1300,9 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                   </tbody>
                                 </table>
                               </div>
-                        </div>
-                      </td>
-                    </tr>
+                            </div>
+                          </td>
+                        </tr>
                       )}
                     </React.Fragment>
                   );
