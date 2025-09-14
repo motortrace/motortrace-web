@@ -1220,7 +1220,12 @@ const NotesTabContent: React.FC<{ notes: string; onNotesChange: (notes: string) 
 // --- Inspections Tab (API-based, new structure) ---
 
 
-const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
+const InspectionsTab: React.FC<{ 
+  workOrderId: string; 
+  onOpenAddInspectionModal: () => void;
+  onOpenAssignTechnicianModal: (inspectionId: string) => void;
+  isServiceAdvisor: boolean;
+}> = ({ workOrderId, onOpenAddInspectionModal, onOpenAssignTechnicianModal, isServiceAdvisor }) => {
   const [inspections, setInspections] = useState<WorkOrderInspection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -1262,15 +1267,21 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
 
   // Helper to get technician name and image
   const getTechnicianName = (inspector: any) => {
-    if (!inspector) return '-';
+    if (!inspector) return 'Not Assigned';
     if (typeof inspector.name === 'string') return inspector.name;
     if (inspector.userProfile && inspector.userProfile.name) return inspector.userProfile.name;
-    return '-';
+    return 'Not Assigned';
   };
   const getTechnicianImage = (inspector: any) => {
     if (!inspector) return null;
     if (inspector.userProfile && inspector.userProfile.profileImage) return inspector.userProfile.profileImage;
     return null;
+  };
+  const isTechnicianAssigned = (inspector: any) => {
+    if (!inspector) return false;
+    if (typeof inspector.name === 'string' && inspector.name !== 'Not Assigned') return true;
+    if (inspector.userProfile && inspector.userProfile.name) return true;
+    return false;
   };
 
   // Summary cards
@@ -1309,7 +1320,11 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
             </div>
           </div>
           <div className="action-buttons" style={{ display: 'flex', gap: '12px' }}>
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button 
+              className="btn btn--secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={onOpenAddInspectionModal}
+            >
               <i className="bx bx-plus"></i>
               Add Inspection
             </button>
@@ -1358,21 +1373,46 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
                 return (
                   <React.Fragment key={inspection.id}>
                     <tr>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                          {getTechnicianImage(inspection.inspector) ? (
-                            <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
-                          ) : (
-                            <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
-                              {getTechnicianName(inspection.inspector)?.[0] || '?'}
-                            </div>
-                          )}
-                          <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
-                        </div>
-                      </td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                        {isTechnicianAssigned(inspection.inspector) ? (
+                          <>
+                            {getTechnicianImage(inspection.inspector) ? (
+                              <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
+                            ) : (
+                              <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
+                                {getTechnicianName(inspection.inspector)?.[0] || '?'}
+                              </div>
+                            )}
+                            <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
+                          </>
+                        ) : (
+                          <span style={{ 
+                            fontWeight: 500, 
+                            color: '#6b7280',
+                            fontStyle: 'italic'
+                          }}>
+                            Not Assigned
+                          </span>
+                        )}
+                      </div>
+                    </td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                        <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
+                        {isTechnicianAssigned(inspection.inspector) ? (
+                          <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
+                        ) : (
+                          <span style={{
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            background: '#374151',
+                            color: '#ffffff'
+                          }}>
+                            Not Assigned
+                          </span>
+                        )}
                       </td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
@@ -1385,6 +1425,16 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
                           >
                             <i className="bx bx-box"></i>
                           </button>
+                          {!isServiceAdvisor && (
+                            <button 
+                              className="assign-btn"
+                              title="Assign Technician"
+                              onClick={() => onOpenAssignTechnicianModal(inspection.id)}
+                              style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                            >
+                              <i className="bx bx-user-plus"></i>
+                            </button>
+                          )}
                           <button 
                             className={`send-btn ${inspection.isCompleted ? 'approved' : 'pending'}`}
                             disabled={!inspection.isCompleted}
@@ -1445,6 +1495,14 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   const [estimatesList, setEstimatesList] = useState<any[]>([]);
   const [showPublishEstimateModal, setShowPublishEstimateModal] = useState(false);
   const [selectedPublishEstimateId, setSelectedPublishEstimateId] = useState('');
+  const [showAddInspectionModal, setShowAddInspectionModal] = useState(false);
+  const [inspectionTemplates, setInspectionTemplates] = useState<any[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState('');
+  const [inspectionNotes, setInspectionNotes] = useState('');
+  const [showAssignTechnicianModal, setShowAssignTechnicianModal] = useState(false);
+  const [technicians, setTechnicians] = useState<any[]>([]);
+  const [selectedInspectionId, setSelectedInspectionId] = useState('');
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState('');
 
   // Fetch estimates when component mounts or workOrder changes
   useEffect(() => {
@@ -1584,6 +1642,18 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       return;
     }
 
+    console.log('=== ADD CANNED SERVICE DEBUG ===');
+    console.log('Estimate ID:', selectedEstimateId);
+    console.log('Canned Service ID:', cannedServiceId);
+    console.log('Token available:', !!token);
+
+    const payload = {
+      cannedServiceId: cannedServiceId
+    };
+
+    console.log('Payload being sent:', payload);
+    console.log('URL:', `http://localhost:3000/estimates/${selectedEstimateId}/add-canned-service`);
+
     try {
       const response = await fetch(`http://localhost:3000/estimates/${selectedEstimateId}/add-canned-service`, {
         method: 'POST',
@@ -1591,15 +1661,20 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          cannedServiceId: cannedServiceId
-        }),
+        body: JSON.stringify(payload),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
         throw new Error(`Failed to add canned service: ${response.statusText}`);
       }
 
+      const result = await response.json();
+      console.log('Success response:', result);
       console.log('Canned service added successfully');
       // Close modal and refresh page
       setShowCannedServicesModal(false);
@@ -1634,11 +1709,206 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
     }
   };
 
+  // Fetch Inspection Templates Function
+  const fetchInspectionTemplates = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/inspection-templates/templates?page=1&limit=100&isActive=true', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch inspection templates: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setInspectionTemplates(Array.isArray(data) ? data : data.data || []);
+    } catch (error) {
+      console.error('Error fetching inspection templates:', error);
+    }
+  };
+
+  // Fetch Technicians Function
+  const fetchTechnicians = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/technicians', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch technicians: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const techniciansArray = Array.isArray(data) ? data : data.data || [];
+      console.log('=== FETCHED TECHNICIANS DEBUG ===');
+      console.log('Technicians data:', techniciansArray);
+      if (techniciansArray.length > 0) {
+        console.log('First technician structure:', techniciansArray[0]);
+      }
+      setTechnicians(techniciansArray);
+    } catch (error) {
+      console.error('Error fetching technicians:', error);
+    }
+  };
+
+  // Assign Inspector Function
+  const handleAssignInspector = async () => {
+    if (!selectedInspectionId || !selectedTechnicianId || !token) {
+      console.error('Missing inspection ID, technician ID, or token');
+      return;
+    }
+
+    console.log('=== ASSIGN INSPECTOR DEBUG ===');
+    console.log('Inspection ID:', selectedInspectionId);
+    console.log('Technician ID:', selectedTechnicianId);
+    console.log('Token available:', !!token);
+
+    const payload = {
+      inspectorId: selectedTechnicianId
+    };
+
+    console.log('Payload being sent:', payload);
+    console.log('URL:', `http://localhost:3000/inspection-templates/inspections/${selectedInspectionId}`);
+
+    try {
+      const response = await fetch(`http://localhost:3000/inspection-templates/inspections/${selectedInspectionId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to assign inspector: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Success response:', result);
+      console.log('Inspector assigned successfully');
+      // Close modal and refresh page
+      setShowAssignTechnicianModal(false);
+      setSelectedInspectionId('');
+      setSelectedTechnicianId('');
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error assigning inspector:', error);
+    }
+  };
+
+  // Assign Inspection Template Function
+  const handleAssignInspectionTemplate = async () => {
+    if (!selectedTemplateId || !workOrder?.id || !token) {
+      console.error('Missing template ID, work order ID, or token');
+      return;
+    }
+
+    console.log('=== ASSIGN INSPECTION TEMPLATE DEBUG ===');
+    console.log('Work Order ID:', workOrder.id);
+    console.log('Selected Template ID:', selectedTemplateId);
+    console.log('Inspection Notes:', inspectionNotes);
+    console.log('Token available:', !!token);
+
+    const payload = {
+      workOrderId: workOrder.id,
+      templateId: selectedTemplateId,
+      notes: inspectionNotes
+    };
+
+    console.log('Payload being sent:', payload);
+    console.log('URL:', 'http://localhost:3000/inspection-templates/work-orders/assign-template');
+
+    try {
+      const response = await fetch('http://localhost:3000/inspection-templates/work-orders/assign-template', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to assign inspection template: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Success response:', result);
+      console.log('Inspection template assigned successfully');
+      // Close modal and refresh page
+      setShowAddInspectionModal(false);
+      setSelectedTemplateId('');
+      setInspectionNotes('');
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error assigning inspection template:', error);
+    }
+  };
+
   // Open Canned Services Modal
   const openCannedServicesModal = () => {
     setShowCannedServicesModal(true);
     fetchCannedServices();
     fetchEstimates();
+  };
+
+  // Open Add Inspection Modal
+  const openAddInspectionModal = () => {
+    setShowAddInspectionModal(true);
+    fetchInspectionTemplates();
+  };
+
+  // Open Assign Technician Modal
+  const openAssignTechnicianModal = (inspectionId: string) => {
+    setSelectedInspectionId(inspectionId);
+    setShowAssignTechnicianModal(true);
+    fetchTechnicians();
+  };
+
+  // Helper function to get technician display name
+  const getTechnicianDisplayName = (technician: any) => {
+    if (!technician) return 'Unknown';
+    
+    // Try different possible name fields
+    if (technician.userProfile?.firstName && technician.userProfile?.lastName) {
+      return `${technician.userProfile.firstName} ${technician.userProfile.lastName}`;
+    }
+    if (technician.userProfile?.name) {
+      return technician.userProfile.name;
+    }
+    if (technician.name) {
+      return technician.name;
+    }
+    if (technician.firstName && technician.lastName) {
+      return `${technician.firstName} ${technician.lastName}`;
+    }
+    
+    return 'Unknown Technician';
   };
 
   // Open Publish Estimate Modal
@@ -1712,7 +1982,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
           estimatesList={estimatesList}
         />;
       case 'inspections':
-        return <InspectionsTab workOrderId={workOrder?.id || ''} />;
+        return <InspectionsTab workOrderId={workOrder?.id || ''} onOpenAddInspectionModal={openAddInspectionModal} onOpenAssignTechnicianModal={openAssignTechnicianModal} isServiceAdvisor={isServiceAdvisor} />;
       case 'services':
         // Only show services tab content for manager/admin roles
         if (isServiceAdvisor) {
@@ -1955,6 +2225,168 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
                     }}
                   >
                     Publish Estimate
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Inspection Modal */}
+      {showAddInspectionModal && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowAddInspectionModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <div className="modal-title">
+                <h2>Add Inspection Template</h2>
+                <p className="modal-subtitle">Select an inspection template to assign to this work order</p>
+              </div>
+              <button className="close-btn" onClick={() => setShowAddInspectionModal(false)} title="Close">
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="modal-body">
+              <div className="main-content" style={{ padding: '24px' }}>
+                {/* Template Selection */}
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                    Select Inspection Template:
+                  </label>
+                  <select 
+                    value={selectedTemplateId} 
+                    onChange={(e) => setSelectedTemplateId(e.target.value)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '8px 12px', 
+                      border: '1px solid #d1d5db', 
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      marginBottom: '20px'
+                    }}
+                  >
+                    <option value="">Select an inspection template...</option>
+                    {inspectionTemplates.map((template: any) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name} - {template.category || 'General'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Notes Section */}
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                    Notes (Optional):
+                  </label>
+                  <textarea
+                    value={inspectionNotes}
+                    onChange={(e) => setInspectionNotes(e.target.value)}
+                    placeholder="Add any notes for this inspection..."
+                    rows={4}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      resize: 'vertical',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button 
+                    className="btn btn--secondary"
+                    onClick={() => setShowAddInspectionModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="btn btn--primary"
+                    onClick={handleAssignInspectionTemplate}
+                    disabled={!selectedTemplateId}
+                    style={{ 
+                      opacity: selectedTemplateId ? 1 : 0.5,
+                      cursor: selectedTemplateId ? 'pointer' : 'not-allowed'
+                    }}
+                  >
+                    Assign Template
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Technician Modal */}
+      {showAssignTechnicianModal && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowAssignTechnicianModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <div className="modal-title">
+                <h2>Assign Technician</h2>
+                <p className="modal-subtitle">Select a technician to assign to this inspection</p>
+              </div>
+              <button className="close-btn" onClick={() => setShowAssignTechnicianModal(false)} title="Close">
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="modal-body">
+              <div className="main-content" style={{ padding: '24px' }}>
+                {/* Technician Selection */}
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                    Select Technician:
+                  </label>
+                  <select 
+                    value={selectedTechnicianId} 
+                    onChange={(e) => setSelectedTechnicianId(e.target.value)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '8px 12px', 
+                      border: '1px solid #d1d5db', 
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      marginBottom: '20px'
+                    }}
+                  >
+                    <option value="">Select a technician...</option>
+                    {technicians.map((technician: any) => (
+                      <option key={technician.id} value={technician.id}>
+                        {getTechnicianDisplayName(technician)} - {technician.specialization || 'General'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button 
+                    className="btn btn--secondary"
+                    onClick={() => setShowAssignTechnicianModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="btn btn--primary"
+                    onClick={handleAssignInspector}
+                    disabled={!selectedTechnicianId}
+                    style={{ 
+                      opacity: selectedTechnicianId ? 1 : 0.5,
+                      cursor: selectedTechnicianId ? 'pointer' : 'not-allowed'
+                    }}
+                  >
+                    Assign Technician
                   </button>
                 </div>
               </div>
