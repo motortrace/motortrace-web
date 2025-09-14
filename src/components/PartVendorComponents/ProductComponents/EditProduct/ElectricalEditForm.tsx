@@ -2,26 +2,26 @@ import React, { useEffect, useState } from 'react';
 import './EditProduct.scss';
 
 interface ElectricalProduct {
-  productName: string;
+  productname: string;
   category?: string;
   voltage?: string;
-  ampRating?: string;
+  amprating?: string;
   brand: string;
-  connectorType?: string;
+  connectortype?: string;
   compatibility?: string;
   position?: string;
   material?: string;
   description?: string;
   quantity?: number;
   price?: string;
-  minimumQuantity?: number;
-  discountType?: string;
-  discountValue?: number;
+  minimumquantity?: number;
+  discounttype?: string;
+  discountvalue?: number;
   image?: File | string;
   warranty?: string;
   manufacturer?: string;
-  manufacturedDate?: string;
-  expiryDate?: string;
+  manufactureddate?: string;
+  expirydate?: string;
 }
 
 interface EditProductProps {
@@ -66,7 +66,7 @@ const ElectricalEditForm: React.FC<EditProductProps> = ({ existingData, onSave }
         <div className="form-grid">
           <div className="form-group">
             <label>Product Name *</label>
-            <input type="text" value={formData.productName} onChange={(e) => handleChange('productName', e.target.value)} />
+            <input type="text" value={formData.productname} onChange={(e) => handleChange('productname', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Part Type *</label>
@@ -89,11 +89,11 @@ const ElectricalEditForm: React.FC<EditProductProps> = ({ existingData, onSave }
           </div>
           <div className="form-group">
             <label>Amp Rating</label>
-            <input type="text" value={formData.ampRating || ''} onChange={(e) => handleChange('ampRating', e.target.value)} />
+            <input type="text" value={formData.amprating || ''} onChange={(e) => handleChange('amprating', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Connector Type / Pin Count</label>
-            <input type="text" value={formData.connectorType || ''} onChange={(e) => handleChange('connectorType', e.target.value)} />
+            <input type="text" value={formData.connectortype || ''} onChange={(e) => handleChange('connectortype', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Position</label>
@@ -127,11 +127,11 @@ const ElectricalEditForm: React.FC<EditProductProps> = ({ existingData, onSave }
           </div>
           <div className="form-group">
             <label>Minimum Quantity *</label>
-            <input type="number" value={formData.minimumQuantity || ''} onChange={(e) => handleChange('minimumQuantity', parseInt(e.target.value))} />
+            <input type="number" value={formData.minimumquantity || ''} onChange={(e) => handleChange('minimumquantity', parseInt(e.target.value))} />
           </div>
           <div className="form-group">
             <label>Discount Type</label>
-            <select value={formData.discountType || ''} onChange={(e) => handleChange('discountType', e.target.value)}>
+            <select value={formData.discounttype || ''} onChange={(e) => handleChange('discounttype', e.target.value)}>
               <option value="">Select</option>
               <option value="percentage">Percentage</option>
               <option value="flat">Flat</option>
@@ -139,7 +139,7 @@ const ElectricalEditForm: React.FC<EditProductProps> = ({ existingData, onSave }
           </div>
           <div className="form-group">
             <label>Discount Value</label>
-            <input type="number" value={formData.discountValue || ''} onChange={(e) => handleChange('discountValue', parseFloat(e.target.value))} />
+            <input type="number" value={formData.discountvalue || ''} onChange={(e) => handleChange('discountvalue', parseFloat(e.target.value))} />
           </div>
         </div>
       </div>
@@ -172,11 +172,11 @@ const ElectricalEditForm: React.FC<EditProductProps> = ({ existingData, onSave }
           </div>
           <div className="form-group">
             <label>Manufactured Date</label>
-            <input type="date" value={formData.manufacturedDate || ''} onChange={(e) => handleChange('manufacturedDate', e.target.value)} />
+            <input type="date" value={formData.manufactureddate || ''} onChange={(e) => handleChange('manufactureddate', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Expiry On</label>
-            <input type="date" value={formData.expiryDate || ''} onChange={(e) => handleChange('expiryDate', e.target.value)} />
+            <input type="date" value={formData.expirydate || ''} onChange={(e) => handleChange('expirydate', e.target.value)} />
           </div>
         </div>
       </div>

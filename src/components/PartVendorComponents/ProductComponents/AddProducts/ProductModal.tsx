@@ -17,7 +17,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
 
  const [formData, setFormData] = useState({
     // Common fields
-    productName: '',
+    productname: '',
     category: 'Engine & Fluids',
     subcategory: '',
     description: '',
@@ -27,7 +27,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
     compatibility: '',
     image: '',
     stock: 0,
-    minQuantity: 1,
+    minquantity: 1,
 
     fluidType: '',
     specification: '',
@@ -39,24 +39,24 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
     position: '',
     size: '',
     finish: '',
-    mountingFeatures: '',
+    mountingfeatures: '',
     electronicFeatures: '',
-    colorCode: '',
+    colorcode: '',
     color: '',
-    surfaceUse: '',
+    surfaceuse: '',
     resistance: '',
-    dryTime: '',
-    applicationMethod: '',
+    drytime: '',
+    applicationmethod: '',
     voltage: '',
-    ampRating: '',
-    connectorType: '',
+    amprating: '',
+    connectortype: '',
     warranty: '',
     manufacturer: '',
-    manufacturedDate: '',
-    expiryDate: '',
+    manufactureddate: '',
+    expirydate: '',
     notes: '',
-    discountType: '',
-    discountValue: 0,
+    discounttype: '',
+    discountvalue: 0,
     type: ''
   });
 
@@ -98,7 +98,7 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 
 const validateForm = (): boolean => {
-    const requiredFields = ['productName', 'brand', 'price', 'quantity'];
+    const requiredFields = ['productname', 'brand', 'price', 'quantity'];
     
     
     for (const field of requiredFields) {
@@ -134,8 +134,8 @@ const handleSave = async () => {
       );
       // Add default values
       productToSave.rating = 0;
-      productToSave.reviewCount = 0;
-      productToSave.availability = formData.quantity > formData.minQuantity 
+      productToSave.reviewcount = 0;
+      productToSave.availability = formData.quantity > formData.minquantity 
         ? 'In Stock' 
         : formData.quantity === 0 
           ? 'Out of Stock' 
@@ -179,8 +179,8 @@ const handleSave = async () => {
                   <label>Product Name *</label>
                   <input 
                     type="text"
-                    value={formData.productName}
-                    onChange={(e) => handleInputChange('productName', e.target.value)}
+                    value={formData.productname}
+                    onChange={(e) => handleInputChange('productname', e.target.value)}
                     required
                   />
                 </div>
@@ -303,8 +303,8 @@ const handleSave = async () => {
                   <label>Minimum Quantity *</label>
                   <input 
                     type="number" 
-                    value={formData.minQuantity}
-                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
                     min="1"
                     required
                   />
@@ -349,15 +349,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Manufactured Date</label>
                         <input type="date" 
-                            value={formData.manufacturedDate}
-                            onChange={(e) => handleInputChange('manufacturedDate', e.target.value)}
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Expiry On</label>
                         <input type="date" 
-                            value={formData.expiryDate}
-                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
                         />
                     </div>
                 </div>
@@ -374,8 +374,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Product Name *</label>
                         <input type="text"
-                            value={formData.productName}
-                            onChange={(e) => handleInputChange('productName', e.target.value)}
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
                             required
                         />
                     </div>
@@ -475,8 +475,8 @@ const handleSave = async () => {
                   <label>Minimum Quantity *</label>
                   <input 
                     type="number" 
-                    value={formData.minQuantity}
-                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
                     min="1"
                     required
                   />
@@ -521,15 +521,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Manufactured Date</label>
                         <input type="date" 
-                            value={formData.manufacturedDate}
-                            onChange={(e) => handleInputChange('manufacturedDate', e.target.value)}
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Expiry On</label>
                         <input type="date" 
-                            value={formData.expiryDate}
-                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
                         />
                     </div>
                 </div>
@@ -547,8 +547,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Product Name *</label>
                         <input type="text"
-                            value={formData.productName}
-                            onChange={(e) => handleInputChange('productName', e.target.value)}
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
                             required
                         />
                     </div>
@@ -593,8 +593,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Mounting Features</label>
                         <input type="text" placeholder='With Fog Cutout, Sensor Slots, Lock Buttons' 
-                            value={formData.mountingFeatures}
-                            onChange={(e) => handleInputChange('mountingFeatures', e.target.value)}
+                            value={formData.mountingfeatures}
+                            onChange={(e) => handleInputChange('mountingfeatures', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -670,8 +670,8 @@ const handleSave = async () => {
                   <label>Minimum Quantity *</label>
                   <input 
                     type="number" 
-                    value={formData.minQuantity}
-                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
                     min="1"
                     required
                   />
@@ -716,15 +716,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Manufactured Date</label>
                         <input type="date" 
-                            value={formData.manufacturedDate}
-                            onChange={(e) => handleInputChange('manufacturedDate', e.target.value)}
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Expiry On</label>
                         <input type="date" 
-                            value={formData.expiryDate}
-                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
                         />
                     </div>
                 </div>
@@ -740,8 +740,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Product Name *</label>
                             <input type="text"
-                                value={formData.productName}
-                                onChange={(e) => handleInputChange('productName', e.target.value)}
+                                value={formData.productname}
+                                onChange={(e) => handleInputChange('productname', e.target.value)}
                                 required
                             />
                     </div>
@@ -770,8 +770,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Color Code</label>
                         <input type="text" placeholder='e.g., “NH731P” (Honda Black)' 
-                            value={formData.colorCode}
-                            onChange={(e) => handleInputChange('colorCode', e.target.value)}
+                            value={formData.colorcode}
+                            onChange={(e) => handleInputChange('colorcode', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -791,8 +791,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Surface Use</label>
                         <input type="text" placeholder='Plastic, Metal, Underbody' 
-                            value={formData.surfaceUse}
-                            onChange={(e) => handleInputChange('surfaceUse', e.target.value)}
+                            value={formData.surfaceuse}
+                            onChange={(e) => handleInputChange('surfaceuse', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -805,8 +805,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Dry Time</label>
                         <input type="text" placeholder='Fast Dry / Regular' 
-                            value={formData.dryTime}
-                            onChange={(e) => handleInputChange('dryTime', e.target.value)}
+                            value={formData.drytime}
+                            onChange={(e) => handleInputChange('drytime', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -819,8 +819,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Application Method</label>
                         <input type="text" placeholder='Spray / Brush / Roll-on' 
-                            value={formData.applicationMethod}
-                            onChange={(e) => handleInputChange('applicationMethod', e.target.value)}
+                            value={formData.applicationmethod}
+                            onChange={(e) => handleInputChange('applicationmethod', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -880,8 +880,8 @@ const handleSave = async () => {
                   <label>Minimum Quantity *</label>
                   <input 
                     type="number" 
-                    value={formData.minQuantity}
-                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
                     min="1"
                     required
                   />
@@ -926,15 +926,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Manufactured Date</label>
                         <input type="date" 
-                            value={formData.manufacturedDate}
-                            onChange={(e) => handleInputChange('manufacturedDate', e.target.value)}
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Expiry On</label>
                         <input type="date" 
-                            value={formData.expiryDate}
-                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
                         />
                     </div>
                 </div>
@@ -951,8 +951,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Product Name *</label>
                         <input type="text"
-                            value={formData.productName}
-                            onChange={(e) => handleInputChange('productName', e.target.value)}
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
                             required
                         />
                     </div>
@@ -1056,8 +1056,8 @@ const handleSave = async () => {
                   <label>Minimum Quantity *</label>
                   <input 
                     type="number" 
-                    value={formData.minQuantity}
-                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
                     min="1"
                     required
                   />
@@ -1102,15 +1102,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Manufactured Date</label>
                         <input type="date" 
-                            value={formData.manufacturedDate}
-                            onChange={(e) => handleInputChange('manufacturedDate', e.target.value)}
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Expiry On</label>
                         <input type="date" 
-                            value={formData.expiryDate}
-                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
                         />
                     </div>
                 </div>
@@ -1126,8 +1126,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Product Name *</label>
                         <input type="text"
-                            value={formData.productName}
-                                onChange={(e) => handleInputChange('productName', e.target.value)}
+                            value={formData.productname}
+                                onChange={(e) => handleInputChange('productname', e.target.value)}
                                 required
                         />
                     </div>
@@ -1163,15 +1163,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Amp Rating</label>
                         <input type="text" placeholder='' 
-                            value={formData.ampRating}
-                            onChange={(e) => handleInputChange('ampRating', e.target.value)}
+                            value={formData.amprating}
+                            onChange={(e) => handleInputChange('amprating', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Connector Type / Pin Count</label>
                         <input type="text" placeholder='' 
-                            value={formData.connectorType}
-                            onChange={(e) => handleInputChange('connectorType', e.target.value)}
+                            value={formData.connectortype}
+                            onChange={(e) => handleInputChange('connectortype', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -1239,8 +1239,8 @@ const handleSave = async () => {
                   <label>Minimum Quantity *</label>
                   <input 
                     type="number" 
-                    value={formData.minQuantity}
-                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
                     min="1"
                     required
                   />
@@ -1285,15 +1285,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Manufactured Date</label>
                         <input type="date" 
-                            value={formData.manufacturedDate}
-                            onChange={(e) => handleInputChange('manufacturedDate', e.target.value)}
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Expiry On</label>
                         <input type="date" 
-                            value={formData.expiryDate}
-                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
                         />
                     </div>
                 </div>
@@ -1309,8 +1309,8 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Product Name *</label>
                         <input type="text"
-                            value={formData.productName}
-                            onChange={(e) => handleInputChange('productName', e.target.value)}
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
                             required
                         />
                     </div>
@@ -1408,8 +1408,8 @@ const handleSave = async () => {
                   <label>Minimum Quantity *</label>
                   <input 
                     type="number" 
-                    value={formData.minQuantity}
-                    onChange={(e) => handleInputChange('minQuantity', parseInt(e.target.value) || 1)}
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
                     min="1"
                     required
                   />
@@ -1454,15 +1454,15 @@ const handleSave = async () => {
                     <div className="form-group">
                         <label>Manufactured Date</label>
                         <input type="date" 
-                            value={formData.manufacturedDate}
-                            onChange={(e) => handleInputChange('manufacturedDate', e.target.value)}
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Expiry On</label>
                         <input type="date" 
-                            value={formData.expiryDate}
-                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
                         />
                     </div>
                 </div>

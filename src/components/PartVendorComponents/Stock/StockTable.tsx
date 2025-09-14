@@ -134,13 +134,13 @@ import './StockTable.scss';
 
 export interface Product {
   id: string;
-  productName: string;
+  productname: string;
   category: 'Engine & Fluids' | 'Wear & Tear Parts' | 'Exterior & Body Parts' | 'Paints & Coatings' | 'Engine & Drivetrain Components' | 'Electrical Components' | 'Accessories & Add-ons' | 'Tools & Kits',
   subcategory: string;
   description: string;
   price: string;
   rating: number;
-  reviewCount: number;
+  reviewcount: number;
   availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
   image: string;
   stock: number;
@@ -149,27 +149,27 @@ export interface Product {
   brand: string;
   finish: string;
   material: string;
-  surfaceUse: string;
+  surfaceuse: string;
   type: string;
   color: string;
   volume: string;
-  mountingFeatures:string;
-  colorCode: string;
+  mountingfeatures:string;
+  colorcode: string;
   quantity: number;
-  minQuantity: number;
-  discountType: string;
-  discountValue: number;
+  minquantity: number;
+  discounttype: string;
+  discountvalue: number;
   warranty: string;
   manufacturer: string;
-  manufacturedDate: string;
-  expiryDate: string;
+  manufactureddate: string;
+  expirydate: string;
   notes: string;
   resistance: string;
-  dryTime: string;
-  applicationMethod: string;
+  drytime: string;
+  applicationmethod: string;
   voltage: string;
-  ampRating: string;
-  connectorType: string;
+  amprating: string;
+  connectortype: string;
 }
 
 type Column = { key: string; label: string };
@@ -198,7 +198,7 @@ const getQty = (p: Product) => {
   return p.quantity ?? p.stock ?? 0;
 };
 const getQtyAlert = (p: Product) => {
-  return p.minQuantity ?? p.minQuantity ?? 0;
+  return p.minquantity ?? p.minquantity ?? 0;
 };
 
 const StockTable: React.FC<Props> = ({

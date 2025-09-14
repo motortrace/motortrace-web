@@ -2,26 +2,26 @@ import React, { useEffect,useState } from 'react';
 import './EditProduct.scss';
 
 interface ExteriorBodyPartProduct {
-  productName: string;
+  productname: string;
   partType: string;
   material?: string;
   position?: string;
   finish?: string;
-  mountingFeatures?: string;
+  mountingfeatures?: string;
   electronicFeatures?: string;
-  colorCode?: string;
+  colorcode?: string;
   brand: string;
   compatibility?: string;
   notes?: string;
   quantity: number;
   price: number;
-  minQuantity: number;
-  discountType?: string;
-  discountValue?: number;
+  minquantity: number;
+  discounttype?: string;
+  discountvalue?: number;
   warranty?: string;
   manufacturer?: string;
-  manufacturedDate?: string;
-  expiryDate?: string;
+  manufactureddate?: string;
+  expirydate?: string;
   image?: File | null;
 }
 
@@ -83,7 +83,7 @@ useEffect(() => {
         <div className="form-grid">
           <div className="form-group">
             <label>Product Name *</label>
-            <input value={formData.productName} onChange={(e) => handleChange('productName', e.target.value)} />
+            <input value={formData.productname} onChange={(e) => handleChange('productname', e.target.value)} />
           </div>
 
           <div className="form-group">
@@ -117,7 +117,7 @@ useEffect(() => {
 
           <div className="form-group">
             <label>Mounting Features</label>
-            <input value={formData.mountingFeatures || ''} onChange={(e) => handleChange('mountingFeatures', e.target.value)} />
+            <input value={formData.mountingfeatures || ''} onChange={(e) => handleChange('mountingfeatures', e.target.value)} />
           </div>
 
           <div className="form-group">
@@ -127,7 +127,7 @@ useEffect(() => {
 
           <div className="form-group">
             <label>Color/Code</label>
-            <input value={formData.colorCode || ''} onChange={(e) => handleChange('colorCode', e.target.value)} />
+            <input value={formData.colorcode || ''} onChange={(e) => handleChange('colorcode', e.target.value)} />
           </div>
 
           <div className="form-group">
@@ -160,11 +160,11 @@ useEffect(() => {
           </div>
           <div className="form-group">
             <label>Minimum Quantity *</label>
-            <input type="number" value={formData.minQuantity} onChange={(e) => handleChange('minQuantity', +e.target.value)} />
+            <input type="number" value={formData.minquantity} onChange={(e) => handleChange('minquantity', +e.target.value)} />
           </div>
           <div className="form-group">
             <label>Discount Type</label>
-            <select value={formData.discountType || ''} onChange={(e) => handleChange('discountType', e.target.value)}>
+            <select value={formData.discounttype || ''} onChange={(e) => handleChange('discounttype', e.target.value)}>
               <option>Select</option>
               <option>Percentage</option>
               <option>Fixed</option>
@@ -172,7 +172,7 @@ useEffect(() => {
           </div>
           <div className="form-group">
             <label>Discount Value</label>
-            <input type="number" value={formData.discountValue || ''} onChange={(e) => handleChange('discountValue', +e.target.value)} />
+            <input type="number" value={formData.discountvalue || ''} onChange={(e) => handleChange('discountvalue', +e.target.value)} />
           </div>
         </div>
       </div>
@@ -206,11 +206,11 @@ useEffect(() => {
           </div>
           <div className="form-group">
             <label>Manufactured Date</label>
-            <input type="date" value={formData.manufacturedDate || ''} onChange={(e) => handleChange('manufacturedDate', e.target.value)} />
+            <input type="date" value={formData.manufactureddate || ''} onChange={(e) => handleChange('manufactureddate', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Expiry On</label>
-            <input type="date" value={formData.expiryDate || ''} onChange={(e) => handleChange('expiryDate', e.target.value)} />
+            <input type="date" value={formData.expirydate || ''} onChange={(e) => handleChange('expirydate', e.target.value)} />
           </div>
         </div>
       </div>

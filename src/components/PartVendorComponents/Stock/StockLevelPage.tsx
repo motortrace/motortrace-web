@@ -11,13 +11,13 @@ import { categoryConfigs } from '../ProductComponents/ProductDetails/categoryCon
 
 export interface Product {
   id: string;
-  productName: string;
+  productname: string;
   category: 'Engine & Fluids' | 'Wear & Tear Parts' | 'Exterior & Body Parts' | 'Paints & Coatings' | 'Engine & Drivetrain Components' | 'Electrical Components' | 'Accessories & Add-ons' | 'Tools & Kits',
   subcategory: string;
   description: string;
   price: string;
   rating: number;
-  reviewCount: number;
+  reviewcount: number;
   availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
   image: string;
   stock: number;
@@ -26,27 +26,27 @@ export interface Product {
   brand: string;
   finish: string;
   material: string;
-  surfaceUse: string;
+  surfaceuse: string;
   type: string;
   color: string;
   volume: string;
-  mountingFeatures:string;
-  colorCode: string;
+  mountingfeatures:string;
+  colorcode: string;
   quantity: number;
-  minQuantity: number;
-  discountType: string;
-  discountValue: number;
+  minquantity: number;
+  discounttype: string;
+  discountvalue: number;
   warranty: string;
   manufacturer: string;
-  manufacturedDate: string;
-  expiryDate: string;
+  manufactureddate: string;
+  expirydate: string;
   notes: string;
   resistance: string;
-  dryTime: string;
-  applicationMethod: string;
+  drytime: string;
+  applicationmethod: string;
   voltage: string;
-  ampRating: string;
-  connectorType: string;
+  amprating: string;
+  connectortype: string;
 }
 
 const ITEMS_PER_PAGE = 5;
@@ -76,7 +76,7 @@ const StockLevelPage: React.FC = () => {
       if (!q) return true;
       // search fields: productName, id, sku, subcategory
       return (
-        p.productName?.toLowerCase().includes(q) ||
+        p.productname?.toLowerCase().includes(q) ||
         p.id?.toLowerCase().includes(q) ||
         (p.subcategory || '').toLowerCase().includes(q) ||
         (p.brand || '').toLowerCase().includes(q)
@@ -88,7 +88,7 @@ const StockLevelPage: React.FC = () => {
   const lowStockRows = useMemo(
     () => filteredByCategory.filter(p => {
       const qty = p.quantity ?? p.stock ?? 0;
-      const min = p.minQuantity ?? p.minQuantity ?? p.minQuantity ?? 0;
+      const min = p.minquantity ?? p.minquantity ?? p.minquantity ?? 0;
       return qty > 0 && qty <= (min || 0);
     }),
     [filteredByCategory]
@@ -112,7 +112,7 @@ const StockLevelPage: React.FC = () => {
   // Edit handlers
   const beginEdit = (product: Product) => {
     const qty = product.quantity ?? product.stock ?? 0;
-    const alert = product.minQuantity ?? product.minQuantity ?? 0;
+    const alert = product.minquantity ?? product.minquantity ?? 0;
     setEditingId(product.id);
     setDraftQty(qty);
     setDraftAlert(alert);
@@ -128,8 +128,8 @@ const StockLevelPage: React.FC = () => {
         if (p.id !== id) return p;
         // prefer quantity/minQuantity fields if present, else update stock/minQuantity
         const hasQuantity = typeof p.quantity === 'number';
-        const hasMinQuantity = typeof p.minQuantity === 'number';
-        const hasLowStockThreshold = typeof p.minQuantity === 'number';
+        const hasMinQuantity = typeof p.minquantity === 'number';
+        const hasLowStockThreshold = typeof p.minquantity === 'number';
         const hasStock = typeof p.stock === 'number';
         const updated: Product = { ...p };
 
@@ -143,12 +143,12 @@ const StockLevelPage: React.FC = () => {
         }
 
         if (hasMinQuantity) {
-          updated.minQuantity = draftAlert;
+          updated.minquantity = draftAlert;
         } else if (hasLowStockThreshold) {
-          updated.minQuantity = draftAlert;
+          updated.minquantity = draftAlert;
         } else {
           // fallback: set minQuantity
-          updated.minQuantity = draftAlert;
+          updated.minquantity = draftAlert;
         }
         return updated;
       })

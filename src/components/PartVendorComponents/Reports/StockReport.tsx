@@ -12,13 +12,13 @@ import './StockReport.scss';
 
 export interface Product {
   id: string;
-  productName: string;
+  productname: string;
   category: 'Engine & Fluids' | 'Wear & Tear Parts' | 'Exterior & Body Parts' | 'Paints & Coatings' | 'Engine & Drivetrain Components' | 'Electrical Components' | 'Accessories & Add-ons' | 'Tools & Kits';
   subcategory: string;
   description: string;
   price: string;
   rating: number;
-  reviewCount: number;
+  reviewcount: number;
   availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
   image: string;
   stock: number;
@@ -27,27 +27,27 @@ export interface Product {
   brand: string;
   finish: string;
   material: string;
-  surfaceUse: string;
+  surfaceuse: string;
   type: string;
   color: string;
   volume: string;
-  mountingFeatures: string;
-  colorCode: string;
+  mountingfeatures: string;
+  colorcode: string;
   quantity: number;
-  minQuantity: number;
-  discountType: string;
-  discountValue: number;
+  minquantity: number;
+  discounttype: string;
+  discountvalue: number;
   warranty: string;
   manufacturer: string;
-  manufacturedDate: string;
-  expiryDate: string;
+  manufactureddate: string;
+  expirydate: string;
   notes: string;
   resistance: string;
-  dryTime: string;
-  applicationMethod: string;
+  drytime: string;
+  applicationmethod: string;
   voltage: string;
-  ampRating: string;
-  connectorType: string;
+  amprating: string;
+  connectortype: string;
 }
 
 interface StockReportProps {
@@ -68,12 +68,12 @@ export const StockReport: React.FC<StockReportProps> = ({
     const categoryMatch = !category || category === 'All Categories' || product.category === category;
     
     if (reportType === 'low-stock') {
-      const isLowStock = product.stock <= product.minQuantity && product.stock > 0;
-      console.log(`Product ${product.productName}: stock=${product.stock}, minQuantity=${product.minQuantity}, categoryMatch=${categoryMatch}, isLowStock=${isLowStock}`);
+      const isLowStock = product.stock <= product.minquantity && product.stock > 0;
+      console.log(`Product ${product.productname}: stock=${product.stock}, minquantity=${product.minquantity}, categoryMatch=${categoryMatch}, isLowStock=${isLowStock}`);
       return categoryMatch && isLowStock;
     } else {
       const isOutOfStock = product.stock === 0;
-      console.log(`Product ${product.productName}: stock=${product.stock}, categoryMatch=${categoryMatch}, isOutOfStock=${isOutOfStock}`);
+      console.log(`Product ${product.productname}: stock=${product.stock}, categoryMatch=${categoryMatch}, isOutOfStock=${isOutOfStock}`);
       return categoryMatch && isOutOfStock;
     }
   });
@@ -88,15 +88,15 @@ export const StockReport: React.FC<StockReportProps> = ({
     console.log('Export to Excel');
   };
 
-  const getStockStatus = (stock: number, minQuantity: number) => {
+  const getStockStatus = (stock: number, minquantity: number) => {
     if (stock === 0) return 'Out of Stock';
-    if (stock <= minQuantity) return 'Low Stock';
+    if (stock <= minquantity) return 'Low Stock';
     return 'In Stock';
   };
 
-  const getStatusColor = (stock: number, minQuantity: number) => {
+  const getStatusColor = (stock: number, minquantity: number) => {
     if (stock === 0) return '#ef4444';
-    if (stock <= minQuantity) return '#f59e0b';
+    if (stock <= minquantity) return '#f59e0b';
     return '#10b981';
   };
 
@@ -139,7 +139,7 @@ export const StockReport: React.FC<StockReportProps> = ({
           <div className="summary-label">Out of Stock</div>
         </div>
         <div className="summary-card warning">
-          <div className="summary-number">{filteredProducts.filter(p => p.stock <= p.minQuantity && p.stock > 0).length}</div>
+          <div className="summary-number">{filteredProducts.filter(p => p.stock <= p.minquantity && p.stock > 0).length}</div>
           <div className="summary-label">Low Stock</div>
         </div>
         <div className="summary-card info">
@@ -164,11 +164,11 @@ export const StockReport: React.FC<StockReportProps> = ({
               <div className="cell product-cell">
                 <img 
                   src={product.image} 
-                  alt={product.productName}
+                  alt={product.productname}
                   className="product-image"
                 />
                 <div className="product-info">
-                  <div className="product-name">{product.productName}</div>
+                  <div className="product-name">{product.productname}</div>
                   <div className="product-brand">{product.brand}</div>
                 </div>
               </div>
@@ -182,24 +182,24 @@ export const StockReport: React.FC<StockReportProps> = ({
               </div>
               
               <div className="cell">
-                <span className="min-quantity">{product.minQuantity}</span>
+                <span className="min-quantity">{product.minquantity}</span>
               </div>
               
               <div className="cell">
                 <span 
                   className="status-badge"
                   style={{ 
-                    backgroundColor: `${getStatusColor(product.stock, product.minQuantity)}20`,
-                    color: getStatusColor(product.stock, product.minQuantity)
+                    backgroundColor: `${getStatusColor(product.stock, product.minquantity)}20`,
+                    color: getStatusColor(product.stock, product.minquantity)
                   }}
                 >
-                  {getStockStatus(product.stock, product.minQuantity)}
+                  {getStockStatus(product.stock, product.minquantity)}
                 </span>
               </div>
               
               <div className="cell">
                 <span className="action-required">
-                  {product.stock === 0 ? 'Immediate Restock' : `Order ${product.minQuantity - product.stock + 10} units`}
+                  {product.stock === 0 ? 'Immediate Restock' : `Order ${product.minquantity - product.stock + 10} units`}
                 </span>
               </div>
             </div>

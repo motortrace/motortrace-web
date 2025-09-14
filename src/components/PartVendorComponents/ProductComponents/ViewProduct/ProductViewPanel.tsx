@@ -20,37 +20,15 @@ import {
   AlertTriangle 
 } from 'lucide-react';
 
-// interface Product {
-//   id: string;
-//   productName: string;
-//   category: string;
-//   subcategory: string;
-//   description: string;
-//   price: string;
-//   rating: number;
-//   reviewCount: number;
-//   availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
-//   image: string;
-//   stock: number;
-//   compatibility: string;
-//   position: string;
-//   brand: string;
-//   finish: string;
-//   material: string;
-//   surfaceUse: string;
-//   type: string;
-//   color: string;
-//   volume: string;
-// }
 interface Product {
   id: string;
-  productName: string;
+  productname: string;
   category: 'Engine & Fluids' | 'Wear & Tear Parts' | 'Exterior & Body Parts' | 'Paints & Coatings' | 'Engine & Drivetrain Components' | 'Electrical Components' | 'Accessories & Add-ons' | 'Tools & Kits',
   subcategory: string;
   description: string;
   price: string;
   rating: number;
-  reviewCount: number;
+  reviewcount: number;
   availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
   image: string;
   stock: number;
@@ -59,27 +37,27 @@ interface Product {
   brand: string;
   finish: string;
   material: string;
-  surfaceUse: string;
+  surfaceuse: string;
   type: string;
   color: string;
   volume: string;
-  mountingFeatures:string;
-  colorCode: string;
+  mountingfeatures:string;
+  colorcode: string;
   quantity: number;
-  minQuantity: number;
-  discountType: string;
-  discountValue: number;
+  minquantity: number;
+  discounttype: string;
+  discountvalue: number;
   warranty: string;
   manufacturer: string;
-  manufacturedDate: string;
-  expiryDate: string;
+  manufactureddate: string;
+  expirydate: string;
   notes: string;
   resistance: string;
-  dryTime: string;
-  applicationMethod: string;
+  drytime: string;
+  applicationmethod: string;
   voltage: string;
-  ampRating: string;
-  connectorType: string;
+  amprating: string;
+  connectortype: string;
 }
 
 interface ProductViewPanelProps {
@@ -188,7 +166,7 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
             <div className="product-info__image-section">
               <img 
                 src={product.image} 
-                alt={product.productName}
+                alt={product.productname}
                 className="product-info__image"
               />
               <div className="product-info__status">
@@ -202,7 +180,7 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
             </div>
 
             <div className="product-info__details">
-              <h3 className="product-info__name">{product.productName}</h3>
+              <h3 className="product-info__name">{product.productname}</h3>
               <p className="product-info__category">{product.category} • {product.subcategory}</p>
               <p className="product-info__description">{product.description}</p>
 
@@ -246,10 +224,10 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                   <span className="spec-value">{product.color}</span>
                 </div>
               )}
-              {product.colorCode && (
+              {product.colorcode && (
                 <div className="spec-item">
                   <span className="spec-label">Color code:</span>
-                  <span className="spec-value">{product.colorCode}</span>
+                  <span className="spec-value">{product.colorcode}</span>
                 </div>
               )}
               {product.finish && (
@@ -270,10 +248,10 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                   <span className="spec-value">{product.position}</span>
                 </div>
               )}
-              {product.surfaceUse && (
+              {product.surfaceuse && (
                 <div className="spec-item">
                   <span className="spec-label">Surface Use:</span>
-                  <span className="spec-value">{product.surfaceUse}</span>
+                  <span className="spec-value">{product.surfaceuse}</span>
                 </div>
               )}
               {product.resistance && (
@@ -282,16 +260,16 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                   <span className="spec-value">{product.resistance}</span>
                 </div>
               )}
-              {product.dryTime && (
+              {product.drytime && (
                 <div className="spec-item">
                   <span className="spec-label">Dry Time:</span>
-                  <span className="spec-value">{product.dryTime}</span>
+                  <span className="spec-value">{product.drytime}</span>
                 </div>
               )}
-              {product.applicationMethod && (
+              {product.applicationmethod && (
                 <div className="spec-item">
                   <span className="spec-label">Application Method:</span>
-                  <span className="spec-value">{product.applicationMethod}</span>
+                  <span className="spec-value">{product.applicationmethod}</span>
                 </div>
               )}
               {product.voltage && (
@@ -300,16 +278,16 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                   <span className="spec-value">{product.voltage}</span>
                 </div>
               )}
-              {product.ampRating && (
+              {product.amprating && (
                 <div className="spec-item">
                   <span className="spec-label">Amp Rating:</span>
-                  <span className="spec-value">{product.ampRating}</span>
+                  <span className="spec-value">{product.amprating}</span>
                 </div>
               )}
-              {product.connectorType && (
+              {product.connectortype && (
                 <div className="spec-item">
                   <span className="spec-label">Connector Type:</span>
-                  <span className="spec-value">{product.connectorType}</span>
+                  <span className="spec-value">{product.connectortype}</span>
                 </div>
               )}
             </div>
@@ -348,7 +326,7 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                 <div className="inventory-item__info">
                   <span className="inventory-item__label">Minimum Stock Level</span>
                   <span className="inventory-item__value">
-                    {product.minQuantity} units
+                    {product.minquantity} units
                   </span>
                 </div>
               </div>
@@ -401,21 +379,21 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
             <h4 className="product-details__title">Additional Details</h4>
             <div className="product-details__grid">
               {/* Discount Information */}
-              {(product.discountType || product.discountValue) && (
+              {(product.discounttype || product.discountvalue) && (
                 <div className="detail-group">
                   <h5 className="detail-group__subtitle">Discount Information</h5>
                   <div className="detail-group__items">
-                    {product.discountType && (
+                    {product.discounttype && (
                       <div className="detail-item">
                         <span className="detail-label">Discount Type:</span>
-                        <span className="detail-value">{product.discountType}</span>
+                        <span className="detail-value">{product.discounttype}</span>
                       </div>
                     )}
-                    {product.discountValue && (
+                    {product.discountvalue && (
                       <div className="detail-item">
                         <span className="detail-label">Discount Value:</span>
                         <span className="detail-value">
-                          {product.discountType === 'percentage' ? `${product.discountValue}%` : `LKR ${product.discountValue}`}
+                          {product.discounttype === 'percentage' ? `${product.discountvalue}%` : `LKR ${product.discountvalue}`}
                         </span>
                       </div>
                     )}
@@ -424,7 +402,7 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
               )}
 
               {/* Manufacturing Information */}
-              {(product.manufacturer || product.manufacturedDate || product.warranty) && (
+              {(product.manufacturer || product.manufactureddate || product.warranty) && (
                 <div className="detail-group">
                   <h5 className="detail-group__subtitle">Manufacturing Information</h5>
                   <div className="detail-group__items">
@@ -434,10 +412,10 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
                         <span className="detail-value">{product.manufacturer}</span>
                       </div>
                     )}
-                    {product.manufacturedDate && (
+                    {product.manufactureddate && (
                       <div className="detail-item">
                         <span className="detail-label">Manufactured Date:</span>
-                        <span className="detail-value">{new Date(product.manufacturedDate).toLocaleDateString()}</span>
+                        <span className="detail-value">{new Date(product.manufactureddate).toLocaleDateString()}</span>
                       </div>
                     )}
                     {product.warranty && (
@@ -451,15 +429,15 @@ const ProductViewPanel: React.FC<ProductViewPanelProps> = ({
               )}
 
               {/* Product Lifecycle */}
-              {product.expiryDate && (
+              {product.expirydate && (
                 <div className="detail-group">
                   <h5 className="detail-group__subtitle">Product Lifecycle</h5>
                   <div className="detail-group__items">
                     <div className="detail-item">
                       <span className="detail-label">Expiry Date:</span>
-                      <span className={`detail-value ${isExpiringSoon(product.expiryDate) ? 'detail-value--warning' : ''}`}>
-                        {new Date(product.expiryDate).toLocaleDateString()}
-                        {isExpiringSoon(product.expiryDate) && (
+                      <span className={`detail-value ${isExpiringSoon(product.expirydate) ? 'detail-value--warning' : ''}`}>
+                        {new Date(product.expirydate).toLocaleDateString()}
+                        {isExpiringSoon(product.expirydate) && (
                           <span className="expiry-warning">⚠️ Expiring Soon</span>
                         )}
                       </span>

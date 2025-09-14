@@ -14,13 +14,13 @@ import belt from '../../../../assets/images/timingBelt.png';
 
 export interface Product {
   id: string;
-  productName: string;
+  productname: string;
   category: 'Engine & Fluids' | 'Wear & Tear Parts' | 'Exterior & Body Parts' | 'Paints & Coatings' | 'Engine & Drivetrain Components' | 'Electrical Components' | 'Accessories & Add-ons' | 'Tools & Kits',
   subcategory: string;
   description: string;
   price: string;
   rating: number;
-  reviewCount: number;
+  reviewcount: number;
   availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
   image: string;
   stock: number;
@@ -29,43 +29,41 @@ export interface Product {
   brand: string;
   finish: string;
   material: string;
-  surfaceUse: string;
+  surfaceuse: string;
   type: string;
   color: string;
   volume: string;
-  mountingFeatures:string;
-  colorCode: string;
+  mountingfeatures:string;
+  colorcode: string;
   quantity: number;
-  minQuantity: number;
-  discountType: string;
-  discountValue: number;
+  minquantity: number;
+  discounttype: string;
+  discountvalue: number;
   warranty: string;
   manufacturer: string;
-  manufacturedDate: string;
-  expiryDate: string;
+  manufactureddate: string;
+  expirydate: string;
   notes: string;
   resistance: string;
-  dryTime: string;
-  applicationMethod: string;
+  drytime: string;
+  applicationmethod: string;
   voltage: string;
-  ampRating: string;
-  connectorType: string;
+  amprating: string;
+  connectortype: string;
 }
 
-
-// Add proper TypeScript interface for DeleteConfirmationPopup props
 interface DeleteConfirmationPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  productName: string;
+  productname: string;
 }
 
 const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({ 
   isOpen, 
   onClose, 
   onConfirm, 
-  productName 
+  productname 
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -93,7 +91,7 @@ const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({
           </div>
           <h3 className="delete-modal-title">Delete Product</h3>
           <p className="delete-modal-message">
-            Are you sure you want to delete <strong>"{productName}"</strong>? 
+            Are you sure you want to delete <strong>"{productname}"</strong>? 
             This action cannot be undone and will permanently remove the product from your inventory.
           </p>
         </div>
@@ -1071,7 +1069,47 @@ const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({
 
 // ];
 
-export const products: Product[] = [];
+export const products: Product[] = [
+  {
+    id: 'PD001',
+    productname: 'Castrol GTX Magnatec 10W-30',
+    category: 'Accessories & Add-ons',
+    subcategory: 'Engine Oil',
+    description: 'High-performance ceramic brake pads.',
+    price: 'LKR 15,500',
+    rating: 4.5,
+    reviewcount: 128,
+    availability: 'Out of Stock',
+    image: brakePadsImg,
+    stock: 45,
+    compatibility: "Petrol Engines (Toyota, Honda)",
+    position: '',
+    brand: 'Castrol',
+    finish: '',
+    material: '',
+    surfaceuse: '',
+    type: '',
+    color: '',
+    volume: '4 Litres',
+    mountingfeatures: '',
+    colorcode: '',
+    quantity: 0,
+    minquantity: 10,
+    discounttype: '',
+    discountvalue: 0,
+    warranty: '',
+    manufacturer: '',
+    manufactureddate: '',
+    expirydate: '',
+    notes: '',
+    resistance: '',
+    drytime: '',
+    applicationmethod: '',
+    voltage: '',
+    amprating: '',
+    connectortype: ''
+  },
+];
 const ITEMS_PER_PAGE = 5;
 
 const ProductDetails: React.FC = () => {
@@ -1087,7 +1125,7 @@ const ProductDetails: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Add state for products and loading
+ 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -1124,7 +1162,7 @@ const ProductDetails: React.FC = () => {
     (product) => 
     product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase() &&
     (searchTerm === '' || 
-     product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     product.productname.toLowerCase().includes(searchTerm.toLowerCase()) ||
      product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
      product.compatibility.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -1221,25 +1259,7 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
     setIsViewPanelOpen(false);
   };
 
-  // const handleDeleteConfirm = () => {
-  //   if (productToDelete) {
-  //     // Implement your actual delete logic here
-  //     console.log('Deleting product:', productToDelete.id);
-      
-  //     // Example: Remove from products array (you'll need proper state management)
-  //     // const updatedProducts = products.filter(p => p.id !== productToDelete.id);
-  //     // setProducts(updatedProducts);
-      
-  //     // Close modal
-  //     setIsDeleteModalOpen(false);
-  //     setProductToDelete(null);
-      
-  //     // Show success message
-  //     alert('Product deleted successfully!');
-  //   }
-  // };
-
-  // In ProductDetails.tsx
+ 
 const handleDeleteConfirm = async () => {
   if (productToDelete) {
     try {
@@ -1460,7 +1480,7 @@ const handleDeleteConfirm = async () => {
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        productName={productToDelete?.productName || ''}
+        productname={productToDelete?.productname || ''}
       />
     </div>
   );

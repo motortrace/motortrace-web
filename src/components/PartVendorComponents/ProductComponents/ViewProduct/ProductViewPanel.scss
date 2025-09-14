@@ -131,14 +131,18 @@
   background: white;
   
   &--primary {
-    background: #3b82f6;
+    background: black;
     color: white;
-    border-color: #3b82f6;
+    border-color: black;
     
     &:hover {
-      background: #2563eb;
-      border-color: #2563eb;
-    }
+        background: #222;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      &:active {
+        background: #000;
+      }
   }
   
   &--secondary {
