@@ -78,6 +78,12 @@ const Sidebar: React.FC = () => {
       ]
     },
     {
+      title: 'Invoices',
+      items: [
+        { id: 'invoices', label: 'Invoices', icon: 'bx bx-folder', route: `${basePath}/invoices` },
+      ] 
+    },
+    {
       title: 'Spare Parts',
       items: [
         { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: `${basePath}/inventory` },

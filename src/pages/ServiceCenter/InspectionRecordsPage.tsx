@@ -147,10 +147,7 @@ const InspectionRecordsPage = () => {
     <div className="inspection-records-page">
       <div className="page-header">
         <h2 className="page-title">Inspection Records</h2>
-        <button className="btn btn--primary" style={{ marginLeft: 'auto' }}>
-          <i className='bx bx-plus'></i>
-          Create Inspection
-        </button>
+
       </div>
 
       <div className="inventory-controls">
