@@ -39,6 +39,7 @@ interface WorkOrderLabor {
   subtotal: number;
   startTime?: string | null;
   endTime?: string | null;
+  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | null; // Labor status tracking
   notes?: string | null;
   cannedServiceId?: string | null;
   serviceDiscountAmount?: number | null;
@@ -1049,12 +1050,23 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       laborItem.cannedServiceId === workOrderService.cannedServiceId
     );
     
-    // Calculate expected subtotal from unit price and quantity
-    const expectedSubtotal = (workOrderService.unitPrice || workOrderService.cannedService?.price || 0) * (workOrderService.quantity || 1);
-    const actualSubtotal = workOrderService.subtotal || expectedSubtotal;
+    // Compare WorkOrderService values with CannedService values
+    const cannedService = workOrderService.cannedService;
+    const workOrderSubtotal = workOrderService.subtotal || 0;
+    const workOrderDiscount = workOrderService.discount || 0;
+    const workOrderTax = workOrderService.tax || 0;
     
-    // Check if pricing matches (with small tolerance for floating point)
-    const isCustomPricing = Math.abs(actualSubtotal - expectedSubtotal) > 0.01;
+    // Get expected values from CannedService
+    const expectedSubtotal = cannedService?.price || 0;
+    const expectedDiscount = 0; // CannedService typically doesn't have discount
+    const expectedTax = 0; // CannedService typically doesn't have tax
+    
+    // Check if any pricing values differ from CannedService (with small tolerance for floating point)
+    const subtotalDiff = Math.abs(workOrderSubtotal - expectedSubtotal) > 0.01;
+    const discountDiff = Math.abs(workOrderDiscount - expectedDiscount) > 0.01;
+    const taxDiff = Math.abs(workOrderTax - expectedTax) > 0.01;
+    
+    const isCustomPricing = subtotalDiff || discountDiff || taxDiff;
     
     return {
       id: workOrderService.id,
@@ -1063,9 +1075,9 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       description: workOrderService.cannedService?.name || workOrderService.description || 'Service',
       quantity: workOrderService.quantity || 1,
       unitPrice: workOrderService.unitPrice || workOrderService.cannedService?.price || 0,
-      subtotal: actualSubtotal,
-      discount: workOrderService.discount || 0,
-      tax: workOrderService.tax || 0,
+      subtotal: workOrderSubtotal,
+      discount: workOrderDiscount,
+      tax: workOrderTax,
       status: workOrderService.status || 'active',
       notes: workOrderService.notes || workOrderService.cannedService?.description || '',
       createdAt: workOrderService.createdAt,
@@ -1137,8 +1149,6 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                 <tr style={{ background: '#f9fafb' }}>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Service Name</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Description</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Unit Price</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Quantity</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Subtotal</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Discount</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Tax</th>
@@ -1157,12 +1167,6 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                       </td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
                           {service.description}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        {service.quantity}
                       </td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>
                         LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -1215,7 +1219,7 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                       {/* Show labor items for this service */}
                       {linkedLabor.length > 0 && (
                         <tr>
-                          <td colSpan={9} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
+                          <td colSpan={7} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
                             <div style={{ padding: '16px 20px' }}>
                               <div style={{ fontWeight: 600, color: '#2563eb', marginBottom: 12, fontSize: 14 }}>
                                 <i className="bx bx-wrench" style={{ marginRight: '6px' }}></i>
@@ -1227,11 +1231,13 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
                                       <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '20%' }}>Description</th>
                                       <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Hours</th>
-                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '12%' }}>Rate</th>
                                       <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '12%' }}>Subtotal</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Start Time</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>End Time</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Status</th>
                                       <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '15%' }}>Technician</th>
-                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '15%' }}>Notes</th>
-                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Actions</th>
+                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Notes</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '5%' }}>Actions</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -1239,8 +1245,35 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                       <tr key={laborItem.id} style={{ borderBottom: index < linkedLabor.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
                                         <td style={{ padding: '12px 16px', fontWeight: '500', color: '#1f2937' }}>{laborItem.description}</td>
                                         <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '500', color: '#6b7280' }}>{laborItem.hours}</td>
-                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '500', color: '#6b7280' }}>LKR {Number(laborItem.rate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                         <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '600', color: '#2563eb' }}>LKR {Number(laborItem.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '500', color: '#6b7280', fontSize: '12px' }}>
+                                          {laborItem.startTime ? new Date(laborItem.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                        </td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '500', color: '#6b7280', fontSize: '12px' }}>
+                                          {laborItem.endTime ? new Date(laborItem.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                        </td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                                          {laborItem.status === 'PENDING' && (
+                                            <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '500' }}>
+                                              PENDING
+                                            </span>
+                                          )}
+                                          {laborItem.status === 'IN_PROGRESS' && (
+                                            <span style={{ background: '#dbeafe', color: '#1e40af', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '500' }}>
+                                              IN PROGRESS
+                                            </span>
+                                          )}
+                                          {laborItem.status === 'COMPLETED' && (
+                                            <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '500' }}>
+                                              COMPLETED
+                                            </span>
+                                          )}
+                                          {!laborItem.status && (
+                                            <span style={{ background: '#f3f4f6', color: '#6b7280', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '500' }}>
+                                              -
+                                            </span>
+                                          )}
+                                        </td>
                                         <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                                           {laborItem.technician?.userProfile?.name ? (
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
