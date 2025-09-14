@@ -192,16 +192,24 @@ const EstimatesTab: React.FC<{
     setLoading(true);
     getWorkOrderEstimates(workOrderId)
       .then((data) => {
+        console.log('=== ESTIMATES DEBUG ===');
+        console.log('Raw estimates data:', data);
+        
         // Support both { data: [...] } and [...] response shapes
         let estimatesArr: any[] = Array.isArray(data) ? data : data.data || [];
+        console.log('Estimates array:', estimatesArr);
+        
         // Patch each estimate to have a unified estimateItems array for rendering
         estimatesArr = estimatesArr.map((est: any) => {
+          console.log('Processing estimate:', est);
           let estimateItems: any[] = [];
           if (Array.isArray(est.estimateItems)) {
             estimateItems = est.estimateItems;
+            console.log('Using existing estimateItems:', estimateItems);
           } else {
             // Merge labor and part items if present
             if (Array.isArray(est.estimateLaborItems)) {
+              console.log('Found estimateLaborItems:', est.estimateLaborItems);
               estimateItems = estimateItems.concat(
                 est.estimateLaborItems.map((item: any) => ({
                   ...item,
@@ -212,13 +220,31 @@ const EstimatesTab: React.FC<{
                 }))
               );
             }
+            // Add estimate parts if present
+            if (Array.isArray(est.estimatePartItems)) {
+              console.log('Found estimatePartItems:', est.estimatePartItems);
+              estimateItems = estimateItems.concat(
+                est.estimatePartItems.map((item: any) => ({
+                  ...item,
+                  type: 'PART',
+                  quantity: item.quantity || 1,
+                  unitPrice: item.unitPrice || 0,
+                  subtotal: item.subtotal || (item.quantity * item.unitPrice),
+                  // Map the part data to inventoryItem for consistency
+                  inventoryItem: item.part,
+                }))
+              );
+            }
           }
+          console.log('Final estimateItems for this estimate:', estimateItems);
           return { ...est, estimateItems };
         });
+        console.log('Final processed estimates:', estimatesArr);
         setEstimates(estimatesArr);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error fetching estimates:', error);
         setError('Failed to fetch estimates');
         setLoading(false);
       });
@@ -399,6 +425,56 @@ const EstimatesTab: React.FC<{
                                   <td style={{ padding: '4px 8px' }}>{item.hours}</td>
                                   <td style={{ padding: '4px 8px' }}>LKR {Number(item.subtotal ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                   <td style={{ padding: '4px 8px' }}>{item.notes || '-'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+
+                  {/* Estimate Parts Section */}
+                  {(() => {
+                    const partItems = Array.isArray(est.estimateItems) ? est.estimateItems.filter((item: any) => item.type === 'PART') : [];
+                    console.log(`Estimate ${est.id} - Part items:`, partItems);
+                    return partItems.length > 0;
+                  })() && (
+                    <tr>
+                      <td colSpan={7} style={{ background: '#f9fafb', padding: 0, border: '1px solid #e5e7eb' }}>
+                        <div style={{ padding: '12px 18px' }}>
+                          <div style={{ fontWeight: 600, color: '#059669', marginBottom: 6 }}>
+                            <i className="bx bx-package" style={{ marginRight: '6px' }}></i>
+                            Estimate Parts
+                          </div>
+                          <table style={{ width: '100%', fontSize: 13, background: '#f9fafb' }}>
+                            <thead>
+                              <tr>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Part Name</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Part Number</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Quantity</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Unit Price</th>
+                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Subtotal</th>
+                                {/* <th style={{ textAlign: 'left', padding: '4px 8px' }}>Notes</th> */}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {est.estimateItems.filter((item: any) => item.type === 'PART').map((item: any) => (
+                                <tr key={item.id}>
+                                  <td style={{ padding: '4px 8px' }}>
+                                    {item.inventoryItem?.name || item.partName || item.description || 'Unknown Part'}
+                                  </td>
+                                  <td style={{ padding: '4px 8px' }}>
+                                    {item.inventoryItem?.partNumber || item.partNumber || item.sku || '-'}
+                                  </td>
+                                  <td style={{ padding: '4px 8px' }}>{item.quantity || 1}</td>
+                                  <td style={{ padding: '4px 8px' }}>
+                                    LKR {Number(item.unitPrice ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                  </td>
+                                  <td style={{ padding: '4px 8px' }}>
+                                    LKR {Number(item.subtotal ?? (item.quantity * item.unitPrice) ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                  </td>
+                                  {/* <td style={{ padding: '4px 8px' }}>{item.notes || '-'}</td> */}
                                 </tr>
                               ))}
                             </tbody>

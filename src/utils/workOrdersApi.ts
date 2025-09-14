@@ -287,10 +287,11 @@ export async function generateEstimate(workOrderId: string) {
 }
 
 export async function getWorkOrderEstimates(workOrderId: string) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/estimates?workOrderId=${workOrderId}`, {
     headers: {
       'Content-Type': 'application/json',
-      // TODO: Add auth headers if needed
+      'Authorization': `Bearer ${token}`,
     },
   });
   if (!res.ok) throw new Error('Failed to fetch work order estimates');
