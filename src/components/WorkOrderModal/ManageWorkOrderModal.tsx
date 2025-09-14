@@ -152,8 +152,8 @@ const TabNavigation: React.FC<{ activeTab: string; onTabChange: (tab: string) =>
     { id: 'overview', label: 'Overview', icon: 'bx-home-circle' },
     { id: 'estimates', label: 'Estimates', icon: 'bx-calculator' },
     { id: 'inspections', label: 'Inspections', icon: 'bx-search-alt' },
-    // Only show Services & Labor tab for manager/admin roles, not for service advisors
-    ...(isServiceAdvisor ? [] : [{ id: 'services', label: 'Services & Labor', icon: 'bx-wrench' }]),
+    // Only show Services tab for manager/admin roles, not for service advisors
+    ...(isServiceAdvisor ? [] : [{ id: 'services', label: 'Services', icon: 'bx-wrench' }]),
     { id: 'notes', label: 'Notes', icon: 'bx-note' },
   ];
 
@@ -885,23 +885,8 @@ interface CannedService {
   price: number;
 }
 
-interface WorkOrderService {
-  id: string;
-  workOrderId: string;
-  cannedService: CannedService;
-  cannedServiceId: string;
-  description?: string;
-  quantity: number;
-  unitPrice: number;
-  subtotal: number;
-  status: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
-  const [services, setServices] = useState<WorkOrderService[]>([]);
   const [labor, setLabor] = useState<WorkOrderLabor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -910,30 +895,52 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
     if (!workOrderId) return;
     setLoading(true);
     
-    // Fetch both services and labor data
-    Promise.all([
-      fetch(`http://localhost:3000/work-orders/${workOrderId}/services`).then(res => res.json()),
-      fetch(`http://localhost:3000/labor/work-order?workOrderId=${workOrderId}`).then(res => res.json())
-    ])
-    .then(([servicesRes, laborRes]) => {
-      // Process services data
-      let servicesArr = Array.isArray(servicesRes) ? servicesRes : (Array.isArray(servicesRes.data) ? servicesRes.data : []);
-      setServices(servicesArr || []);
-      
-      // Process labor data
-      let laborArr = Array.isArray(laborRes) ? laborRes : (Array.isArray(laborRes.data) ? laborRes.data : []);
-      setLabor(laborArr || []);
-      
-      setLoading(false);
-    })
-    .catch(() => {
-      setError('Failed to fetch services and labor data');
-      setLoading(false);
-    });
+    // Fetch only labor data
+    fetch(`http://localhost:3000/labor/work-order?workOrderId=${workOrderId}`)
+      .then(res => res.json())
+      .then(laborRes => {
+        // Process labor data
+        let laborArr = Array.isArray(laborRes) ? laborRes : (Array.isArray(laborRes.data) ? laborRes.data : []);
+        setLabor(laborArr || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch labor data');
+        setLoading(false);
+      });
   }, [workOrderId]);
 
   if (loading) return <div className="tab-content services-labor-tab">Loading services and labor...</div>;
   if (error) return <div className="tab-content services-labor-tab" style={{ color: 'red' }}>{error}</div>;
+
+  // Group labor entries by cannedServiceId to create services
+  const groupedLaborByService = labor.reduce((acc, laborItem) => {
+    const serviceId = laborItem.cannedServiceId || 'unlinked';
+    if (!acc[serviceId]) {
+      acc[serviceId] = [];
+    }
+    acc[serviceId].push(laborItem);
+    return acc;
+  }, {} as Record<string, WorkOrderLabor[]>);
+
+  // Create service entries from grouped labor
+  const services = Object.entries(groupedLaborByService).map(([serviceId, laborItems]) => {
+    const firstLaborItem = laborItems[0];
+    
+    return {
+      id: serviceId,
+      cannedServiceId: serviceId,
+      cannedService: null, // We'll need to fetch this separately if needed
+      description: serviceId === 'unlinked' ? 'Unlinked Labor' : `Service ${serviceId}`,
+      quantity: laborItems.length,
+      unitPrice: 0, // We'll calculate this from labor items
+      subtotal: laborItems.reduce((sum, item) => sum + (item.subtotal || 0), 0),
+      status: 'active',
+      notes: '',
+      createdAt: firstLaborItem.createdAt,
+      updatedAt: firstLaborItem.updatedAt
+    };
+  });
 
   // Summary calculations for services
   const totalServiceCount = services.length;
@@ -945,12 +952,6 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
   const technicianIds = new Set(labor.map(l => l.technicianId).filter(Boolean));
   const numTechnicians = technicianIds.size;
 
-  // Helper function to check if labor is linked to a service
-  const isLaborLinkedToService = (laborItem: WorkOrderLabor) => {
-    return services.some(service => 
-      service.cannedService?.id === laborItem.cannedServiceId
-    );
-  };
 
   return (
     <div className="tab-content services-labor-tab">
@@ -1010,63 +1011,121 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
               </thead>
               <tbody>
                 {services.map(service => {
-                  const linkedLabor = labor.filter(l => 
-                    l.cannedServiceId === service.cannedService?.id
-                  );
+                  const linkedLabor = groupedLaborByService[service.id] || [];
                   return (
-                    <tr key={service.id}>
-                      <td style={{ padding: '6px 10px', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid #e5e7eb' }}>
-                        {service.cannedService?.name || '-'}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        {service.description || service.cannedService?.description || '-'}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        {service.quantity}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>
-                        LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                        {linkedLabor.length > 0 ? (
-                          <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
-                            {linkedLabor.length} linked
-                          </span>
-                        ) : (
-                          <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
-                            No labor
-                          </span>
-                        )}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
-                          <button 
-                            className="view-btn"
-                            title="View Service"
-                            style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                          >
-                            <i className="bx bx-box"></i>
-                          </button>
-                          <button 
-                            className="assign-btn"
-                            title="Assign Technician"
-                            style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                          >
-                            <i className="bx bx-user-plus"></i>
-                          </button>
-                          <button 
-                            className="delete-btn"
-                            title="Delete Service"
-                            style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                          >
-                            <i className="bx bx-trash"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                    <React.Fragment key={service.id}>
+                      <tr>
+                        <td style={{ padding: '6px 10px', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid #e5e7eb' }}>
+                          {service.description}
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                          {service.description}
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                          LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                          {service.quantity}
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>
+                          LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
+                          {linkedLabor.length > 0 ? (
+                            <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
+                              {linkedLabor.length} labor items
+                            </span>
+                          ) : (
+                            <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
+                              No labor
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                            <button 
+                              className="view-btn"
+                              title="View Service"
+                              style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                            >
+                              <i className="bx bx-box"></i>
+                            </button>
+                            <button 
+                              className="assign-btn"
+                              title="Assign Technician"
+                              style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                            >
+                              <i className="bx bx-user-plus"></i>
+                            </button>
+                            <button 
+                              className="delete-btn"
+                              title="Delete Service"
+                              style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                            >
+                              <i className="bx bx-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      {/* Show labor items for this service */}
+                      {linkedLabor.length > 0 && (
+                        <tr>
+                          <td colSpan={7} style={{ background: '#f6f8fa', padding: 0, border: '1px solid #e5e7eb' }}>
+                            <div style={{ padding: '16px 20px' }}>
+                              <div style={{ fontWeight: 600, color: '#2563eb', marginBottom: 12, fontSize: 14 }}>
+                                <i className="bx bx-wrench" style={{ marginRight: '6px' }}></i>
+                                Labor Items ({linkedLabor.length})
+                              </div>
+                              <div style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+                                <table style={{ width: '100%', fontSize: 13, background: '#fff', borderCollapse: 'collapse' }}>
+                                  <thead>
+                                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
+                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hours</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rate</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Subtotal</th>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Technician</th>
+                                      <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Notes</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {linkedLabor.map((laborItem: WorkOrderLabor, index: number) => (
+                                      <tr key={laborItem.id} style={{ borderBottom: index < linkedLabor.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                                        <td style={{ padding: '12px 16px', fontWeight: '500', color: '#1f2937' }}>{laborItem.description}</td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '500', color: '#6b7280' }}>{laborItem.hours}</td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '500', color: '#6b7280' }}>LKR {Number(laborItem.rate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '600', color: '#2563eb' }}>LKR {Number(laborItem.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                                          {laborItem.technician?.userProfile?.name ? (
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                              {laborItem.technician.userProfile.profileImage ? (
+                                                <img 
+                                                  src={laborItem.technician.userProfile.profileImage} 
+                                                  alt={laborItem.technician.userProfile.name} 
+                                                  style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} 
+                                                />
+                                              ) : (
+                                                <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: '600', fontSize: 12 }}>
+                                                  {laborItem.technician.userProfile.name[0]}
+                                                </div>
+                                              )}
+                                              <span style={{ fontWeight: '500', color: '#374151', fontSize: '12px' }}>{laborItem.technician.userProfile.name}</span>
+                                            </div>
+                                          ) : (
+                                            <span style={{ color: '#9ca3af', fontStyle: 'italic', fontSize: '12px' }}>Unassigned</span>
+                                          )}
+                                        </td>
+                                        <td style={{ padding: '12px 16px', color: '#6b7280', fontSize: '12px' }}>{laborItem.notes || '-'}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>
@@ -1080,121 +1139,6 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
         )}
       </div>
 
-      {/* Labor Section */}
-      <div className="labor-section">
-        <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <h3 style={{ margin: 0, color: '#374151', fontSize: '18px', fontWeight: '600' }}>
-            <i className="bx bx-user-voice" style={{ marginRight: '8px' }}></i>
-            Labor
-          </h3>
-          <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <i className="bx bx-plus"></i>
-            Add Labor
-          </button>
-        </div>
-        
-        {labor.length > 0 ? (
-          <div className="labor-table-container" style={{ overflowX: 'auto', padding: 0 }}>
-            <table className="labor-table styled-table" style={{ width: '100%', minWidth: 700, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
-              <thead>
-                <tr style={{ background: '#f9fafb' }}>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Name</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Rate</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Hours</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Total</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Linked to Service</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {labor.map(item => {
-                  const tech = item.technician;
-                  const userProfile = tech?.userProfile;
-                  const techAssigned = !!tech && !!userProfile;
-                  const isLinked = isLaborLinkedToService(item);
-                  
-                  return (
-                    <tr key={item.id}>
-                      <td style={{ padding: '6px 10px', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid #e5e7eb' }}>
-                        {item.laborCatalog?.name || item.description || '-'}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        LKR {Number(item.rate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                        {Number(item.hours).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>
-                        LKR {Number(item.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                        {techAssigned ? (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-                            {userProfile.profileImage ? (
-                              <img src={userProfile.profileImage} alt={userProfile.name} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
-                            ) : (
-                              <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
-                                {userProfile.name?.[0] || '?'}
-                              </div>
-                            )}
-                            <span style={{ fontWeight: 500 }}>{userProfile.name}</span>
-                          </div>
-                        ) : (
-                          <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>Unassigned</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                        {isLinked ? (
-                          <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
-                            <i className="bx bx-link" style={{ marginRight: '4px' }}></i>
-                            Linked
-                          </span>
-                        ) : (
-                          <span style={{ background: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
-                            <i className="bx bx-unlink" style={{ marginRight: '4px' }}></i>
-                            Unlinked
-                          </span>
-                        )}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
-                          <button 
-                            className="view-btn"
-                            title="View Labor"
-                            style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                          >
-                            <i className="bx bx-box"></i>
-                          </button>
-                          <button 
-                            className="assign-btn"
-                            title="Assign Technician"
-                            style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                          >
-                            <i className="bx bx-user-plus"></i>
-                          </button>
-                          <button 
-                            className="delete-btn"
-                            title="Delete Labor"
-                            style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                          >
-                            <i className="bx bx-trash"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-            <i className="bx bx-user-voice" style={{ fontSize: '48px', marginBottom: '16px', display: 'block' }}></i>
-            <p style={{ margin: 0, fontSize: '16px' }}>No labor records for this work order</p>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
