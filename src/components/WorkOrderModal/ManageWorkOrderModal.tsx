@@ -286,10 +286,10 @@ const EstimatesTab: React.FC<{
               <i className="bx bx-file-blank"></i>
               Generate Estimate
             </button>
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="bx bx-file"></i>
               View Full Report
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
@@ -299,26 +299,26 @@ const EstimatesTab: React.FC<{
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}># Estimates</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{totalEstimates}</div>
         </div> */}
-        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+        {/* <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Amount</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalEstimateAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
-        </div>
-        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+        </div> */}
+        {/* <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Labor</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalLaborAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
-        </div>
-        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+        </div> */}
+        {/* <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Parts</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalPartsAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
-        </div>
-        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+        </div> */}
+        {/* <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Tax</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalTaxAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
-        </div>
-        <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+        </div> */}
+        {/* <div className="estimates-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Discount</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR {Number(totalDiscountAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).replace(/^0+(?=\d)/, '')}</div>
-        </div>
+        </div> */}
       </div>
       {estimates.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
@@ -383,7 +383,6 @@ const EstimatesTab: React.FC<{
                               <tr>
                                 <th style={{ textAlign: 'left', padding: '4px 8px' }}>Description</th>
                                 <th style={{ textAlign: 'left', padding: '4px 8px' }}>Hours</th>
-                                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Rate</th>
                                 <th style={{ textAlign: 'left', padding: '4px 8px' }}>Subtotal</th>
                                 <th style={{ textAlign: 'left', padding: '4px 8px' }}>Notes</th>
                               </tr>
@@ -393,7 +392,6 @@ const EstimatesTab: React.FC<{
                                 <tr key={item.id}>
                                   <td style={{ padding: '4px 8px' }}>{item.description}</td>
                                   <td style={{ padding: '4px 8px' }}>{item.hours}</td>
-                                  <td style={{ padding: '4px 8px' }}>LKR {Number(item.rate ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                   <td style={{ padding: '4px 8px' }}>LKR {Number(item.subtotal ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                   <td style={{ padding: '4px 8px' }}>{item.notes || '-'}</td>
                                 </tr>
@@ -1316,7 +1314,6 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Description</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Subtotal</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Discount</th>
-                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Tax</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Pricing Status</th>
                   <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Actions</th>
                 </tr>
@@ -1338,9 +1335,6 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                       </td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
                         LKR {Number(service.discount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                        LKR {Number(service.tax).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
                       <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
                         {service.isCustomPricing ? (
@@ -1580,7 +1574,7 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       {/* Assign Technician Modal */}
       {showAssignTechnicianModal && (
         <div className="manage-workorder-modal__overlay" onClick={() => setShowAssignTechnicianModal(false)}>
-          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="manage-workorder-modal--compact_40vh" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
             <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #e5e7eb' }}>
               <h3 style={{ margin: 0, color: '#374151', fontSize: '18px', fontWeight: '600' }}>
                 <i className="bx bx-user-plus" style={{ marginRight: '8px', color: '#10b981' }}></i>
@@ -1677,7 +1671,7 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       {/* Edit Labor Modal */}
       {showEditLaborModal && selectedLaborItem && (
         <div className="manage-workorder-modal__overlay" onClick={() => setShowEditLaborModal(false)}>
-          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+          <div className="manage-workorder-modal--compact_75vh" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
             <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #e5e7eb' }}>
               <h3 style={{ margin: 0, color: '#374151', fontSize: '18px', fontWeight: '600' }}>
                 <i className="bx bx-edit" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
@@ -1823,7 +1817,7 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       {/* Reset Prices Confirmation Modal */}
       {showResetConfirmModal && laborToReset && (
         <div className="manage-workorder-modal__overlay" onClick={() => setShowResetConfirmModal(false)}>
-          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="manage-workorder-modal--compact_60vh" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
             <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #e5e7eb' }}>
               <h3 style={{ margin: 0, color: '#374151', fontSize: '18px', fontWeight: '600' }}>
                 <i className="bx bx-reset" style={{ marginRight: '8px', color: '#f59e0b' }}></i>
@@ -1887,14 +1881,6 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '20px', padding: '12px', background: '#fef2f2', borderRadius: '6px', border: '1px solid #fecaca' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <i className="bx bx-info-circle" style={{ color: '#dc2626', marginRight: '8px', fontSize: '16px' }}></i>
-                    <span style={{ color: '#dc2626', fontSize: '14px', fontWeight: '500' }}>
-                      This action will recalculate the subtotal based on hours × rate
-                    </span>
-                  </div>
-                </div>
 
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                   <button
