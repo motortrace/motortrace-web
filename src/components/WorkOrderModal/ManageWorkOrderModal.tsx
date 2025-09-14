@@ -1259,7 +1259,6 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
 
   if (loading) return <div className="tab-content inspections-tab">Loading inspections...</div>;
   if (error) return <div className="tab-content inspections-tab" style={{ color: 'red' }}>{error}</div>;
-  if (!inspections || inspections.length === 0) return <div className="tab-content inspections-tab">No inspections found.</div>;
 
   // Helper to get technician name and image
   const getTechnicianName = (inspector: any) => {
@@ -1332,93 +1331,103 @@ const InspectionsTab: React.FC<{ workOrderId: string }> = ({ workOrderId }) => {
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{completedInspections}</div>
         </div>
       </div>
-      <div className="inspection-summary-table-container full-width-table">
-        <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb' }}>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Date</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Name</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Category</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {inspections.map((inspection) => {
-              const template: Partial<InspectionTemplate> = inspection.template || {};
-              return (
-                <React.Fragment key={inspection.id}>
-                  <tr>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        {getTechnicianImage(inspection.inspector) ? (
-                          <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
-                        ) : (
-                          <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
-                            {getTechnicianName(inspection.inspector)?.[0] || '?'}
-                          </div>
-                        )}
-                        <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                      <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
-                    </td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                      <div className="inspection-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
-                        <button 
-                          className="view-btn"
-                          title="View Inspection"
-                          onClick={() => alert(`View details for inspection ${inspection.id}`)}
-                        >
-                          <i className="bx bx-box"></i>
-                        </button>
-                        <button 
-                          className={`send-btn ${inspection.isCompleted ? 'approved' : 'pending'}`}
-                          disabled={!inspection.isCompleted}
-                          title={inspection.isCompleted ? "Send Report" : "Inspection must be completed to send"}
-                        >
-                          <i className="bx bx-send"></i>
-                          Send
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  {/* Attachments section for this inspection */}
-                  <tr>
-                    <td colSpan={6} style={{ padding: '12px 10px', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                      <div style={{ marginTop: 8 }}>
-                        <div style={{ fontWeight: 600, color: '#374151', marginBottom: 8 }}>Attachments</div>
-                        {loadingAttachments[inspection.id] ? (
-                          <div>Loading attachments...</div>
-                        ) : (attachments[inspection.id] && attachments[inspection.id].length > 0 ? (
-                          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                            {attachments[inspection.id].map(att => (
-                              <div key={att.id} style={{ width: 100, textAlign: 'center', background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', padding: 8 }}>
-                                <div style={{ width: 80, height: 80, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: 6, overflow: 'hidden' }}>
-                                  <img src={att.fileUrl} alt={att.fileName || 'Attachment'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+
+      {inspections.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
+          <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>No inspections found for this work order.</div>
+          <div style={{ fontSize: 48, color: '#d1d5db' }}>
+            <i className="bx bx-search-alt"></i>
+          </div>
+        </div>
+      ) : (
+        <div className="inspection-summary-table-container full-width-table">
+          <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
+            <thead>
+              <tr style={{ background: '#f9fafb' }}>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Date</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Name</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Category</th>
+                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {inspections.map((inspection) => {
+                const template: Partial<InspectionTemplate> = inspection.template || {};
+                return (
+                  <React.Fragment key={inspection.id}>
+                    <tr>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                          {getTechnicianImage(inspection.inspector) ? (
+                            <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
+                          ) : (
+                            <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
+                              {getTechnicianName(inspection.inspector)?.[0] || '?'}
+                            </div>
+                          )}
+                          <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                        <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                        <div className="inspection-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                          <button 
+                            className="view-btn"
+                            title="View Inspection"
+                            onClick={() => alert(`View details for inspection ${inspection.id}`)}
+                          >
+                            <i className="bx bx-box"></i>
+                          </button>
+                          <button 
+                            className={`send-btn ${inspection.isCompleted ? 'approved' : 'pending'}`}
+                            disabled={!inspection.isCompleted}
+                            title={inspection.isCompleted ? "Send Report" : "Inspection must be completed to send"}
+                          >
+                            <i className="bx bx-send"></i>
+                            Send
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {/* Attachments section for this inspection */}
+                    <tr>
+                      <td colSpan={6} style={{ padding: '12px 10px', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
+                        <div style={{ marginTop: 8 }}>
+                          <div style={{ fontWeight: 600, color: '#374151', marginBottom: 8 }}>Attachments</div>
+                          {loadingAttachments[inspection.id] ? (
+                            <div>Loading attachments...</div>
+                          ) : (attachments[inspection.id] && attachments[inspection.id].length > 0 ? (
+                            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                              {attachments[inspection.id].map(att => (
+                                <div key={att.id} style={{ width: 100, textAlign: 'center', background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', padding: 8 }}>
+                                  <div style={{ width: 80, height: 80, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: 6, overflow: 'hidden' }}>
+                                    <img src={att.fileUrl} alt={att.fileName || 'Attachment'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  </div>
+                                  <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>{att.fileName || 'Image'}</div>
+                                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{att.uploadedAt ? new Date(att.uploadedAt).toLocaleString() : ''}</div>
                                 </div>
-                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>{att.fileName || 'Image'}</div>
-                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{att.uploadedAt ? new Date(att.uploadedAt).toLocaleString() : ''}</div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div style={{ color: '#9ca3af', fontSize: 13 }}>No attachments found.</div>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                </React.Fragment>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div style={{ color: '#9ca3af', fontSize: 13 }}>No attachments found.</div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
@@ -1529,7 +1538,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         }
       } catch (updateError) {
         console.error('Error updating work order status:', updateError);
-        console.error('Error details:', updateError.message);
+        console.error('Error details:', updateError instanceof Error ? updateError.message : 'Unknown error');
       }
       
       // Refresh the page to show the new estimate
