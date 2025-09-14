@@ -890,6 +890,15 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
   const [labor, setLabor] = useState<WorkOrderLabor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  // Assign technician modal state
+  const [showAssignTechnicianModal, setShowAssignTechnicianModal] = useState(false);
+  const [selectedLaborId, setSelectedLaborId] = useState<string>('');
+  const [technicians, setTechnicians] = useState<any[]>([]);
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>('');
+  const [assigningTechnician, setAssigningTechnician] = useState(false);
+  
+  const { token } = useAuth();
 
   useEffect(() => {
     if (!workOrderId) return;
@@ -899,16 +908,102 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
     fetch(`http://localhost:3000/labor/work-order?workOrderId=${workOrderId}`)
       .then(res => res.json())
       .then(laborRes => {
-        // Process labor data
-        let laborArr = Array.isArray(laborRes) ? laborRes : (Array.isArray(laborRes.data) ? laborRes.data : []);
-        setLabor(laborArr || []);
-        setLoading(false);
-      })
-      .catch(() => {
+      // Process labor data
+      let laborArr = Array.isArray(laborRes) ? laborRes : (Array.isArray(laborRes.data) ? laborRes.data : []);
+      setLabor(laborArr || []);
+      setLoading(false);
+    })
+    .catch(() => {
         setError('Failed to fetch labor data');
-        setLoading(false);
-      });
+      setLoading(false);
+    });
   }, [workOrderId]);
+
+  // Fetch technicians for assignment
+  const fetchTechnicians = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/technicians', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch technicians');
+      }
+      const data = await response.json();
+      console.log('Technicians data:', data);
+      setTechnicians(Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []));
+    } catch (error) {
+      console.error('Error fetching technicians:', error);
+      setError('Failed to fetch technicians');
+    }
+  };
+
+  // Handle opening assign technician modal
+  const handleOpenAssignTechnicianModal = (laborId: string) => {
+    setSelectedLaborId(laborId);
+    setSelectedTechnicianId('');
+    setShowAssignTechnicianModal(true);
+    fetchTechnicians();
+  };
+
+  // Handle assigning technician to labor
+  const handleAssignTechnician = async () => {
+    if (!selectedTechnicianId || !selectedLaborId) return;
+    
+    setAssigningTechnician(true);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/labor/${selectedLaborId}/assign-technician`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          technicianId: selectedTechnicianId
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to assign technician');
+      }
+
+      // Refresh labor data
+      const laborResponse = await fetch(`http://localhost:3000/labor/work-order?workOrderId=${workOrderId}`);
+      if (laborResponse.ok) {
+        const laborData = await laborResponse.json();
+        setLabor(Array.isArray(laborData) ? laborData : (Array.isArray(laborData.data) ? laborData.data : []));
+      }
+
+      setShowAssignTechnicianModal(false);
+      setSelectedLaborId('');
+      setSelectedTechnicianId('');
+    } catch (error) {
+      console.error('Error assigning technician:', error);
+      setError('Failed to assign technician');
+    } finally {
+      setAssigningTechnician(false);
+    }
+  };
+
+  // Helper function to get technician display name
+  const getTechnicianDisplayName = (technician: any) => {
+    if (!technician) return 'Unknown';
+    if (technician.userProfile?.firstName && technician.userProfile?.lastName) {
+      return `${technician.userProfile.firstName} ${technician.userProfile.lastName}`;
+    }
+    if (technician.userProfile?.name) {
+      return technician.userProfile.name;
+    }
+    if (technician.name) {
+      return technician.name;
+    }
+    if (technician.firstName && technician.lastName) {
+      return `${technician.firstName} ${technician.lastName}`;
+    }
+    return 'Unknown Technician';
+  };
 
   if (loading) return <div className="tab-content services-labor-tab">Loading services and labor...</div>;
   if (error) return <div className="tab-content services-labor-tab" style={{ color: 'red' }}>{error}</div>;
@@ -1015,58 +1110,58 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                   return (
                     <React.Fragment key={service.id}>
                       <tr>
-                        <td style={{ padding: '6px 10px', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid #e5e7eb' }}>
+                      <td style={{ padding: '6px 10px', maxWidth: 120, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid #e5e7eb' }}>
                           {service.description}
-                        </td>
-                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
                           {service.description}
-                        </td>
-                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                          LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                          {service.quantity}
-                        </td>
-                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>
-                          LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                          {linkedLabor.length > 0 ? (
-                            <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                        LKR {Number(service.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                        {service.quantity}
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', fontWeight: 600, color: '#2563eb' }}>
+                        LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
+                        {linkedLabor.length > 0 ? (
+                          <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
                               {linkedLabor.length} labor items
-                            </span>
-                          ) : (
-                            <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
-                              No labor
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
-                            <button 
-                              className="view-btn"
-                              title="View Service"
-                              style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                            >
-                              <i className="bx bx-box"></i>
-                            </button>
-                            <button 
-                              className="assign-btn"
-                              title="Assign Technician"
-                              style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                            >
-                              <i className="bx bx-user-plus"></i>
-                            </button>
-                            <button 
-                              className="delete-btn"
-                              title="Delete Service"
-                              style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                            >
-                              <i className="bx bx-trash"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
+                          </span>
+                        ) : (
+                          <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>
+                            No labor
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                          <button 
+                            className="view-btn"
+                            title="View Service"
+                            style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                          >
+                            <i className="bx bx-box"></i>
+                          </button>
+                          <button 
+                            className="assign-btn"
+                            title="Assign Technician"
+                            style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                          >
+                            <i className="bx bx-user-plus"></i>
+                          </button>
+                          <button 
+                            className="delete-btn"
+                            title="Delete Service"
+                            style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                          >
+                            <i className="bx bx-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                       {/* Show labor items for this service */}
                       {linkedLabor.length > 0 && (
                         <tr>
@@ -1075,10 +1170,10 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                               <div style={{ fontWeight: 600, color: '#2563eb', marginBottom: 12, fontSize: 14 }}>
                                 <i className="bx bx-wrench" style={{ marginRight: '6px' }}></i>
                                 Labor Items ({linkedLabor.length})
-                              </div>
+          </div>
                               <div style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
                                 <table style={{ width: '100%', fontSize: 13, background: '#fff', borderCollapse: 'collapse' }}>
-                                  <thead>
+              <thead>
                                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
                                       <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</th>
                                       <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hours</th>
@@ -1086,9 +1181,10 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                       <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Subtotal</th>
                                       <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Technician</th>
                                       <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Notes</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
+                                      <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
                                     {linkedLabor.map((laborItem: WorkOrderLabor, index: number) => (
                                       <tr key={laborItem.id} style={{ borderBottom: index < linkedLabor.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
                                         <td style={{ padding: '12px 16px', fontWeight: '500', color: '#1f2937' }}>{laborItem.description}</td>
@@ -1107,23 +1203,56 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                               ) : (
                                                 <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: '600', fontSize: 12 }}>
                                                   {laborItem.technician.userProfile.name[0]}
-                                                </div>
-                                              )}
+                              </div>
+                            )}
                                               <span style={{ fontWeight: '500', color: '#374151', fontSize: '12px' }}>{laborItem.technician.userProfile.name}</span>
-                                            </div>
-                                          ) : (
+                          </div>
+                        ) : (
                                             <span style={{ color: '#9ca3af', fontStyle: 'italic', fontSize: '12px' }}>Unassigned</span>
-                                          )}
-                                        </td>
+                        )}
+                      </td>
                                         <td style={{ padding: '12px 16px', color: '#6b7280', fontSize: '12px' }}>{laborItem.notes || '-'}</td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                                          <button 
+                                            className="assign-technician-btn"
+                                            title="Assign Technician"
+                                            onClick={() => handleOpenAssignTechnicianModal(laborItem.id)}
+                                            style={{ 
+                                              background: '#10b981', 
+                                              color: '#fff', 
+                                              border: 'none', 
+                                              borderRadius: '6px', 
+                                              padding: '8px', 
+                                              fontSize: '14px', 
+                                              cursor: 'pointer', 
+                                              display: 'flex', 
+                                              alignItems: 'center', 
+                                              justifyContent: 'center', 
+                                              width: '32px', 
+                                              height: '32px', 
+                                              transition: 'all 0.2s ease',
+                                              margin: '0 auto'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                              e.currentTarget.style.background = '#059669';
+                                              e.currentTarget.style.transform = 'scale(1.05)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                              e.currentTarget.style.background = '#10b981';
+                                              e.currentTarget.style.transform = 'scale(1)';
+                                            }}
+                                          >
+                                            <i className="bx bx-user-plus"></i>
+                                          </button>
+                                        </td>
                                       </tr>
                                     ))}
                                   </tbody>
                                 </table>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
+                        </div>
+                      </td>
+                    </tr>
                       )}
                     </React.Fragment>
                   );
@@ -1138,6 +1267,103 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
           </div>
         )}
       </div>
+
+      {/* Assign Technician Modal */}
+      {showAssignTechnicianModal && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowAssignTechnicianModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #e5e7eb' }}>
+              <h3 style={{ margin: 0, color: '#374151', fontSize: '18px', fontWeight: '600' }}>
+                <i className="bx bx-user-plus" style={{ marginRight: '8px', color: '#10b981' }}></i>
+                Assign Technician
+              </h3>
+              <button 
+                onClick={() => setShowAssignTechnicianModal(false)}
+                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}
+              >
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="main-content" style={{ padding: '24px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                    Select Technician
+                  </label>
+                  <select
+                    value={selectedTechnicianId}
+                    onChange={(e) => setSelectedTechnicianId(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      background: '#fff',
+                      color: '#374151'
+                    }}
+                  >
+                    <option value="">Select a technician...</option>
+                    {technicians.map((technician) => (
+                      <option key={technician.id} value={technician.id}>
+                        {getTechnicianDisplayName(technician)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setShowAssignTechnicianModal(false)}
+                    style={{
+                      padding: '10px 20px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      background: '#fff',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAssignTechnician}
+                    disabled={!selectedTechnicianId || assigningTechnician}
+                    style={{
+                      padding: '10px 20px',
+                      border: 'none',
+                      borderRadius: '6px',
+                      background: !selectedTechnicianId || assigningTechnician ? '#9ca3af' : '#10b981',
+                      color: '#fff',
+                      cursor: !selectedTechnicianId || assigningTechnician ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {assigningTechnician ? (
+                      <>
+                        <i className="bx bx-loader-alt bx-spin"></i>
+                        Assigning...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bx bx-check"></i>
+                        Assign Technician
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
@@ -1299,36 +1525,36 @@ const InspectionsTab: React.FC<{
           </div>
         </div>
       ) : (
-        <div className="inspection-summary-table-container full-width-table">
-          <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
-            <thead>
-              <tr style={{ background: '#f9fafb' }}>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Date</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Name</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Category</th>
-                <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {inspections.map((inspection) => {
-                const template: Partial<InspectionTemplate> = inspection.template || {};
-                return (
-                  <React.Fragment key={inspection.id}>
-                    <tr>
+      <div className="inspection-summary-table-container full-width-table">
+        <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
+          <thead>
+            <tr style={{ background: '#f9fafb' }}>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Date</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Name</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Category</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {inspections.map((inspection) => {
+              const template: Partial<InspectionTemplate> = inspection.template || {};
+              return (
+                <React.Fragment key={inspection.id}>
+                  <tr>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                         {isTechnicianAssigned(inspection.inspector) ? (
                           <>
-                            {getTechnicianImage(inspection.inspector) ? (
-                              <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
-                            ) : (
-                              <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
-                                {getTechnicianName(inspection.inspector)?.[0] || '?'}
-                              </div>
-                            )}
-                            <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
+                        {getTechnicianImage(inspection.inspector) ? (
+                          <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
+                        ) : (
+                          <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
+                            {getTechnicianName(inspection.inspector)?.[0] || '?'}
+                          </div>
+                        )}
+                        <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
                           </>
                         ) : (
                           <span style={{ 
@@ -1341,10 +1567,10 @@ const InspectionsTab: React.FC<{
                         )}
                       </div>
                     </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                         {isTechnicianAssigned(inspection.inspector) ? (
-                          <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
+                      <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
                         ) : (
                           <span style={{
                             padding: '4px 8px',
@@ -1357,18 +1583,18 @@ const InspectionsTab: React.FC<{
                             Not Assigned
                           </span>
                         )}
-                      </td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                        <div className="inspection-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
-                          <button 
-                            className="view-btn"
-                            title="View Inspection"
-                            onClick={() => alert(`View details for inspection ${inspection.id}`)}
-                          >
-                            <i className="bx bx-box"></i>
-                          </button>
+                    </td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                      <div className="inspection-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                        <button 
+                          className="view-btn"
+                          title="View Inspection"
+                          onClick={() => alert(`View details for inspection ${inspection.id}`)}
+                        >
+                          <i className="bx bx-box"></i>
+                        </button>
                           {!isServiceAdvisor && (
                             <button 
                               className="assign-btn"
@@ -1379,48 +1605,48 @@ const InspectionsTab: React.FC<{
                               <i className="bx bx-user-plus"></i>
                             </button>
                           )}
-                          <button 
-                            className={`send-btn ${inspection.isCompleted ? 'approved' : 'pending'}`}
-                            disabled={!inspection.isCompleted}
-                            title={inspection.isCompleted ? "Send Report" : "Inspection must be completed to send"}
-                          >
-                            <i className="bx bx-send"></i>
-                            Send
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                    {/* Attachments section for this inspection */}
-                    <tr>
-                      <td colSpan={6} style={{ padding: '12px 10px', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                        <div style={{ marginTop: 8 }}>
-                          <div style={{ fontWeight: 600, color: '#374151', marginBottom: 8 }}>Attachments</div>
-                          {loadingAttachments[inspection.id] ? (
-                            <div>Loading attachments...</div>
-                          ) : (attachments[inspection.id] && attachments[inspection.id].length > 0 ? (
-                            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                              {attachments[inspection.id].map(att => (
-                                <div key={att.id} style={{ width: 100, textAlign: 'center', background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', padding: 8 }}>
-                                  <div style={{ width: 80, height: 80, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: 6, overflow: 'hidden' }}>
-                                    <img src={att.fileUrl} alt={att.fileName || 'Attachment'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                  </div>
-                                  <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>{att.fileName || 'Image'}</div>
-                                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{att.uploadedAt ? new Date(att.uploadedAt).toLocaleString() : ''}</div>
+                        <button 
+                          className={`send-btn ${inspection.isCompleted ? 'approved' : 'pending'}`}
+                          disabled={!inspection.isCompleted}
+                          title={inspection.isCompleted ? "Send Report" : "Inspection must be completed to send"}
+                        >
+                          <i className="bx bx-send"></i>
+                          Send
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {/* Attachments section for this inspection */}
+                  <tr>
+                    <td colSpan={6} style={{ padding: '12px 10px', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
+                      <div style={{ marginTop: 8 }}>
+                        <div style={{ fontWeight: 600, color: '#374151', marginBottom: 8 }}>Attachments</div>
+                        {loadingAttachments[inspection.id] ? (
+                          <div>Loading attachments...</div>
+                        ) : (attachments[inspection.id] && attachments[inspection.id].length > 0 ? (
+                          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                            {attachments[inspection.id].map(att => (
+                              <div key={att.id} style={{ width: 100, textAlign: 'center', background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', padding: 8 }}>
+                                <div style={{ width: 80, height: 80, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: 6, overflow: 'hidden' }}>
+                                  <img src={att.fileUrl} alt={att.fileName || 'Attachment'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div style={{ color: '#9ca3af', fontSize: 13 }}>No attachments found.</div>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>{att.fileName || 'Image'}</div>
+                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{att.uploadedAt ? new Date(att.uploadedAt).toLocaleString() : ''}</div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div style={{ color: '#9ca3af', fontSize: 13 }}>No attachments found.</div>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       )}
     </div>
   );
