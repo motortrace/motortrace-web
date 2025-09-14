@@ -907,6 +907,11 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
   const [editEndTime, setEditEndTime] = useState<string>('');
   const [updatingLabor, setUpdatingLabor] = useState(false);
   
+  // Reset prices modal state
+  const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
+  const [laborToReset, setLaborToReset] = useState<WorkOrderLabor | null>(null);
+  const [resettingLabor, setResettingLabor] = useState(false);
+  
   // WorkOrderServices data state
   const [workOrderServices, setWorkOrderServices] = useState<any[]>([]);
   
@@ -1153,6 +1158,50 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       }
     } catch (error) {
       console.error('Error updating WorkOrderService subtotal:', error);
+    }
+  };
+
+  // Handle opening reset confirmation modal
+  const handleResetLaborSubtotal = (laborItem: WorkOrderLabor) => {
+    setLaborToReset(laborItem);
+    setShowResetConfirmModal(true);
+  };
+
+  // Handle confirming reset
+  const handleConfirmReset = async () => {
+    if (!laborToReset) return;
+    
+    setResettingLabor(true);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/labor/${laborToReset.id}/reset-subtotal`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to reset labor subtotal');
+      }
+
+      // Refresh labor data
+      const laborResponse = await fetch(`http://localhost:3000/labor/work-order?workOrderId=${workOrderId}`);
+      if (laborResponse.ok) {
+        const laborData = await laborResponse.json();
+        setLabor(Array.isArray(laborData) ? laborData : (Array.isArray(laborData.data) ? laborData.data : []));
+      }
+
+      // Update WorkOrderService subtotal
+      await updateWorkOrderServiceSubtotal(laborToReset.cannedServiceId);
+
+      setShowResetConfirmModal(false);
+      setLaborToReset(null);
+    } catch (error) {
+      console.error('Error resetting labor subtotal:', error);
+      setError('Failed to reset labor subtotal');
+    } finally {
+      setResettingLabor(false);
     }
   };
 
@@ -1473,6 +1522,36 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                                             >
                                               <i className="bx bx-edit"></i>
                                             </button>
+                                            <button 
+                                              className="reset-prices-btn"
+                                              title="Reset Prices"
+                                              onClick={() => handleResetLaborSubtotal(laborItem)}
+                                              style={{ 
+                                                background: '#f59e0b', 
+                                                color: '#fff', 
+                                                border: 'none', 
+                                                borderRadius: '6px', 
+                                                padding: '8px', 
+                                                fontSize: '14px', 
+                                                cursor: 'pointer', 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                justifyContent: 'center', 
+                                                width: '32px', 
+                                                height: '32px', 
+                                                transition: 'all 0.2s ease'
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = '#d97706';
+                                                e.currentTarget.style.transform = 'scale(1.05)';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = '#f59e0b';
+                                                e.currentTarget.style.transform = 'scale(1)';
+                                              }}
+                                            >
+                                              <i className="bx bx-reset"></i>
+                                            </button>
                                           </div>
                                         </td>
                                       </tr>
@@ -1731,6 +1810,135 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
                       <>
                         <i className="bx bx-save"></i>
                         Update Labor
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Prices Confirmation Modal */}
+      {showResetConfirmModal && laborToReset && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowResetConfirmModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #e5e7eb' }}>
+              <h3 style={{ margin: 0, color: '#374151', fontSize: '18px', fontWeight: '600' }}>
+                <i className="bx bx-reset" style={{ marginRight: '8px', color: '#f59e0b' }}></i>
+                Reset Labor Prices
+              </h3>
+              <button 
+                onClick={() => setShowResetConfirmModal(false)}
+                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}
+              >
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="main-content" style={{ padding: '24px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+                    <div style={{ 
+                      width: '48px', 
+                      height: '48px', 
+                      borderRadius: '50%', 
+                      background: '#fef3c7', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      marginRight: '16px',
+                      fontSize: '24px',
+                      color: '#f59e0b'
+                    }}>
+                      <i className="bx bx-reset"></i>
+                    </div>
+                    <div>
+                      <h4 style={{ margin: 0, color: '#374151', fontSize: '16px', fontWeight: '600' }}>
+                        Reset Labor Prices
+                      </h4>
+                      <p style={{ margin: '4px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
+                        This will reset the subtotal to the original calculated value
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '20px', padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                  <div style={{ marginBottom: '8px' }}>
+                    <span style={{ fontWeight: '500', color: '#374151' }}>Labor Description:</span>
+                    <span style={{ marginLeft: '8px', color: '#6b7280' }}>{laborToReset.description}</span>
+                  </div>
+                  <div style={{ marginBottom: '8px' }}>
+                    <span style={{ fontWeight: '500', color: '#374151' }}>Current Subtotal:</span>
+                    <span style={{ marginLeft: '8px', color: '#dc2626', fontWeight: '600' }}>
+                      LKR {Number(laborToReset.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontWeight: '500', color: '#374151' }}>Hours:</span>
+                    <span style={{ marginLeft: '8px', color: '#6b7280' }}>{laborToReset.hours}</span>
+                    <span style={{ marginLeft: '8px', fontWeight: '500', color: '#374151' }}>Rate:</span>
+                    <span style={{ marginLeft: '8px', color: '#6b7280' }}>
+                      LKR {Number(laborToReset.rate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '20px', padding: '12px', background: '#fef2f2', borderRadius: '6px', border: '1px solid #fecaca' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <i className="bx bx-info-circle" style={{ color: '#dc2626', marginRight: '8px', fontSize: '16px' }}></i>
+                    <span style={{ color: '#dc2626', fontSize: '14px', fontWeight: '500' }}>
+                      This action will recalculate the subtotal based on hours × rate
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setShowResetConfirmModal(false)}
+                    disabled={resettingLabor}
+                    style={{
+                      padding: '10px 20px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      background: '#fff',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmReset}
+                    disabled={resettingLabor}
+                    style={{
+                      padding: '10px 20px',
+                      border: 'none',
+                      borderRadius: '6px',
+                      background: resettingLabor ? '#9ca3af' : '#f59e0b',
+                      color: '#fff',
+                      cursor: resettingLabor ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {resettingLabor ? (
+                      <>
+                        <i className="bx bx-loader-alt bx-spin"></i>
+                        Resetting...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bx bx-reset"></i>
+                        Reset Prices
                       </>
                     )}
                   </button>
