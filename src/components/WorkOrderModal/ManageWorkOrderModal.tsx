@@ -180,8 +180,9 @@ const EstimatesTab: React.FC<{
   workOrderId: string; 
   onGenerateEstimate: () => void;
   onOpenCannedServicesModal: () => void;
+  onOpenEstimatePartsModal: () => void;
   estimatesList: any[];
-}> = ({ workOrderId, onGenerateEstimate, onOpenCannedServicesModal, estimatesList }) => {
+}> = ({ workOrderId, onGenerateEstimate, onOpenCannedServicesModal, onOpenEstimatePartsModal, estimatesList }) => {
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -274,9 +275,13 @@ const EstimatesTab: React.FC<{
               <i className="bx bx-plus"></i>
               Add Canned Service
             </button>
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <i className="bx bx-wrench"></i>
-              Add Labor
+            <button 
+              className="btn btn--secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={onOpenEstimatePartsModal}
+            >
+              <i className="bx bx-package"></i>
+              Add Estimate Part
             </button>
             <button 
               className="btn btn--primary" 
@@ -2230,8 +2235,11 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   const [notes, setNotes] = useState('');
   const [isGeneratingEstimate, setIsGeneratingEstimate] = useState(false);
   const [showCannedServicesModal, setShowCannedServicesModal] = useState(false);
+  const [showEstimatePartsModal, setShowEstimatePartsModal] = useState(false);
   const [cannedServices, setCannedServices] = useState<any[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
   const [selectedEstimateId, setSelectedEstimateId] = useState('');
+  const [selectedEstimatePartId, setSelectedEstimatePartId] = useState('');
   const [estimatesList, setEstimatesList] = useState<any[]>([]);
   const [showPublishEstimateModal, setShowPublishEstimateModal] = useState(false);
   const [selectedPublishEstimateId, setSelectedPublishEstimateId] = useState('');
@@ -2372,6 +2380,111 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       setCannedServices(Array.isArray(data) ? data : data.data || []);
     } catch (error) {
       console.error('Error fetching canned services:', error);
+    }
+  };
+
+  // Open Estimate Parts Modal Function
+  const handleOpenEstimatePartsModal = () => {
+    setShowEstimatePartsModal(true);
+    fetchInventoryItems();
+  };
+
+  // Fetch Inventory Items Function
+  const fetchInventoryItems = async () => {
+    if (!token) {
+      console.error('No token available');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/inventory', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch inventory: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      const data = result.success ? result.data : result;
+      setInventoryItems(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching inventory items:', error);
+    }
+  };
+
+  // Add Estimate Part Function
+  const handleAddEstimatePart = async (inventoryItemId: string, quantity: number) => {
+    if (!selectedEstimatePartId || !token) {
+      console.error('Missing estimate ID or token');
+      return;
+    }
+
+    // Find the inventory item to get unit price
+    const inventoryItem = inventoryItems.find(item => item.id === inventoryItemId);
+    if (!inventoryItem) {
+      console.error('Inventory item not found');
+      return;
+    }
+
+    // Get unit price with proper fallbacks and validation
+    const unitPrice = Number(inventoryItem.unitPrice || inventoryItem.retailPrice || inventoryItem.costPrice || inventoryItem.price || 0);
+    if (unitPrice <= 0) {
+      console.error('Invalid unit price for inventory item:', inventoryItem);
+      alert('This inventory item has an invalid price. Please contact an administrator.');
+      return;
+    }
+
+    const payload = {
+      estimateId: selectedEstimatePartId,
+      inventoryItemId: inventoryItemId,
+      quantity: quantity,
+      unitPrice: unitPrice
+    };
+
+    console.log('=== ADD ESTIMATE PART DEBUG ===');
+    console.log('Estimate ID:', selectedEstimatePartId);
+    console.log('Inventory Item ID:', inventoryItemId);
+    console.log('Quantity:', quantity);
+    console.log('Inventory Item:', inventoryItem);
+    console.log('Available price fields:', {
+      retailPrice: inventoryItem.retailPrice,
+      costPrice: inventoryItem.costPrice,
+      price: inventoryItem.price,
+      unitPrice: inventoryItem.unitPrice
+    });
+    console.log('Calculated Unit Price:', unitPrice);
+    console.log('Payload:', payload);
+
+    try {
+      const response = await fetch('http://localhost:3000/estimates/parts', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to add estimate part: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Success response:', result);
+      console.log('Estimate part added successfully');
+      
+      // Close modal and refresh page
+      setShowEstimatePartsModal(false);
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error adding estimate part:', error);
     }
   };
 
@@ -2719,6 +2832,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
           workOrderId={workOrder?.id || ''} 
           onGenerateEstimate={handleGenerateEstimate}
           onOpenCannedServicesModal={openCannedServicesModal}
+          onOpenEstimatePartsModal={handleOpenEstimatePartsModal}
           estimatesList={estimatesList}
         />;
       case 'inspections':
@@ -2776,10 +2890,10 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
                   <i className="bx bx-receipt"></i>
                   Generate Invoice
                 </button>
-                <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {/* <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <i className="bx bx-send"></i>
                   Publish Invoice
-                </button>
+                </button> */}
               </>
             )}
             <button className="close-btn" onClick={onClose} title="Close">
@@ -2802,6 +2916,166 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
           {/* <Sidebar /> */}
         </div>
       </div>
+
+      {/* Estimate Parts Modal */}
+      {showEstimatePartsModal && (
+        <div className="manage-workorder-modal__overlay" onClick={() => setShowEstimatePartsModal(false)}>
+          <div className="manage-workorder-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <div className="modal-title">
+                <h2>Add Estimate Part</h2>
+                <p className="modal-subtitle">Select an inventory item to add to the estimate</p>
+              </div>
+              <button className="close-btn" onClick={() => setShowEstimatePartsModal(false)} title="Close">
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="modal-body">
+              {/* Estimate Selection */}
+              <div className="form-group" style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                  Select Estimate Version
+                </label>
+                <select
+                  value={selectedEstimatePartId}
+                  onChange={(e) => setSelectedEstimatePartId(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">Choose an estimate...</option>
+                  {estimatesList.map((estimate) => (
+                    <option key={estimate.id} value={estimate.id}>
+                      Version {estimate.version} - {estimate.status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Inventory Items List */}
+              {selectedEstimatePartId && (
+                <div className="inventory-items-section">
+                  <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#374151' }}>
+                    Available Inventory Items
+                  </h3>
+                  
+                  {inventoryItems.length > 0 ? (
+                    <div className="inventory-items-list" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                      {inventoryItems.map((item) => (
+                        <div key={item.id} className="inventory-item-card" style={{
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                          padding: '16px',
+                          marginBottom: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                            <div>
+                              <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#111827' }}>
+                                {item.partName || item.name}
+                              </h4>
+                              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#6b7280' }}>
+                                Part #: {item.partNumber || item.code}
+                              </p>
+                              <p style={{ margin: '0', fontSize: '12px', color: '#6b7280' }}>
+                                Manufacturer: {item.manufacturer || 'N/A'}
+                              </p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#059669' }}>
+                                LKR {Number(item.retailPrice || item.costPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              </p>
+                              <p style={{ margin: '0', fontSize: '12px', color: '#6b7280' }}>
+                                Stock: {item.quantityOnHand || item.quantity || 0}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {item.description && (
+                            <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#4b5563', lineHeight: '1.4' }}>
+                              {item.description}
+                            </p>
+                          )}
+
+                          {/* Add Part Form */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ flex: '1' }}>
+                              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: '500', color: '#374151' }}>
+                                Quantity
+                              </label>
+                              <input
+                                type="number"
+                                min="1"
+                                defaultValue="1"
+                                style={{
+                                  width: '100%',
+                                  padding: '8px',
+                                  border: '1px solid #d1d5db',
+                                  borderRadius: '6px',
+                                  fontSize: '14px'
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    const quantity = parseInt((e.target as HTMLInputElement).value);
+                                    if (quantity > 0) {
+                                      handleAddEstimatePart(item.id, quantity);
+                                    }
+                                  }
+                                }}
+                              />
+                            </div>
+                            <button
+                              className="btn btn--primary"
+                              style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px',
+                                padding: '8px 16px',
+                                fontSize: '12px'
+                              }}
+                              onClick={(e) => {
+                                const quantityInput = e.currentTarget.parentElement?.querySelector('input[type="number"]') as HTMLInputElement;
+                                const quantity = parseInt(quantityInput?.value || '1');
+                                if (quantity > 0) {
+                                  handleAddEstimatePart(item.id, quantity);
+                                }
+                              }}
+                            >
+                              <i className="bx bx-plus"></i>
+                              Add to Estimate
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+                      <i className="bx bx-package" style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}></i>
+                      <p style={{ margin: '0', fontSize: '14px' }}>No inventory items available</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!selectedEstimatePartId && (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+                  <i className="bx bx-file-blank" style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}></i>
+                  <p style={{ margin: '0', fontSize: '14px' }}>Please select an estimate version first</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Canned Services Modal */}
       {showCannedServicesModal && (
