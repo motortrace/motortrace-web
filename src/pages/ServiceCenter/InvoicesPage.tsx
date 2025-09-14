@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './InvoicesPage.scss';
@@ -11,7 +11,7 @@ interface Invoice {
   workOrderId: string;
   issueDate: string;
   dueDate: string;
-  status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+  status: 'DRAFT' | 'SENT' | 'OVERDUE' | 'CANCELLED';
   subtotalServices: number;
   subtotalLabor: number;
   subtotalParts: number;
@@ -19,8 +19,6 @@ interface Invoice {
   taxAmount: number;
   discountAmount: number;
   totalAmount: number;
-  paidAmount: number;
-  balanceDue: number;
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -84,7 +82,6 @@ const getStatusBadge = (status: string) => {
   const statusConfig = {
     'DRAFT': { class: 'status-draft', text: 'Draft', color: '#6b7280' },
     'SENT': { class: 'status-sent', text: 'Sent', color: '#3b82f6' },
-    'PAID': { class: 'status-paid', text: 'Paid', color: '#10b981' },
     'OVERDUE': { class: 'status-overdue', text: 'Overdue', color: '#ef4444' },
     'CANCELLED': { class: 'status-cancelled', text: 'Cancelled', color: '#6b7280' }
   };
@@ -167,8 +164,8 @@ const InvoicesPage = () => {
   });
 
   const handleView = (id: string) => {
-    // For now, just log the invoice ID - you can implement a detailed view later
-    console.log('View invoice:', id);
+    const basePath = getBasePath();
+    navigate(`${basePath}/invoice-detail/${id}`);
   };
 
   const formatCurrency = (amount: number) => {
@@ -184,7 +181,7 @@ const InvoicesPage = () => {
       key: 'invoiceNumber',
       label: 'Invoice #',
       sortable: true,
-      render: (value: any, row: Invoice) => (
+      render: (_: any, row: Invoice) => (
         <strong>{row.invoiceNumber}</strong>
       )
     },
@@ -203,9 +200,9 @@ const InvoicesPage = () => {
       render: (_: any, row: Invoice) => (
         <div>
           <div style={{ fontWeight: '500' }}>{row.workOrder?.customer?.name || 'Unknown'}</div>
-          <div style={{ fontSize: '12px', color: '#6b7280' }}>
+          {/* <div style={{ fontSize: '12px', color: '#6b7280' }}>
             {row.workOrder?.vehicle?.make} {row.workOrder?.vehicle?.model} ({row.workOrder?.vehicle?.year})
-          </div>
+          </div> */}
         </div>
       )
     },
@@ -232,31 +229,6 @@ const InvoicesPage = () => {
       align: 'right' as const,
       render: (value: any) => (
         <span style={{ fontWeight: '600' }}>{formatCurrency(value)}</span>
-      )
-    },
-    {
-      key: 'paidAmount',
-      label: 'Paid Amount',
-      sortable: true,
-      align: 'right' as const,
-      render: (value: any, row: Invoice) => (
-        <span style={{ color: value > 0 ? '#10b981' : '#6b7280' }}>
-          {formatCurrency(value)}
-        </span>
-      )
-    },
-    {
-      key: 'balanceDue',
-      label: 'Balance Due',
-      sortable: true,
-      align: 'right' as const,
-      render: (value: any) => (
-        <span style={{ 
-          fontWeight: '600', 
-          color: value > 0 ? '#ef4444' : '#10b981' 
-        }}>
-          {formatCurrency(value)}
-        </span>
       )
     },
     {
@@ -313,7 +285,6 @@ const InvoicesPage = () => {
             <option value="all">All Statuses</option>
             <option value="DRAFT">Draft</option>
             <option value="SENT">Sent</option>
-            <option value="PAID">Paid</option>
             <option value="OVERDUE">Overdue</option>
             <option value="CANCELLED">Cancelled</option>
           </select>

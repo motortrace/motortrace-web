@@ -25,6 +25,7 @@ import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
 import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
 import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
+import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
 
 
 import AdminLogin from './pages/Admin/AdminLogin';
@@ -115,6 +116,7 @@ function App() {
           <Route path="jobcard" element={<JobCard />} />
           <Route path="inventory" element={<PartsInventory />} />
           <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="invoice-detail/:id" element={<InvoiceDetailPage />} />
           <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
@@ -140,6 +142,7 @@ function App() {
           <Route path="jobcard" element={<JobCard />} />
           <Route path="inventory" element={<PartsInventory />} />
           <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="invoice-detail/:id" element={<InvoiceDetailPage />} />
           <Route path="inspection-templates" element={<InspectionTemplates />} />
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
