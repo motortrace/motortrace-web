@@ -898,6 +898,9 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>('');
   const [assigningTechnician, setAssigningTechnician] = useState(false);
   
+  // WorkOrderServices data state
+  const [workOrderServices, setWorkOrderServices] = useState<any[]>([]);
+  
   const { token } = useAuth();
 
   useEffect(() => {
@@ -918,6 +921,37 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
       setLoading(false);
     });
   }, [workOrderId]);
+
+  // Fetch WorkOrderServices data
+  useEffect(() => {
+    if (!workOrderId) return;
+    
+    const fetchWorkOrderServices = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}/services`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          console.warn(`Failed to fetch work order services:`, response.status);
+          return;
+        }
+        
+        const data = await response.json();
+        console.log('WorkOrderServices data:', data);
+        
+        // Handle different response structures
+        const servicesData = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+        setWorkOrderServices(servicesData);
+      } catch (error) {
+        console.error('Error fetching work order services:', error);
+      }
+    };
+    
+    fetchWorkOrderServices();
+  }, [workOrderId, token]);
 
   // Fetch technicians for assignment
   const fetchTechnicians = async () => {
@@ -1008,32 +1042,26 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
   if (loading) return <div className="tab-content services-labor-tab">Loading services and labor...</div>;
   if (error) return <div className="tab-content services-labor-tab" style={{ color: 'red' }}>{error}</div>;
 
-  // Group labor entries by cannedServiceId to create services
-  const groupedLaborByService = labor.reduce((acc, laborItem) => {
-    const serviceId = laborItem.cannedServiceId || 'unlinked';
-    if (!acc[serviceId]) {
-      acc[serviceId] = [];
-    }
-    acc[serviceId].push(laborItem);
-    return acc;
-  }, {} as Record<string, WorkOrderLabor[]>);
-
-  // Create service entries from grouped labor
-  const services = Object.entries(groupedLaborByService).map(([serviceId, laborItems]) => {
-    const firstLaborItem = laborItems[0];
+  // Use WorkOrderServices as the primary data source
+  const services = workOrderServices.map(workOrderService => {
+    // Find labor items that belong to this service
+    const linkedLabor = labor.filter(laborItem => 
+      laborItem.cannedServiceId === workOrderService.cannedServiceId
+    );
     
     return {
-      id: serviceId,
-      cannedServiceId: serviceId,
-      cannedService: null, // We'll need to fetch this separately if needed
-      description: serviceId === 'unlinked' ? 'Unlinked Labor' : `Service ${serviceId}`,
-      quantity: laborItems.length,
-      unitPrice: 0, // We'll calculate this from labor items
-      subtotal: laborItems.reduce((sum, item) => sum + (item.subtotal || 0), 0),
-      status: 'active',
-      notes: '',
-      createdAt: firstLaborItem.createdAt,
-      updatedAt: firstLaborItem.updatedAt
+      id: workOrderService.id,
+      cannedServiceId: workOrderService.cannedServiceId,
+      cannedService: workOrderService.cannedService,
+      description: workOrderService.cannedService?.name || workOrderService.description || 'Service',
+      quantity: workOrderService.quantity || 1,
+      unitPrice: workOrderService.unitPrice || workOrderService.cannedService?.price || 0,
+      subtotal: workOrderService.subtotal || (workOrderService.unitPrice * (workOrderService.quantity || 1)),
+      status: workOrderService.status || 'active',
+      notes: workOrderService.notes || workOrderService.cannedService?.description || '',
+      createdAt: workOrderService.createdAt,
+      updatedAt: workOrderService.updatedAt,
+      linkedLabor: linkedLabor // Store linked labor for display
     };
   });
 
@@ -1106,7 +1134,7 @@ const ServicesAndLaborTab: React.FC<{ workOrderId: string }> = ({ workOrderId })
               </thead>
               <tbody>
                 {services.map(service => {
-                  const linkedLabor = groupedLaborByService[service.id] || [];
+                  const linkedLabor = service.linkedLabor || [];
                   return (
                     <React.Fragment key={service.id}>
                       <tr>
