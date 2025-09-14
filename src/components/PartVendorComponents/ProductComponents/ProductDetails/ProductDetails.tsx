@@ -52,28 +52,6 @@ export interface Product {
   connectorType: string;
 }
 
-// Define the interface that EditProduct expects
-interface EngineFluidProduct {
-  productName: string;
-  fluidType: string;
-  specification: string;
-  brand: string;
-  volume: string;
-  compatibility?: string;
-  replacementCycle?: string;
-  boilingPoint?: string;
-  description?: string;
-  stock: number;
-  lowStockThreshold: number;
-  price: string;
-  discountType?: string;
-  discountValue?: number;
-  image?: File | string;
-  manufacturer?: string;
-  manufacturedDate?: string;
-  expiryDate?: string;
-  
-}
 
 // Add proper TypeScript interface for DeleteConfirmationPopup props
 interface DeleteConfirmationPopupProps {
@@ -83,7 +61,6 @@ interface DeleteConfirmationPopupProps {
   productName: string;
 }
 
-// Delete Confirmation Popup Component with proper typing
 const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({ 
   isOpen, 
   onClose, 
@@ -94,7 +71,6 @@ const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({
 
   const handleConfirm = async () => {
     setIsDeleting(true);
-    // Add a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 800));
     onConfirm();
     setIsDeleting(false);
@@ -1109,6 +1085,7 @@ const ProductDetails: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Add state for products and loading
   const [products, setProducts] = useState<Product[]>([]);
@@ -1225,15 +1202,7 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
     setSelectedProduct(null);
   };
 
-  // Updated edit handler to open edit modal
-  // const handleEditProduct = (product: Product) => {
-  //   setProductToEdit(product);
-  //   setIsEditModalOpen(true);
-  //   // Close view panel if it's open
-  //   setIsViewPanelOpen(false);
-  // };
 
-  //changed here
   const handleEditProduct = (product: Product) => {
   setProductToEdit(product);
   setIsEditModalOpen(true);
@@ -1244,7 +1213,7 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
     setProductToEdit(null);
   };
 
-  // Delete handlers
+  
   const handleDeleteProduct = (product: Product) => {
     setProductToDelete(product);
     setIsDeleteModalOpen(true);
@@ -1252,141 +1221,77 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
     setIsViewPanelOpen(false);
   };
 
-  const handleDeleteConfirm = () => {
-    if (productToDelete) {
-      // Implement your actual delete logic here
-      console.log('Deleting product:', productToDelete.id);
+  // const handleDeleteConfirm = () => {
+  //   if (productToDelete) {
+  //     // Implement your actual delete logic here
+  //     console.log('Deleting product:', productToDelete.id);
       
-      // Example: Remove from products array (you'll need proper state management)
-      // const updatedProducts = products.filter(p => p.id !== productToDelete.id);
-      // setProducts(updatedProducts);
+  //     // Example: Remove from products array (you'll need proper state management)
+  //     // const updatedProducts = products.filter(p => p.id !== productToDelete.id);
+  //     // setProducts(updatedProducts);
       
-      // Close modal
+  //     // Close modal
+  //     setIsDeleteModalOpen(false);
+  //     setProductToDelete(null);
+      
+  //     // Show success message
+  //     alert('Product deleted successfully!');
+  //   }
+  // };
+
+  // In ProductDetails.tsx
+const handleDeleteConfirm = async () => {
+  if (productToDelete) {
+    try {
+      setIsDeleting(true);
+      
+      // Call your delete API endpoint
+      const response = await fetch(`http://localhost:3000/api/products/${productToDelete.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server returned ${response.status}`);
+      }
+      
+      
+      if (response.ok) {
+        const updatedProducts = products.filter(p => p.id !== productToDelete.id);
+        setProducts(updatedProducts);
+        
+        alert('Product deleted successfully!');
+        await fetchProducts();
+      } else {
+        throw new Error('Failed to delete product');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Error deleting product. Please try again.');
+    } finally {
+      // Close modal and reset state
       setIsDeleteModalOpen(false);
       setProductToDelete(null);
-      
-      // Show success message
-      alert('Product deleted successfully!');
+      setIsDeleting(false);
     }
-  };
-
+  }
+};
   const handleDeleteCancel = () => {
     setIsDeleteModalOpen(false);
     setProductToDelete(null);
   };
 
-  // Conversion for Engine & Fluids (already present)
-  const convertToEngineFluidProduct = (product: Product): EngineFluidProduct => ({
-    productName: product.productName,
-    fluidType: product.subcategory,
-    specification: '',
-    brand: product.brand,
-    volume: product.volume,
-    compatibility: product.compatibility,
-    replacementCycle: '',
-    boilingPoint: '',
-    description: product.description,
-    stock: product.stock,
-    lowStockThreshold: 10,
-    price: product.price,
-    discountType: '',
-    discountValue: 0,
-    image: product.image,
-    manufacturer: '',
-    manufacturedDate: '',
-    expiryDate: '',
-  });
-
-  // Conversion for Wear & Tear Parts
-  const convertToWearTearProduct = (product: Product) => ({
-    productName: product.productName,
-    partType: product.subcategory,
-    material: product.material,
-    position: product.position,
-    brand: product.brand,
-    size: '',
-    compatibility: product.compatibility,
-    replacementCycle: '',
-    description: product.description,
-    quantity: product.stock,
-    price: product.price,
-    minimumQuantity: 1,
-    discountType: '',
-    discountValue: 0,
-    image: product.image,
-    warranty: '',
-    manufacturer: '',
-    manufacturedDate: '',
-    expiryDate: '',
-  });
-
-  // Conversion for Exterior & Body Parts
-  const convertToExteriorBodyPartProduct = (product: Product) => ({
-    productName: product.productName,
-    partType: product.subcategory,
-    material: product.material,
-    position: product.position,
-    finish: product.finish,
-    mountingFeatures: '',
-    electronicFeatures: '',
-    colorCode: product.color,
-    brand: product.brand,
-    compatibility: product.compatibility,
-    notes: product.description,
-    quantity: product.stock,
-    price: parseFloat(product.price.replace(/[^0-9.]/g, '')),
-    minQuantity: 1,
-    discountType: '',
-    discountValue: 0,
-    warranty: '',
-    manufacturer: '',
-    manufacturedDate: '',
-    expiryDate: '',
-    image: product.image,
-  });
-
-  // const handleSaveEditedProduct = (updatedData: EngineFluidProduct) => {
-  //   // Here you would update your products array or make an API call
-  //   console.log('Updated product data:', updatedData);
-    
-  //   // Example: Update the products array (you'll need to implement proper state management)
-  //   // const updatedProducts = products.map(product => 
-  //   //   product.id === productToEdit?.id 
-  //   //     ? { ...product, ...updatedData } 
-  //   //     : product
-  //   // );
-    
-  //   // Close the edit modal
-  //   setIsEditModalOpen(false);
-  //   setProductToEdit(null);
-    
-  //   // Show success message or refresh the data
-  //   alert('Product updated successfully!');
-  // };
-
   const handleSaveEditedProduct = (updatedProduct: any) => {
-  // Update your local state or refetch products
   console.log('Product updated:', updatedProduct);
-  
-  // Example: Update the products array
-  // const updatedProducts = products.map(p => 
-  //   p.id === updatedProduct.id ? updatedProduct : p
-  // );
-  // setProducts(updatedProducts);
-  
   setIsEditModalOpen(false);
   setProductToEdit(null);
   alert('Product updated successfully!');
 };
-  const handleDuplicateProduct = (product: Product) => {
-    // Implement duplicate logic
-    console.log('Duplicating product:', product);
-    // Create a new product based on the current one
-    setIsViewPanelOpen(false);
-  };
 
   const handleDeleteFromViewPanel = (productId: string) => {
-    // Find the product by ID
     const product = products.find(p => p.id === productId);
     if (product) {
       handleDeleteProduct(product);
@@ -1526,47 +1431,20 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
         onSave={handleSaveProduct}
       />
 
-      {/* Edit Product Modal
+      
+
+            
       {isEditModalOpen && productToEdit && (
         <div className="modal-overlay" onClick={handleCloseEditModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-header-title">
-                <h2>Edit Product</h2>
-              </div>
-              <button className="modal-close" onClick={handleCloseEditModal}>×</button>
-            </div>
-            <div className='edit-product'>
             <EditProduct 
               category={productToEdit.category}
-              existingData={
-                productToEdit.category === 'Engine & Fluids'
-                  ? convertToEngineFluidProduct(productToEdit)
-                  : productToEdit.category === 'Wear & Tear Parts'
-                  ? convertToWearTearProduct(productToEdit)
-                  : productToEdit.category === 'Exterior & Body Parts'
-                  ? convertToExteriorBodyPartProduct(productToEdit)
-                  : productToEdit
-              }
+              existingData={productToEdit} // Pass the entire product object
               onSave={handleSaveEditedProduct}
             />
-            </div>
           </div>
         </div>
-      )} */}
-
-      
-{isEditModalOpen && productToEdit && (
-  <div className="modal-overlay" onClick={handleCloseEditModal}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <EditProduct 
-        category={productToEdit.category}
-        existingData={productToEdit} // Pass the entire product object
-        onSave={handleSaveEditedProduct}
-      />
-    </div>
-  </div>
-)}
+      )}
 
       {/* Product View Panel */}
       <ProductViewPanel
@@ -1578,6 +1456,7 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
 
       {/* Delete Confirmation Popup */}
       <DeleteConfirmationPopup
+        
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
