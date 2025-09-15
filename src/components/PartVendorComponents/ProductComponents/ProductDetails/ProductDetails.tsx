@@ -1124,47 +1124,35 @@ const ProductDetails: React.FC = () => {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch products from API
+
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  // const fetchProducts = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await apiRequest('http://localhost:3000/api/products');
-      
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
-      
-  //     const data = await response.json();
-  //     setProducts(data);
-  //     setError(null);
-  //   } catch (err) {
-  //     setError('Failed to fetch products. Please try again later.');
-  //     console.error('Error fetching products:', err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  //the product filtering logic -not updated but looks same
   const currentColumns = categoryConfigs[selectedCategory] || [];
   const filteredProducts = products.filter(
-    // (product) => product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+    // (product) => 
+    // product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase() &&
+    // (searchTerm === '' || 
+    //  product.productname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //  product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //  product.compatibility.toLowerCase().includes(searchTerm.toLowerCase()))
     (product) => 
     product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase() &&
-    (searchTerm === '' || 
+    (selectedSubCategory === '' || product.subcategory === selectedSubCategory) &&
+    (selectedStatus === '' || product.availability === selectedStatus) &&
+    (searchTerm === '' ||
      product.productname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     product.compatibility.toLowerCase().includes(searchTerm.toLowerCase()))
+    //  product.compatibility.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     product.brand.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
@@ -1187,7 +1175,7 @@ const ProductDetails: React.FC = () => {
 };
 
 
-  //the refresh functionality
+
   const handleRefresh = () => {
     fetchProducts();
   };
@@ -1318,6 +1306,19 @@ const handleDeleteConfirm = async () => {
     }
   };
 
+  // Add this function in your ProductDetails component
+const getUniqueSubCategories = () => {
+  const subCategories = new Set<string>();
+  
+  filteredProducts.forEach(product => {
+    if (product.subcategory) {
+      subCategories.add(product.subcategory);
+    }
+  });
+  
+  return Array.from(subCategories).sort();
+};
+
   if (loading) {
     return (
       <div className="product-details">
@@ -1347,9 +1348,9 @@ const handleDeleteConfirm = async () => {
       <div className="product-details__header">
         <h2 className="product-details__title">Product List</h2>
         <div className="product-details__actions">
-          <button className="btn pdf">PDF</button>
+          {/* <button className="btn pdf">PDF</button> */}
           <button className="btn refresh" onClick={handleRefresh}>⟳</button>
-          <button className="btn sort">⇅</button>
+          {/* <button className="btn sort">⇅</button> */}
           <button className="btn add" onClick={handleAddProduct}>
             + Add Product
           </button>
@@ -1357,7 +1358,7 @@ const handleDeleteConfirm = async () => {
       </div>
 
       <div className="product-details__filters">
-        <input className="filter-input" placeholder="Search..." 
+        <input className="filter-input" placeholder="Search Product Name, Brand" 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -1371,16 +1372,42 @@ const handleDeleteConfirm = async () => {
           ))}
         </select>
 
-        <select className="filter-select">
+        <select 
+          className="filter-select"
+          value={selectedSubCategory}
+          onChange={(e) => setSelectedSubCategory(e.target.value)}
+          disabled={!selectedCategory} // Disable if no category selected
+        >
           <option value="">All Sub-Categories</option>
+          {getUniqueSubCategories().map(subCat => (
+            <option key={subCat} value={subCat}>{subCat}</option>
+          ))}
         </select>
 
-        <select className="filter-select">
+        <select 
+          className="filter-select"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+        >
           <option value="">All Statuses</option>
           <option value="In Stock">In Stock</option>
           <option value="Low Stock">Low Stock</option>
           <option value="Out of Stock">Out of Stock</option>
         </select>
+
+        {/* Add clear filters button */}
+        {(selectedSubCategory || selectedStatus || searchTerm) && (
+          <button 
+            className="btn clear-filters"
+            onClick={() => {
+              setSelectedSubCategory('');
+              setSelectedStatus('');
+              setSearchTerm('');
+            }}
+          >
+            Clear Filters
+          </button>
+        )}
       </div>
 
       <div className="product-details__table">        

@@ -20,15 +20,16 @@ export const categoryConfigs = {
   "Exterior & Body Parts": [
     { key: "id", label: "ID" },
     { key: "productname", label: "Product Name" },
+    { key: "subcategory", label: "Part Category" },
     { key: "position", label: "Position" },
-    { key: "finish", label: "Finish" },
+    // { key: "finish", label: "Finish" },
     { key: "brand", label: "Brand" },
     { key: "compatibility", label: "Compatible Models" }
   ],
   "Paints & Coatings": [
     { key: "id", label: "ID" },
     { key: "productname", label: "Product Name" },
-    { key: "subcategory", label: "Sub Category" },
+    { key: "subcategory", label: "Category" },
     { key: "color", label: "Color" },
     
     { key: "type", label: "Type" },
