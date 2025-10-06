@@ -1,6 +1,6 @@
-.delivered-orders-card {
-  @import '../../../../../styles/variables.scss';
+@use '../../../../../styles/variables' as *;
 
+.delivered-orders-card {
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 16px;

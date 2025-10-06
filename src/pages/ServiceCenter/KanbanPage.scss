@@ -1,5 +1,5 @@
 // KanbanPage.scss
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
 // Loading and Error States
 .loading-container {

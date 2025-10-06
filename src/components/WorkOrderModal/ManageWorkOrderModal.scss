@@ -1,3 +1,7 @@
+@use '../../styles/variables' as *;
+@use '../../styles/components/button' as *;
+@use 'sass:color';
+
 // Inspections Tab Header Styles
 .inspections-header {
   .search-container {
@@ -464,8 +468,6 @@
     }
   }
 }
-@import '../../styles/variables.scss';
-@import '../../styles/components/button.scss';
 
 // Color Variables
 $primary-color: #0969da;
@@ -1318,7 +1320,7 @@ $grey-na: #e5e7eb;
             transition: all 0.2s ease;
             
             &:hover:not(:disabled) {
-              background: darken($primary-color, 10%);
+              background: color.adjust($primary-color, $lightness: -10%);
             }
             
             &:disabled {

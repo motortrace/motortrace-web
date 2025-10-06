@@ -1,5 +1,6 @@
+@use '../../../../../styles/variables' as *;
+
 .low-stock-card {
-  @import '../../../../../styles/variables.scss';
 
   background: white;
   border: 2px solid #e5e7eb;
