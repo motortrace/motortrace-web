@@ -10,6 +10,7 @@ import { useWorkOrderModal } from './hooks/useWorkOrderModal';
 import { useInspections } from './hooks/useInspections';
 import { isServiceAdvisorRole } from './utils/helpers';
 import type { ManageWorkOrderModalProps } from './types';
+import '../WorkOrderModal/ManageWorkOrderModal.scss';
 
 /**
  * ManageWorkOrderModal - Refactored Component
@@ -27,6 +28,9 @@ import type { ManageWorkOrderModalProps } from './types';
 const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder, onUpdate }) => {
   const { token } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Debug logging
+  console.log('ManageWorkOrderModal rendered:', { open, workOrder: workOrder?.id });
 
   // Initialize modal hook
   const modalHook = useWorkOrderModal({
@@ -110,6 +114,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   };
 
   if (!open || !workOrder) {
+    console.log('Modal not rendering:', { open, hasWorkOrder: !!workOrder });
     return null;
   }
 

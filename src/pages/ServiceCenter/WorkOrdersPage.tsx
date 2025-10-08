@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './WorkOrdersPage.scss';
-import ManageWorkOrderModal from '../../components/WorkOrderModal/ManageWorkOrderModal';
+import ManageWorkOrderModal from '../../components/ManageWorkOrderModal';
 import { getWorkOrders } from '../../utils/workOrdersApi';
 import type { WorkOrder } from '../../utils/workOrdersApi';
 

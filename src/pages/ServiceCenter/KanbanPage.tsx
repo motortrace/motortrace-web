@@ -137,8 +137,10 @@ const KanbanPage: React.FC = () => {
   };
 
   const handleCardClick = (workOrder: WorkOrder) => {
+    console.log('Card clicked:', workOrder);
     setSelectedWorkOrder(workOrder);
     setModalOpen(true);
+    console.log('Modal should be open now');
   };
 
   // Fetch confirmed appointments without work orders
