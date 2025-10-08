@@ -2,6 +2,29 @@
 @use '../../styles/components/button' as *;
 @use 'sass:color';
 
+// Toast Animation
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
 // Inspections Tab Header Styles
 .inspections-header {
   .search-container {
@@ -2399,5 +2422,458 @@ $grey-na: #e5e7eb;
   &--pending {
     background-color: #fef3c7;
     color: #92400e;
+  }
+}
+
+// ==================== Technician Assignment Modals ====================
+
+.technician-assignment-modal {
+  .modal-content {
+    max-width: 600px;
+  }
+
+  .service-info-card,
+  .labor-info-card {
+    padding: 16px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+
+    .info-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+
+    .info-meta {
+      font-size: 13px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      i {
+        margin-right: 4px;
+      }
+    }
+
+    .info-notes {
+      font-size: 13px;
+      color: #6b7280;
+      font-style: italic;
+      margin-top: 8px;
+    }
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    margin-bottom: 16px;
+
+    i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #9ca3af;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px 10px 40px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+    }
+  }
+
+  .technicians-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f3f4f6;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 4px;
+
+      &:hover {
+        background: #9ca3af;
+      }
+    }
+
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: #9ca3af;
+
+      i {
+        font-size: 32px;
+        margin-bottom: 8px;
+        display: block;
+      }
+    }
+  }
+
+  .technician-item {
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #f9fafb;
+    }
+
+    &.selected {
+      background-color: #f0f9ff;
+    }
+
+    .technician-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      flex-shrink: 0;
+
+      &.busy {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+
+      &.available {
+        background-color: #e0e7ff;
+        color: #6366f1;
+      }
+    }
+
+    .technician-info {
+      flex: 1;
+
+      .technician-name-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+
+        .technician-name {
+          font-size: 15px;
+          font-weight: 600;
+          color: #111827;
+        }
+
+        .status-pill {
+          font-size: 11px;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-weight: 500;
+
+          &.busy {
+            background-color: #fef3c7;
+            color: #92400e;
+          }
+
+          &.available {
+            background-color: #d1fae5;
+            color: #065f46;
+          }
+        }
+      }
+
+      .technician-specialization {
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .technician-employee-id {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 2px;
+      }
+    }
+
+    .technician-chevron {
+      font-size: 20px;
+      color: #9ca3af;
+    }
+  }
+
+  .back-button {
+    background: none;
+    border: none;
+    padding: 8px 0;
+    color: #6366f1;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #4f46e5;
+    }
+  }
+
+  .technician-details-card {
+    padding: 20px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+
+    .technician-details-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+
+      .technician-large-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 600;
+
+        &.busy {
+          background-color: #fef3c7;
+          color: #92400e;
+        }
+
+        &.available {
+          background-color: #e0e7ff;
+          color: #6366f1;
+        }
+      }
+
+      .technician-details-info {
+        h3 {
+          margin: 0 0 4px 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #111827;
+        }
+
+        p {
+          margin: 0;
+          color: #6b7280;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .active-work-section {
+      margin-top: 16px;
+
+      h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .active-work-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .active-work-item {
+        padding: 12px;
+        background-color: #ffffff;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+
+        .work-order-id {
+          font-size: 13px;
+          color: #6b7280;
+          margin-bottom: 4px;
+        }
+
+        .work-description {
+          font-size: 14px;
+          color: #111827;
+          margin-bottom: 4px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          i {
+            font-size: 14px;
+          }
+        }
+
+        .work-status {
+          font-size: 11px;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-weight: 500;
+          display: inline-block;
+
+          &.in-progress {
+            background-color: #fef3c7;
+            color: #92400e;
+          }
+
+          &.completed {
+            background-color: #d1fae5;
+            color: #065f46;
+          }
+        }
+      }
+
+      .no-active-work {
+        padding: 16px;
+        text-align: center;
+        color: #9ca3af;
+        background-color: #ffffff;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+
+        i {
+          font-size: 24px;
+          margin-bottom: 4px;
+          display: block;
+        }
+
+        p {
+          margin: 0;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .confirmation-card {
+    padding: 16px;
+    background-color: #eff6ff;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+
+    i {
+      font-size: 20px;
+      color: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .confirmation-content {
+      .confirmation-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 4px;
+      }
+
+      .confirmation-message {
+        font-size: 13px;
+        color: #1e40af;
+      }
+    }
+  }
+}
+
+// Toast Notification
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  animation: slideIn 0.3s ease-out;
+
+  &.success {
+    background-color: #10b981;
+    color: #ffffff;
+  }
+
+  &.error {
+    background-color: #ef4444;
+    color: #ffffff;
+  }
+
+  i {
+    font-size: 24px;
+  }
+
+  .toast-content {
+    flex: 1;
+
+    .toast-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .toast-message {
+      font-size: 14px;
+    }
+  }
+
+  .toast-close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    i {
+      font-size: 20px;
+    }
   }
 }

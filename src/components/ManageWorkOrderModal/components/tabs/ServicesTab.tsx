@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../hooks/useAuth';
 import type { WorkOrderService, WorkOrderLaborItem } from '../../types';
 import { getTechnicianDisplayName } from '../../utils/helpers';
+import { useTechnicians } from '../../hooks/useTechnicians';
+import AssignTechnicianToServiceModal from '../modals/AssignTechnicianToServiceModal';
+import AssignTechnicianToLaborModal from '../modals/AssignTechnicianToLaborModal';
 
 interface ServicesTabProps {
   workOrderId: string;
@@ -17,6 +20,14 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedServiceIds, setExpandedServiceIds] = useState<Set<string>>(new Set());
+  
+  // Technician assignment state
+  const { technicians, assignTechnicianToService, assignTechnicianToLabor, fetchTechnicians } = useTechnicians();
+  const [showServiceAssignModal, setShowServiceAssignModal] = useState(false);
+  const [showLaborAssignModal, setShowLaborAssignModal] = useState(false);
+  const [selectedService, setSelectedService] = useState<WorkOrderService | null>(null);
+  const [selectedLabor, setSelectedLabor] = useState<WorkOrderLaborItem | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     if (workOrderId && token) {
@@ -133,6 +144,64 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
   };
 
+  /**
+   * Show toast notification
+   */
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToastMessage({ type, message });
+    setTimeout(() => setToastMessage(null), 5000);
+  };
+
+  /**
+   * Handle service assignment button click
+   */
+  const handleServiceAssignClick = (service: WorkOrderService) => {
+    setSelectedService(service);
+    setShowServiceAssignModal(true);
+  };
+
+  /**
+   * Handle labor assignment button click
+   */
+  const handleLaborAssignClick = (labor: WorkOrderLaborItem) => {
+    setSelectedLabor(labor);
+    setShowLaborAssignModal(true);
+  };
+
+  /**
+   * Handle service technician assignment
+   */
+  const handleServiceAssignment = async (technicianId: string) => {
+    if (!selectedService) return;
+    
+    try {
+      await assignTechnicianToService(selectedService.id, technicianId);
+      showToast('success', 'Technician successfully assigned to all labor items under this service');
+      await fetchServices(); // Refresh services to show updated assignments
+      await fetchTechnicians(); // Refresh technician status
+    } catch (error) {
+      showToast('error', error instanceof Error ? error.message : 'Failed to assign technician');
+      throw error;
+    }
+  };
+
+  /**
+   * Handle labor technician assignment
+   */
+  const handleLaborAssignment = async (technicianId: string) => {
+    if (!selectedLabor) return;
+    
+    try {
+      await assignTechnicianToLabor(selectedLabor.id, technicianId);
+      showToast('success', 'Technician successfully assigned to labor item');
+      await fetchServices(); // Refresh services to show updated assignments
+      await fetchTechnicians(); // Refresh technician status
+    } catch (error) {
+      showToast('error', error instanceof Error ? error.message : 'Failed to assign technician');
+      throw error;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="tab-content" style={{ padding: '40px', textAlign: 'center' }}>
@@ -205,7 +274,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
               <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Approval
               </th>
-              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }} title="Number of labor items - click to expand">
+              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', width: '150px' }} title="Labor items and assignment">
                 Labor
               </th>
             </tr>
@@ -249,7 +318,39 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                       {getApprovalBadge(service)}
                     </td>
                     <td style={{ padding: '16px', textAlign: 'center', verticalAlign: 'top' }}>
-                      {hasLaborItems ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        {hasLaborItems && (
+                          <button
+                            onClick={() => handleServiceAssignClick(service)}
+                            style={{
+                              background: 'none',
+                              border: '1px solid #e5e7eb',
+                              cursor: 'pointer',
+                              padding: '6px 10px',
+                              borderRadius: '6px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              color: '#6366f1',
+                              fontSize: '13px',
+                              fontWeight: '500',
+                              transition: 'all 0.2s'
+                            }}
+                            title="Assign technician to all labor items"
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#eff6ff';
+                              e.currentTarget.style.borderColor = '#6366f1';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.borderColor = '#e5e7eb';
+                            }}
+                          >
+                            <i className="bx bx-user-check" style={{ fontSize: '16px' }}></i>
+                            
+                          </button>
+                        )}
+                        {hasLaborItems ? (
                         <button
                           onClick={() => toggleServiceExpansion(service.id)}
                           style={{
@@ -273,13 +374,14 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                       ) : (
                         <span style={{ color: '#9ca3af', fontSize: '13px' }}>—</span>
                       )}
+                      </div>
                     </td>
                   </tr>
 
                   {/* Expanded Labor Items */}
                   {isExpanded && hasLaborItems && (
                     <tr style={{ backgroundColor: '#f9fafb' }}>
-                      <td colSpan={5} style={{ padding: '0' }}>
+                      <td colSpan={6} style={{ padding: '0' }}>
                         <div style={{ padding: '16px 24px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                             <i className="bx bx-wrench" style={{ fontSize: '16px', color: '#6b7280' }}></i>
@@ -311,6 +413,9 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                   </th>
                                   <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: '#6d806bff', textTransform: 'uppercase' }}>
                                     Status
+                                  </th>
+                                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', width: '100px' }}>
+                                    Action
                                   </th>
                                 </tr>
                               </thead>
@@ -369,6 +474,38 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                         {labor.status.replace('_', ' ')}
                                       </span>
                                     </td>
+                                    <td style={{ padding: '12px', textAlign: 'center', verticalAlign: 'top' }}>
+                                      <button
+                                        onClick={() => handleLaborAssignClick(labor)}
+                                        style={{
+                                          background: 'none',
+                                          border: '1px solid #e5e7eb',
+                                          cursor: 'pointer',
+                                          padding: '4px 8px',
+                                          borderRadius: '4px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '4px',
+                                          margin: '0 auto',
+                                          color: '#6366f1',
+                                          fontSize: '12px',
+                                          fontWeight: '500',
+                                          transition: 'all 0.2s'
+                                        }}
+                                        title="Assign technician to this labor item"
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.backgroundColor = '#eff6ff';
+                                          e.currentTarget.style.borderColor = '#6366f1';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'transparent';
+                                          e.currentTarget.style.borderColor = '#e5e7eb';
+                                        }}
+                                      >
+                                        <i className="bx bx-user-plus" style={{ fontSize: '14px' }}></i>
+                                        Assign
+                                      </button>
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -384,6 +521,49 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={`toast-notification ${toastMessage.type}`}>
+          <i className={`bx ${toastMessage.type === 'success' ? 'bx-check-circle' : 'bx-error-circle'}`}></i>
+          <div className="toast-content">
+            <div className="toast-title">
+              {toastMessage.type === 'success' ? 'Success' : 'Error'}
+            </div>
+            <div className="toast-message">{toastMessage.message}</div>
+          </div>
+          <button className="toast-close" onClick={() => setToastMessage(null)}>
+            <i className="bx bx-x"></i>
+          </button>
+        </div>
+      )}
+
+      {/* Assignment Modals */}
+      {selectedService && (
+        <AssignTechnicianToServiceModal
+          open={showServiceAssignModal}
+          onClose={() => {
+            setShowServiceAssignModal(false);
+            setSelectedService(null);
+          }}
+          service={selectedService}
+          technicians={technicians}
+          onAssign={handleServiceAssignment}
+        />
+      )}
+
+      {selectedLabor && (
+        <AssignTechnicianToLaborModal
+          open={showLaborAssignModal}
+          onClose={() => {
+            setShowLaborAssignModal(false);
+            setSelectedLabor(null);
+          }}
+          laborItem={selectedLabor}
+          technicians={technicians}
+          onAssign={handleLaborAssignment}
+        />
+      )}
     </div>
   );
 };

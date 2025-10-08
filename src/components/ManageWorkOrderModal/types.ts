@@ -175,6 +175,39 @@ export interface WorkOrderService {
   laborItems?: WorkOrderLaborItem[];
 }
 
+// ==================== Technician Assignment Types ====================
+
+export interface Technician {
+  id: string;
+  userProfileId?: string;
+  employeeId?: string;
+  specialization?: string;
+  certifications?: string[];
+  userProfile?: UserProfile | null;
+  isActive?: boolean;
+}
+
+export interface TechnicianActiveWork {
+  workOrderId: string;
+  workOrderNumber?: string;
+  laborItem?: {
+    id: string;
+    description: string;
+    status: ServiceStatus;
+  } | null;
+  part?: {
+    id: string;
+    description: string;
+    status: string;
+  } | null;
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'UNASSIGNED';
+}
+
+export interface TechnicianWithStatus extends Technician {
+  activeWork?: TechnicianActiveWork[];
+  isBusy: boolean;
+}
+
 // ==================== Modal Props ====================
 
 export interface ManageWorkOrderModalProps {
