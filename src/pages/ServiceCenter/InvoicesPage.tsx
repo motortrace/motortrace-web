@@ -20,6 +20,8 @@ interface Invoice {
   discountAmount: number;
   totalAmount: number;
   notes: string;
+  terms: string | null;
+  pdfUrl: string | null;
   createdAt: string;
   updatedAt: string;
   workOrder: {
@@ -163,9 +165,15 @@ const InvoicesPage = () => {
     return matchesSearch && matchesStatus && matchesCustomer;
   });
 
-  const handleView = (id: string) => {
-    const basePath = getBasePath();
-    navigate(`${basePath}/invoice-detail/${id}`);
+  const handleView = (invoice: Invoice) => {
+    // If pdfUrl exists, open it in a new tab
+    if (invoice.pdfUrl) {
+      window.open(invoice.pdfUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      // Fallback to detail page if no PDF exists
+      const basePath = getBasePath();
+      navigate(`${basePath}/invoice-detail/${invoice.id}`);
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -248,10 +256,36 @@ const InvoicesPage = () => {
       align: 'center' as const,
       render: (_: any, row: Invoice) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
+          <button 
+            className="btn-icon" 
+            title="View" 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              e.preventDefault();
+              console.log('View button clicked');
+              console.log('Invoice pdfUrl:', row.pdfUrl);
+              console.log('Full invoice:', row);
+              if (row.pdfUrl) {
+                console.log('Opening PDF:', row.pdfUrl);
+                window.open(row.pdfUrl, '_blank', 'noopener,noreferrer');
+              } else {
+                console.log('No pdfUrl found for this invoice');
+              }
+            }}
+          >
             <i className='bx bx-show'></i>
           </button>
-          <button className="btn-icon" title="Download" onClick={e => { e.stopPropagation(); }}>
+          <button 
+            className="btn-icon" 
+            title="Download" 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              e.preventDefault();
+              if (row.pdfUrl) {
+                window.open(row.pdfUrl, '_blank', 'noopener,noreferrer');
+              }
+            }}
+          >
             <i className='bx bx-download'></i>
           </button>
         </div>
@@ -320,7 +354,7 @@ const InvoicesPage = () => {
           <Table
             columns={columns}
             data={filteredInvoices}
-            onRowClick={(invoice) => handleView(invoice.id)}
+            onRowClick={(invoice) => handleView(invoice)}
             emptyMessage="No invoices found matching your search criteria."
           />
         )}
