@@ -2337,3 +2337,67 @@ $grey-na: #e5e7eb;
   display: block;
   margin: 0 auto;
 }
+
+/* Service Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+
+  &--estimated {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  &--pending {
+    background-color: #3b82f6;
+    color: #ffffff;
+  }
+
+  &--in-progress {
+    background-color: #f59e0b;
+    color: #ffffff;
+  }
+
+  &--completed {
+    background-color: #10b981;
+    color: #ffffff;
+  }
+
+  &--cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+/* Approval Badges */
+.approval-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &--approved {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &--rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &--pending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+}

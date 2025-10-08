@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
 import InspectionsTab from './components/tabs/InspectionsTab';
+import ServicesTab from './components/tabs/ServicesTab';
 import AddInspectionModal from './components/modals/AddInspectionModal';
 import AssignTechnicianModal from './components/modals/AssignTechnicianModal';
 import GenerateInvoiceModal from './components/modals/GenerateInvoiceModal';
@@ -28,9 +29,6 @@ import '../WorkOrderModal/ManageWorkOrderModal.scss';
 const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder, onUpdate }) => {
   const { token } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-
-  // Debug logging
-  console.log('ManageWorkOrderModal rendered:', { open, workOrder: workOrder?.id });
 
   // Initialize modal hook
   const modalHook = useWorkOrderModal({
@@ -114,7 +112,6 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
   };
 
   if (!open || !workOrder) {
-    console.log('Modal not rendering:', { open, hasWorkOrder: !!workOrder });
     return null;
   }
 
@@ -184,11 +181,9 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               />
             )}
 
-            {/* Services tab - Excluded per user request */}
+            {/* Services tab */}
             {activeTab === 'services' && (
-              <div className="tab-content">
-                <p>Services functionality coming soon...</p>
-              </div>
+              <ServicesTab workOrderId={workOrder.id} />
             )}
 
             {/* Notes tab - Excluded per user request */}

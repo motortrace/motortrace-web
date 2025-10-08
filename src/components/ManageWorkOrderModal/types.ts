@@ -134,6 +134,47 @@ export interface CannedService {
   price: number;
 }
 
+export type ServiceStatus = 'ESTIMATED' | 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export interface WorkOrderLaborItem {
+  id: string;
+  workOrderId: string;
+  laborCatalogId?: string | null;
+  description: string;
+  technicianId?: string | null;
+  technician?: TechnicianProfile | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  status: ServiceStatus;
+  notes?: string | null;
+  serviceId: string;
+  estimatedMinutes?: number | null;
+  actualMinutes?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkOrderService {
+  id: string;
+  workOrderId: string;
+  cannedServiceId?: string | null;
+  cannedService?: CannedService | null;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  status: ServiceStatus;
+  notes?: string | null;
+  customerApproved: boolean;
+  customerRejected: boolean;
+  approvedAt?: string | null;
+  rejectedAt?: string | null;
+  customerNotes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  laborItems?: WorkOrderLaborItem[];
+}
+
 // ==================== Modal Props ====================
 
 export interface ManageWorkOrderModalProps {
