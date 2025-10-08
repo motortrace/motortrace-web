@@ -23,6 +23,7 @@ import CannedServices from './pages/ServiceCenter/Services/CannedServices';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
+import CustomerManagement from './pages/ServiceCenter/CustomerManagement';
 import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
 import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
 import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
@@ -126,6 +127,7 @@ function App() {
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="customer" element={<CustomerManagement />} />
         </Route>
 
         {/* Manager Dashboard Routes */}
@@ -152,6 +154,7 @@ function App() {
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="customer" element={<CustomerManagement />} />
         </Route>
 
         <Route path="admin/login" element={<AdminLogin />} />
