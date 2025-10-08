@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import KanbanBoard from '../../components/KanbanBoard/KanbanBoard';
 import { ClipboardList, AlertCircle } from 'lucide-react';
 import './KanbanPage.scss';
-import ManageWorkOrderModal from '../../components/WorkOrderModal/ManageWorkOrderModal';
+import ManageWorkOrderModal from '../../components/ManageWorkOrderModal';
 import { type WorkOrder, getWorkOrders, updateWorkOrderStatus } from '../../utils/workOrdersApi';
 import { useAuth } from '../../hooks/useAuth';
 
