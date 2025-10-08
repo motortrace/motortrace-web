@@ -1,84 +1,116 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './CustomerManagement.scss';
+
+interface Vehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  licensePlate: string;
+}
+
+interface Appointment {
+  id: string;
+  status: string;
+  startTime: string;
+}
+
+interface WorkOrder {
+  id: string;
+  workOrderNumber: string;
+  status: string;
+}
+
+interface UserProfile {
+  id: string;
+  name: string;
+  phone: string;
+  profileImage: string | null;
+  role: string;
+  isRegistrationComplete: boolean;
+}
 
 interface Customer {
   id: string;
   name: string;
   email: string;
   phone: string;
-  vehicles: number;
-  lastVisit: string;
-  totalSpent: number;
-  status: 'Active' | 'Inactive';
   address?: string;
+  createdAt?: string;
+  userProfile?: UserProfile;
+  vehicles?: Vehicle[];
+  appointments?: Appointment[];
+  workOrders?: WorkOrder[];
 }
 
-const initialCustomers: Customer[] = [
-  {
-    id: 'cust1',
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '+94 77 123 4567',
-    vehicles: 2,
-    lastVisit: '2024-10-05',
-    totalSpent: 45000,
-    status: 'Active',
-    address: '123 Main St, Colombo',
-  },
-  {
-    id: 'cust2',
-    name: 'Jane Smith',
-    email: 'jane.smith@email.com',
-    phone: '+94 71 234 5678',
-    vehicles: 1,
-    lastVisit: '2024-09-28',
-    totalSpent: 32000,
-    status: 'Active',
-    address: '456 Galle Rd, Colombo',
-  },
-  {
-    id: 'cust3',
-    name: 'Robert Johnson',
-    email: 'robert.j@email.com',
-    phone: '+94 76 345 6789',
-    vehicles: 3,
-    lastVisit: '2024-08-15',
-    totalSpent: 78000,
-    status: 'Active',
-    address: '789 Kandy Rd, Kandy',
-  },
-  {
-    id: 'cust4',
-    name: 'Emily Davis',
-    email: 'emily.davis@email.com',
-    phone: '+94 70 456 7890',
-    vehicles: 1,
-    lastVisit: '2023-12-10',
-    totalSpent: 15000,
-    status: 'Inactive',
-    address: '321 Negombo Rd, Negombo',
-  },
-];
-
 const CustomerManagement: React.FC = () => {
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Search, sort, filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('Name (A-Z)');
-  const [statusFilter, setStatusFilter] = useState('All Statuses');
+  
+  // Pagination
+  const [limit] = useState(50);
+  const [offset] = useState(0);
 
   // Modal form state
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
-    vehicles: '',
-    status: 'Active',
     address: '',
   });
-  const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
+
+  // Fetch customers from API with debounce for search
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchCustomers();
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, limit, offset]);
+
+  const fetchCustomers = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const token = localStorage.getItem('token');
+      const params = new URLSearchParams({
+        limit: limit.toString(),
+        offset: offset.toString(),
+      });
+      
+      if (searchTerm) {
+        params.append('search', searchTerm);
+      }
+
+      const response = await fetch(`http://localhost:3000/customers?${params}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch customers');
+      }
+
+      const result = await response.json();
+      // Handle the response structure: { success, data: [...], message, pagination }
+      setCustomers(result.data || []);
+    } catch (err) {
+      console.error('Error fetching customers:', err);
+      setError('Failed to load customers. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleOpenAddModal = () => setIsAddModalOpen(true);
   const handleCloseAddModal = () => {
@@ -87,81 +119,73 @@ const CustomerManagement: React.FC = () => {
       name: '',
       email: '',
       phone: '',
-      vehicles: '',
-      status: 'Active',
       address: '',
     });
-    setError('');
+    setFormError('');
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAddCustomer = (e: React.FormEvent) => {
+  const handleAddCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone) {
-      setError('Please fill in all required fields.');
+      setFormError('Please fill in all required fields.');
       return;
     }
-    const newCustomer: Customer = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      vehicles: Number(form.vehicles) || 0,
-      lastVisit: new Date().toISOString().split('T')[0],
-      totalSpent: 0,
-      status: form.status as Customer['status'],
-      address: form.address,
-    };
-    setCustomers([...customers, newCustomer]);
-    handleCloseAddModal();
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3000/customers', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          address: form.address,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add customer');
+      }
+
+      // Refresh the customer list
+      await fetchCustomers();
+      handleCloseAddModal();
+    } catch (err) {
+      console.error('Error adding customer:', err);
+      setFormError('Failed to add customer. Please try again.');
+    }
   };
 
-  // --- Filtering, Searching, Sorting Logic ---
-  const filteredCustomers = customers.filter(customer => {
-    // Status filter
-    if (statusFilter !== 'All Statuses' && customer.status !== statusFilter) return false;
-    // Search
-    const search = searchTerm.toLowerCase();
-    if (search) {
-      const inName = customer.name.toLowerCase().includes(search);
-      const inEmail = customer.email.toLowerCase().includes(search);
-      const inPhone = customer.phone.toLowerCase().includes(search);
-      const inAddress = (customer.address || '').toLowerCase().includes(search);
-      return inName || inEmail || inPhone || inAddress;
-    }
-    return true;
-  });
+  const handleViewCustomer = (customerId: string) => {
+    // TODO: Navigate to customer detail page or open detail modal
+    console.log('View customer:', customerId);
+    // You can implement navigation to a detail page here
+    // navigate(`${basePath}/customer/${customerId}`);
+  };
 
-  const sortedCustomers = [...filteredCustomers].sort((a, b) => {
+  // --- Sorting Logic ---
+  const sortedCustomers = [...customers].sort((a, b) => {
     switch (sortOption) {
       case 'Name (A-Z)':
         return a.name.localeCompare(b.name);
       case 'Name (Z-A)':
         return b.name.localeCompare(a.name);
-      case 'Total Spent (High-Low)':
-        return b.totalSpent - a.totalSpent;
-      case 'Total Spent (Low-High)':
-        return a.totalSpent - b.totalSpent;
-      case 'Last Visit (Recent First)':
-        return new Date(b.lastVisit).getTime() - new Date(a.lastVisit).getTime();
-      case 'Last Visit (Oldest First)':
-        return new Date(a.lastVisit).getTime() - new Date(b.lastVisit).getTime();
+      case 'Email (A-Z)':
+        return a.email.localeCompare(b.email);
+      case 'Email (Z-A)':
+        return b.email.localeCompare(a.email);
       default:
         return 0;
     }
   });
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `Rs. ${amount.toLocaleString()}`;
-  };
 
   return (
     <div className="customer-management">
@@ -200,56 +224,105 @@ const CustomerManagement: React.FC = () => {
         >
           <option value="Name (A-Z)">Sort by Name (A-Z)</option>
           <option value="Name (Z-A)">Sort by Name (Z-A)</option>
-          <option value="Total Spent (High-Low)">Total Spent (High-Low)</option>
-          <option value="Total Spent (Low-High)">Total Spent (Low-High)</option>
-          <option value="Last Visit (Recent First)">Last Visit (Recent First)</option>
-          <option value="Last Visit (Oldest First)">Last Visit (Oldest First)</option>
-        </select>
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          style={{ padding: '10px 12px', border: '2px solid #e5e7eb', borderRadius: 8, fontSize: 14, color: '#374151', background: 'white', fontFamily: 'Poppins' }}
-        >
-          <option value="All Statuses">All Statuses</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
+          <option value="Email (A-Z)">Sort by Email (A-Z)</option>
+          <option value="Email (Z-A)">Sort by Email (Z-A)</option>
         </select>
       </div>
 
+      {/* Loading and Error States */}
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '40px', fontFamily: 'Poppins', color: '#6b7280' }}>
+          Loading customers...
+        </div>
+      )}
+      {error && (
+        <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'Poppins', color: '#dc2626', background: '#fee2e2', borderRadius: 8, marginBottom: 18 }}>
+          {error}
+        </div>
+      )}
+
       {/* Customer Table */}
-      <div className="customer-management__table" style={{ width: '100%', border: '2px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
-        <div className="customer-management__table-header" style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr 1.5fr 1fr 1fr 1.2fr 1fr', background: '#f8f9fa', padding: '16px 20px', gap: 16, fontWeight: 600, color: '#656970', fontFamily: 'Poppins', fontSize: 13 }}>
-          <div>Name</div>
-          <div>Email</div>
-          <div>Phone</div>
-          <div>Vehicles</div>
-          <div>Last Visit</div>
-          <div>Total Spent</div>
-          <div>Status</div>
-        </div>
-        <div className="customer-management__table-body" style={{ display: 'flex', flexDirection: 'column' }}>
-          {sortedCustomers.map(customer => (
-            <div key={customer.id} className="customer-management__row" style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr 1.5fr 1fr 1fr 1.2fr 1fr', gap: 16, alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #f1f3f5', fontFamily: 'Poppins', fontSize: 14, color: '#374151' }}>
-              <div style={{ fontWeight: 600 }}>{customer.name}</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>{customer.email}</div>
-              <div>{customer.phone}</div>
-              <div>{customer.vehicles}</div>
-              <div>{formatDate(customer.lastVisit)}</div>
-              <div style={{ fontWeight: 600, color: '#10b981' }}>{formatCurrency(customer.totalSpent)}</div>
-              <div>
-                <span style={{
-                  fontWeight: 600,
-                  padding: '4px 12px',
-                  borderRadius: 12,
-                  fontSize: 12,
-                  backgroundColor: customer.status === 'Active' ? '#d1fae5' : '#f3f4f6',
-                  color: customer.status === 'Active' ? '#10b981' : '#6b7280',
-                }}>{customer.status}</span>
+      {!loading && !error && (
+        <div className="customer-management__table" style={{ width: '100%', border: '2px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
+          <div className="customer-management__table-header" style={{ display: 'grid', gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1fr 1fr 1fr 0.8fr', background: '#f8f9fa', padding: '16px 20px', gap: 16, fontWeight: 600, color: '#656970', fontFamily: 'Poppins', fontSize: 13 }}>
+            <div>Name</div>
+            <div>Email</div>
+            <div>Phone</div>
+            <div style={{ textAlign: 'center' }}>Vehicles</div>
+            <div style={{ textAlign: 'center' }}>Appointments</div>
+            <div style={{ textAlign: 'center' }}>Work Orders</div>
+            <div style={{ textAlign: 'center' }}>Actions</div>
+          </div>
+          <div className="customer-management__table-body" style={{ display: 'flex', flexDirection: 'column' }}>
+            {sortedCustomers.length > 0 ? (
+              sortedCustomers.map(customer => (
+                <div key={customer.id} className="customer-management__row" style={{ display: 'grid', gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1fr 1fr 1fr 0.8fr', gap: 16, alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #f1f3f5', fontFamily: 'Poppins', fontSize: 14, color: '#374151' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      background: customer.userProfile?.profileImage ? 'transparent' : '#e5e7eb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      {customer.userProfile?.profileImage ? (
+                        <img 
+                          src={customer.userProfile.profileImage} 
+                          alt={customer.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <i className="bx bx-user" style={{ fontSize: 22, color: '#9ca3af' }}></i>
+                      )}
+                    </div>
+                    <span style={{ fontWeight: 600 }}>{customer.name}</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#6b7280' }}>{customer.email}</div>
+                  <div>{customer.phone}</div>
+                  <div style={{ textAlign: 'center', fontWeight: 600, color: '#0ea5e9' }}>
+                    {customer.vehicles?.length || 0}
+                  </div>
+                  <div style={{ textAlign: 'center', fontWeight: 600, color: '#8b5cf6' }}>
+                    {customer.appointments?.length || 0}
+                  </div>
+                  <div style={{ textAlign: 'center', fontWeight: 600, color: '#10b981' }}>
+                    {customer.workOrders?.length || 0}
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <button
+                      onClick={() => handleViewCustomer(customer.id)}
+                      style={{
+                        background: '#f3f4f6',
+                        border: 'none',
+                        borderRadius: 6,
+                        padding: '6px 10px',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background 0.2s',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#e5e7eb'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = '#f3f4f6'}
+                      title="View Details"
+                    >
+                      <i className="bx bx-box" style={{ fontSize: 18, color: '#374151' }}></i>
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px', fontFamily: 'Poppins', color: '#9ca3af' }}>
+                No customers found
               </div>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Add Customer Modal */}
       {isAddModalOpen && (
@@ -260,13 +333,8 @@ const CustomerManagement: React.FC = () => {
               <input name="name" value={form.name} onChange={handleFormChange} placeholder="Full Name *" style={inputStyle} required />
               <input name="email" value={form.email} onChange={handleFormChange} placeholder="Email *" style={inputStyle} type="email" required />
               <input name="phone" value={form.phone} onChange={handleFormChange} placeholder="Phone Number *" style={inputStyle} required />
-              <input name="vehicles" value={form.vehicles} onChange={handleFormChange} placeholder="Number of Vehicles" style={inputStyle} type="number" min={0} />
               <input name="address" value={form.address} onChange={handleFormChange} placeholder="Address (optional)" style={inputStyle} />
-              <select name="status" value={form.status} onChange={handleFormChange} style={inputStyle}>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              {error && <div style={{ color: '#dc2626', fontSize: 13, marginTop: 8 }}>{error}</div>}
+              {formError && <div style={{ color: '#dc2626', fontSize: 13, marginTop: 8 }}>{formError}</div>}
               <div style={{ display: 'flex', gap: 12, marginTop: 18, justifyContent: 'flex-end' }}>
                 <button type="button" onClick={handleCloseAddModal} style={{ ...buttonStyle, background: '#f3f4f6', color: '#374151' }}>Cancel</button>
                 <button type="submit" style={{ ...buttonStyle, background: '#0ea5e9', color: 'white' }}>Add Customer</button>
