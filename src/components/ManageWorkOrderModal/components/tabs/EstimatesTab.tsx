@@ -19,39 +19,10 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
   const [estimates, setEstimates] = useState<WorkOrderApproval[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [creatingEstimate, setCreatingEstimate] = useState(false);
 
   useEffect(() => {
-    if (!workOrderId || !token) {
-      if (!token) {
-        setError('Authentication required');
-        setLoading(false);
-      }
-      return;
-    }
-
-    setLoading(true);
-    fetch(`http://localhost:3000/work-orders/${workOrderId}/approvals`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(apiRes => {
-        let estimatesArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
-        setEstimates(estimatesArr || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error fetching estimates:', err);
-        setError('Failed to fetch estimates');
-        setLoading(false);
-      });
+    fetchEstimates();
   }, [workOrderId, token]);
 
   if (loading) return <div className="tab-content estimates-tab">Loading estimates...</div>;
@@ -112,6 +83,69 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
     return approvedBy && approvedBy.name;
   };
 
+  // Function to create a new estimate
+  const handleCreateEstimate = async () => {
+    if (!token || !workOrderId) return;
+
+    setCreatingEstimate(true);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}/generate-estimate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+        // No body needed for generate-estimate endpoint
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Refresh the estimates list after successful creation
+      await fetchEstimates();
+    } catch (err) {
+      console.error('Error creating estimate:', err);
+      // Error is handled silently - could add error state if needed
+    } finally {
+      setCreatingEstimate(false);
+    }
+  };
+
+  // Function to fetch estimates (extracted for reuse)
+  const fetchEstimates = async () => {
+    if (!workOrderId || !token) {
+      if (!token) {
+        setError('Authentication required');
+        setLoading(false);
+      }
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}/approvals`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const apiRes = await response.json();
+      let estimatesArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
+      setEstimates(estimatesArr || []);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching estimates:', err);
+      setError('Failed to fetch estimates');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="tab-content estimates-tab">
       {/* Header with search and action buttons */}
@@ -147,9 +181,11 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
             <button
               className="btn btn--secondary"
               style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={handleCreateEstimate}
+              disabled={creatingEstimate}
             >
               <i className="bx bx-plus"></i>
-              Create Estimate
+              {creatingEstimate ? 'Creating...' : 'Create Estimate'}
             </button>
             <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="bx bx-file"></i>

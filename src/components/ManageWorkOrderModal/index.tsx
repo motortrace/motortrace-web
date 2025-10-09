@@ -145,10 +145,6 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
             </button>
-            <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <i className="bx bx-calculator"></i>
-              Publish Estimate
-            </button>
             {!isServiceAdvisor && (
               <button 
                 className="btn btn--secondary" 
