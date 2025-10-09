@@ -291,7 +291,7 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
                     <button
                       className="pdf-btn"
                       title="View PDF"
-                      onClick={() => alert(`View PDF for estimate ${estimate.id}`)}
+                      onClick={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
                       style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
                     >
                       <i className="bx bx-file"></i>
