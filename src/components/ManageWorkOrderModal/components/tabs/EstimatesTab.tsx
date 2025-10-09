@@ -21,6 +21,40 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
   const [error, setError] = useState('');
   const [creatingEstimate, setCreatingEstimate] = useState(false);
 
+  // Function to fetch estimates (extracted for reuse)
+  const fetchEstimates = async () => {
+    if (!workOrderId || !token) {
+      if (!token) {
+        setError('Authentication required');
+        setLoading(false);
+      }
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}/approvals`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const apiRes = await response.json();
+      let estimatesArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
+      setEstimates(estimatesArr || []);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching estimates:', err);
+      setError('Failed to fetch estimates');
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchEstimates();
   }, [workOrderId, token]);
@@ -109,40 +143,6 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
       // Error is handled silently - could add error state if needed
     } finally {
       setCreatingEstimate(false);
-    }
-  };
-
-  // Function to fetch estimates (extracted for reuse)
-  const fetchEstimates = async () => {
-    if (!workOrderId || !token) {
-      if (!token) {
-        setError('Authentication required');
-        setLoading(false);
-      }
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}/approvals`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const apiRes = await response.json();
-      let estimatesArr = Array.isArray(apiRes) ? apiRes : (Array.isArray(apiRes.data) ? apiRes.data : []);
-      setEstimates(estimatesArr || []);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching estimates:', err);
-      setError('Failed to fetch estimates');
-      setLoading(false);
     }
   };
 
