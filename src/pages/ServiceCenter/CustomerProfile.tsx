@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DetailsTab, PaymentsTab } from './CustomerProfileTabs';
+import { DetailsTab, PaymentsTab, AppointmentTab } from './CustomerProfileTabs';
 import './CustomerProfile.scss';
 
 interface Vehicle {
@@ -43,6 +43,15 @@ interface Conversation {
   unread: boolean;
 }
 
+interface Appointment {
+  id: string;
+  date: string;
+  time: string;
+  service: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  customerName?: string;
+}
+
 interface CustomerDetails {
   id: string;
   name: string;
@@ -57,13 +66,14 @@ interface CustomerDetails {
   vehicles?: Vehicle[];
   workOrders?: WorkOrder[];
   payments?: Payment[];
+  appointments?: Appointment[];
   conversations?: Conversation[];
   totalSpent?: number;
   lastPaymentDate?: string;
   lastPaymentAmount?: number;
 }
 
-type TabType = 'details' | 'payments';
+type TabType = 'details' | 'payments' | 'appointment';
 
 interface TabConfig {
   id: TabType;
@@ -131,25 +141,28 @@ const CustomerProfile: React.FC = () => {
       label: 'Details',
       component: DetailsTab
     },
+    {
+      id: 'appointment',
+      label: 'Appointment',
+      component: AppointmentTab
+    },
     { 
       id: 'payments', 
       label: 'Payments',
       component: PaymentsTab
     },
-    // Add more tabs here as needed:
-    // { id: 'workorders', label: 'Work Orders', component: WorkOrdersTab },
-    // { id: 'history', label: 'Service History', component: ServiceHistoryTab },
-    // { id: 'notes', label: 'Notes', component: NotesTab },
+
   ];
 
   const getTabProps = (tabId: TabType) => {
     if (!customer) return {};
-    
     switch (tabId) {
       case 'details':
         return { customer };
       case 'payments':
         return { payments: customer.payments || [] };
+      case 'appointment':
+        return { appointments: customer.appointments || [] };
       default:
         return {};
     }
