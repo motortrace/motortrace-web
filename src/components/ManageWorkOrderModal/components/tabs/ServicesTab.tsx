@@ -103,20 +103,20 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   const getApprovalBadge = (service: WorkOrderService) => {
     if (service.customerApproved) {
       return (
-        <span className="approval-badge approval-badge--approved">
+        <span className="status-badge status-badge--completed">
           <i className="bx bx-check-circle"></i> Approved
         </span>
       );
     }
     if (service.customerRejected) {
       return (
-        <span className="approval-badge approval-badge--rejected">
+        <span className="status-badge status-badge--cancelled">
           <i className="bx bx-x-circle"></i> Rejected
         </span>
       );
     }
     return (
-      <span className="approval-badge approval-badge--pending">
+      <span className="status-badge status-badge--pending">
         <i className="bx bx-time-five"></i> Pending Approval
       </span>
     );
@@ -238,45 +238,35 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   return (
     <div className="tab-content" style={{ padding: '24px' }}>
       {/* Services Summary */}
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ flex: 1, padding: '20px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-          <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>Total Services</div>
-          <div style={{ fontSize: '32px', fontWeight: '600', color: '#111827' }}>{services.length}</div>
+      <div className="services-summary-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20, marginBottom: 24, width: '100%' }}>
+        <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Services</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>{services.length}</div>
         </div>
-        <div style={{ flex: 1, padding: '20px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-          <div style={{ fontSize: '14px', color: '#6c806bff', marginBottom: '8px' }}>Completed</div>
-          <div style={{ fontSize: '32px', fontWeight: '600', color: '#10b981' }}>
+        <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Completed</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>
             {services.filter(s => s.status === 'COMPLETED').length}
           </div>
         </div>
-        <div style={{ flex: 1, padding: '20px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-          <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>Total Amount</div>
-          <div style={{ fontSize: '32px', fontWeight: '600', color: '#111827' }}>
+        <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Amount</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>
             LKR {services.reduce((sum, s) => sum + Number(s.subtotal), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
         </div>
       </div>
 
       {/* Services Table */}
-      <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="services-table-container full-width-table">
+        <table className="services-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
           <thead>
-            <tr style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-              <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Service Description
-              </th>
-              <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Subtotal
-              </th>
-              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Status
-              </th>
-              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Approval
-              </th>
-              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', width: '150px' }} title="Labor items and assignment">
-                Labor
-              </th>
+            <tr style={{ background: '#f9fafb' }}>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Service Description</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Subtotal</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Approval</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', width: '150px' }} title="Labor items and assignment">Labor</th>
             </tr>
           </thead>
           <tbody>
@@ -289,7 +279,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                 <React.Fragment key={service.id}>
                   {/* Service Row */}
                   <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={{ padding: '16px', verticalAlign: 'top' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'left', verticalAlign: 'middle' }}>
                       <div style={{ fontWeight: '500', color: '#111827', marginBottom: '4px' }}>
                         {service.description}
                       </div>
@@ -304,72 +294,37 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                         </div>
                       )}
                     </td>
-                    <td style={{ padding: '16px', textAlign: 'right', verticalAlign: 'top' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                       <span style={{ fontWeight: '600', color: '#111827', fontSize: '15px' }}>
                         LKR {Number(service.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </span>
                     </td>
-                    <td style={{ padding: '16px', textAlign: 'center', verticalAlign: 'top' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                       <span className={`status-badge ${getStatusBadgeClass(service.status)}`}>
                         {service.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td style={{ padding: '16px', textAlign: 'center', verticalAlign: 'top' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                       {getApprovalBadge(service)}
                     </td>
-                    <td style={{ padding: '16px', textAlign: 'center', verticalAlign: 'top' }}>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                         {hasLaborItems && (
                           <button
                             onClick={() => handleServiceAssignClick(service)}
-                            style={{
-                              background: 'none',
-                              border: '1px solid #e5e7eb',
-                              cursor: 'pointer',
-                              padding: '6px 10px',
-                              borderRadius: '6px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              color: '#6366f1',
-                              fontSize: '13px',
-                              fontWeight: '500',
-                              transition: 'all 0.2s'
-                            }}
+                            style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
                             title="Assign technician to all labor items"
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = '#eff6ff';
-                              e.currentTarget.style.borderColor = '#6366f1';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = 'transparent';
-                              e.currentTarget.style.borderColor = '#e5e7eb';
-                            }}
                           >
                             <i className="bx bx-user-check" style={{ fontSize: '16px' }}></i>
-                            
                           </button>
                         )}
                         {hasLaborItems ? (
                         <button
                           onClick={() => toggleServiceExpansion(service.id)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            margin: '0 auto',
-                            color: '#6366f1',
-                            fontSize: '13px',
-                            fontWeight: '500',
-                          }}
+                          style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                          title="Toggle labor items"
                         >
                           <i className={`bx bx-chevron-${isExpanded ? 'up' : 'down'}`} style={{ fontSize: '18px' }}></i>
-                          {service.laborItems!.length}
                         </button>
                       ) : (
                         <span style={{ color: '#9ca3af', fontSize: '13px' }}>—</span>
@@ -381,7 +336,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                   {/* Expanded Labor Items */}
                   {isExpanded && hasLaborItems && (
                     <tr style={{ backgroundColor: '#f9fafb' }}>
-                      <td colSpan={6} style={{ padding: '0' }}>
+                      <td colSpan={6} style={{ padding: '0', border: '1px solid #e5e7eb' }}>
                         <div style={{ padding: '16px 24px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                             <i className="bx bx-wrench" style={{ fontSize: '16px', color: '#6b7280' }}></i>
@@ -395,34 +350,22 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                           </div>
 
                           {/* Labor Items Table */}
-                          <div style={{ backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                          <div className="labor-table-container" style={{ backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+                            <table className="labor-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                               <thead>
-                                <tr style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #e5e7eb' }}>
-                                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                                    Description
-                                  </th>
-                                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                                    Technician
-                                  </th>
-                                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                                    Estimated
-                                  </th>
-                                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>
-                                    Actual
-                                  </th>
-                                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: '#6d806bff', textTransform: 'uppercase' }}>
-                                    Status
-                                  </th>
-                                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', width: '100px' }}>
-                                    Action
-                                  </th>
+                                <tr style={{ backgroundColor: '#fafafa' }}>
+                                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'left' }}>Description</th>
+                                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>Technician</th>
+                                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>Estimated</th>
+                                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>Actual</th>
+                                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center' }}>Status</th>
+                                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', width: '100px' }}>Action</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {service.laborItems!.map((labor, index) => (
                                   <tr key={labor.id} style={{ borderBottom: index < service.laborItems!.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-                                    <td style={{ padding: '12px', verticalAlign: 'top' }}>
+                                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'left', verticalAlign: 'middle' }}>
                                       <div style={{ fontSize: '14px', color: '#111827', fontWeight: '500', marginBottom: '4px' }}>
                                         {labor.description}
                                       </div>
@@ -437,9 +380,9 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                         </div>
                                       )}
                                     </td>
-                                    <td style={{ padding: '12px', verticalAlign: 'top' }}>
+                                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       {labor.technician ? (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                           <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600', color: '#6366f1' }}>
                                             {getTechnicianDisplayName(labor.technician).charAt(0)}
                                           </div>
@@ -451,7 +394,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                         <span style={{ fontSize: '13px', color: '#9ca3af' }}>Not assigned</span>
                                       )}
                                     </td>
-                                    <td style={{ padding: '12px', textAlign: 'center', verticalAlign: 'top' }}>
+                                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       {labor.estimatedMinutes ? (
                                         <span style={{ fontSize: '14px', color: '#6b7280' }}>
                                           {formatMinutes(labor.estimatedMinutes)}
@@ -460,7 +403,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                         <span style={{ color: '#9ca3af' }}>—</span>
                                       )}
                                     </td>
-                                    <td style={{ padding: '12px', textAlign: 'center', verticalAlign: 'top' }}>
+                                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       {labor.actualMinutes ? (
                                         <span style={{ fontSize: '14px', color: '#10b981', fontWeight: '500' }}>
                                           {formatMinutes(labor.actualMinutes)}
@@ -469,41 +412,18 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                         <span style={{ color: '#9ca3af' }}>—</span>
                                       )}
                                     </td>
-                                    <td style={{ padding: '12px', textAlign: 'center', verticalAlign: 'top' }}>
+                                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       <span className={`status-badge ${getStatusBadgeClass(labor.status)}`} style={{ fontSize: '11px' }}>
                                         {labor.status.replace('_', ' ')}
                                       </span>
                                     </td>
-                                    <td style={{ padding: '12px', textAlign: 'center', verticalAlign: 'top' }}>
+                                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       <button
                                         onClick={() => handleLaborAssignClick(labor)}
-                                        style={{
-                                          background: 'none',
-                                          border: '1px solid #e5e7eb',
-                                          cursor: 'pointer',
-                                          padding: '4px 8px',
-                                          borderRadius: '4px',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: '4px',
-                                          margin: '0 auto',
-                                          color: '#6366f1',
-                                          fontSize: '12px',
-                                          fontWeight: '500',
-                                          transition: 'all 0.2s'
-                                        }}
+                                        style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
                                         title="Assign technician to this labor item"
-                                        onMouseEnter={(e) => {
-                                          e.currentTarget.style.backgroundColor = '#eff6ff';
-                                          e.currentTarget.style.borderColor = '#6366f1';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                          e.currentTarget.style.backgroundColor = 'transparent';
-                                          e.currentTarget.style.borderColor = '#e5e7eb';
-                                        }}
                                       >
                                         <i className="bx bx-user-plus" style={{ fontSize: '14px' }}></i>
-                                        Assign
                                       </button>
                                     </td>
                                   </tr>
