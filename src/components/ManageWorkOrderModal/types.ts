@@ -208,6 +208,32 @@ export interface TechnicianWithStatus extends Technician {
   isBusy: boolean;
 }
 
+// ==================== Work Order Approval Types ====================
+
+export interface WorkOrderApproval {
+  id: string;
+  workOrderId: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'EXPIRED';
+  requestedAt: string;
+  approvedAt: string | null;
+  approvedById: string | null;
+  method: string | null;
+  notes: string | null;
+  customerSignature: string | null;
+  pdfUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+  approvedBy?: {
+    id: string;
+    employeeId: string;
+    userProfile: {
+      id: string;
+      name: string;
+      profileImage?: string | null;
+    };
+  } | null;
+}
+
 // ==================== Modal Props ====================
 
 export interface ManageWorkOrderModalProps {

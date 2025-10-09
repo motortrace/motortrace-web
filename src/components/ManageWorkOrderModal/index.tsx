@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
 import InspectionsTab from './components/tabs/InspectionsTab';
+import EstimatesTab from './components/tabs/EstimatesTab';
 import ServicesTab from './components/tabs/ServicesTab';
 import AddInspectionModal from './components/modals/AddInspectionModal';
 import AssignTechnicianModal from './components/modals/AssignTechnicianModal';
@@ -184,6 +185,13 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
             {/* Services tab */}
             {activeTab === 'services' && (
               <ServicesTab workOrderId={workOrder.id} />
+            )}
+
+            {activeTab === 'estimates' && (
+              <EstimatesTab
+                workOrderId={workOrder.id}
+                isServiceAdvisor={isServiceAdvisor}
+              />
             )}
 
             {/* Notes tab - Excluded per user request */}
