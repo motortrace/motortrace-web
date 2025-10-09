@@ -230,6 +230,36 @@ export interface WorkOrderApproval {
   } | null;
 }
 
+// ==================== Payment Types ====================
+
+export type PaymentMethod = 'CASH' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'BANK_TRANSFER' | 'UPI' | 'CHEQUE' | 'DIGITAL_WALLET' | 'INSURANCE' | 'WARRANTY';
+
+export type PaymentStatus = 'PENDING' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'COMPLETED' | 'FAILED' | 'REFUNDED' | 'PARTIAL_REFUND' | 'CANCELLED';
+
+export interface WorkOrderPayment {
+  id: string;
+  workOrderId: string;
+  method: PaymentMethod;
+  amount: number;
+  reference?: string;
+  status: PaymentStatus;
+  paidAt: string;
+  processedById?: string;
+  notes?: string;
+  refundAmount?: number;
+  refundReason?: string;
+  createdAt: string;
+  updatedAt: string;
+  processedBy?: {
+    id: string;
+    employeeId: string;
+    userProfile: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
 // ==================== Modal Props ====================
 
 export interface ManageWorkOrderModalProps {

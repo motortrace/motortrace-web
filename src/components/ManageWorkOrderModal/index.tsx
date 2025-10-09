@@ -4,6 +4,7 @@ import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
 import InspectionsTab from './components/tabs/InspectionsTab';
 import EstimatesTab from './components/tabs/EstimatesTab';
+import PaymentsTab from './components/tabs/PaymentsTab';
 import ServicesTab from './components/tabs/ServicesTab';
 import AddInspectionModal from './components/modals/AddInspectionModal';
 import AssignTechnicianModal from './components/modals/AssignTechnicianModal';
@@ -185,6 +186,13 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
 
             {activeTab === 'estimates' && (
               <EstimatesTab
+                workOrderId={workOrder.id}
+                isServiceAdvisor={isServiceAdvisor}
+              />
+            )}
+
+            {activeTab === 'payments' && (
+              <PaymentsTab
                 workOrderId={workOrder.id}
                 isServiceAdvisor={isServiceAdvisor}
               />

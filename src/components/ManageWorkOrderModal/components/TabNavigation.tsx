@@ -37,6 +37,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
     // Only show Services tab for manager/admin roles, not for service advisors
     ...(isServiceAdvisor ? [] : [{ id: 'services', label: 'Services', icon: 'bx-wrench' }]),
     { id: 'estimates', label: 'Estimates', icon: 'bx-calculator' },
+    { id: 'payments', label: 'Payments', icon: 'bx-credit-card' },
     { id: 'notes', label: 'Notes', icon: 'bx-note' },
   ];
 
