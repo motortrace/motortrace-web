@@ -24,6 +24,7 @@ import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
 import CustomerManagement from './pages/ServiceCenter/CustomerManagement';
+import CustomerProfile from './pages/ServiceCenter/CustomerProfile';
 import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
 import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
 import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
@@ -128,6 +129,7 @@ function App() {
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
           <Route path="customer" element={<CustomerManagement />} />
+          <Route path="customer/:customerId" element={<CustomerProfile />} />
         </Route>
 
         {/* Manager Dashboard Routes */}
@@ -155,6 +157,7 @@ function App() {
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
           <Route path="customer" element={<CustomerManagement />} />
+          <Route path="customer/:customerId" element={<CustomerProfile />} />
         </Route>
 
         <Route path="admin/login" element={<AdminLogin />} />

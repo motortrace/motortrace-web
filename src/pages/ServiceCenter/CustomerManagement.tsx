@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './CustomerManagement.scss';
 
 interface Vehicle {
@@ -44,6 +45,7 @@ interface Customer {
 }
 
 const CustomerManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -165,10 +167,10 @@ const CustomerManagement: React.FC = () => {
   };
 
   const handleViewCustomer = (customerId: string) => {
-    // TODO: Navigate to customer detail page or open detail modal
-    console.log('View customer:', customerId);
-    // You can implement navigation to a detail page here
-    // navigate(`${basePath}/customer/${customerId}`);
+    // Get the base path from current location (either /serviceadvisor or /manager)
+    const currentPath = window.location.pathname;
+    const basePath = currentPath.includes('/serviceadvisor') ? '/serviceadvisor' : '/manager';
+    navigate(`${basePath}/customer/${customerId}`);
   };
 
   // --- Sorting Logic ---
