@@ -383,9 +383,17 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       {labor.technician ? (
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600', color: '#6366f1' }}>
-                                            {getTechnicianDisplayName(labor.technician).charAt(0)}
-                                          </div>
+                                          {labor.technician.userProfile?.profileImage ? (
+                                            <img 
+                                              src={labor.technician.userProfile.profileImage} 
+                                              alt={getTechnicianDisplayName(labor.technician)} 
+                                              style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} 
+                                            />
+                                          ) : (
+                                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600', color: '#6366f1' }}>
+                                              {getTechnicianDisplayName(labor.technician).charAt(0)}
+                                            </div>
+                                          )}
                                           <span style={{ fontSize: '14px', color: '#111827' }}>
                                             {getTechnicianDisplayName(labor.technician)}
                                           </span>
