@@ -225,12 +225,8 @@ export interface WorkOrderApproval {
   updatedAt: string;
   approvedBy?: {
     id: string;
-    employeeId: string;
-    userProfile: {
-      id: string;
-      name: string;
-      profileImage?: string | null;
-    };
+    name: string;
+    profileImage?: string | null;
   } | null;
 }
 

@@ -100,18 +100,16 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
   // Helper functions for profile display
   const getProfileName = (approvedBy: any) => {
     if (!approvedBy) return 'N/A';
-    if (approvedBy.userProfile && approvedBy.userProfile.name) return approvedBy.userProfile.name;
-    return 'N/A';
+    return approvedBy.name || 'N/A';
   };
 
   const getProfileImage = (approvedBy: any) => {
     if (!approvedBy) return null;
-    if (approvedBy.userProfile && approvedBy.userProfile.profileImage) return approvedBy.userProfile.profileImage;
-    return null;
+    return approvedBy.profileImage || null;
   };
 
   const isProfileAvailable = (approvedBy: any) => {
-    return approvedBy && approvedBy.userProfile && approvedBy.userProfile.name;
+    return approvedBy && approvedBy.name;
   };
 
   return (
