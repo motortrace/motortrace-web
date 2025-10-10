@@ -312,7 +312,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                         {hasLaborItems && (
                           <button
                             onClick={() => handleServiceAssignClick(service)}
-                            style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                            style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
                             title="Assign technician to all labor items"
                           >
                             <i className="bx bx-user-check" style={{ fontSize: '16px' }}></i>
@@ -428,7 +428,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       <button
                                         onClick={() => handleLaborAssignClick(labor)}
-                                        style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                                        style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
                                         title="Assign technician to this labor item"
                                       >
                                         <i className="bx bx-user-plus" style={{ fontSize: '14px' }}></i>
