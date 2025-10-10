@@ -61,15 +61,16 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
    */
   const fetchInspectionTemplates = async () => {
     try {
-      const response = await fetch('http://localhost:3000/inspection-templates/templates', {
+      const response = await fetch('http://localhost:3000/inspection-templates/templates/available', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
-        const data = await response.json();
-        modalHook.setInspectionTemplates(data);
+        const result = await response.json();
+        const templates = result.success ? result.data : [];
+        modalHook.setInspectionTemplates(templates);
       }
     } catch (error) {
       console.error('Error fetching inspection templates:', error);

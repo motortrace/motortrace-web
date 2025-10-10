@@ -229,14 +229,6 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
                               <i className="bx bx-user-plus"></i>
                             </button>
                           )}
-                        <button 
-                          className={`send-btn ${inspection.isCompleted ? 'approved' : 'pending'}`}
-                          disabled={!inspection.isCompleted}
-                          title={inspection.isCompleted ? "Send Report" : "Inspection must be completed to send"}
-                        >
-                          <i className="bx bx-send"></i>
-                          Send
-                        </button>
                       </div>
                     </td>
                   </tr>
