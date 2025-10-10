@@ -149,7 +149,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
             {!isServiceAdvisor && (
               <button 
                 className="btn btn--secondary" 
-                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#3b82f6', color: '#fff', borderColor: '#3b82f6' }}
                 onClick={modalHook.openGenerateInvoiceModal}
               >
                 <i className="bx bx-receipt"></i>
