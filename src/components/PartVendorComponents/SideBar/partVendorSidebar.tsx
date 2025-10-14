@@ -55,12 +55,6 @@ const menuGroups: MenuGroup[] = [
       ]
     },
   {
-    title: 'Reports',
-    items: [
-      { id: 'reports', label: 'Reports', icon: 'bx bx-bar-chart-alt-2', route: '/PartVendor/ReportsSummary' },
-    ]
-  },
-  {
     title: 'Profile',
     items: [
       { id: 'profile', label: 'Profile', icon: 'bx bx-user', route: '/PartVendor/ProfilePartVendor' },

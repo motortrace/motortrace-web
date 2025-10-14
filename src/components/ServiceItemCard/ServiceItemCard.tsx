@@ -1,17 +1,7 @@
 import React from 'react';
 import { Clock, User, Car } from 'lucide-react';
 import './ServiceItemCard.scss';
-
-interface WorkOrder {
-  id: string;
-  workOrderNumber: string;
-  customer: string;
-  vehicle: string;
-  assignedTechnician: string;
-  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
-  description?: string;
-  priority: 'high' | 'medium' | 'low';
-}
+import { type WorkOrder } from '../../utils/workOrdersApi';
 
 interface ServiceItemCardProps {
   serviceItem: WorkOrder;
@@ -19,28 +9,34 @@ interface ServiceItemCardProps {
   getTypeIcon: () => React.ReactNode;
   getTypeColor: () => string;
   getPriorityColor: (priority: WorkOrder['priority']) => string;
-  onClick?: () => void; // Add this line
+  onClick?: () => void;
 }
 
 const getPriorityIndicator = (priority: WorkOrder['priority']) => {
   switch (priority) {
-    case 'high':
+    case 'HIGH':
       return {
         color: '#dc2626',
         backgroundColor: '#fef2f2',
         borderColor: '#fecaca'
       };
-    case 'medium':
+    case 'MEDIUM':
       return {
         color: '#d97706',
         backgroundColor: '#fffbeb',
         borderColor: '#fed7aa'
       };
-    case 'low':
+    case 'LOW':
       return {
         color: '#059669',
         backgroundColor: '#f0fdf4',
         borderColor: '#bbf7d0'
+      };
+    case 'NORMAL':
+      return {
+        color: '#64748b',
+        backgroundColor: '#f8fafc',
+        borderColor: '#e2e8f0'
       };
     default:
       return {
@@ -51,15 +47,19 @@ const getPriorityIndicator = (priority: WorkOrder['priority']) => {
   }
 };
 
-const getVehicleImage = (vehicle: string) => {
-  // Simple mapping for demo; in real app, use a better mapping or a vehicle image API
-  const lower = vehicle.toLowerCase();
-  if (lower.includes('camry')) return 'https://platform.cstatic-images.com/xxlarge/in/v2/stock_photos/8760bf48-c1a5-42f7-a83b-1cd39e2efbec/57ee2adf-a4a3-4757-8f50-6d85fcf5a351.png';
-  if (lower.includes('cr-v')) return 'https://di-uploads-pod11.dealerinspire.com/hondaofkirkland/uploads/2019/08/2019-Honda-CR-V-LX-2WD-1.png';
-  if (lower.includes('f-150')) return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZGOHHY8IeOYnZJ1iILcd8v-8kzs8hZ0QIVg&s';
-  if (lower.includes('altima')) return 'https://di-shared-assets.dealerinspire.com/legacy/rackspace/ldm-images/2021-Nissan-Altima-hero.png';
-  if (lower.includes('x5')) return 'https://larte-design.com/storage/app/media/models/bmw/x5m-competition-front-site-carbon-gray-donington.webp';
-  if (lower.includes('a4')) return 'https://images.dealer.com/ddc/vehicles/2025/Audi/A4/Sedan/color/Navarra%20Blue%20Metallic-2D2D-10,33,127-320-en_US.jpg';
+const getVehicleImage = (vehicle: WorkOrder['vehicle']) => {
+  if (!vehicle) return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
+  if (vehicle.imageUrl && typeof vehicle.imageUrl === 'string' && vehicle.imageUrl.trim() !== '') {
+    return vehicle.imageUrl;
+  }
+  const make = vehicle.make?.toLowerCase() || '';
+  const model = vehicle.model?.toLowerCase() || '';
+  if (make.includes('toyota') && model.includes('camry')) return 'https://platform.cstatic-images.com/xxlarge/in/v2/stock_photos/8760bf48-c1a5-42f7-a83b-1cd39e2efbec/57ee2adf-a4a3-4757-8f50-6d85fcf5a351.png';
+  if (make.includes('honda') && model.includes('cr-v')) return 'https://di-uploads-pod11.dealerinspire.com/hondaofkirkland/uploads/2019/08/2019-Honda-CR-V-LX-2WD-1.png';
+  if (make.includes('ford') && model.includes('f-150')) return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZGOHHY8IeOYnZJ1iILcd8v-8kzs8hZ0QIVg&s';
+  if (make.includes('nissan') && model.includes('altima')) return 'https://di-shared-assets.dealerinspire.com/legacy/rackspace/ldm-images/2021-Nissan-Altima-hero.png';
+  if (make.includes('bmw') && model.includes('x5')) return 'https://larte-design.com/storage/app/media/models/bmw/x5m-competition-front-site-carbon-gray-donington.webp';
+  if (make.includes('audi') && model.includes('a4')) return 'https://images.dealer.com/ddc/vehicles/2025/Audi/A4/Sedan/color/Navarra%20Blue%20Metallic-2D2D-10,33,127-320-en_US.jpg';
   // Default placeholder
   return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
 };
@@ -70,7 +70,7 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
   getTypeIcon,
   getTypeColor,
   getPriorityColor,
-  onClick // Add this line
+  onClick
 }) => {
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('text/plain', serviceItem.id);
@@ -92,12 +92,11 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
       />
 
       {/* Vehicle Image */}
-      <div className="vehicle-image-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '8px 0' }}>
+      <div className="vehicle-image-wrapper">
         <img
           src={getVehicleImage(serviceItem.vehicle)}
-          alt={serviceItem.vehicle}
+          alt={serviceItem.vehicle ? `${serviceItem.vehicle.year} ${serviceItem.vehicle.make} ${serviceItem.vehicle.model}` : 'Vehicle'}
           className="vehicle-image"
-          style={{ width: 200, height: 200, objectFit: 'contain', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
         />
       </div>
 
@@ -110,7 +109,7 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
 
       {/* Card Title (Customer + Vehicle) */}
       <div className="card-title">
-        {serviceItem.customer} - {serviceItem.vehicle}
+        {serviceItem.customer ? `${serviceItem.customer.firstName} ${serviceItem.customer.lastName}` : 'Unknown Customer'} - {serviceItem.vehicle ? `${serviceItem.vehicle.year} ${serviceItem.vehicle.make} ${serviceItem.vehicle.model}` : 'Unknown Vehicle'}
       </div>
 
       {/* Card Content */}
@@ -119,26 +118,43 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
           <div className="content-item">
             <User size={14} />
             <span className="content-label">Customer</span>
-            <span className="content-value">{serviceItem.customer}</span>
+            <span className="content-value">{serviceItem.customer ? `${serviceItem.customer.firstName} ${serviceItem.customer.lastName}` : 'Unknown'}</span>
           </div>
         </div>
         <div className="content-row">
           <div className="content-item">
             <Car size={14} />
             <span className="content-label">Vehicle</span>
-            <span className="content-value">{serviceItem.vehicle}</span>
+            <span className="content-value">{serviceItem.vehicle ? `${serviceItem.vehicle.year} ${serviceItem.vehicle.make} ${serviceItem.vehicle.model}` : 'Unknown'}</span>
           </div>
         </div>
+        {serviceItem.complaint && (
+          <div className="content-row">
+            <div className="content-item">
+              <Clock size={14} />
+              <span className="content-label">Issue</span>
+              <span className="content-value">{serviceItem.complaint}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Card Footer */}
       <div className="card-footer">
         <div className="technician-info">
           <div className="technician-avatar technician-avatar--initials" style={{ backgroundColor: '#3b82f6' }}>
-            {serviceItem.assignedTechnician.split(' ').map(n => n[0]).join('').toUpperCase()}
+            {serviceItem.serviceAdvisor?.userProfile ? 
+              `${serviceItem.serviceAdvisor.userProfile.firstName[0]}${serviceItem.serviceAdvisor.userProfile.lastName[0]}`.toUpperCase() :
+              'SA'
+            }
           </div>
           <div className="technician-details">
-            <span className="technician-name">{serviceItem.assignedTechnician}</span>
+            <span className="technician-name">
+              {serviceItem.serviceAdvisor?.userProfile ? 
+                `${serviceItem.serviceAdvisor.userProfile.firstName} ${serviceItem.serviceAdvisor.userProfile.lastName}` : 
+                'Unassigned'
+              }
+            </span>
           </div>
         </div>
       </div>

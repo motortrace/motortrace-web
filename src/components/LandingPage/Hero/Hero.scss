@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // Variables
 $primary-color: #2563eb;
 $primary-dark: #1d4ed8;
@@ -384,7 +386,7 @@ $neutral-300: #cbd5e1;
                                 color: $white;
 
                                 &:hover {
-                                    background: darken($success-color, 10%);
+                                    background: color.adjust($success-color, $lightness: -10%);
                                 }
                             }
 
@@ -393,7 +395,7 @@ $neutral-300: #cbd5e1;
                                 color: $white;
 
                                 &:hover {
-                                    background: darken($danger-color, 10%);
+                                    background: color.adjust($danger-color, $lightness: -10%);
                                 }
                             }
                         }

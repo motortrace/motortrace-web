@@ -1,5 +1,5 @@
 // src/components/SalesMetricCard/SalesMetricCard.scss
-@import '../../../../styles/variables.scss';
+@use '../../../../styles/variables' as *;
 
 .sales-metric-card {
   background: white;

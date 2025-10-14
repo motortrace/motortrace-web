@@ -1,5 +1,5 @@
-@import '../../../styles/variables.scss';
-@import '../../../styles/components/button.scss';
+@use '../../../styles/variables' as *;
+@use '../../../styles/components/button' as *;
 
 .canned-services-page {
   max-width: 1200px;

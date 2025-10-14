@@ -1,7 +1,7 @@
 /* src/styles/main.scss */
 
-@import './fonts';
-@import './variables';
-@import './base';
-@import './components/button';
-@import './components/card';
+@use './fonts';
+@use './variables';
+@use './base';
+@use './components/button';
+@use './components/card';

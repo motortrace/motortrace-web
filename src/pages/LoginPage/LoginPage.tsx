@@ -147,7 +147,6 @@ const LoginPage = () => {
 
       // Get user for redirection
       const user = data.data.user;
-
       const userRole = user?.role;  // Directly from user object, not user_metadata
 
       if (!userRole) {
@@ -166,15 +165,6 @@ const LoginPage = () => {
           break;
         case 'manager':
           window.location.href = '/manager/dashboard';
-          break;
-        case 'technician':
-          window.location.href = '/technician/dashboard';
-          break;
-        case 'inventory_manager':
-          window.location.href = '/inventory/dashboard';
-          break;
-        case 'customer':
-          window.location.href = '/customer/dashboard';
           break;
         default:
           window.location.href = '/';
