@@ -65,15 +65,15 @@ const Notifications: React.FC<NotificationsProps> = ({
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'info':
-        return 'ℹ️';
+        return 'bx bx-info-circle';
       case 'warning':
-        return '⚠️';
+        return 'bx bx-error';
       case 'success':
-        return '✅';
+        return 'bx bx-check-circle';
       case 'error':
-        return '❌';
+        return 'bx bx-x-circle';
       default:
-        return 'ℹ️';
+        return 'bx bx-info-circle';
     }
   };
 
@@ -153,9 +153,10 @@ const Notifications: React.FC<NotificationsProps> = ({
               {/* Icon */}
               <div style={{
                 fontSize: '16px',
-                marginTop: '2px'
+                marginTop: '2px',
+                color: getNotificationColor(notification.type)
               }}>
-                {getNotificationIcon(notification.type)}
+                <i className={getNotificationIcon(notification.type)}></i>
               </div>
 
               {/* Content */}

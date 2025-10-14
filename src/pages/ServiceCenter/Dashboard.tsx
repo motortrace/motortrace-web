@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import DailyCustomersLineChart from '../../components/DailyCustomersLineChart/DailyCustomersLineChart';
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
+import Notifications from '../../components/Notifications/Notifications';
 
 // MetricCard Component
 interface MetricCardProps {
@@ -43,6 +44,24 @@ const MetricCard: React.FC<MetricCardProps> = ({
 };
 
 const Dashboard = () => {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
   // Fake data for daily customers
   const dailyCustomersData = [
     { date: '2024-01-15', customers: 15 },
@@ -229,6 +248,66 @@ const Dashboard = () => {
           alignItems: 'center',
           gap: '16px'
         }}>
+          {/* Notification Button */}
+          <div style={{ position: 'relative', height: '56px' }} ref={notificationRef}>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: 'white',
+                color: '#64748b',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                position: 'relative',
+                transition: 'all 0.2s',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f8fafc';
+                e.currentTarget.style.borderColor = '#cbd5e1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.borderColor = '#e2e8f0';
+              }}
+            >
+              <i className='bx bx-bell'></i>
+              {/* Notification Badge */}
+              <div style={{
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#ef4444',
+                border: '2px solid white'
+              }} />
+            </button>
+            
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div style={{
+                position: 'absolute',
+                top: '66px',
+                right: '0',
+                width: '400px',
+                height: '500px',
+                zIndex: 1000,
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                borderRadius: '12px'
+              }}>
+                <Notifications />
+              </div>
+            )}
+          </div>
+          
           {/* Manager Profile */}
           <div style={{
             display: 'flex',
@@ -238,19 +317,20 @@ const Dashboard = () => {
             backgroundColor: 'white',
             borderRadius: '12px',
             border: '1px solid #e2e8f0',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            height: '56px'
           }}>
             {/* Profile Image */}
             <div style={{
-              width: '48px',
-              height: '48px',
+              width: '36px',
+              height: '36px',
               borderRadius: '50%',
               backgroundColor: '#2563eb',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontSize: '18px',
+              fontSize: '14px',
               fontWeight: '600'
             }}>
               MS
