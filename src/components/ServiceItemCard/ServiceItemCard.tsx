@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, User, Car } from 'lucide-react';
+import { User, Car } from 'lucide-react';
 import './ServiceItemCard.scss';
 import { type WorkOrder } from '../../utils/workOrdersApi';
 
@@ -118,25 +118,25 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
             <span className="content-value">{serviceItem.vehicle ? `${serviceItem.vehicle.year} ${serviceItem.vehicle.make} ${serviceItem.vehicle.model}` : 'Unknown'}</span>
           </div>
         </div>
-        {serviceItem.complaint && (
-          <div className="content-row">
-            <div className="content-item">
-              <Clock size={14} />
-              <span className="content-label">Issue</span>
-              <span className="content-value">{serviceItem.complaint}</span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Card Footer */}
       <div className="card-footer">
         <div className="technician-info">
-          <div className="technician-avatar technician-avatar--initials" style={{ backgroundColor: '#3b82f6' }}>
-            {serviceItem.serviceAdvisor?.userProfile ? 
-              `${serviceItem.serviceAdvisor.userProfile.firstName[0]}${serviceItem.serviceAdvisor.userProfile.lastName[0]}`.toUpperCase() :
-              'SA'
-            }
+          <div className="technician-avatar">
+            {serviceItem.serviceAdvisor?.userProfile?.profileImage ? (
+              <img
+                src={serviceItem.serviceAdvisor.userProfile.profileImage}
+                alt={`${serviceItem.serviceAdvisor.userProfile.firstName} ${serviceItem.serviceAdvisor.userProfile.lastName}`}
+              />
+            ) : (
+              <div className="technician-avatar--initials" style={{ backgroundColor: '#3b82f6' }}>
+                {serviceItem.serviceAdvisor?.userProfile ? 
+                  `${serviceItem.serviceAdvisor.userProfile.firstName[0]}${serviceItem.serviceAdvisor.userProfile.lastName[0]}`.toUpperCase() :
+                  'SA'
+                }
+              </div>
+            )}
           </div>
           <div className="technician-details">
             <span className="technician-name">
