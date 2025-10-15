@@ -11,21 +11,28 @@ interface Appointment {
   status: 'PENDING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
   priority: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
   notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  assignedToId?: string;
   customer: {
-    firstName: string;
-    lastName: string;
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    profileImage?: string;
   };
   vehicle: {
+    id: string;
     make: string;
     model: string;
     year: number;
+    licensePlate: string;
   };
   assignedTo?: {
-    name: string;
+    id: string;
+    profileImage?: string;
   };
-  cannedServices?: Array<{
-    name: string;
-  }>;
+  cannedServices?: Array<any>;
 }
 
 interface MiniCalendarProps {
@@ -302,25 +309,98 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
                 <div style={{
                   flex: 1,
                   backgroundColor: '#f8fafc',
-                  borderRadius: '6px',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: '8px',
+                  padding: '12px',
+                  border: `2px solid ${appointment.priority === 'URGENT' ? '#ef4444' : appointment.priority === 'HIGH' ? '#f59e0b' : appointment.priority === 'NORMAL' ? '#3b82f6' : '#10b981'}`,
+                  position: 'relative'
                 }}>
-                  <h3 style={{
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#1e293b',
-                    margin: '0 0 2px 0'
+                  {/* Priority Indicator */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: appointment.priority === 'URGENT' ? '#ef4444' : appointment.priority === 'HIGH' ? '#f59e0b' : appointment.priority === 'NORMAL' ? '#3b82f6' : '#10b981'
+                  }} />
+
+                  {/* Customer Info */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '6px'
                   }}>
-                    {appointment.customer.firstName} {appointment.customer.lastName}
-                  </h3>
-                  <p style={{
-                    fontSize: '10px',
+                    {appointment.customer.profileImage && (
+                      <img
+                        src={appointment.customer.profileImage}
+                        alt={appointment.customer.name}
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    )}
+                    <h3 style={{
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      margin: 0
+                    }}>
+                      {appointment.customer.name}
+                    </h3>
+                  </div>
+
+                  {/* Vehicle Info */}
+                  <div style={{
+                    fontSize: '11px',
                     color: '#64748b',
-                    margin: 0
+                    marginBottom: '4px',
+                    fontWeight: '500'
                   }}>
+                    {appointment.vehicle.year} {appointment.vehicle.make} {appointment.vehicle.model}
+                  </div>
+
+                  {/* License Plate */}
+                  <div style={{
+                    fontSize: '10px',
+                    color: '#94a3b8',
+                    marginBottom: '6px',
+                    backgroundColor: '#e2e8f0',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    display: 'inline-block'
+                  }}>
+                    {appointment.vehicle.licensePlate}
+                  </div>
+
+                  {/* Time */}
+                  <div style={{
+                    fontSize: '11px',
+                    color: '#475569',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <i className='bx bx-time' style={{ fontSize: '12px' }}></i>
                     {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
-                  </p>
+                  </div>
+
+                  {/* Notes if available */}
+                  {appointment.notes && (
+                    <div style={{
+                      fontSize: '10px',
+                      color: '#64748b',
+                      marginTop: '4px',
+                      fontStyle: 'italic'
+                    }}>
+                      {appointment.notes}
+                    </div>
+                  )}
                 </div>
               </div>
             ))

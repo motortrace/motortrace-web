@@ -464,15 +464,44 @@ const AppointmentsPage = () => {
       label: 'Customer',
       sortable: true,
       render: (_: any, row: Appointment) => (
-        <div>
-          <div style={{ fontWeight: '500' }}>
-            {row.customer?.name || row.customerId}
-          </div>
-          {row.customer?.phone && (
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>
-              {row.customer.phone}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {row.customer?.profileImage ? (
+            <img 
+              src={row.customer.profileImage} 
+              alt={row.customer.name}
+              style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                objectFit: 'cover' 
+              }}
+            />
+          ) : (
+            <div style={{ 
+              width: '32px', 
+              height: '32px', 
+              borderRadius: '50%', 
+              backgroundColor: '#e5e7eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#6b7280'
+            }}>
+              {(row.customer?.name || row.customerId || 'C').charAt(0).toUpperCase()}
             </div>
           )}
+          <div>
+            <div style={{ fontWeight: '500' }}>
+              {row.customer?.name || row.customerId}
+            </div>
+            {row.customer?.phone && (
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                {row.customer.phone}
+              </div>
+            )}
+          </div>
         </div>
       )
     },
@@ -755,15 +784,6 @@ const AppointmentsPage = () => {
     <div className="appointments-page">
       <div className="page-header">
         <h2 className="page-title">Appointments</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
-          <span style={{ fontSize: '12px', color: '#6b7280' }}>
-            Service Advisors: {serviceAdvisors.length} {serviceAdvisorsLoading && '(Loading...)'}
-          </span>
-          <button className="btn btn--primary">
-            <i className='bx bx-plus'></i>
-            New Appointment
-          </button>
-        </div>
       </div>
 
       <div className="inventory-controls">

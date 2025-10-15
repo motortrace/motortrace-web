@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import DailyCustomersLineChart from '../../components/DailyCustomersLineChart/DailyCustomersLineChart';
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
 import Notifications from '../../components/Notifications/Notifications';
+import { useAuth } from '../../hooks/useAuth';
 
 // MetricCard Component
 interface MetricCardProps {
@@ -44,7 +45,11 @@ const MetricCard: React.FC<MetricCardProps> = ({
 };
 
 const Dashboard = () => {
+  const { token, loading: authLoading } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointmentsLoading, setAppointmentsLoading] = useState(false);
+  const [appointmentsError, setAppointmentsError] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,6 +67,57 @@ const Dashboard = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showNotifications]);
+
+  // Fetch confirmed appointments
+  const fetchAppointments = async () => {
+    if (!token) {
+      console.log('No token available for appointments fetch');
+      return;
+    }
+
+    setAppointmentsLoading(true);
+    setAppointmentsError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/appointments?status=CONFIRMED', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch appointments: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Transform string dates to Date objects for MiniCalendar
+        const transformedAppointments = data.data.map((appointment: any) => ({
+          ...appointment,
+          startTime: new Date(appointment.startTime),
+          endTime: new Date(appointment.endTime)
+        }));
+        setAppointments(transformedAppointments);
+        console.log('Confirmed appointments loaded:', transformedAppointments.length);
+      } else {
+        throw new Error(data.message || 'Failed to fetch appointments');
+      }
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      setAppointmentsError(err instanceof Error ? err.message : 'Failed to fetch appointments');
+    } finally {
+      setAppointmentsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!authLoading && token) {
+      fetchAppointments();
+    }
+  }, [token, authLoading]);
   // Fake data for daily customers
   const dailyCustomersData = [
     { date: '2024-01-15', customers: 15 },
@@ -71,139 +127,6 @@ const Dashboard = () => {
     { date: '2024-01-19', customers: 24 },
     { date: '2024-01-20', customers: 31 },
     { date: '2024-01-21', customers: 19 }
-  ];
-
-  // Sample appointment data for September 13, 2025
-  const sampleAppointments = [
-    {
-      id: '1',
-      customerId: 'cust1',
-      vehicleId: 'veh1',
-      requestedAt: new Date(),
-      startTime: new Date(2025, 8, 13, 9, 0), // Sep 13, 2025 at 9:00 AM
-      endTime: new Date(2025, 8, 13, 10, 0), // Sep 13, 2025 at 10:00 AM
-      status: 'CONFIRMED' as const,
-      priority: 'NORMAL' as const,
-      notes: 'Regular maintenance',
-      customer: {
-        firstName: 'John',
-        lastName: 'Smith'
-      },
-      vehicle: {
-        make: 'Toyota',
-        model: 'Camry',
-        year: 2020
-      },
-      assignedTo: {
-        name: 'Mike Johnson'
-      },
-      cannedServices: [
-        { name: 'Oil Change' },
-        { name: 'Filter Replacement' }
-      ]
-    },
-    {
-      id: '2',
-      customerId: 'cust2',
-      vehicleId: 'veh2',
-      requestedAt: new Date(),
-      startTime: new Date(2025, 8, 13, 14, 0), // Sep 13, 2025 at 2:00 PM
-      endTime: new Date(2025, 8, 13, 15, 30), // Sep 13, 2025 at 3:30 PM
-      status: 'PENDING' as const,
-      priority: 'HIGH' as const,
-      notes: 'Brake inspection',
-      customer: {
-        firstName: 'Sarah',
-        lastName: 'Johnson'
-      },
-      vehicle: {
-        make: 'Honda',
-        model: 'Civic',
-        year: 2019
-      },
-      cannedServices: [
-        { name: 'Brake Inspection' },
-        { name: 'Brake Pad Replacement' }
-      ]
-    },
-    {
-      id: '3',
-      customerId: 'cust3',
-      vehicleId: 'veh3',
-      requestedAt: new Date(),
-      startTime: new Date(2025, 8, 13, 11, 0), // Sep 13, 2025 at 11:00 AM
-      endTime: new Date(2025, 8, 13, 12, 0), // Sep 13, 2025 at 12:00 PM
-      status: 'IN_PROGRESS' as const,
-      priority: 'URGENT' as const,
-      notes: 'Engine repair',
-      customer: {
-        firstName: 'Mike',
-        lastName: 'Davis'
-      },
-      vehicle: {
-        make: 'Ford',
-        model: 'Focus',
-        year: 2021
-      },
-      assignedTo: {
-        name: 'Sarah Wilson'
-      },
-      cannedServices: [
-        { name: 'Engine Diagnostic' },
-        { name: 'Engine Repair' }
-      ]
-    },
-    {
-      id: '4',
-      customerId: 'cust4',
-      vehicleId: 'veh4',
-      requestedAt: new Date(),
-      startTime: new Date(2025, 8, 13, 16, 0), // Sep 13, 2025 at 4:00 PM
-      endTime: new Date(2025, 8, 13, 17, 0), // Sep 13, 2025 at 5:00 PM
-      status: 'CONFIRMED' as const,
-      priority: 'NORMAL' as const,
-      notes: 'Tire rotation',
-      customer: {
-        firstName: 'Lisa',
-        lastName: 'Anderson'
-      },
-      vehicle: {
-        make: 'Nissan',
-        model: 'Altima',
-        year: 2018
-      },
-      assignedTo: {
-        name: 'David Brown'
-      },
-      cannedServices: [
-        { name: 'Tire Rotation' },
-        { name: 'Wheel Alignment' }
-      ]
-    },
-    {
-      id: '5',
-      customerId: 'cust5',
-      vehicleId: 'veh5',
-      requestedAt: new Date(),
-      startTime: new Date(2025, 8, 13, 8, 0), // Sep 13, 2025 at 8:00 AM
-      endTime: new Date(2025, 8, 13, 8, 45), // Sep 13, 2025 at 8:45 AM
-      status: 'PENDING' as const,
-      priority: 'LOW' as const,
-      notes: 'AC check',
-      customer: {
-        firstName: 'Robert',
-        lastName: 'Wilson'
-      },
-      vehicle: {
-        make: 'Chevrolet',
-        model: 'Malibu',
-        year: 2020
-      },
-      cannedServices: [
-        { name: 'AC System Check' },
-        { name: 'Refrigerant Top-up' }
-      ]
-    }
   ];
 
   return (
@@ -403,7 +326,34 @@ const Dashboard = () => {
         <div style={{
           height: '100%'
         }}>
-          <MiniCalendar appointments={sampleAppointments} />
+          {appointmentsLoading ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '400px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0'
+            }}>
+              Loading appointments...
+            </div>
+          ) : appointmentsError ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '400px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              color: '#ef4444'
+            }}>
+              Error loading appointments: {appointmentsError}
+            </div>
+          ) : (
+            <MiniCalendar appointments={appointments} />
+          )}
         </div>
       </div>
 
