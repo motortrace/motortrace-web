@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import { useAuth } from '../../hooks/useAuth';
 import './EmployeeManagement.scss';
@@ -28,6 +29,8 @@ interface Technician {
 
 const EmployeeManagement: React.FC = () => {
   const { token, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -184,7 +187,7 @@ const EmployeeManagement: React.FC = () => {
       align: 'center',
       render: (_: any, row: Technician) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); console.log('View technician details:', row.userProfile.name); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`${location.pathname.startsWith('/serviceadvisor') ? '/serviceadvisor' : '/manager'}/technician/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
         </div>

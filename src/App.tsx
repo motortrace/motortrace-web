@@ -29,6 +29,7 @@ import CustomerProfile from './pages/ServiceCenter/CustomerProfile';
 import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
 import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
 import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
+import TechnicianProfile from './pages/ServiceCenter/TechnicianProfile';
 
 
 import AdminLogin from './pages/Admin/AdminLogin';
@@ -129,6 +130,7 @@ function App() {
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
         </Route>
@@ -157,6 +159,7 @@ function App() {
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
         </Route>
