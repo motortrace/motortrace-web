@@ -407,12 +407,22 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
           ) : (
             <div style={{
               textAlign: 'center',
-              padding: '20px',
-              color: '#64748b'
+              padding: '40px 20px',
+              color: '#64748b',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              height: '200px'
             }}>
+              <i className='bx bx-calendar' style={{ fontSize: '110px', color: '#cbd5e1', marginTop: '60px' }}></i>
               <p style={{
-                fontSize: '12px',
-                margin: 0
+                fontSize: '16px',
+                margin: 0,
+                color: '#94a3b8',
+                fontWeight: '500',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
               }}>
                 No appointments scheduled
               </p>
