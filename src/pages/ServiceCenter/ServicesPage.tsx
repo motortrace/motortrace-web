@@ -36,6 +36,12 @@ const ServicesPage = () => {
   const [error, setError] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  const getCategoryColor = (category: string) => {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+    const index = category ? category.split('').reduce((a, b) => a + b.charCodeAt(0), 0) % colors.length : 0;
+    return colors[index];
+  };
+
   useEffect(() => {
     setLoading(true);
     cannedServiceService.getPackages()
@@ -74,8 +80,7 @@ const ServicesPage = () => {
 
   // Filtering logic
   const filteredServices = services.filter(service => {
-    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = filterCategory === 'all' || service.category === filterCategory;
     
@@ -91,23 +96,16 @@ const ServicesPage = () => {
       label: 'Service Name',
       sortable: true,
       render: (value: any) => (
-        <strong>{value}</strong>
+        <strong style={{ marginRight: '12px' }}>{value}</strong>
       )
     },
     {
       key: 'category',
       label: 'Category',
       sortable: true,
+      align: 'center',
       render: (value: any) => (
-        <span>{value || 'N/A'}</span>
-      )
-    },
-    {
-      key: 'description',
-      label: 'Description',
-      sortable: true,
-      render: (value: any) => (
-        <span>{value || 'No description'}</span>
+        <span className="category-badge" style={{ backgroundColor: getCategoryColor(value) }}>{value || 'N/A'}</span>
       )
     },
     {

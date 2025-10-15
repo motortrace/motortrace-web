@@ -287,6 +287,16 @@
     }
   }
 
+  .category-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
   // Service Analytics Charts
   .services-analytics {
     margin-bottom: 24px;
