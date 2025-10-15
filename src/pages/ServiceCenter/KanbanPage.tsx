@@ -15,7 +15,6 @@ const KanbanPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Work order creation state
@@ -84,7 +83,6 @@ const KanbanPage: React.FC = () => {
   useEffect(() => {
     const fetchWorkOrders = async () => {
       try {
-        setLoading(true);
         setError(null);
         
         // First fetch the current service advisor details
@@ -105,8 +103,6 @@ const KanbanPage: React.FC = () => {
       } catch (err) {
         console.error('Failed to fetch work orders:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch work orders');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -177,6 +173,23 @@ const KanbanPage: React.FC = () => {
   };
 
   const handleAppointmentSelect = (appointmentId: string) => {
+    if (appointmentId === '') {
+      // Reset to manual entry
+      setWorkOrderForm(prev => ({
+        ...prev,
+        appointmentId: '',
+        customerId: '',
+        vehicleId: '',
+        advisorId: currentServiceAdvisor?.id || '',
+        complaint: '',
+        cannedServiceIds: [],
+        quantities: [],
+        prices: [],
+        serviceNotes: []
+      }));
+      return;
+    }
+
     const appointment = availableAppointments.find(apt => apt.id === appointmentId);
     if (appointment) {
       setWorkOrderForm(prev => ({
@@ -207,7 +220,7 @@ const KanbanPage: React.FC = () => {
       const workOrderData = {
         customerId: workOrderForm.customerId,
         vehicleId: workOrderForm.vehicleId,
-        appointmentId: workOrderForm.appointmentId,
+        appointmentId: workOrderForm.appointmentId === '' ? null : workOrderForm.appointmentId,
         advisorId: workOrderForm.advisorId,
         status: workOrderForm.status,
         jobType: workOrderForm.jobType,
@@ -329,14 +342,6 @@ const KanbanPage: React.FC = () => {
     { id: 'WAITING_FOR_PARTS', title: 'Waiting for Parts', color: '#8b5cf6' },
     { id: 'COMPLETED', title: 'Completed', color: '#059669' },
   ];
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner">Loading work orders...</div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
