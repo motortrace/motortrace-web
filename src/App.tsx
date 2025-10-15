@@ -20,6 +20,7 @@ import InspectionRecordsPage from './pages/ServiceCenter/InspectionRecordsPage';
 import InspectionDetailPage from './pages/ServiceCenter/InspectionDetailPage';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
+import ServicesPage from './pages/ServiceCenter/ServicesPage';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
@@ -123,7 +124,7 @@ function App() {
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
-          <Route path="services" element={<CannedServices />} />
+          <Route path="services" element={<ServicesPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
@@ -151,7 +152,7 @@ function App() {
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
-          <Route path="services" element={<CannedServices />} />
+          <Route path="services" element={<ServicesPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />

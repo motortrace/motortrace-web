@@ -76,4 +76,6 @@ export interface PackageFilters {
   minPrice?: number;
   maxPrice?: number;
   search?: string;
+  category?: string;
+  vehicleType?: string;
 }
