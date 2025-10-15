@@ -3,6 +3,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import type { WorkOrderService, WorkOrderLaborItem } from '../../types';
 import { getTechnicianDisplayName } from '../../utils/helpers';
 import { useTechnicians } from '../../hooks/useTechnicians';
+import { useToast } from '../../../../hooks/useToast';
 import AssignTechnicianToServiceModal from '../modals/AssignTechnicianToServiceModal';
 import AssignTechnicianToLaborModal from '../modals/AssignTechnicianToLaborModal';
 import AddServiceToWorkOrderModal from '../modals/AddServiceToWorkOrderModal';
@@ -28,10 +29,12 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   const [showLaborAssignModal, setShowLaborAssignModal] = useState(false);
   const [selectedService, setSelectedService] = useState<WorkOrderService | null>(null);
   const [selectedLabor, setSelectedLabor] = useState<WorkOrderLaborItem | null>(null);
-  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Add service modal state
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
+
+  // Universal toast system
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (workOrderId && token) {
@@ -149,14 +152,6 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   };
 
   /**
-   * Show toast notification
-   */
-  const showToast = (type: 'success' | 'error', message: string) => {
-    setToastMessage({ type, message });
-    setTimeout(() => setToastMessage(null), 5000);
-  };
-
-  /**
    * Handle service assignment button click
    */
   const handleServiceAssignClick = (service: WorkOrderService) => {
@@ -180,11 +175,11 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
     
     try {
       await assignTechnicianToService(selectedService.id, technicianId);
-      showToast('success', 'Technician successfully assigned to all labor items under this service');
+      showToast('success', 'Assignment Successful', 'Technician successfully assigned to all labor items under this service');
       await fetchServices(); // Refresh services to show updated assignments
       await fetchTechnicians(); // Refresh technician status
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : 'Failed to assign technician');
+      showToast('error', 'Assignment Failed', error instanceof Error ? error.message : 'Failed to assign technician');
       throw error;
     }
   };
@@ -197,11 +192,11 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
     
     try {
       await assignTechnicianToLabor(selectedLabor.id, technicianId);
-      showToast('success', 'Technician successfully assigned to labor item');
+      showToast('success', 'Assignment Successful', 'Technician successfully assigned to labor item');
       await fetchServices(); // Refresh services to show updated assignments
       await fetchTechnicians(); // Refresh technician status
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : 'Failed to assign technician');
+      showToast('error', 'Assignment Failed', error instanceof Error ? error.message : 'Failed to assign technician');
       throw error;
     }
   };
@@ -487,22 +482,6 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
           </tbody>
         </table>
       </div>
-
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className={`toast-notification ${toastMessage.type}`}>
-          <i className={`bx ${toastMessage.type === 'success' ? 'bx-check-circle' : 'bx-error-circle'}`}></i>
-          <div className="toast-content">
-            <div className="toast-title">
-              {toastMessage.type === 'success' ? 'Success' : 'Error'}
-            </div>
-            <div className="toast-message">{toastMessage.message}</div>
-          </div>
-          <button className="toast-close" onClick={() => setToastMessage(null)}>
-            <i className="bx bx-x"></i>
-          </button>
-        </div>
-      )}
 
       {/* Assignment Modals */}
       {selectedService && (
