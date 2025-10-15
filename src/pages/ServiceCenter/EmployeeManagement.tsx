@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import { useAuth } from '../../hooks/useAuth';
 import './EmployeeManagement.scss';
+import TechnicianTaskDistributionChart from '../../components/TechnicianTaskDistributionChart/TechnicianTaskDistributionChart';
 
 interface Technician {
   id: string;
@@ -220,6 +221,10 @@ const EmployeeManagement: React.FC = () => {
             </select>
           </div>
         </div>
+      </div>
+
+      <div className="chart-container" style={{ marginBottom: '24px' }}>
+        <TechnicianTaskDistributionChart className="analytics-chart" />
       </div>
 
       <div className="parts-table-container">
