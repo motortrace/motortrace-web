@@ -50,6 +50,13 @@ const Dashboard = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
   const [appointmentsError, setAppointmentsError] = useState('');
+  const [generalStats, setGeneralStats] = useState<{
+    totalCustomers: number;
+    totalVehicles: number;
+    totalTechnicians: number;
+  } | null>(null);
+  const [generalStatsLoading, setGeneralStatsLoading] = useState(false);
+  const [generalStatsError, setGeneralStatsError] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -113,9 +120,49 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch general statistics
+  const fetchGeneralStats = async () => {
+    if (!token) {
+      console.log('No token available for general stats fetch');
+      return;
+    }
+
+    setGeneralStatsLoading(true);
+    setGeneralStatsError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/work-orders/statistics/general', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch general statistics: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setGeneralStats(data.data);
+        console.log('General statistics loaded:', data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch general statistics');
+      }
+    } catch (err) {
+      console.error('Error fetching general statistics:', err);
+      setGeneralStatsError(err instanceof Error ? err.message : 'Failed to fetch general statistics');
+    } finally {
+      setGeneralStatsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!authLoading && token) {
       fetchAppointments();
+      fetchGeneralStats();
     }
   }, [token, authLoading]);
 
@@ -294,18 +341,40 @@ const Dashboard = () => {
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '16px'
           }}>
-            <MetricCard
-              title="Revenue"
-              amount="30,000 LKR"
-            />
-            <MetricCard
-              title="Daily Sales"
-              amount="10,000 LKR"
-            />
-            <MetricCard
-              title="Average Appointment Time"
-              amount="3 hrs"
-            />
+            {generalStatsLoading ? (
+              <>
+                <MetricCard title="Total Customers" amount="Loading..." />
+                <MetricCard title="Total Vehicles" amount="Loading..." />
+                <MetricCard title="Total Technicians" amount="Loading..." />
+              </>
+            ) : generalStatsError ? (
+              <>
+                <MetricCard title="Total Customers" amount="Error" />
+                <MetricCard title="Total Vehicles" amount="Error" />
+                <MetricCard title="Total Technicians" amount="Error" />
+              </>
+            ) : generalStats ? (
+              <>
+                <MetricCard
+                  title="Total Customers"
+                  amount={generalStats.totalCustomers.toString()}
+                />
+                <MetricCard
+                  title="Total Vehicles"
+                  amount={generalStats.totalVehicles.toString()}
+                />
+                <MetricCard
+                  title="Total Technicians"
+                  amount={generalStats.totalTechnicians.toString()}
+                />
+              </>
+            ) : (
+              <>
+                <MetricCard title="Total Customers" amount="--" />
+                <MetricCard title="Total Vehicles" amount="--" />
+                <MetricCard title="Total Technicians" amount="--" />
+              </>
+            )}
           </div>
           
           {/* Work Order Statistics Chart */}
