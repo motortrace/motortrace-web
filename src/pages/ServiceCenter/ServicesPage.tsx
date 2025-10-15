@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import CreateCannedServiceModal from '../../components/CreateCannedServiceModal';
+import ServicePopularityChart from '../../components/ServicePopularityChart/ServicePopularityChart';
+import RevenueByServiceChart from '../../components/RevenueByServiceChart/RevenueByServiceChart';
 import './ServicesPage.scss';
 import { cannedServiceService } from '../../services/cannedServiceService';
 
@@ -191,6 +193,14 @@ const ServicesPage = () => {
             <i className="bx bx-plus"></i>
             Create Service
           </button>
+        </div>
+      </div>
+
+      {/* Service Analytics Charts */}
+      <div className="services-analytics">
+        <div className="analytics-row">
+          <ServicePopularityChart className="analytics-chart" />
+          <RevenueByServiceChart className="analytics-chart" />
         </div>
       </div>
 

@@ -142,6 +142,26 @@
     }
   }
 
+  .services-analytics {
+    margin-bottom: 24px;
+
+    .analytics-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    .analytics-chart {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
   .inventory-controls {
     display: flex;
     justify-content: space-between;
