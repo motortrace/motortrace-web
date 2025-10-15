@@ -378,7 +378,7 @@ const CreateCannedServiceModal: React.FC<CreateCannedServiceModalProps> = ({
                 <select
                   id="variantLabel"
                   value={formData.variantLabel || ''}
-                  onChange={(e) => handleInputChange('variantLabel', e.target.value || undefined)}
+                  onChange={(e) => handleInputChange('variantLabel', e.target.value === '' ? undefined : e.target.value as ServiceVariantLabel)}
                   style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
                 >
                   <option value="">Select Variant Label (Optional)</option>
