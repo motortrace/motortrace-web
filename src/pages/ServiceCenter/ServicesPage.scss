@@ -286,6 +286,35 @@
       border: 1px solid rgba(199, 44, 43, 0.2);
     }
   }
+
+  // Service Analytics Charts
+  .services-analytics {
+    margin-bottom: 24px;
+
+    .analytics-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+
+      .analytics-chart {
+        min-height: 300px;
+      }
+    }
+  }
+
+  // Responsive design for analytics
+  @media (max-width: 1024px) {
+    .services-analytics {
+      .analytics-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+
+        .analytics-chart {
+          min-height: 250px;
+        }
+      }
+    }
+  }
 }
 
 .btn--ghost {

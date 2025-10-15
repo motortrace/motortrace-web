@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import CreateCannedServiceModal from '../../components/CreateCannedServiceModal';
 import ServicePopularityChart from '../../components/ServicePopularityChart/ServicePopularityChart';
-import RevenueByServiceChart from '../../components/RevenueByServiceChart/RevenueByServiceChart';
+import ServiceCategoriesChart from '../../components/ServiceCategoriesChart/ServiceCategoriesChart';
 import './ServicesPage.scss';
 import { cannedServiceService } from '../../services/cannedServiceService';
 
@@ -200,7 +200,7 @@ const ServicesPage = () => {
       <div className="services-analytics">
         <div className="analytics-row">
           <ServicePopularityChart className="analytics-chart" />
-          <RevenueByServiceChart className="analytics-chart" />
+          <ServiceCategoriesChart className="analytics-chart" />
         </div>
       </div>
 
