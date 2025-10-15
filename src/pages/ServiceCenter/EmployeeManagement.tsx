@@ -3,6 +3,7 @@ import Table, { type TableColumn } from '../../components/Table/Table';
 import { useAuth } from '../../hooks/useAuth';
 import './EmployeeManagement.scss';
 import TechnicianTaskDistributionChart from '../../components/TechnicianTaskDistributionChart/TechnicianTaskDistributionChart';
+import TechnicianWorkingStatusChart from '../../components/TechnicianWorkingStatusChart/TechnicianWorkingStatusChart';
 
 interface Technician {
   id: string;
@@ -223,8 +224,13 @@ const EmployeeManagement: React.FC = () => {
         </div>
       </div>
 
-      <div className="chart-container" style={{ marginBottom: '24px' }}>
-        <TechnicianTaskDistributionChart className="analytics-chart" />
+      <div className="chart-container" style={{ marginBottom: '24px', display: 'flex', gap: '24px' }}>
+        <div style={{ flex: 3 }}>
+          <TechnicianTaskDistributionChart className="analytics-chart" />
+        </div>
+        <div style={{ flex: 1 }}>
+          <TechnicianWorkingStatusChart className="analytics-chart" />
+        </div>
       </div>
 
       <div className="parts-table-container">
