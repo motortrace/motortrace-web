@@ -783,13 +783,12 @@ const AppointmentsPage = () => {
   return (
     <div className="appointments-page">
       <div className="page-header">
-        <h2 className="page-title">Appointments</h2>
-      </div>
-
-      <div className="inventory-controls">
-        <div className="search-filters">
-          <div className="search-box">
-            <i className='bx bx-search search-icon'></i>
+        <div className="header-content">
+          <h1 className="page-title">Appointments</h1>
+          <p className="page-subtitle">Manage and confirm appointment requests</p>
+        </div>
+        <div className="header-actions">
+          <div className="search-container">
             <input
               type="text"
               placeholder="Search by customer, vehicle, or notes..."
@@ -798,41 +797,45 @@ const AppointmentsPage = () => {
               className="search-input"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="CANCELLED">Cancelled</option>
-            <option value="NO_SHOW">No Show</option>
-          </select>
-          <select
-            value={filterCustomer}
-            onChange={(e) => setFilterCustomer(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Customers</option>
-            {uniqueCustomers.map(customer => (
-              <option key={customer} value={customer}>{customer}</option>
-            ))}
-          </select>
-          <select
-            value={filterVehicle}
-            onChange={(e) => setFilterVehicle(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Vehicles</option>
-            {uniqueVehicles.map(vehicle => (
-              <option key={vehicle} value={vehicle}>{vehicle}</option>
-            ))}
-          </select>
-        </div>
-        <div className="quick-actions">
+          <div className="status-filter">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+              <option value="NO_SHOW">No Show</option>
+            </select>
+          </div>
+          <div className="customer-filter">
+            <select
+              value={filterCustomer}
+              onChange={(e) => setFilterCustomer(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Customers</option>
+              {uniqueCustomers.map(customer => (
+                <option key={customer} value={customer}>{customer}</option>
+              ))}
+            </select>
+          </div>
+          <div className="vehicle-filter">
+            <select
+              value={filterVehicle}
+              onChange={(e) => setFilterVehicle(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Vehicles</option>
+              {uniqueVehicles.map(vehicle => (
+                <option key={vehicle} value={vehicle}>{vehicle}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
