@@ -3,8 +3,10 @@ import { useAuth } from '../../../../hooks/useAuth';
 import type { WorkOrderService, WorkOrderLaborItem } from '../../types';
 import { getTechnicianDisplayName } from '../../utils/helpers';
 import { useTechnicians } from '../../hooks/useTechnicians';
+import { useToast } from '../../../../hooks/useToast';
 import AssignTechnicianToServiceModal from '../modals/AssignTechnicianToServiceModal';
 import AssignTechnicianToLaborModal from '../modals/AssignTechnicianToLaborModal';
+import AddServiceToWorkOrderModal from '../modals/AddServiceToWorkOrderModal';
 
 interface ServicesTabProps {
   workOrderId: string;
@@ -27,7 +29,12 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   const [showLaborAssignModal, setShowLaborAssignModal] = useState(false);
   const [selectedService, setSelectedService] = useState<WorkOrderService | null>(null);
   const [selectedLabor, setSelectedLabor] = useState<WorkOrderLaborItem | null>(null);
-  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Add service modal state
+  const [showAddServiceModal, setShowAddServiceModal] = useState(false);
+
+  // Universal toast system
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (workOrderId && token) {
@@ -145,14 +152,6 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   };
 
   /**
-   * Show toast notification
-   */
-  const showToast = (type: 'success' | 'error', message: string) => {
-    setToastMessage({ type, message });
-    setTimeout(() => setToastMessage(null), 5000);
-  };
-
-  /**
    * Handle service assignment button click
    */
   const handleServiceAssignClick = (service: WorkOrderService) => {
@@ -176,11 +175,11 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
     
     try {
       await assignTechnicianToService(selectedService.id, technicianId);
-      showToast('success', 'Technician successfully assigned to all labor items under this service');
+      showToast('success', 'Assignment Successful', 'Technician successfully assigned to all labor items under this service');
       await fetchServices(); // Refresh services to show updated assignments
       await fetchTechnicians(); // Refresh technician status
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : 'Failed to assign technician');
+      showToast('error', 'Assignment Failed', error instanceof Error ? error.message : 'Failed to assign technician');
       throw error;
     }
   };
@@ -193,11 +192,11 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
     
     try {
       await assignTechnicianToLabor(selectedLabor.id, technicianId);
-      showToast('success', 'Technician successfully assigned to labor item');
+      showToast('success', 'Assignment Successful', 'Technician successfully assigned to labor item');
       await fetchServices(); // Refresh services to show updated assignments
       await fetchTechnicians(); // Refresh technician status
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : 'Failed to assign technician');
+      showToast('error', 'Assignment Failed', error instanceof Error ? error.message : 'Failed to assign technician');
       throw error;
     }
   };
@@ -225,12 +224,34 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
 
   if (services.length === 0) {
     return (
-      <div className="tab-content" style={{ padding: '40px', textAlign: 'center' }}>
-        <i className="bx bx-wrench" style={{ fontSize: '48px', color: '#d1d5db' }}></i>
-        <p style={{ marginTop: '16px', color: '#6b7280', fontSize: '16px' }}>No services added yet</p>
-        <p style={{ marginTop: '8px', color: '#9ca3af', fontSize: '14px' }}>
-          Services will appear here once they are added to this work order
-        </p>
+      <div className="tab-content" style={{ padding: '24px' }}>
+        {/* Add Service Button */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+          <button
+            onClick={() => setShowAddServiceModal(true)}
+            className="btn btn--primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            <i className="bx bx-plus"></i>
+            Add Service
+          </button>
+        </div>
+
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <i className="bx bx-wrench" style={{ fontSize: '48px', color: '#d1d5db' }}></i>
+          <p style={{ marginTop: '16px', color: '#6b7280', fontSize: '16px' }}>No services added yet</p>
+          <p style={{ marginTop: '8px', color: '#9ca3af', fontSize: '14px' }}>
+            Services will appear here once they are added to this work order
+          </p>
+        </div>
+
+        {/* Add Service Modal */}
+        <AddServiceToWorkOrderModal
+          open={showAddServiceModal}
+          onClose={() => setShowAddServiceModal(false)}
+          workOrderId={workOrderId}
+          onServiceAdded={fetchServices}
+        />
       </div>
     );
   }
@@ -255,6 +276,18 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
             LKR {services.reduce((sum, s) => sum + Number(s.subtotal), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
         </div>
+      </div>
+
+      {/* Add Service Button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+        <button
+          onClick={() => setShowAddServiceModal(true)}
+          className="btn btn--primary"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          <i className="bx bx-plus"></i>
+          Add Service
+        </button>
       </div>
 
       {/* Services Table */}
@@ -450,22 +483,6 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
         </table>
       </div>
 
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className={`toast-notification ${toastMessage.type}`}>
-          <i className={`bx ${toastMessage.type === 'success' ? 'bx-check-circle' : 'bx-error-circle'}`}></i>
-          <div className="toast-content">
-            <div className="toast-title">
-              {toastMessage.type === 'success' ? 'Success' : 'Error'}
-            </div>
-            <div className="toast-message">{toastMessage.message}</div>
-          </div>
-          <button className="toast-close" onClick={() => setToastMessage(null)}>
-            <i className="bx bx-x"></i>
-          </button>
-        </div>
-      )}
-
       {/* Assignment Modals */}
       {selectedService && (
         <AssignTechnicianToServiceModal
@@ -492,6 +509,14 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
           onAssign={handleLaborAssignment}
         />
       )}
+
+      {/* Add Service Modal */}
+      <AddServiceToWorkOrderModal
+        open={showAddServiceModal}
+        onClose={() => setShowAddServiceModal(false)}
+        workOrderId={workOrderId}
+        onServiceAdded={fetchServices}
+      />
     </div>
   );
 };

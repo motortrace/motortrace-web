@@ -1,0 +1,565 @@
+// Details Tab
+.details-tab {
+  padding: 24px;
+
+  .details-grid {
+    display: grid;
+    gap: 24px;
+  }
+
+  .details-section {
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 16px 0;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        label {
+          font-size: 12px;
+          font-weight: 500;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        span {
+          font-size: 14px;
+          color: #1e293b;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Card styles from customer profile
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    &-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+
+    &-body {
+      padding: 24px;
+
+      .certifications-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .certification-badge {
+          padding: 6px 12px;
+          background: #dbeafe;
+          color: #1d4ed8;
+          border-radius: 16px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+      }
+
+      .performance-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+
+        .performance-item {
+          text-align: center;
+          padding: 16px;
+          background: #f8fafc;
+          border-radius: 8px;
+          border: 1px solid #e2e8f0;
+
+          .performance-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 4px;
+          }
+
+          .performance-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+      }
+
+      .no-data {
+        color: #64748b;
+        font-style: italic;
+        margin: 0;
+      }
+    }
+  }
+
+  // Contact Information Card - Horizontal Layout
+  .contact-info-card {
+    margin-bottom: 24px;
+
+    .info-grid-horizontal {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 10px;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #f3f4f6;
+          transform: translateY(-2px);
+        }
+
+        i {
+          font-size: 24px;
+          color: #4f46e5;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+
+        > div {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          min-width: 0;
+        }
+
+        .info-label {
+          font-size: 12px;
+          color: #6b7280;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .info-value {
+          font-size: 14px;
+          color: #111827;
+          font-weight: 500;
+          word-break: break-word;
+        }
+      }
+    }
+  }
+}
+
+// Stats Tab
+.stats-tab {
+  padding: 24px;
+
+  .stats-grid {
+    display: grid;
+    gap: 24px;
+  }
+
+  .stats-section {
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 16px 0;
+    }
+
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+
+      .stat-card {
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+
+        .stat-value {
+          font-size: 28px;
+          font-weight: 700;
+          color: #2563eb;
+          margin-bottom: 8px;
+
+          &.active {
+            color: #10b981;
+          }
+
+          &.inactive {
+            color: #ef4444;
+          }
+        }
+
+        .stat-label {
+          font-size: 12px;
+          color: #64748b;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+    }
+
+    .current-activity {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+
+      .activity-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+
+        .activity-label {
+          font-size: 14px;
+          color: #64748b;
+          font-weight: 500;
+        }
+
+        .activity-value {
+          font-size: 14px;
+          color: #1e293b;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Current Work Tab
+.current-work-tab {
+  padding: 24px;
+
+  .current-work-summary {
+    margin-bottom: 24px;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 16px 0;
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+
+      .summary-item {
+        text-align: center;
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+
+        .summary-value {
+          font-size: 24px;
+          font-weight: 700;
+          color: #2563eb;
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        .summary-label {
+          font-size: 12px;
+          color: #64748b;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+    }
+  }
+
+  .current-work-sections {
+    display: grid;
+    gap: 24px;
+
+    .work-section {
+      h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 12px 0;
+      }
+
+      .work-items {
+        display: grid;
+        gap: 12px;
+
+        .work-item {
+          padding: 16px;
+          background: #f8fafc;
+          border-radius: 8px;
+          border: 1px solid #e2e8f0;
+
+          .work-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+
+            .work-item-title {
+              font-size: 14px;
+              font-weight: 600;
+              color: #1e293b;
+            }
+
+            .work-item-status {
+              padding: 4px 8px;
+              border-radius: 12px;
+              font-size: 10px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+
+              &.active {
+                background: #dcfce7;
+                color: #166534;
+              }
+            }
+          }
+
+          .work-item-details {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #64748b;
+          }
+        }
+      }
+
+      .no-data {
+        color: #64748b;
+        font-style: italic;
+        margin: 16px 0;
+      }
+    }
+  }
+}
+
+// Work Orders Tab
+.work-orders-tab {
+  padding: 24px;
+
+  .work-orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .work-orders-count {
+      font-size: 14px;
+      color: #64748b;
+    }
+  }
+
+  .work-orders-list {
+    display: grid;
+    gap: 16px;
+
+    .work-order-card {
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+
+      .work-order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+
+        .work-order-info {
+          .work-order-number {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 4px 0;
+          }
+
+          .work-order-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            &.status-completed {
+              background: #dcfce7;
+              color: #166534;
+            }
+
+            &.status-in-progress {
+              background: #dbeafe;
+              color: #1d4ed8;
+            }
+
+            &.status-open {
+              background: #fef3c7;
+              color: #92400e;
+            }
+
+            &.status-cancelled {
+              background: #fee2e2;
+              color: #dc2626;
+            }
+
+            &.status-default {
+              background: #f3f4f6;
+              color: #374151;
+            }
+          }
+        }
+
+        .work-order-amount {
+          font-size: 18px;
+          font-weight: 700;
+          color: #2563eb;
+        }
+      }
+
+      .work-order-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 8px;
+        margin-bottom: 16px;
+
+        .detail-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .detail-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .detail-value {
+            font-size: 12px;
+            color: #1e293b;
+            font-weight: 500;
+          }
+        }
+      }
+
+      .work-order-footer {
+        .btn-view-details {
+          padding: 8px 16px;
+          background: #2563eb;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background: #1d4ed8;
+          }
+        }
+      }
+    }
+  }
+
+  .no-work-orders {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+
+    p {
+      font-size: 16px;
+      margin: 0;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .details-tab,
+  .stats-tab,
+  .current-work-tab,
+  .work-orders-tab {
+    padding: 16px;
+
+    .details-grid,
+    .stats-grid,
+    .current-work-sections {
+      gap: 16px;
+    }
+
+    .info-grid,
+    .performance-grid,
+    .stats-cards,
+    .summary-stats,
+    .work-order-details {
+      grid-template-columns: 1fr;
+    }
+
+    .work-orders-list .work-order-card .work-order-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    // Card responsive styles
+    .contact-info-card .info-grid-horizontal {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+}

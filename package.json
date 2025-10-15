@@ -21,7 +21,7 @@
     "@react-pdf/renderer": "^4.3.0",
     "@tailwindcss/vite": "^4.1.10",
     "boxicons": "^2.1.4",
-    "chart.js": "^4.5.0",
+    "chart.js": "^4.5.1",
     "html2canvas": "^1.4.1",
     "html2pdf": "^0.0.11",
     "html2pdf.js": "^0.10.3",

@@ -1,0 +1,119 @@
+@use '../../styles/variables' as *;
+
+.service-popularity-chart {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+
+  .chart-header {
+    margin-bottom: 20px;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 4px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 300px;
+  }
+
+  .chart-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 12px;
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e2e8f0;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    p {
+      color: #64748b;
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+
+  .chart-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 12px;
+
+    p {
+      color: #ef4444;
+      font-size: 14px;
+      margin: 0;
+      text-align: center;
+    }
+
+    .retry-btn {
+      padding: 8px 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background: #2563eb;
+      }
+    }
+  }
+}
+
+.service-popularity-tooltip {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .tooltip-title {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    font-size: 14px;
+  }
+
+  .tooltip-code {
+    color: #64748b;
+    margin: 0 0 8px 0;
+    font-size: 12px;
+  }
+
+  .tooltip-value {
+    color: #3b82f6;
+    font-weight: 500;
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

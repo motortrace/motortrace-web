@@ -464,15 +464,44 @@ const AppointmentsPage = () => {
       label: 'Customer',
       sortable: true,
       render: (_: any, row: Appointment) => (
-        <div>
-          <div style={{ fontWeight: '500' }}>
-            {row.customer?.name || row.customerId}
-          </div>
-          {row.customer?.phone && (
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>
-              {row.customer.phone}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {row.customer?.profileImage ? (
+            <img 
+              src={row.customer.profileImage} 
+              alt={row.customer.name}
+              style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                objectFit: 'cover' 
+              }}
+            />
+          ) : (
+            <div style={{ 
+              width: '32px', 
+              height: '32px', 
+              borderRadius: '50%', 
+              backgroundColor: '#e5e7eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#6b7280'
+            }}>
+              {(row.customer?.name || row.customerId || 'C').charAt(0).toUpperCase()}
             </div>
           )}
+          <div>
+            <div style={{ fontWeight: '500' }}>
+              {row.customer?.name || row.customerId}
+            </div>
+            {row.customer?.phone && (
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                {row.customer.phone}
+              </div>
+            )}
+          </div>
         </div>
       )
     },
@@ -754,22 +783,12 @@ const AppointmentsPage = () => {
   return (
     <div className="appointments-page">
       <div className="page-header">
-        <h2 className="page-title">Appointments</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
-          <span style={{ fontSize: '12px', color: '#6b7280' }}>
-            Service Advisors: {serviceAdvisors.length} {serviceAdvisorsLoading && '(Loading...)'}
-          </span>
-          <button className="btn btn--primary">
-            <i className='bx bx-plus'></i>
-            New Appointment
-          </button>
+        <div className="header-content">
+          <h1 className="page-title">Appointments</h1>
+          <p className="page-subtitle">Manage and confirm appointment requests</p>
         </div>
-      </div>
-
-      <div className="inventory-controls">
-        <div className="search-filters">
-          <div className="search-box">
-            <i className='bx bx-search search-icon'></i>
+        <div className="header-actions">
+          <div className="search-container">
             <input
               type="text"
               placeholder="Search by customer, vehicle, or notes..."
@@ -778,41 +797,45 @@ const AppointmentsPage = () => {
               className="search-input"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="CANCELLED">Cancelled</option>
-            <option value="NO_SHOW">No Show</option>
-          </select>
-          <select
-            value={filterCustomer}
-            onChange={(e) => setFilterCustomer(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Customers</option>
-            {uniqueCustomers.map(customer => (
-              <option key={customer} value={customer}>{customer}</option>
-            ))}
-          </select>
-          <select
-            value={filterVehicle}
-            onChange={(e) => setFilterVehicle(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Vehicles</option>
-            {uniqueVehicles.map(vehicle => (
-              <option key={vehicle} value={vehicle}>{vehicle}</option>
-            ))}
-          </select>
-        </div>
-        <div className="quick-actions">
+          <div className="status-filter">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+              <option value="NO_SHOW">No Show</option>
+            </select>
+          </div>
+          <div className="customer-filter">
+            <select
+              value={filterCustomer}
+              onChange={(e) => setFilterCustomer(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Customers</option>
+              {uniqueCustomers.map(customer => (
+                <option key={customer} value={customer}>{customer}</option>
+              ))}
+            </select>
+          </div>
+          <div className="vehicle-filter">
+            <select
+              value={filterVehicle}
+              onChange={(e) => setFilterVehicle(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Vehicles</option>
+              {uniqueVehicles.map(vehicle => (
+                <option key={vehicle} value={vehicle}>{vehicle}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

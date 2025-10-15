@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, User, Car } from 'lucide-react';
+import { User, Car } from 'lucide-react';
 import './ServiceItemCard.scss';
 import { type WorkOrder } from '../../utils/workOrdersApi';
 
@@ -48,19 +48,9 @@ const getPriorityIndicator = (priority: WorkOrder['priority']) => {
 };
 
 const getVehicleImage = (vehicle: WorkOrder['vehicle']) => {
-  if (!vehicle) return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
-  if (vehicle.imageUrl && typeof vehicle.imageUrl === 'string' && vehicle.imageUrl.trim() !== '') {
+  if (vehicle?.imageUrl) {
     return vehicle.imageUrl;
   }
-  const make = vehicle.make?.toLowerCase() || '';
-  const model = vehicle.model?.toLowerCase() || '';
-  if (make.includes('toyota') && model.includes('camry')) return 'https://platform.cstatic-images.com/xxlarge/in/v2/stock_photos/8760bf48-c1a5-42f7-a83b-1cd39e2efbec/57ee2adf-a4a3-4757-8f50-6d85fcf5a351.png';
-  if (make.includes('honda') && model.includes('cr-v')) return 'https://di-uploads-pod11.dealerinspire.com/hondaofkirkland/uploads/2019/08/2019-Honda-CR-V-LX-2WD-1.png';
-  if (make.includes('ford') && model.includes('f-150')) return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZGOHHY8IeOYnZJ1iILcd8v-8kzs8hZ0QIVg&s';
-  if (make.includes('nissan') && model.includes('altima')) return 'https://di-shared-assets.dealerinspire.com/legacy/rackspace/ldm-images/2021-Nissan-Altima-hero.png';
-  if (make.includes('bmw') && model.includes('x5')) return 'https://larte-design.com/storage/app/media/models/bmw/x5m-competition-front-site-carbon-gray-donington.webp';
-  if (make.includes('audi') && model.includes('a4')) return 'https://images.dealer.com/ddc/vehicles/2025/Audi/A4/Sedan/color/Navarra%20Blue%20Metallic-2D2D-10,33,127-320-en_US.jpg';
-  // Default placeholder
   return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
 };
 
@@ -128,25 +118,25 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
             <span className="content-value">{serviceItem.vehicle ? `${serviceItem.vehicle.year} ${serviceItem.vehicle.make} ${serviceItem.vehicle.model}` : 'Unknown'}</span>
           </div>
         </div>
-        {serviceItem.complaint && (
-          <div className="content-row">
-            <div className="content-item">
-              <Clock size={14} />
-              <span className="content-label">Issue</span>
-              <span className="content-value">{serviceItem.complaint}</span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Card Footer */}
       <div className="card-footer">
         <div className="technician-info">
-          <div className="technician-avatar technician-avatar--initials" style={{ backgroundColor: '#3b82f6' }}>
-            {serviceItem.serviceAdvisor?.userProfile ? 
-              `${serviceItem.serviceAdvisor.userProfile.firstName[0]}${serviceItem.serviceAdvisor.userProfile.lastName[0]}`.toUpperCase() :
-              'SA'
-            }
+          <div className="technician-avatar">
+            {serviceItem.serviceAdvisor?.userProfile?.profileImage ? (
+              <img
+                src={serviceItem.serviceAdvisor.userProfile.profileImage}
+                alt={`${serviceItem.serviceAdvisor.userProfile.firstName} ${serviceItem.serviceAdvisor.userProfile.lastName}`}
+              />
+            ) : (
+              <div className="technician-avatar--initials" style={{ backgroundColor: '#3b82f6' }}>
+                {serviceItem.serviceAdvisor?.userProfile ? 
+                  `${serviceItem.serviceAdvisor.userProfile.firstName[0]}${serviceItem.serviceAdvisor.userProfile.lastName[0]}`.toUpperCase() :
+                  'SA'
+                }
+              </div>
+            )}
           </div>
           <div className="technician-details">
             <span className="technician-name">

@@ -15,7 +15,6 @@ const KanbanPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Work order creation state
@@ -84,7 +83,6 @@ const KanbanPage: React.FC = () => {
   useEffect(() => {
     const fetchWorkOrders = async () => {
       try {
-        setLoading(true);
         setError(null);
         
         // First fetch the current service advisor details
@@ -105,8 +103,6 @@ const KanbanPage: React.FC = () => {
       } catch (err) {
         console.error('Failed to fetch work orders:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch work orders');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -177,6 +173,23 @@ const KanbanPage: React.FC = () => {
   };
 
   const handleAppointmentSelect = (appointmentId: string) => {
+    if (appointmentId === '') {
+      // Reset to manual entry
+      setWorkOrderForm(prev => ({
+        ...prev,
+        appointmentId: '',
+        customerId: '',
+        vehicleId: '',
+        advisorId: currentServiceAdvisor?.id || '',
+        complaint: '',
+        cannedServiceIds: [],
+        quantities: [],
+        prices: [],
+        serviceNotes: []
+      }));
+      return;
+    }
+
     const appointment = availableAppointments.find(apt => apt.id === appointmentId);
     if (appointment) {
       setWorkOrderForm(prev => ({
@@ -207,7 +220,7 @@ const KanbanPage: React.FC = () => {
       const workOrderData = {
         customerId: workOrderForm.customerId,
         vehicleId: workOrderForm.vehicleId,
-        appointmentId: workOrderForm.appointmentId,
+        appointmentId: workOrderForm.appointmentId === '' ? null : workOrderForm.appointmentId,
         advisorId: workOrderForm.advisorId,
         status: workOrderForm.status,
         jobType: workOrderForm.jobType,
@@ -330,14 +343,6 @@ const KanbanPage: React.FC = () => {
     { id: 'COMPLETED', title: 'Completed', color: '#059669' },
   ];
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner">Loading work orders...</div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="error-container">
@@ -404,7 +409,7 @@ const KanbanPage: React.FC = () => {
         <div className="modal-overlay" onClick={() => setCreateWorkOrderModalOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ backgroundColor: 'white', borderRadius: '8px', maxWidth: '800px', width: '90%', maxHeight: '90vh', overflow: 'auto' }}>
             <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>Create Work Order</h3>
+              <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>Create Work Order</h3>
               <button onClick={() => setCreateWorkOrderModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', padding: '0', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <i className='bx bx-x'></i>
               </button>

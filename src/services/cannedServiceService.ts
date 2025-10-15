@@ -90,10 +90,15 @@ class CannedServiceService {
         duration: data.duration,
         price: data.price,
         isAvailable: data.isAvailable !== undefined ? data.isAvailable : true,
-        laborOperations: data.serviceIds.map((serviceId: string, index: number) => ({
-          laborCatalogId: serviceId,
-          sequence: index + 1
-        }))
+        variantLabel: data.variantLabel,
+        vehicleType: data.vehicleType,
+        hasOptionalParts: data.hasOptionalParts,
+        hasOptionalLabor: data.hasOptionalLabor,
+        category: data.category,
+        minVehicleAge: data.minVehicleAge,
+        maxVehicleMileage: data.maxVehicleMileage,
+        isArchived: data.isArchived,
+        laborOperations: data.laborOperations || []
       };
 
       console.log('Sending canned service data:', cannedServiceData);

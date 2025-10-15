@@ -56,6 +56,7 @@ export interface WorkOrder {
       phone: string;
       firstName: string;
       lastName: string;
+      profileImage?: string;
     };
   };
   inspector?: {

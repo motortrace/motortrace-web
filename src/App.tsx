@@ -20,6 +20,7 @@ import InspectionRecordsPage from './pages/ServiceCenter/InspectionRecordsPage';
 import InspectionDetailPage from './pages/ServiceCenter/InspectionDetailPage';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
+import ServicesPage from './pages/ServiceCenter/ServicesPage';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
@@ -28,6 +29,7 @@ import CustomerProfile from './pages/ServiceCenter/CustomerProfile';
 import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
 import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
 import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
+import TechnicianProfile from './pages/ServiceCenter/TechnicianProfile';
 
 
 import AdminLogin from './pages/Admin/AdminLogin';
@@ -123,11 +125,12 @@ function App() {
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
-          <Route path="services" element={<CannedServices />} />
+          <Route path="services" element={<ServicesPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
         </Route>
@@ -151,11 +154,12 @@ function App() {
           <Route path="inspection-records" element={<InspectionRecordsPage />} />
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
-          <Route path="services" element={<CannedServices />} />
+          <Route path="services" element={<ServicesPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
         </Route>
