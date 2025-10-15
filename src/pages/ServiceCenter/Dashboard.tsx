@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import DailyCustomersLineChart from '../../components/DailyCustomersLineChart/DailyCustomersLineChart';
+import WorkOrderStatistics from '../../components/WorkOrderStatistics/WorkOrderStatistics';
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
 import Notifications from '../../components/Notifications/Notifications';
 import { useAuth } from '../../hooks/useAuth';
@@ -118,16 +118,6 @@ const Dashboard = () => {
       fetchAppointments();
     }
   }, [token, authLoading]);
-  // Fake data for daily customers
-  const dailyCustomersData = [
-    { date: '2024-01-15', customers: 15 },
-    { date: '2024-01-16', customers: 22 },
-    { date: '2024-01-17', customers: 18 },
-    { date: '2024-01-18', customers: 28 },
-    { date: '2024-01-19', customers: 24 },
-    { date: '2024-01-20', customers: 31 },
-    { date: '2024-01-21', customers: 19 }
-  ];
 
   return (
     <div style={{
@@ -318,8 +308,8 @@ const Dashboard = () => {
             />
           </div>
           
-          {/* Daily Customers Chart */}
-          <DailyCustomersLineChart data={dailyCustomersData} />
+          {/* Work Order Statistics Chart */}
+          <WorkOrderStatistics />
         </div>
 
         {/* Right Section - Calendar */}
