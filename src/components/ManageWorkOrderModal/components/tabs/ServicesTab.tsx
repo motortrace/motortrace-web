@@ -5,6 +5,7 @@ import { getTechnicianDisplayName } from '../../utils/helpers';
 import { useTechnicians } from '../../hooks/useTechnicians';
 import AssignTechnicianToServiceModal from '../modals/AssignTechnicianToServiceModal';
 import AssignTechnicianToLaborModal from '../modals/AssignTechnicianToLaborModal';
+import AddServiceToWorkOrderModal from '../modals/AddServiceToWorkOrderModal';
 
 interface ServicesTabProps {
   workOrderId: string;
@@ -28,6 +29,9 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   const [selectedService, setSelectedService] = useState<WorkOrderService | null>(null);
   const [selectedLabor, setSelectedLabor] = useState<WorkOrderLaborItem | null>(null);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Add service modal state
+  const [showAddServiceModal, setShowAddServiceModal] = useState(false);
 
   useEffect(() => {
     if (workOrderId && token) {
@@ -225,12 +229,34 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
 
   if (services.length === 0) {
     return (
-      <div className="tab-content" style={{ padding: '40px', textAlign: 'center' }}>
-        <i className="bx bx-wrench" style={{ fontSize: '48px', color: '#d1d5db' }}></i>
-        <p style={{ marginTop: '16px', color: '#6b7280', fontSize: '16px' }}>No services added yet</p>
-        <p style={{ marginTop: '8px', color: '#9ca3af', fontSize: '14px' }}>
-          Services will appear here once they are added to this work order
-        </p>
+      <div className="tab-content" style={{ padding: '24px' }}>
+        {/* Add Service Button */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+          <button
+            onClick={() => setShowAddServiceModal(true)}
+            className="btn btn--primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            <i className="bx bx-plus"></i>
+            Add Service
+          </button>
+        </div>
+
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <i className="bx bx-wrench" style={{ fontSize: '48px', color: '#d1d5db' }}></i>
+          <p style={{ marginTop: '16px', color: '#6b7280', fontSize: '16px' }}>No services added yet</p>
+          <p style={{ marginTop: '8px', color: '#9ca3af', fontSize: '14px' }}>
+            Services will appear here once they are added to this work order
+          </p>
+        </div>
+
+        {/* Add Service Modal */}
+        <AddServiceToWorkOrderModal
+          open={showAddServiceModal}
+          onClose={() => setShowAddServiceModal(false)}
+          workOrderId={workOrderId}
+          onServiceAdded={fetchServices}
+        />
       </div>
     );
   }
@@ -255,6 +281,18 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
             LKR {services.reduce((sum, s) => sum + Number(s.subtotal), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
         </div>
+      </div>
+
+      {/* Add Service Button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+        <button
+          onClick={() => setShowAddServiceModal(true)}
+          className="btn btn--primary"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          <i className="bx bx-plus"></i>
+          Add Service
+        </button>
       </div>
 
       {/* Services Table */}
@@ -492,6 +530,14 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
           onAssign={handleLaborAssignment}
         />
       )}
+
+      {/* Add Service Modal */}
+      <AddServiceToWorkOrderModal
+        open={showAddServiceModal}
+        onClose={() => setShowAddServiceModal(false)}
+        workOrderId={workOrderId}
+        onServiceAdded={fetchServices}
+      />
     </div>
   );
 };
