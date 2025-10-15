@@ -3,6 +3,7 @@ import WorkOrderStatistics from '../../components/WorkOrderStatistics/WorkOrderS
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
 import Notifications from '../../components/Notifications/Notifications';
 import { useAuth } from '../../hooks/useAuth';
+import { useWorkingTechnicians } from '../../hooks/useWorkingTechnicians';
 
 // MetricCard Component
 interface MetricCardProps {
@@ -46,6 +47,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 
 const Dashboard = () => {
   const { token, loading: authLoading } = useAuth();
+  const { technicians: workingTechnicians, loading: techniciansLoading, error: techniciansError } = useWorkingTechnicians();
   const [showNotifications, setShowNotifications] = useState(false);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
@@ -442,201 +444,194 @@ const Dashboard = () => {
 
         {/* Technicians Table */}
         <div style={{ padding: '16px 20px' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1fr 1fr auto',
-            gap: '16px',
-            alignItems: 'center',
-            padding: '12px 0',
-            borderBottom: '1px solid #f1f5f9',
-            fontSize: '12px',
-            fontWeight: '600',
-            color: '#64748b',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            <div>Technician</div>
-            <div>Specialization</div>
-            <div>Work Order</div>
-            <div>Work Type</div>
-            <div>Actions</div>
-          </div>
-
-          {/* Sample Technician Data */}
-          {[
-            {
-              id: 1,
-              name: 'John Smith',
-              specialization: 'Engine Specialist',
-              workOrderNumber: 'WO-2024-001',
-              workType: 'Labor',
-              avatar: '/src/assets/images/user.png'
-            },
-            {
-              id: 2,
-              name: 'Sarah Johnson',
-              specialization: 'Brake Systems',
-              workOrderNumber: 'WO-2024-002',
-              workType: 'Inspection',
-              avatar: '/src/assets/images/user.png'
-            },
-            {
-              id: 3,
-              name: 'Mike Wilson',
-              specialization: 'Electrical',
-              workOrderNumber: 'WO-2024-003',
-              workType: 'Labor',
-              avatar: '/src/assets/images/user.png'
-            }
-          ].map((technician) => {
-            // Define colors for different specializations
-            const getSpecializationColor = (specialization: string) => {
-              switch (specialization) {
-                case 'Engine Specialist':
-                  return { color: '#7c3aed', backgroundColor: '#ede9fe' }; // Purple
-                case 'Brake Systems':
-                  return { color: '#ea580c', backgroundColor: '#fed7aa' }; // Orange
-                case 'Electrical':
-                  return { color: '#0891b2', backgroundColor: '#cffafe' }; // Cyan
-                case 'Transmission':
-                  return { color: '#be185d', backgroundColor: '#fce7f3' }; // Pink
-                case 'Suspension':
-                  return { color: '#65a30d', backgroundColor: '#ecfccb' }; // Lime
-                case 'AC Systems':
-                  return { color: '#7c2d12', backgroundColor: '#fed7aa' }; // Brown
-                case 'Diagnostics':
-                  return { color: '#1e40af', backgroundColor: '#dbeafe' }; // Blue
-                case 'Body Work':
-                  return { color: '#be123c', backgroundColor: '#fce7f3' }; // Rose
-                case 'Exhaust':
-                  return { color: '#9333ea', backgroundColor: '#f3e8ff' }; // Violet
-                case 'Fuel System':
-                  return { color: '#0d9488', backgroundColor: '#ccfbf1' }; // Teal
-                default:
-                  return { color: '#6b7280', backgroundColor: '#f3f4f6' }; // Gray
-              }
-            };
-
-            const specColors = getSpecializationColor(technician.specialization);
-
-            return (
-            <div key={technician.id} style={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr 1fr auto',
-              gap: '16px',
+          {techniciansLoading ? (
+            <div style={{
+              display: 'flex',
               alignItems: 'center',
-              padding: '16px 0',
-              borderBottom: '1px solid #f1f5f9'
+              justifyContent: 'center',
+              padding: '40px',
+              color: '#64748b'
             }}>
-              {/* Technician Name with Avatar */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-              }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  backgroundColor: '#e2e8f0',
-                  backgroundImage: `url(${technician.avatar})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  border: '2px solid #f1f5f9'
-                }} />
-                <div>
-                  <div style={{
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#1e293b',
-                    marginBottom: '2px'
-                  }}>
-                    {technician.name}
-                  </div>
-                </div>
-              </div>
-
-              {/* Specialization */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start'
-              }}>
-                <span style={{
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  color: specColors.color,
-                  backgroundColor: specColors.backgroundColor,
-                  padding: '4px 8px',
-                  borderRadius: '12px',
-                  textAlign: 'center',
-                  width: 'fit-content'
-                }}>
-                  {technician.specialization}
-                </span>
-              </div>
-
-              {/* Work Order Number */}
-              <div style={{
-                fontSize: '13px',
-                color: '#475569',
-                fontWeight: '500'
-              }}>
-                {technician.workOrderNumber}
-              </div>
-
-              {/* Work Type */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start'
-              }}>
-                <span style={{
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  color: technician.workType === 'Labor' ? '#059669' : '#dc2626',
-                  backgroundColor: technician.workType === 'Labor' ? '#d1fae5' : '#fee2e2',
-                  padding: '4px 8px',
-                  borderRadius: '12px',
-                  textAlign: 'center',
-                  width: 'fit-content'
-                }}>
-                  {technician.workType}
-                </span>
-              </div>
-
-              {/* Action Button */}
-              <div>
-                <button style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '6px',
-                  border: '1px solid #e2e8f0',
-                  backgroundColor: 'white',
-                  color: '#64748b',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s',
-                  fontSize: '16px'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#cbd5e1';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                }}
-                onClick={() => console.log('View technician:', technician.id)}
-                >
-                  <i className='bx bx-show'></i>
-                </button>
-              </div>
+              Loading technicians...
             </div>
-            );
-          })}
+          ) : techniciansError ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+              color: '#ef4444'
+            }}>
+              Error loading technicians: {techniciansError}
+            </div>
+          ) : workingTechnicians.length === 0 ? (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+              color: '#64748b'
+            }}>
+              <i className='bx bx-user-x' style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}></i>
+              <div style={{ fontSize: '16px', fontWeight: '500' }}>No technicians currently working</div>
+            </div>
+          ) : (
+            <>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1fr 2fr 1fr auto',
+                gap: '16px',
+                alignItems: 'center',
+                padding: '12px 0',
+                borderBottom: '1px solid #f1f5f9',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#64748b',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                <div>Technician</div>
+                <div>Work Order</div>
+                <div>Task Type</div>
+                <div>Task Description</div>
+                <div>Time Worked</div>
+                <div>Actions</div>
+              </div>
+
+              {workingTechnicians.map((technician, index) => {
+                const formatTime = (minutes: number) => {
+                  const hours = Math.floor(minutes / 60);
+                  const mins = minutes % 60;
+                  return `${hours}:${mins.toString().padStart(2, '0')}`;
+                };
+
+                return (
+                  <div key={index} style={{
+                    display: 'grid',
+                    gridTemplateColumns: '2fr 1fr 1fr 2fr 1fr auto',
+                    gap: '16px',
+                    alignItems: 'center',
+                    padding: '16px 0',
+                    borderBottom: '1px solid #f1f5f9'
+                  }}>
+                    {/* Technician Name with Avatar */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px'
+                    }}>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: '#e2e8f0',
+                        backgroundImage: `url(${technician.technicianImage})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        border: '2px solid #f1f5f9'
+                      }} />
+                      <div>
+                        <div style={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#1e293b',
+                          marginBottom: '2px'
+                        }}>
+                          {technician.technicianName}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Work Order Number */}
+                    <div style={{
+                      fontSize: '13px',
+                      color: '#475569',
+                      fontWeight: '500'
+                    }}>
+                      {technician.workOrderNumber}
+                    </div>
+
+                    {/* Task Type */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start'
+                    }}>
+                      <span style={{
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: technician.taskType === 'Labor' ? '#059669' : '#dc2626',
+                        backgroundColor: technician.taskType === 'Labor' ? '#d1fae5' : '#fee2e2',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        textAlign: 'center',
+                        width: 'fit-content'
+                      }}>
+                        {technician.taskType}
+                      </span>
+                    </div>
+
+                    {/* Task Description */}
+                    <div style={{
+                      fontSize: '13px',
+                      color: '#475569'
+                    }}>
+                      {technician.taskDescription}
+                    </div>
+
+                    {/* Time Worked */}
+                    <div style={{
+                      fontSize: '13px',
+                      color: '#475569',
+                      fontWeight: '500'
+                    }}>
+                      {formatTime(technician.timeWorkedMinutes)}
+                      {technician.expectedMinutes && (
+                        <div style={{
+                          fontSize: '11px',
+                          color: '#64748b',
+                          marginTop: '2px'
+                        }}>
+                          / {formatTime(technician.expectedMinutes)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Button */}
+                    <div>
+                      <button style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '6px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: 'white',
+                        color: '#64748b',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s',
+                        fontSize: '16px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f8fafc';
+                        e.currentTarget.style.borderColor = '#cbd5e1';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                      }}
+                      onClick={() => console.log('View technician:', technician.technicianName)}
+                      >
+                        <i className='bx bx-show'></i>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
         </div>
       </div>
     </div>
