@@ -30,7 +30,8 @@ import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
 import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
 import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
 import TechnicianProfile from './pages/ServiceCenter/TechnicianProfile';
-
+import ServiceDetailPage from './pages/ServiceCenter/ServiceDetailPage';
+import LaborCatalogPage from './pages/ServiceCenter/LaborCatalogPage';
 
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
@@ -126,6 +127,8 @@ function App() {
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<ServicesPage />} />
+          <Route path="service/:id" element={<ServiceDetailPage />} />
+          <Route path="labor-catalog" element={<LaborCatalogPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />
@@ -155,6 +158,8 @@ function App() {
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<ServicesPage />} />
+          <Route path="service/:id" element={<ServiceDetailPage />} />
+          <Route path="labor-catalog" element={<LaborCatalogPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="profile" element={<EditProfile />} />

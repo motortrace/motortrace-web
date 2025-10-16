@@ -23,6 +23,7 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
   const [error, setError] = useState('');
   const [attachments, setAttachments] = useState<Record<string, any[]>>({}); // inspectionId -> attachments
   const [loadingAttachments, setLoadingAttachments] = useState<Record<string, boolean>>({});
+  const [approvals, setApprovals] = useState<any[]>([]);
 
   useEffect(() => {
     if (!workOrderId) return;
@@ -51,6 +52,16 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
       .catch(() => {
         setError('Failed to fetch inspections');
         setLoading(false);
+      });
+
+    // Fetch approvals
+    fetch(`http://localhost:3000/work-orders/${workOrderId}/approvals`)
+      .then(res => res.json())
+      .then(data => {
+        setApprovals(data.data || []);
+      })
+      .catch(() => {
+        setApprovals([]);
       });
   }, [workOrderId]);
 
@@ -81,6 +92,7 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
   // Summary cards
   const totalInspections = inspections.length;
   const completedInspections = inspections.filter(i => i.isCompleted).length;
+  const pendingApproval = approvals.find(a => a.status === 'PENDING');
 
   return (
     <div className="tab-content inspections-tab">
@@ -215,7 +227,13 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
                         <button 
                           className="view-btn"
                           title="View Inspection"
-                          onClick={() => alert(`View details for inspection ${inspection.id}`)}
+                          onClick={() => {
+                            if (pendingApproval && pendingApproval.inspectionPdfUrl) {
+                              window.open(pendingApproval.inspectionPdfUrl, '_blank');
+                            } else {
+                              alert('No inspection PDF available');
+                            }
+                          }}
                         >
                           <i className="bx bx-box"></i>
                         </button>

@@ -98,7 +98,7 @@
 
 .login-right {
   flex: 1.2;
-  background: linear-gradient(135deg, #4153F1 0%, #667eea 50%, #764ba2 100%);
+  background: #1d4ed8;
   padding: 48px;
   display: flex;
   flex-direction: column;
@@ -171,7 +171,7 @@
   margin: 0 0 12px 0;
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #1a1a1a 0%, #4254F6 100%);
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -385,7 +385,7 @@
 }
 
 .login-submit {
-  background: linear-gradient(135deg, #4153F1 0%, #667eea 100%);
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
   border: none;
   border-radius: 12px;
   padding: 18px 24px;
@@ -395,7 +395,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 8px;
-  box-shadow: 0 8px 25px rgba(65, 83, 241, 0.3);
+  box-shadow: 0 8px 25px rgba(29, 78, 216, 0.3);
   position: relative;
   overflow: hidden;
   letter-spacing: -0.01em;
@@ -413,7 +413,7 @@
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(65, 83, 241, 0.4);
+    box-shadow: 0 12px 35px rgba(29, 78, 216, 0.4);
 
     &::before {
       left: 100%;

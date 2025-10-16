@@ -66,6 +66,20 @@ class CannedServiceService {
     }
   }
 
+  async getPackageDetails(id: string): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${id}/details`, {
+        headers: this.getAuthHeaders(),
+      });
+
+      const result = await this.handleResponse(response);
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching package details:', error);
+      throw error;
+    }
+  }
+
   async createPackage(data: any): Promise<any> {
     // try {
     //   const response = await fetch(this.baseUrl, {

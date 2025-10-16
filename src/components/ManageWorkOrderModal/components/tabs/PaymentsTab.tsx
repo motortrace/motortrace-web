@@ -206,7 +206,7 @@ const PaymentsTab: React.FC<PaymentsTabProps> = ({
         </div>
         <div className="payments-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Amount</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>${totalAmount.toFixed(2)}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>LKR{totalAmount.toFixed(2)}</div>
         </div>
       </div>
 
@@ -241,7 +241,7 @@ const PaymentsTab: React.FC<PaymentsTabProps> = ({
                     {getMethodBadge(payment.method)}
                   </td>
                   <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle', fontWeight: '600' }}>
-                    ${Number(payment.amount).toFixed(2)}
+                    LKR{Number(payment.amount).toFixed(2)}
                   </td>
                   <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                     {payment.reference ? payment.reference : getUnavailableBadge('No Reference')}
