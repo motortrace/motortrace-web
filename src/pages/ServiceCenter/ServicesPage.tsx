@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import CreateCannedServiceModal from '../../components/CreateCannedServiceModal';
 import ServicePopularityChart from '../../components/ServicePopularityChart/ServicePopularityChart';
@@ -29,6 +30,7 @@ interface Service {
 }
 
 const ServicesPage = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [services, setServices] = useState<Service[]>([]);
@@ -150,7 +152,7 @@ const ServicesPage = () => {
       align: 'center',
       render: (_: any, row: Service) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); console.log('View service details:', row.name); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); console.log('Navigating to service:', row.id); navigate(`service/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
         </div>
@@ -211,7 +213,7 @@ const ServicesPage = () => {
           <Table
             columns={columns}
             data={filteredServices}
-            onRowClick={(service) => console.log('View service details:', service.name)}
+            onRowClick={(service) => navigate(`service/${service.id}`)}
             emptyMessage="No services found matching your search criteria."
           />
         )}
