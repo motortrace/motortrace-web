@@ -331,7 +331,7 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <div className="login-right">
+        <div className="login-right" style={{ background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)' }}>
 
           <div style={{
             textAlign: 'center',
