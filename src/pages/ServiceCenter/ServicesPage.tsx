@@ -189,6 +189,10 @@ const ServicesPage = () => {
               ))}
             </select>
           </div>
+          <button className="action-btn secondary" onClick={() => navigate('labor-catalog')}>
+            <i className="bx bx-list-ul"></i>
+            View Labor Catalog
+          </button>
           <button className="action-btn primary" onClick={() => setIsCreateModalOpen(true)}>
             <i className="bx bx-plus"></i>
             Create Service
