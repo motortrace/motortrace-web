@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './AppointmentsPage.scss';
 import { useAuth } from '../../hooks/useAuth';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Types based on the backend API response
 interface Appointment {
@@ -150,6 +153,7 @@ const getPriorityBadge = (priority: string) => {
 
 const AppointmentsPage = () => {
   const { token, loading: authLoading } = useAuth();
+  const localizer = momentLocalizer(moment);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCustomer, setFilterCustomer] = useState('all');
@@ -159,6 +163,7 @@ const AppointmentsPage = () => {
   const [error, setError] = useState('');
   const [serviceAdvisors, setServiceAdvisors] = useState<ServiceAdvisor[]>([]);
   const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
 
   // Modal state
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -780,6 +785,73 @@ const AppointmentsPage = () => {
   const pendingAppointments = filteredAppointments.filter(apt => apt.status === 'PENDING');
   const confirmedAppointments = filteredAppointments.filter(apt => apt.status === 'CONFIRMED');
 
+  // Map calendar appointments to BigCalendar events
+  const calendarEvents = appointments
+    .filter(apt => apt.startTime) // Only show appointments with scheduled times
+    .map(apt => ({
+      id: apt.id,
+      title: `${apt.customer?.name || apt.customerId} – ${apt.vehicle ? `${apt.vehicle.make} ${apt.vehicle.model}` : apt.vehicleId}`,
+      start: new Date(apt.startTime!),
+      end: new Date(apt.startTime!), // Assuming no end time, or add duration if available
+      resource: apt,
+    }));
+
+  const handleEventClick = (event: any) => {
+    // Find the full appointment details from the regular appointments list
+    const appointment = appointments.find(apt => apt.id === event.id);
+    if (appointment) {
+      setSelectedAppointment(appointment);
+      setViewModalOpen(true);
+    }
+  };
+
+  const eventStyleGetter = (event: any) => {
+    let backgroundColor = '#3b82f6'; // default blue
+    let borderColor = '#2563eb';
+    
+    switch (event.resource.status) {
+      case 'PENDING':
+        backgroundColor = '#2A7399';
+        borderColor = '#1e5f7a';
+        break;
+      case 'CONFIRMED':
+        backgroundColor = '#1DB5D5';
+        borderColor = '#1794ad';
+        break;
+      case 'IN_PROGRESS':
+        backgroundColor = '#FECC1B';
+        borderColor = '#d4a816';
+        break;
+      case 'COMPLETED':
+        backgroundColor = '#ED7861';
+        borderColor = '#c55f4e';
+        break;
+      case 'CANCELLED':
+        backgroundColor = '#E95988';
+        borderColor = '#c1476f';
+        break;
+      case 'NO_SHOW':
+        backgroundColor = '#6b7280'; // gray for no show
+        borderColor = '#4b5563';
+        break;
+      default:
+        backgroundColor = '#3b82f6'; // blue
+        borderColor = '#2563eb';
+    }
+
+    return {
+      style: {
+        backgroundColor,
+        borderColor,
+        borderRadius: '4px',
+        opacity: 0.8,
+        color: 'white',
+        border: '0px',
+        display: 'block'
+      }
+    };
+  };
+
   return (
     <div className="appointments-page">
       <div className="page-header">
@@ -788,6 +860,20 @@ const AppointmentsPage = () => {
           <p className="page-subtitle">Manage and confirm appointment requests</p>
         </div>
         <div className="header-actions">
+          <div className="view-toggle">
+            <button 
+              className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
+              onClick={() => setViewMode('table')}
+            >
+              <i className='bx bx-table'></i> Table
+            </button>
+            <button 
+              className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
+              onClick={() => setViewMode('calendar')}
+            >
+              <i className='bx bx-calendar'></i> Calendar
+            </button>
+          </div>
           <div className="search-container">
             <input
               type="text"
@@ -839,49 +925,76 @@ const AppointmentsPage = () => {
         </div>
       </div>
 
-      {/* Incoming Appointment Requests */}
-      <div className="appointments-section">
-        <div className="section-header">
-          <h3 className="section-title">Incoming Appointment Requests</h3>
-          <span className="count-badge">{pendingAppointments.length}</span>
-        </div>
-        <div className="parts-table-container">
-          {loading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div style={{ color: 'red' }}>{error}</div>
-          ) : (
-            <Table
-              columns={incomingColumns}
-              data={pendingAppointments.map(apt => ({ ...apt, uniqueKey: `pending-${apt.id}` }))}
-              onRowClick={(appointment) => handleView(appointment.id)}
-              emptyMessage="No pending appointment requests found."
-            />
-          )}
-        </div>
-      </div>
+      {viewMode === 'table' ? (
+        <>
+          {/* Incoming Appointment Requests */}
+          <div className="appointments-section">
+            <div className="section-header">
+              <h3 className="section-title">Incoming Appointment Requests</h3>
+              <span className="count-badge">{pendingAppointments.length}</span>
+            </div>
+            <div className="parts-table-container">
+              {loading ? (
+                <div>Loading...</div>
+              ) : error ? (
+                <div style={{ color: 'red' }}>{error}</div>
+              ) : (
+                <Table
+                  columns={incomingColumns}
+                  data={pendingAppointments.map(apt => ({ ...apt, uniqueKey: `pending-${apt.id}` }))}
+                  onRowClick={(appointment) => handleView(appointment.id)}
+                  emptyMessage="No pending appointment requests found."
+                />
+              )}
+            </div>
+          </div>
 
-      {/* Confirmed Appointments */}
-      <div className="appointments-section">
-        <div className="section-header">
-          <h3 className="section-title">Confirmed Appointments</h3>
-          <span className="count-badge">{confirmedAppointments.length}</span>
+          {/* Confirmed Appointments */}
+          <div className="appointments-section">
+            <div className="section-header">
+              <h3 className="section-title">Confirmed Appointments</h3>
+              <span className="count-badge">{confirmedAppointments.length}</span>
+            </div>
+            <div className="parts-table-container">
+              {loading ? (
+                <div>Loading...</div>
+              ) : error ? (
+                <div style={{ color: 'red' }}>{error}</div>
+              ) : (
+                <Table
+                  columns={confirmedColumns}
+                  data={confirmedAppointments.map(apt => ({ ...apt, uniqueKey: `confirmed-${apt.id}` }))}
+                  onRowClick={(appointment) => handleView(appointment.id)}
+                  emptyMessage="No confirmed appointments found."
+                />
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="calendar-section">
+          <div className="section-header">
+            <h3 className="section-title">Appointment Calendar</h3>
+          </div>
+          <div className="calendar-container">
+            {loading ? (
+              <div>Loading calendar...</div>
+            ) : (
+              <Calendar
+                localizer={localizer}
+                events={calendarEvents}
+                startAccessor="start"
+                endAccessor="end"
+                style={{ height: 600 }}
+                onSelectEvent={handleEventClick}
+                views={['month', 'week', 'day']}
+                defaultView="month"
+                eventPropGetter={eventStyleGetter}
+              />
+            )}
+          </div>
         </div>
-        <div className="parts-table-container">
-          {loading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div style={{ color: 'red' }}>{error}</div>
-          ) : (
-            <Table
-              columns={confirmedColumns}
-              data={confirmedAppointments.map(apt => ({ ...apt, uniqueKey: `confirmed-${apt.id}` }))}
-              onRowClick={(appointment) => handleView(appointment.id)}
-              emptyMessage="No confirmed appointments found."
-            />
-          )}
-        </div>
-      </div>
+      )}
 
       {/* View Modal */}
       {viewModalOpen && selectedAppointment && (
