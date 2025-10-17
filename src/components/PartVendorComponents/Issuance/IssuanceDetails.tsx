@@ -149,7 +149,7 @@ const IssuanceDetails: React.FC = () => {
       setIssuance(data);
     } catch (err) {
       console.error('Error fetching issuance details:', err);
-      setError('Failed to load issuance details. Please try again.');
+      setError(`Failed to load issuance details. Please try again.${id}`);
     } finally {
       setLoading(false);
     }

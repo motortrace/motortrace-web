@@ -287,7 +287,7 @@ const IssuanceList: React.FC = () => {
               {paginatedIssuances.map((itm: Issuance) => (
                 <div key={itm.id} className="issuance-list__row">
                   <div className="issuance-list__cell" data-label="Issuance #">
-                    {itm.issuance_number}
+                    {itm.id}
                   </div>
 
                   <div className="issuance-list__cell" data-label="Part(s)">
@@ -302,7 +302,7 @@ const IssuanceList: React.FC = () => {
                         />
                       ) : (
                         <div className="issuance-list__product-placeholder">
-                          No Image
+                          {/* No Image */}
                         </div>
                       )}
                       <div className="issuance-list__product-info">

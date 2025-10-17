@@ -480,7 +480,7 @@ export const ReportPage: React.FC = () => {
             {/* Low-stock / Out-of-stock reports use StockReport */}
             {(selectedReport === 'low-stock' || selectedReport === 'out-of-stock') && (
               <StockReport
-                products={products}
+                // products={products}
                 reportType={selectedReport}
                 category={currentFilters.category}
               />
