@@ -11,7 +11,7 @@ export interface WorkOrder {
   advisorId?: string;
   technicianId?: string;
   status: 'RECEIVED' | 'ESTIMATE' | 'APPROVAL' | 'IN_PROGRESS' | 'WAITING_FOR_PARTS' | 'COMPLETED' | 'CANCELLED';
-  workflowStep: 'RECEIVED' | 'ESTIMATE' | 'APPROVAL' | 'IN_PROGRESS' | 'WAITING_FOR_PARTS' | 'COMPLETED' | 'CANCELLED';
+  workflowStep: 'RECEIVED' | 'INSPECTION' | 'ESTIMATE' | 'APPROVAL' | 'REPAIR' | 'QC' | 'READY' | 'CLOSED';
   jobType: 'REPAIR' | 'MAINTENANCE' | 'INSPECTION' | 'DIAGNOSTIC' | 'OTHER';
   priority: 'HIGH' | 'MEDIUM' | 'LOW' | 'NORMAL';
   source: 'WALK_IN' | 'APPOINTMENT' | 'PHONE' | 'ONLINE' | 'OTHER';
@@ -259,6 +259,20 @@ export async function updateWorkOrderStatus(id: string, status: WorkOrder['statu
     body: JSON.stringify({ status, workflowStep }),
   });
   if (!res.ok) throw new Error('Failed to update work order status');
+  return res.json();
+}
+
+export async function updateWorkOrderWorkflowStep(id: string, workflowStep: WorkOrder['workflowStep']) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${API_BASE}/${id}/workflow-step`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ workflowStep }),
+  });
+  if (!res.ok) throw new Error('Failed to update work order workflow step');
   return res.json();
 }
 
