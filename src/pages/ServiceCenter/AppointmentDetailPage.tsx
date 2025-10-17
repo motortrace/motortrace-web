@@ -502,15 +502,13 @@ const AppointmentDetailPage = () => {
                 <h4>Requested Services</h4>
                 <div className="services-list">
                   {appointment.cannedServices.map((service, index) => (
-                    <div key={service.id || index} className="service-item">
-                      <div className="service-header">
+                    <div key={service.id || index} className="service-card">
+                      <div className="service-card-header">
                         <h5>{service.name}</h5>
                         <span className="service-code">Code: {service.code}</span>
                       </div>
-                      <div className="service-details">
+                      <div className="service-card-body">
                         <p><strong>Duration:</strong> {service.duration} minutes</p>
-                        <p><strong>Quantity:</strong> {service.quantity}</p>
-                        <p><strong>Price:</strong> LKR {typeof service.price === 'number' ? service.price.toFixed(2) : service.price}</p>
                         {service.notes && <p><strong>Notes:</strong> {service.notes}</p>}
                       </div>
                     </div>

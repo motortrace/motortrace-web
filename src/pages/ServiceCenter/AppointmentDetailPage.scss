@@ -199,43 +199,56 @@
 
           .services-list {
             display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 16px;
 
-            .service-item {
-              padding: 16px;
-              background: #f9fafb;
-              border-radius: 6px;
+            .service-card {
+              background: white;
               border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              padding: 20px;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              transition: box-shadow 0.2s;
 
-              .service-header {
+              &:hover {
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              }
+
+              .service-card-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
-                margin-bottom: 12px;
+                align-items: flex-start;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #f3f4f6;
 
                 h5 {
-                  font-size: 16px;
+                  font-size: 18px;
                   font-weight: 600;
                   color: #111827;
                   margin: 0;
+                  flex: 1;
                 }
 
                 .service-code {
                   font-size: 12px;
                   color: #6b7280;
-                  background: #e5e7eb;
-                  padding: 2px 6px;
+                  background: #f3f4f6;
+                  padding: 4px 8px;
                   border-radius: 4px;
+                  margin-left: 12px;
+                  white-space: nowrap;
                 }
               }
 
-              .service-details {
+              .service-card-body {
                 p {
-                  margin: 4px 0;
+                  margin: 8px 0;
                   font-size: 14px;
+                  color: #374151;
 
                   strong {
-                    color: #374151;
+                    color: #111827;
                     min-width: 80px;
                     display: inline-block;
                   }
