@@ -268,3 +268,60 @@ export interface ManageWorkOrderModalProps {
   workOrder?: any;
   onUpdate?: () => void;
 }
+
+// ==================== Invoice Types ====================
+
+export interface InvoiceLineItem {
+  id: string;
+  invoiceId: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  type: 'SERVICE' | 'PART' | 'LABOR';
+  createdAt: string;
+}
+
+export interface InvoiceCustomer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface InvoiceVehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  licensePlate: string;
+}
+
+export interface InvoiceWorkOrder {
+  id: string;
+  workOrderNumber: string;
+  customer: InvoiceCustomer;
+  vehicle: InvoiceVehicle;
+}
+
+export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  workOrderId: string;
+  issueDate: string;
+  dueDate: string;
+  status: InvoiceStatus;
+  subtotalServices: number;
+  subtotalLabor: number;
+  subtotalParts: number;
+  subtotal: number;
+  taxAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  notes?: string;
+  terms?: string;
+  workOrder: InvoiceWorkOrder;
+  lineItems: InvoiceLineItem[];
+}
