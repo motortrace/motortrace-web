@@ -75,6 +75,33 @@ interface ServiceAdvisor {
   estimatesCount: number;
 }
 
+interface ServiceHistoryItem {
+  workOrderId: string;
+  workOrderNumber: string;
+  vehicle: {
+    id: string;
+    make: string;
+    model: string;
+    year: number;
+    licensePlate: string;
+  };
+  completedAt: string;
+  services: Array<{
+    id: string;
+    name: string;
+    code: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+  }>;
+  inspections: Array<{
+    id: string;
+    templateName: string;
+    inspector: string;
+    date: string;
+  }>;
+}
+
 const getPriorityBadge = (priority: string) => {
   const priorityText = priority.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
@@ -168,6 +195,11 @@ const AppointmentDetailPage = () => {
   const [cancelLoading, setCancelLoading] = useState(false);
   const [cancelError, setCancelError] = useState('');
 
+  // Service history state
+  const [serviceHistory, setServiceHistory] = useState<ServiceHistoryItem[]>([]);
+  const [serviceHistoryLoading, setServiceHistoryLoading] = useState(false);
+  const [serviceHistoryError, setServiceHistoryError] = useState('');
+
   // Fetch service advisors
   const fetchServiceAdvisors = async () => {
     if (!token) {
@@ -209,6 +241,44 @@ const AppointmentDetailPage = () => {
       console.error('Error fetching service advisors:', err);
     } finally {
       setServiceAdvisorsLoading(false);
+    }
+  };
+
+  // Fetch service history
+  const fetchServiceHistory = async (customerId: string) => {
+    if (!token) {
+      console.log('No token available for service history fetch');
+      return;
+    }
+
+    setServiceHistoryLoading(true);
+    setServiceHistoryError('');
+
+    try {
+      const response = await fetch(`http://localhost:3000/customers/${customerId}/service-history`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch service history: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setServiceHistory(data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch service history');
+      }
+    } catch (err) {
+      console.error('Error fetching service history:', err);
+      setServiceHistoryError(err instanceof Error ? err.message : 'Failed to fetch service history');
+    } finally {
+      setServiceHistoryLoading(false);
     }
   };
 
@@ -257,6 +327,13 @@ const AppointmentDetailPage = () => {
       fetchServiceAdvisors();
     }
   }, [id, token]);
+
+  // Fetch service history when appointment is loaded
+  useEffect(() => {
+    if (appointment?.customerId && token) {
+      fetchServiceHistory(appointment.customerId);
+    }
+  }, [appointment?.customerId, token]);
 
   // Handle appointment assignment
   const handleAssign = async () => {
@@ -523,6 +600,63 @@ const AppointmentDetailPage = () => {
                 </div>
               </div>
             )}
+
+            {/* Service History Section */}
+            <div className="service-history-section">
+              <h4>Service History</h4>
+              {serviceHistoryLoading ? (
+                <div className="loading-history">Loading service history...</div>
+              ) : serviceHistoryError ? (
+                <div className="error-history">{serviceHistoryError}</div>
+              ) : serviceHistory.length > 0 ? (
+                <div className="history-list">
+                  {serviceHistory.map((item, index) => (
+                    <div key={item.workOrderId || index} className="history-item">
+                      <div className="history-header">
+                        <h5>{item.workOrderNumber}</h5>
+                        <span className="completion-date">
+                          {new Date(item.completedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="history-body">
+                        <div className="vehicle-summary">
+                          <p><strong>Vehicle:</strong> {item.vehicle.year} {item.vehicle.make} {item.vehicle.model}</p>
+                          <p><strong>License Plate:</strong> {item.vehicle.licensePlate}</p>
+                        </div>
+
+                        {item.services.length > 0 && (
+                          <div className="services-summary">
+                            <h6>Services Performed:</h6>
+                            <ul>
+                              {item.services.map((service, serviceIndex) => (
+                                <li key={service.id || serviceIndex}>
+                                  {service.name} ({service.code}) - Qty: {service.quantity}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {item.inspections.length > 0 && (
+                          <div className="inspections-summary">
+                            <h6>Inspections:</h6>
+                            <ul>
+                              {item.inspections.map((inspection, inspectionIndex) => (
+                                <li key={inspection.id || inspectionIndex}>
+                                  {inspection.templateName} - {inspection.inspector} ({new Date(inspection.date).toLocaleDateString()})
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-history">No service history found for this customer.</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
