@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { WorkOrderInspection, InspectionTemplate } from '../../types';
+import { useTechnicians } from '../../hooks/useTechnicians';
+import AssignTechnicianModal from '../modals/AssignTechnicianModal';
 
 interface InspectionsTabProps {
   workOrderId: string;
@@ -24,6 +26,10 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
   const [attachments, setAttachments] = useState<Record<string, any[]>>({}); // inspectionId -> attachments
   const [loadingAttachments, setLoadingAttachments] = useState<Record<string, boolean>>({});
   const [approvals, setApprovals] = useState<any[]>([]);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedInspectionId, setSelectedInspectionId] = useState<string | null>(null);
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>('');
+  const { technicians, assignTechnicianToLabor, fetchTechnicians } = useTechnicians();
 
   useEffect(() => {
     if (!workOrderId) return;
@@ -241,7 +247,10 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
                             <button 
                               className="assign-btn"
                               title="Assign Technician"
-                              onClick={() => onOpenAssignTechnicianModal(inspection.id)}
+                              onClick={() => {
+                                setSelectedInspectionId(inspection.id);
+                                setShowAssignModal(true);
+                              }}
                               style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
                             >
                               <i className="bx bx-user-plus"></i>
@@ -282,6 +291,39 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
         </table>
       </div>
       )}
+
+      {/* Assign Technician Modal */}
+      <AssignTechnicianModal
+        show={showAssignModal}
+        onClose={() => {
+          setShowAssignModal(false);
+          setSelectedTechnicianId('');
+        }}
+        technicians={technicians}
+        selectedTechnicianId={selectedTechnicianId}
+        setSelectedTechnicianId={setSelectedTechnicianId}
+        onAssign={async () => {
+          if (!selectedTechnicianId || !selectedInspectionId) return;
+          try {
+            const response = await fetch(`http://localhost:3000/inspection-templates/inspections/${selectedInspectionId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ inspectorId: selectedTechnicianId }),
+            });
+            if (response.ok) {
+              setShowAssignModal(false);
+              setSelectedTechnicianId('');
+            } else {
+              alert('Failed to assign technician');
+            }
+          } catch (error) {
+            alert('Error assigning technician');
+          }
+        }}
+        getTechnicianDisplayName={(technician) => technician.userProfile?.name || 'Unnamed Technician'}
+      />
     </div>
   );
 };
