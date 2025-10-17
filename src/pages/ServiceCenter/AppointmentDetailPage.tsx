@@ -505,7 +505,14 @@ const AppointmentDetailPage = () => {
                     <div key={service.id || index} className="service-card">
                       <div className="service-card-header">
                         <h5>{service.name}</h5>
-                        <span className="service-code">Code: {service.code}</span>
+                        <a
+                          href={`http://localhost:5173/manager/service/${service.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="service-view-btn"
+                        >
+                          <i className='bx bx-show'></i> View
+                        </a>
                       </div>
                       <div className="service-card-body">
                         <p><strong>Duration:</strong> {service.duration} minutes</p>
