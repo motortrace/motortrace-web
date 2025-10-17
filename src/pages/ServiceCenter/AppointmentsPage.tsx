@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './AppointmentsPage.scss';
 import { useAuth } from '../../hooks/useAuth';
@@ -140,6 +141,7 @@ const getPriorityBadge = (priority: string) => {
 
 const AppointmentsPage = () => {
   const { token, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const localizer = momentLocalizer(moment);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -553,6 +555,9 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/serviceadvisor/appointment-detail/${row.id}`); }}>
+            <i className='bx bx-show'></i>
+          </button>
           <button className="btn-icon" title="Confirm" onClick={e => { e.stopPropagation(); handleConfirm(row.id); }}>
             <i className='bx bx-check'></i>
           </button>
@@ -747,7 +752,7 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); console.log('View appointment:', row.id); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/serviceadvisor/appointment-detail/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
         </div>
