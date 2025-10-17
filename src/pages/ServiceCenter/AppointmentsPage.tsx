@@ -77,19 +77,6 @@ interface ServiceAdvisor {
   estimatesCount: number;
 }
 
-const getStatusBadge = (status: string) => {
-  const badgeClass = {
-    'PENDING': 'status-badge status-low-stock',
-    'CONFIRMED': 'status-badge status-in-stock',
-    'IN_PROGRESS': 'status-badge status-overstock',
-    'COMPLETED': 'status-badge status-in-stock',
-    'CANCELLED': 'status-badge status-out-of-stock',
-    'NO_SHOW': 'status-badge status-out-of-stock',
-  }[status] || 'status-badge';
-  const statusText = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  return <span className={badgeClass}>{statusText}</span>;
-};
-
 const getPriorityBadge = (priority: string) => {
   const priorityText = priority.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   
@@ -166,8 +153,6 @@ const AppointmentsPage = () => {
   const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
 
   // Modal state
-  const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmingAppointment, setConfirmingAppointment] = useState<Appointment | null>(null);
   
@@ -305,12 +290,6 @@ const AppointmentsPage = () => {
     return matchesSearch && matchesStatus && matchesCustomer && matchesVehicle;
   });
 
-  const handleView = (id: string) => {
-    const appointment = appointments.find((a: Appointment) => a.id === id) || null;
-    setSelectedAppointment(appointment);
-    setViewModalOpen(true);
-  };
-
   const handleConfirm = (id: string) => {
     const appointment = appointments.find((a: Appointment) => a.id === id);
     if (appointment) {
@@ -374,7 +353,6 @@ const AppointmentsPage = () => {
         
         // Close modals and reset form
         setConfirmModalOpen(false);
-        setViewModalOpen(false);
         setConfirmingAppointment(null);
         setConfirmationForm({
           priority: 'NORMAL',
@@ -433,7 +411,6 @@ const AppointmentsPage = () => {
         );
         
         // Close any open modals
-        setViewModalOpen(false);
         setConfirmModalOpen(false);
         
         console.log('Appointment cancelled successfully');
@@ -576,9 +553,6 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
-            <i className='bx bx-show'></i>
-          </button>
           <button className="btn-icon" title="Confirm" onClick={e => { e.stopPropagation(); handleConfirm(row.id); }}>
             <i className='bx bx-check'></i>
           </button>
@@ -773,7 +747,7 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); console.log('View appointment:', row.id); }}>
             <i className='bx bx-show'></i>
           </button>
         </div>
@@ -797,12 +771,8 @@ const AppointmentsPage = () => {
     }));
 
   const handleEventClick = (event: any) => {
-    // Find the full appointment details from the regular appointments list
-    const appointment = appointments.find(apt => apt.id === event.id);
-    if (appointment) {
-      setSelectedAppointment(appointment);
-      setViewModalOpen(true);
-    }
+    // Calendar event clicked - no modal to show
+    console.log('Calendar event clicked:', event);
   };
 
   const eventStyleGetter = (event: any) => {
@@ -942,7 +912,6 @@ const AppointmentsPage = () => {
                 <Table
                   columns={incomingColumns}
                   data={pendingAppointments.map(apt => ({ ...apt, uniqueKey: `pending-${apt.id}` }))}
-                  onRowClick={(appointment) => handleView(appointment.id)}
                   emptyMessage="No pending appointment requests found."
                 />
               )}
@@ -964,7 +933,6 @@ const AppointmentsPage = () => {
                 <Table
                   columns={confirmedColumns}
                   data={confirmedAppointments.map(apt => ({ ...apt, uniqueKey: `confirmed-${apt.id}` }))}
-                  onRowClick={(appointment) => handleView(appointment.id)}
                   emptyMessage="No confirmed appointments found."
                 />
               )}
@@ -992,80 +960,6 @@ const AppointmentsPage = () => {
                 eventPropGetter={eventStyleGetter}
               />
             )}
-          </div>
-        </div>
-      )}
-
-      {/* View Modal */}
-      {viewModalOpen && selectedAppointment && (
-        <div className="modal-overlay" onClick={() => setViewModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Appointment Details</h3>
-              <button className="btn-icon" onClick={() => setViewModalOpen(false)}>
-                <i className='bx bx-x'></i>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>Customer Information</h4>
-                <p><strong>Name:</strong> {selectedAppointment.customer?.name || 'N/A'}</p>
-                <p><strong>Phone:</strong> {selectedAppointment.customer?.phone || 'N/A'}</p>
-                <p><strong>Email:</strong> {selectedAppointment.customer?.email || 'N/A'}</p>
-              </div>
-              
-              <div className="detail-section">
-                <h4>Vehicle Information</h4>
-                <p><strong>Vehicle:</strong> {selectedAppointment.vehicle?.year} {selectedAppointment.vehicle?.make} {selectedAppointment.vehicle?.model}</p>
-                <p><strong>License Plate:</strong> {selectedAppointment.vehicle?.licensePlate || 'N/A'}</p>
-              </div>
-
-              <div className="detail-section">
-                <h4>Appointment Details</h4>
-                <p><strong>Requested At:</strong> {new Date(selectedAppointment.requestedAt).toLocaleString()}</p>
-                <p><strong>Scheduled Time:</strong> {selectedAppointment.startTime ? new Date(selectedAppointment.startTime).toLocaleString() : 'Not scheduled'}</p>
-                <p><strong>Status:</strong> {getStatusBadge(selectedAppointment.status)}</p>
-                <p><strong>Priority:</strong> {getPriorityBadge(selectedAppointment.priority)}</p>
-                <p><strong>Service Advisor:</strong> {selectedAppointment.assignedTo ? 'Assigned' : 'Unassigned'}</p>
-                {selectedAppointment.notes && (
-                  <p><strong>Notes:</strong> {selectedAppointment.notes}</p>
-                )}
-              </div>
-
-                     {selectedAppointment.cannedServices && selectedAppointment.cannedServices.length > 0 && (
-                       <div className="detail-section">
-                         <h4>Services</h4>
-                         {selectedAppointment.cannedServices.map((service, index) => (
-                           <div key={`${selectedAppointment.id}-service-${index}`} className="service-item">
-                             <p><strong>{service.name}</strong></p>
-                             <p>Code: {service.code}</p>
-                             <p>Duration: {service.duration} minutes</p>
-                             <p>Quantity: {service.quantity}</p>
-                             <p>Price: LKR {typeof service.price === 'number' ? service.price.toFixed(2) : service.price}</p>
-                             {service.notes && <p>Notes: {service.notes}</p>}
-                           </div>
-                         ))}
-                       </div>
-                     )}
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn--secondary" onClick={() => setViewModalOpen(false)}>
-                Close
-              </button>
-              {selectedAppointment.status === 'PENDING' && (
-                <>
-                  <button className="btn btn--success" onClick={() => {
-                    setViewModalOpen(false);
-                    handleConfirm(selectedAppointment.id);
-                  }}>
-                    Confirm Appointment
-                  </button>
-                  <button className="btn btn--danger" onClick={() => handleCancel(selectedAppointment.id)}>
-                    Cancel Appointment
-                  </button>
-                </>
-              )}
-            </div>
           </div>
         </div>
       )}
