@@ -263,7 +263,7 @@ export const IssuanceHistoryReport: React.FC<IssuanceHistoryReportProps> = ({
       setError(null);
       
       // Build the API endpoint with filters
-      let endpoint = 'http://localhost:3000/api/issuance';
+      let endpoint = 'http://localhost:3000/api/issuances';
       const params = new URLSearchParams();
       
       if (dateFrom) params.append('dateFrom', dateFrom);
