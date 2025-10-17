@@ -351,9 +351,9 @@ const Dashboard = () => {
               </>
             ) : generalStatsError ? (
               <>
-                <MetricCard title="Total Customers" amount="Error" />
-                <MetricCard title="Total Vehicles" amount="Error" />
-                <MetricCard title="Total Technicians" amount="Error" />
+                <MetricCard title="Total Customers" amount="0" />
+                <MetricCard title="Total Vehicles" amount="0" />
+                <MetricCard title="Total Technicians" amount="0" />
               </>
             ) : generalStats ? (
               <>

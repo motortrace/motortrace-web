@@ -242,9 +242,7 @@ const LoginPage = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Enter your password (min 8 characters)"
-                  required
-                  minLength={8}
+                  placeholder="Enter your password"
                   disabled={loading}
                   autoComplete="current-password"
                 />
