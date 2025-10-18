@@ -107,7 +107,7 @@ class WorkOrderService {
     notes?: string;
   }): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/misc-charges/${miscChargeId}`, {
+      const response = await fetch(`${this.baseUrl}/work-orders/misc-charges/${miscChargeId}`, {
         method: 'PUT',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(miscChargeData),
@@ -123,7 +123,7 @@ class WorkOrderService {
 
   async deleteMiscCharge(miscChargeId: string): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/misc-charges/${miscChargeId}`, {
+      const response = await fetch(`${this.baseUrl}/work-orders/misc-charges/${miscChargeId}`, {
         method: 'DELETE',
         headers: this.getAuthHeaders(),
       });
