@@ -23,6 +23,7 @@ const AddServiceToWorkOrderModal: React.FC<AddServiceToWorkOrderModalProps> = ({
 
   // Form state
   const [selectedCannedServiceId, setSelectedCannedServiceId] = useState<string>('');
+  const [quantity, setQuantity] = useState<number>(1);
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const AddServiceToWorkOrderModal: React.FC<AddServiceToWorkOrderModalProps> = ({
 
   const resetForm = () => {
     setSelectedCannedServiceId('');
+    setQuantity(1);
     setNotes('');
     setError(null);
   };
@@ -68,11 +70,6 @@ const AddServiceToWorkOrderModal: React.FC<AddServiceToWorkOrderModalProps> = ({
     setSelectedCannedServiceId(serviceId);
   };
 
-  const calculateSubtotal = () => {
-    const selectedService = cannedServices.find(s => s.id === selectedCannedServiceId);
-    return selectedService ? selectedService.price : 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -85,23 +82,19 @@ const AddServiceToWorkOrderModal: React.FC<AddServiceToWorkOrderModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const selectedService = cannedServices.find(s => s.id === selectedCannedServiceId);
-      if (!selectedService) {
-        throw new Error('Selected service not found');
+      const payload: any = {
+        cannedServiceId: selectedCannedServiceId,
+      };
+
+      // Only include quantity if it's different from default (1)
+      if (quantity !== 1) {
+        payload.quantity = quantity;
       }
 
-      const payload = {
-        workOrderId,
-        cannedServiceId: selectedCannedServiceId,
-        description: selectedService.name,
-        quantity: 1,
-        unitPrice: selectedService.price,
-        subtotal: selectedService.price,
-        status: 'ESTIMATED',
-        notes: notes.trim() || null,
-        customerApproved: false,
-        customerRejected: false,
-      };
+      // Only include notes if provided
+      if (notes.trim()) {
+        payload.notes = notes.trim();
+      }
 
       const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}/services`, {
         method: 'POST',
@@ -192,30 +185,31 @@ const AddServiceToWorkOrderModal: React.FC<AddServiceToWorkOrderModalProps> = ({
               </select>
             </div>
 
-            {selectedCannedServiceId && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '8px'
-                }}>
-                  Price
-                </label>
-                <div style={{
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Quantity
+              </label>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                min="1"
+                style={{
+                  width: '100%',
                   padding: '10px 12px',
-                  backgroundColor: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#111827'
-                }}>
-                  LKR {calculateSubtotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </div>
-              </div>
-            )}
+                  backgroundColor: '#fff'
+                }}
+              />
+            </div>
 
             <div style={{ marginBottom: '24px' }}>
               <label style={{

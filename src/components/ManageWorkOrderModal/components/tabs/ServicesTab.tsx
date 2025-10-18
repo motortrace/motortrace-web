@@ -123,6 +123,33 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   };
 
   /**
+   * Check if a service has started work
+   */
+  const hasServiceStartedWork = (service: WorkOrderService): boolean => {
+    // Check if service status indicates work has started
+    if (service.status === 'IN_PROGRESS' || service.status === 'COMPLETED') {
+      return true;
+    }
+    // Check if any labor item has actual time logged
+    if (service.laborItems) {
+      return service.laborItems.some(labor => Boolean(labor.actualMinutes && labor.actualMinutes > 0));
+    }
+    return false;
+  };
+
+  /**
+   * Check if a labor item has started work
+   */
+  const hasLaborStartedWork = (labor: WorkOrderLaborItem): boolean => {
+    // Check if labor status indicates work has started
+    if (labor.status === 'IN_PROGRESS' || labor.status === 'COMPLETED') {
+      return true;
+    }
+    // Check if actual time has been logged
+    return Boolean(labor.actualMinutes && labor.actualMinutes > 0);
+  };
+
+  /**
    * Check if a service is locked (cannot be assigned technicians)
    * Services are locked when they are in ESTIMATED status (awaiting approval)
    * or when work has already started
@@ -226,8 +253,6 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
    * Handle service deletion
    */
   const handleDeleteService = async (serviceId: string) => {
-    if (!confirm('Are you sure you want to delete this service?')) return;
-    
     try {
       await workOrderService.deleteService(serviceId);
       showToast('success', 'Service Deleted', 'Service has been successfully deleted');

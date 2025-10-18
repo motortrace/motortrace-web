@@ -139,7 +139,7 @@ class WorkOrderService {
   // Service management
   async deleteService(serviceId: string): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/services/${serviceId}`, {
+      const response = await fetch(`${this.baseUrl}/work-orders/services/${serviceId}`, {
         method: 'DELETE',
         headers: this.getAuthHeaders(),
       });
@@ -148,6 +148,22 @@ class WorkOrderService {
       return result;
     } catch (error) {
       console.error('Error deleting service:', error);
+      throw error;
+    }
+  }
+
+  // Inspection management
+  async deleteInspection(inspectionId: string): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/work-orders/inspections/${inspectionId}`, {
+        method: 'DELETE',
+        headers: this.getAuthHeaders(),
+      });
+
+      const result = await this.handleResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error deleting inspection:', error);
       throw error;
     }
   }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { WorkOrderInspection, InspectionTemplate } from '../../types';
 import { useTechnicians } from '../../hooks/useTechnicians';
+import { workOrderService } from '../../../../services/workOrderService';
+import { useToast } from '../../../../hooks/useToast';
 import AssignTechnicianModal from '../modals/AssignTechnicianModal';
 
 interface InspectionsTabProps {
@@ -40,6 +42,23 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
   const [recommendedInspections, setRecommendedInspections] = useState<RecommendedInspection[]>([]);
   const [loadingRecommended, setLoadingRecommended] = useState(true);
   const { technicians, assignTechnicianToLabor, fetchTechnicians } = useTechnicians();
+
+  // Universal toast system
+  const { showToast } = useToast();
+
+  /**
+   * Handle inspection deletion
+   */
+  const handleDeleteInspection = async (inspectionId: string) => {
+    try {
+      await workOrderService.deleteInspection(inspectionId);
+      showToast('success', 'Inspection Deleted', 'Inspection has been successfully deleted');
+      // Refresh the inspections list
+      window.location.reload();
+    } catch (error) {
+      showToast('error', 'Delete Failed', error instanceof Error ? error.message : 'Failed to delete inspection');
+    }
+  };
 
   useEffect(() => {
     if (!workOrderId) return;
@@ -328,6 +347,14 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
                                   <i className="bx bx-user-plus"></i>
                                 </button>
                               )}
+                            <button
+                              className="delete-btn"
+                              title="Delete Inspection"
+                              onClick={() => handleDeleteInspection(inspection.id)}
+                              style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                            >
+                              <i className="bx bx-trash"></i>
+                            </button>
                           </div>
                         </td>
                       </tr>
