@@ -126,7 +126,7 @@ const Header: React.FC = () => {
           className={`header__links-holder__link ${activeLink === 'pricing' ? 'active' : ''}`}
           onClick={() => handleLinkClick('pricing')}
         >
-          Pricing
+          Popular Services
         </Link>
         {/* <Link 
           to="/contactUs" 

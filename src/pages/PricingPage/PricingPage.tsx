@@ -1,250 +1,236 @@
+
+import { useState } from 'react';
 import Header from '../../components/LandingPage/Header/Header';
 import Footer from '../../components/LandingPage/Footer/Footer';
-import Button from '@mui/material/Button';
-import { Wrench, PackageSearch, Check, Users, BarChart3, Calendar, Settings, ShoppingCart, Truck, Star } from "lucide-react";
-import "./Pricing.scss";
+import { Car, Wrench, Sparkles, Check, Smartphone, Clock } from 'lucide-react';
+import './Pricing.scss';
 
-interface PricingProps {
-    className?: string;
+interface Service {
+    id: 'service' | 'repair' | 'detailing';
+    title: string;
+    icon: React.ComponentType<{ className?: string }>;
+    gradient: string;
+    lightGradient: string;
+    accentColor: string;
+    borderColor: string;
+    description: string;
+    features: string[];
+    duration: string;
+    badge: string;
+    price: string;
+    highlight: boolean;
 }
 
-const PricingPage: React.FC<PricingProps> = ({ className = '' }) => {
-    const handleContactUs = () => {
-        // Redirect to contact us page
-        window.location.href = '/contact';
+interface ServiceColors {
+    service: { gradient: string; light: string };
+    repair: { gradient: string; light: string };
+    detailing: { gradient: string; light: string };
+}
+
+export default function PricingPage() {
+    const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+
+    const handleBookService = (serviceName: string): void => {
+        console.log(`Booking ${serviceName}`);
+    };
+
+    const services: Service[] = [
+        {
+            id: 'service',
+            title: 'Full Vehicle Service',
+            icon: Car,
+            gradient: 'from-blue-500 to-blue-600',
+            lightGradient: 'from-blue-50 to-blue-100',
+            accentColor: 'text-blue-600',
+            borderColor: 'border-blue-200',
+            description: 'Comprehensive maintenance to keep your car running smoothly',
+            features: [
+                'Engine oil & filter change',
+                'Air filter replacement',
+                'Brake system inspection',
+                'Tire pressure & condition check',
+                'Battery & electrical test',
+                'Fluid level inspection'
+            ],
+            duration: '3-5 hours',
+            badge: 'Most Popular',
+            price: 'Starting at LKR 10,000',
+            highlight: true
+        },
+        {
+            id: 'repair',
+            title: 'Engine Diagnostics & Fix',
+            icon: Wrench,
+            gradient: 'from-teal-500 to-teal-600',
+            lightGradient: 'from-teal-50 to-teal-100',
+            accentColor: 'text-teal-600',
+            borderColor: 'border-teal-200',
+            description: 'Advanced diagnostics with precision repairs',
+            features: [
+                'Computer diagnostic scan',
+                'Engine performance analysis',
+                'Emission system check',
+                'Fuel system inspection',
+                'Transmission diagnostics',
+                'Detailed repair report'
+            ],
+            duration: '5-7 hours',
+            badge: 'Expert Technicians',
+            price: 'Starting at LKR 25,000',
+            highlight: false
+        },
+        {
+            id: 'detailing',
+            title: 'Interior & Exterior Detailing',
+            icon: Sparkles,
+            gradient: 'from-emerald-500 to-emerald-600',
+            lightGradient: 'from-emerald-50 to-emerald-100',
+            accentColor: 'text-emerald-600',
+            borderColor: 'border-emerald-200',
+            description: 'Professional detailing for showroom perfection',
+            features: [
+                'Exterior wash & wax',
+                'Interior vacuum & cleaning',
+                'Dashboard & console polish',
+                'Leather seat conditioning',
+                'Window cleaning',
+                'Tire shine & rim cleaning'
+            ],
+            duration: '2-4 hours',
+            badge: 'Premium Quality',
+            price: 'Starting at LKR 15,000',
+            highlight: false
+        }
+    ];
+
+    const serviceColors: ServiceColors = {
+        service: { gradient: 'linear-gradient(135deg, #3b82f6, #2563eb)', light: 'linear-gradient(135deg, #eff6ff, #dbeafe)' },
+        repair: { gradient: 'linear-gradient(135deg, #14b8a6, #0d9488)', light: 'linear-gradient(135deg, #f0fdfa, #ccfbf1)' },
+        detailing: { gradient: 'linear-gradient(135deg, #10b981, #059669)', light: 'linear-gradient(135deg, #f0fdf4, #dcfce7)' }
     };
 
     return (
         <>
             <Header />
-            <section className={`pricing-section ${className}`}>
-            <div className="pricing-section__container">
-                {/* Header */}
-                <div className="pricing-section__header">
-                    <h1 className="pricing-section__title">
-                        Choose Your Perfect Plan
-                    </h1>
-                    <p className="pricing-section__subtitle">
-                        Simple, transparent pricing designed for your automotive business needs.
-                        No hidden fees, no complicated tiers - just powerful features at fair prices.
-                    </p>
+            <div className="ep-container">
+                {/* Animated Background Shapes */}
+                <div className="ep-bg-shapes">
+                    <div className="ep-blob ep-blob-1"></div>
+                    <div className="ep-blob ep-blob-2"></div>
+                    <div className="ep-blob ep-blob-3"></div>
                 </div>
 
-                {/* Pricing Cards */}
-                <div className="pricing-section__cards">
-                    {/* Service Center Plan */}
-                    <div className="pricing-card pricing-card--service">
-                        <div className="pricing-card__header">
-                            <div className="pricing-card__icon">
-                                <Wrench size={32} />
+                {/* Content */}
+                <div className="ep-content">
+                    {/* Hero Section */}
+                 
+
+                    {/* Pricing Cards Section */}
+                    <section className="ep-services">
+                        <div className="ep-services__header">
+                            <h2 className="ep-services__title">Our Popular Services</h2>
+                            <p className="ep-services__subtitle">Choose from our most popular services or explore more in the app</p>
+                        </div>
+
+                        {/* Cards Grid */}
+                        <div className="ep-cards-grid">
+                            {services.map((service, idx) => {
+                                const Icon = service.icon;
+                                const isHovered = hoveredCard === idx;
+                                const colorScheme = serviceColors[service.id];
+
+                                return (
+                                    <div
+                                        key={idx}
+                                        onMouseEnter={() => setHoveredCard(idx)}
+                                        onMouseLeave={() => setHoveredCard(null)}
+                                        className={`ep-service-card ${service.highlight ? 'ep-service-card--highlight' : ''} ${isHovered ? 'ep-service-card--hovered' : ''}`}
+                                    >
+                                        {/* Background Accent */}
+                                        <div
+                                            className="ep-service-card__accent"
+                                            style={{ background: colorScheme.light }}
+                                        ></div>
+
+                                        {/* Badge */}
+                                        {service.highlight && (
+                                            <div className="ep-service-card__badge ep-service-card__badge--primary">
+                                                ⭐ {service.badge}
+                                            </div>
+                                        )}
+                                        {!service.highlight && (
+                                            <div className="ep-service-card__badge ep-service-card__badge--secondary">
+                                                {service.badge}
+                                            </div>
+                                        )}
+
+                                        {/* Icon */}
+                                        <div
+                                            className="ep-service-card__icon"
+                                            style={{ background: colorScheme.gradient }}
+                                        >
+                                            <Icon className="ep-service-card__icon-svg" />
+                                        </div>
+
+                                        {/* Title & Description */}
+                                        <h3 className="ep-service-card__title">{service.title}</h3>
+                                        <p className="ep-service-card__description">{service.description}</p>
+
+                                        {/* Features List */}
+                                        <div className="ep-service-card__features">
+                                            {service.features.map((feature, fidx) => (
+                                                <div key={fidx} className="ep-service-card__feature-item">
+                                                    <Check className="ep-service-card__feature-icon" />
+                                                    <span className="ep-service-card__feature-text">{feature}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Duration & Price */}
+                                        <div className="ep-service-card__footer">
+                                            <div className="ep-service-card__duration">
+                                                <Clock className="ep-service-card__duration-icon" />
+                                                <span>{service.duration}</span>
+                                            </div>
+                                            <p className={`ep-service-card__price ${service.highlight ? 'ep-service-card__price--highlight' : ''}`}>
+                                                {service.price}
+                                            </p>
+                                        </div>
+
+                                        
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+
+                    {/* CTA Section */}
+                    <section className="ep-cta">
+                        <div className="ep-cta__inner">
+                            <div className="ep-cta__bg-shapes">
+                                <div className="ep-cta__bg-circle ep-cta__bg-circle--1"></div>
+                                <div className="ep-cta__bg-circle ep-cta__bg-circle--2"></div>
                             </div>
-                            <h3 className="pricing-card__title">Service Center</h3>
-                            <p className="pricing-card__description">
-                                Complete workshop management solution for automotive service centers
-                            </p>
-                        </div>
 
-                        <div className="pricing-card__price">
-                            <span className="price-currency">LKR</span>
-                            <span className="price-amount">8,500</span>
-                            <span className="price-period">/month</span>
-                        </div>
+                            <div className="ep-cta__content">
+                                <h2 className="ep-cta__title">Ready to Experience the Difference?</h2>
+                                <p className="ep-cta__subtitle">
+                                    Download the MotorTrace app to explore all services, get real-time updates, and join thousands of happy car owners.
+                                </p>
 
-                        <div className="pricing-card__features">
-                            <h4 className="features-title">Everything you need:</h4>
-                            <ul className="features-list">
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Unlimited vehicle inspections</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Technician management & assignment</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Booking & appointment system</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Customer management portal</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Invoice & billing management</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Inventory tracking</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Performance analytics</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Mobile app access</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>24/7 dedicated support</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div className="pricing-card__stats">
-                            <div className="stat-item">
-                                <Users size={20} />
-                                <span>Up to 10 technicians</span>
-                            </div>
-                            <div className="stat-item">
-                                <BarChart3 size={20} />
-                                <span>Advanced reporting</span>
-                            </div>
-                        </div>
-
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            size="large" 
-                            fullWidth
-                            onClick={handleContactUs}
-                            className="pricing-card__button"
-                            sx={{ 
-                                textTransform: 'none', 
-                                fontFamily: 'Poppins, sans-serif',
-                                padding: '14px 0',
-                                fontSize: '1rem',
-                                fontWeight: 600
-                            }}
-                        >
-                            Get Started Today
-                        </Button>
-
-                        <p className="pricing-card__note">
-                            Perfect for workshops with 5-50 service bays
-                        </p>
-                    </div>
-
-                    {/* Parts Seller Plan */}
-                    <div className="pricing-card pricing-card--parts">
-                        <div className="pricing-card__header">
-                            <div className="pricing-card__icon">
-                                <PackageSearch size={32} />
-                            </div>
-                            <h3 className="pricing-card__title">Parts Seller</h3>
-                            <p className="pricing-card__description">
-                                Comprehensive inventory and sales management for spare parts dealers
-                            </p>
-                        </div>
-
-                        <div className="pricing-card__price">
-                            <span className="price-currency">LKR</span>
-                            <span className="price-amount">6,500</span>
-                            <span className="price-period">/month</span>
-                        </div>
-
-                        <div className="pricing-card__features">
-                            <h4 className="features-title">Everything you need:</h4>
-                            <ul className="features-list">
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Unlimited product listings</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Advanced inventory management</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Order processing & tracking</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Supplier management system</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Automated stock alerts</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Sales analytics & reports</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Multi-location support</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Customer portal access</span>
-                                </li>
-                                <li className="feature-item">
-                                    <Check size={18} />
-                                    <span>Priority customer support</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div className="pricing-card__stats">
-                            <div className="stat-item">
-                                <ShoppingCart size={20} />
-                                <span>Unlimited transactions</span>
-                            </div>
-                            <div className="stat-item">
-                                <Truck size={20} />
-                                <span>Delivery management</span>
+                                <button className="ep-cta__button">
+                                    <Smartphone className="ep-cta__button-icon" />
+                                    Download Free App
+                                </button>
                             </div>
                         </div>
+                    </section>
 
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            size="large" 
-                            fullWidth
-                            onClick={handleContactUs}
-                            className="pricing-card__button"
-                            sx={{ 
-                                textTransform: 'none', 
-                                fontFamily: 'Poppins, sans-serif',
-                                padding: '14px 0',
-                                fontSize: '1rem',
-                                fontWeight: 600
-                            }}
-                        >
-                            Get Started Today
-                        </Button>
-
-                        <p className="pricing-card__note">
-                            Ideal for parts dealers and distributors
-                        </p>
-                    </div>
-                </div>
-
-                {/* Bottom Section */}
-                <div className="pricing-section__bottom">
-                    <div className="pricing-section__support">
-                        <h4>Need something custom?</h4>
-                        <p>Enterprise solutions available for large operations with multiple locations.</p>
-                        <Button 
-                            variant="outlined" 
-                            color="primary" 
-                            onClick={handleContactUs}
-                            sx={{ 
-                                textTransform: 'none', 
-                                fontFamily: 'Poppins, sans-serif',
-                                marginTop: '12px'
-                            }}
-                        >
-                            Contact Sales Team
-                        </Button>
-                    </div>
+                    
                 </div>
             </div>
-        </section>
+
             <Footer />
         </>
     );
-}; 
-
-export default PricingPage; 
+}

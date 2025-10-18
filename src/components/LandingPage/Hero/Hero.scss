@@ -187,7 +187,8 @@ $neutral-300: #cbd5e1;
         height: 600px;
         min-width: 750px;
         animation: slideInRight 1s ease-out 0.3s both;
-        margin-top: 2rem;
+        margin-top: 1.75rem;
+        margin-right: -7.5rem;
     }
 
     &__person {
@@ -222,7 +223,7 @@ $neutral-300: #cbd5e1;
             top: 30px;
             left: -150px;
             width: 240px;
-            @include floating-animation(0s);
+            
 
             .card-header {
                 display: flex;
@@ -286,7 +287,7 @@ $neutral-300: #cbd5e1;
                         width: 12px;
                         height: 12px;
                         border-radius: 50%;
-                        background: #e5e7eb;
+                        background: $warning-color;
 
                         &--active {
                             background: $success-color;
@@ -301,7 +302,6 @@ $neutral-300: #cbd5e1;
             top: 0px;
             right: 87.5px;
             width: 280px;
-            @include floating-animation(1s);
 
             .card-header {
                 display: flex;
@@ -411,6 +411,11 @@ $neutral-300: #cbd5e1;
                             background: $success-color;
                             color: $white;
                         }
+
+                        &--in-progress {
+                            background: $warning-color;
+                            color: $white;
+                        }
                     }
                 }
             }
@@ -420,7 +425,6 @@ $neutral-300: #cbd5e1;
             bottom: 25px;
             right: 112.5px;
             width: 160px;
-            @include floating-animation(2s);
 
             .card-content {
                 @include flex-center;
@@ -442,10 +446,11 @@ $neutral-300: #cbd5e1;
 
                 .customer-review {
                     text-align: center;
+                    
 
                     .rating-stars {
                         font-size: 0.75rem;
-                        margin-bottom: 4px;
+                        margin-left: 22.5px;
                     }
 
                     .review-text {
@@ -462,7 +467,6 @@ $neutral-300: #cbd5e1;
             bottom: 87.5px;
             left: -112.5px;
             width: 200px;
-            @include floating-animation(1.5s);
 
             .card-content {
                 display: flex;
@@ -498,8 +502,8 @@ $neutral-300: #cbd5e1;
 
 .button-container {
     display: flex;
-    justify-content: space-between;
-    min-width: 660px;
+    justify-content: flex-start;
+    min-width: 400px;
     margin-top: -225px;
 
     Button:hover{
