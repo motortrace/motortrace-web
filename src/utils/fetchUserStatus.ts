@@ -15,13 +15,32 @@ export async function fetchUserStatus() {
     }
     
     const data = await res.json();
+    console.log('fetchUserStatus response:', data);
     
-    // Store the updated user data if needed
-    if (data.user) {
-      localStorage.setItem('user', JSON.stringify(data.user));
+    // Extract user from the response (your API returns it in data.data)
+    const userFromApi = data.data || data.user || data;
+    
+    // Create a consistent user object to store
+    const user = {
+      id: userFromApi.supabaseUserId || userFromApi.id,
+      email: userFromApi.email,
+      role: userFromApi.role?.toLowerCase() || userFromApi.role,
+      customerId: userFromApi.customerId || null,
+      isRegistrationComplete: userFromApi.isRegistrationComplete ?? true
+    };
+    
+    console.log('fetchUserStatus - Normalized user:', user);
+    
+    // Store the normalized user data if present
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
     }
     
-    return data;
+    // Return data in a consistent format
+    return {
+      user,
+      data: data
+    };
   } catch (e) {
     console.error('Error fetching user status:', e);
     return null;

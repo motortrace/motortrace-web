@@ -110,7 +110,7 @@ function App() {
 
         {/* Service Advisor Dashboard Routes */}
         <Route path="/serviceadvisor" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['serviceadvisor', 'service_advisor', 'advisor']}>
             <DashboardLayout />
           </ProtectedRoute>
         }>
@@ -142,7 +142,7 @@ function App() {
 
         {/* Manager Dashboard Routes */}
         <Route path="/manager" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['manager']}>
             <DashboardLayout />
           </ProtectedRoute>
         }>
@@ -174,7 +174,11 @@ function App() {
 
         <Route path="admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<Navigate to="login" replace />} />
-        <Route path="/admin/*" element={<AdminDashboardLayout />}>
+        <Route path="/admin/*" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminDashboardLayout />
+          </ProtectedRoute>
+        }>
 
           <Route path="dashboard" element={<AdminDashboard />} />
 
