@@ -41,6 +41,7 @@
 
           &.customer-message {
             align-items: flex-start;
+            align-self: flex-start;
 
             .message-header {
               justify-content: flex-start;
@@ -50,20 +51,24 @@
               background: #e3f2fd;
               align-self: flex-start;
               max-width: 70%;
+              text-align: left;
             }
           }
 
           &.advisor-message {
             align-items: flex-end;
+            align-self: flex-end;
 
             .message-header {
               justify-content: flex-end;
             }
 
             .message-content {
-              background: #f3e5f5;
+              background: #0969DA;
+              color: white;
               align-self: flex-end;
               max-width: 70%;
+              text-align: right;
             }
           }
 
@@ -104,6 +109,7 @@
             font-size: 14px;
             line-height: 1.4;
             word-wrap: break-word;
+            text-align: left;
           }
         }
       }

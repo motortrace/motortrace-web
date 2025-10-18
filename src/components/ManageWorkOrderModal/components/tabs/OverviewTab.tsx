@@ -36,7 +36,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
       const messages = await workOrderService.getWorkOrderMessages(workOrder.id);
       const transformedMessages = messages.map((msg: any) => ({
         id: msg.id,
-        sender: msg.senderRole === 'SERVICE_ADVISOR' ? 'advisor' : 'customer',
+        sender: (msg.senderRole === 'SERVICE_ADVISOR' || msg.senderRole === 'MANAGER') ? 'advisor' : 'customer',
         message: msg.message,
         timestamp: msg.createdAt,
         senderName: msg.sender.name,
