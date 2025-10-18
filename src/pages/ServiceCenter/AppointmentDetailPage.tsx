@@ -449,7 +449,7 @@ const AppointmentDetailPage = () => {
           <p className="page-subtitle">ID: {appointment.id.substring(0, 8)}...</p>
         </div>
         <div className="header-actions">
-          {appointment.status === 'PENDING' && (
+          {(appointment.status === 'PENDING' || appointment.status === 'CONFIRMED') && (
             <>
               <button
                 className="btn btn--primary"
