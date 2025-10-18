@@ -11,6 +11,7 @@ interface InspectionsTabProps {
 }
 
 interface RecommendedInspection {
+  id?: string;
   image: string;
   name: string;
   itemCount: number;
@@ -123,6 +124,11 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
     return false;
   };
 
+  // Filter recommended inspections to exclude those already added
+  const filteredRecommendedInspections = recommendedInspections.filter(recommended => 
+    !inspections.some(existing => existing.template?.id === recommended.id)
+  );
+
   // Summary cards
   const totalInspections = inspections.length;
   const completedInspections = inspections.filter(i => i.isCompleted).length;
@@ -192,11 +198,11 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
         <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1f2937', marginBottom: 16 }}>Recommended Inspections</h3>
         {loadingRecommended ? (
           <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>Loading recommended inspections...</div>
-        ) : recommendedInspections.length === 0 ? (
+        ) : filteredRecommendedInspections.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>No recommended inspections available.</div>
         ) : (
           <div className="recommended-inspections-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-            {recommendedInspections.map((inspection, index) => (
+            {filteredRecommendedInspections.map((inspection, index) => (
               <div key={index} className="recommended-inspection-card" style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
                 <div style={{ height: 120, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img src={inspection.image} alt={inspection.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
