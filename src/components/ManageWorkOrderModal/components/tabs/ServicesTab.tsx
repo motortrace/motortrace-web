@@ -130,6 +130,33 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   };
 
   /**
+   * Check if a service has started work
+   */
+  const hasServiceStartedWork = (service: WorkOrderService): boolean => {
+    // Check if service status indicates work has started
+    if (service.status === 'IN_PROGRESS' || service.status === 'COMPLETED') {
+      return true;
+    }
+    // Check if any labor item has actual time logged
+    if (service.laborItems) {
+      return service.laborItems.some(labor => Boolean(labor.actualMinutes && labor.actualMinutes > 0));
+    }
+    return false;
+  };
+
+  /**
+   * Check if a labor item has started work
+   */
+  const hasLaborStartedWork = (labor: WorkOrderLaborItem): boolean => {
+    // Check if labor status indicates work has started
+    if (labor.status === 'IN_PROGRESS' || labor.status === 'COMPLETED') {
+      return true;
+    }
+    // Check if actual time has been logged
+    return Boolean(labor.actualMinutes && labor.actualMinutes > 0);
+  };
+
+  /**
    * Calculate total labor time
    */
   const calculateTotalLaborTime = (laborItems?: WorkOrderLaborItem[]) => {
@@ -345,8 +372,24 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                         {hasLaborItems && (
                           <button
                             onClick={() => handleServiceAssignClick(service)}
-                            style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                            title="Assign technician to all labor items"
+                            disabled={hasServiceStartedWork(service)}
+                            style={{ 
+                              background: hasServiceStartedWork(service) ? '#9ca3af' : '#3b82f6', 
+                              color: '#fff', 
+                              border: 'none', 
+                              borderRadius: 6, 
+                              padding: '6px', 
+                              fontSize: 16, 
+                              cursor: hasServiceStartedWork(service) ? 'not-allowed' : 'pointer', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              width: '32px', 
+                              height: '32px', 
+                              transition: 'all 0.2s ease',
+                              opacity: hasServiceStartedWork(service) ? 0.6 : 1
+                            }}
+                            title={hasServiceStartedWork(service) ? "Cannot assign technician - work has already started" : "Assign technician to all labor items"}
                           >
                             <i className="bx bx-user-check" style={{ fontSize: '16px' }}></i>
                           </button>
@@ -461,8 +504,24 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       <button
                                         onClick={() => handleLaborAssignClick(labor)}
-                                        style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                                        title="Assign technician to this labor item"
+                                        disabled={hasLaborStartedWork(labor)}
+                                        style={{ 
+                                          background: hasLaborStartedWork(labor) ? '#9ca3af' : '#3b82f6', 
+                                          color: '#fff', 
+                                          border: 'none', 
+                                          borderRadius: 6, 
+                                          padding: '6px', 
+                                          fontSize: 16, 
+                                          cursor: hasLaborStartedWork(labor) ? 'not-allowed' : 'pointer', 
+                                          display: 'flex', 
+                                          alignItems: 'center', 
+                                          justifyContent: 'center', 
+                                          width: '32px', 
+                                          height: '32px', 
+                                          transition: 'all 0.2s ease',
+                                          opacity: hasLaborStartedWork(labor) ? 0.6 : 1
+                                        }}
+                                        title={hasLaborStartedWork(labor) ? "Cannot assign technician - work has already started" : "Assign technician to this labor item"}
                                       >
                                         <i className="bx bx-user-plus" style={{ fontSize: '14px' }}></i>
                                       </button>

@@ -1,0 +1,701 @@
+.appointment-detail-page {
+  padding: 20px;
+  margin: 0 auto;
+
+  .loading, .error {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+  }
+
+  .error {
+    color: #ef4444;
+
+    h2 {
+      color: #ef4444;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      margin-top: 20px;
+    }
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+
+    .header-content {
+      .page-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+      }
+
+      .page-subtitle {
+        color: #6b7280;
+        margin: 5px 0 0 0;
+        font-size: 14px;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .appointment-content {
+    .appointment-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+
+      .card-header {
+        padding: 24px 24px 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+
+        h3 {
+          font-size: 20px;
+          font-weight: 600;
+          color: #111827;
+          margin: 0;
+        }
+
+        .status-badges {
+          display: flex;
+          gap: 8px;
+        }
+      }
+
+      .card-body {
+        padding: 0 24px 24px 24px;
+
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 24px;
+          margin-bottom: 32px;
+
+          .info-section {
+            h4 {
+              font-size: 16px;
+              font-weight: 600;
+              color: #374151;
+              margin: 0 0 16px 0;
+              padding-bottom: 8px;
+              border-bottom: 1px solid #e5e7eb;
+            }
+
+            .customer-info, .advisor-info {
+              display: flex;
+              align-items: center;
+              gap: 16px;
+
+              .customer-avatar, .advisor-avatar {
+                width: 124px;
+                height: 124px;
+                border-radius: 20%;
+                object-fit: cover;
+              }
+
+              .customer-avatar-placeholder, .advisor-avatar-placeholder {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                background-color: #e5e7eb;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                font-weight: 600;
+                color: #6b7280;
+              }
+
+              .customer-details, .advisor-details {
+                p {
+                  margin: 2px 0;
+                  font-size: 14px;
+
+                  strong {
+                    color: #374151;
+                    min-width: 120px;
+                    display: inline-block;
+                  }
+                }
+              }
+            }
+
+            .vehicle-info {
+              display: flex;
+              align-items: center;
+              gap: 16px;
+
+              .vehicle-image {
+                width: 150px;
+                height: 150px;
+                border-radius: 25%;
+                object-fit: cover;
+                border: 1px solid #e5e7eb;
+              }
+
+              .vehicle-image-placeholder {
+                width: 80px;
+                height: 60px;
+                border-radius: 6px;
+                background-color: #e5e7eb;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                color: #6b7280;
+                border: 1px solid #e5e7eb;
+              }
+
+              .vehicle-details {
+                p {
+                  margin: 2px 0;
+                  font-size: 14px;
+
+                  strong {
+                    color: #374151;
+                    min-width: 120px;
+                    display: inline-block;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .services-section {
+          h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+          }
+
+          .services-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 350px);
+            gap: 12px;
+            justify-content: start;
+
+            .service-card {
+              background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              padding: 16px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              transition: all 0.3s ease;
+              position: relative;
+              overflow: hidden;
+
+              &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #3b82f6, #06b6d4);
+              }
+
+              &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+                border-color: #3b82f6;
+              }
+
+              .service-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 12px;
+
+                h5 {
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #1e293b;
+                  margin: 0;
+                  flex: 1;
+                  line-height: 1.3;
+                }
+
+                .service-view-btn {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 4px;
+                  padding: 6px 12px;
+                  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+                  color: white;
+                  text-decoration: none;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  transition: all 0.2s ease;
+                  border: none;
+                  cursor: pointer;
+
+                  &:hover {
+                    background: linear-gradient(135deg, #2563eb, #0891b2);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+                  }
+
+                  i {
+                    font-size: 14px;
+                  }
+                }
+              }
+
+              .service-card-body {
+                p {
+                  margin: 6px 0;
+                  font-size: 13px;
+                  color: #475569;
+                  line-height: 1.4;
+
+                  strong {
+                    color: #334155;
+                    min-width: 70px;
+                    display: inline-block;
+                    font-weight: 600;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .service-history-section {
+          h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin: 32px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+          }
+
+          .loading-history, .error-history, .no-history {
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+          }
+
+          .error-history {
+            color: #ef4444;
+            background: #fef2f2;
+            border-radius: 6px;
+            border: 1px solid #fecaca;
+          }
+
+          .history-list {
+            display: grid;
+            gap: 16px;
+
+            .history-item {
+              background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              transition: box-shadow 0.3s ease;
+
+              &:hover {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+              }
+
+              .history-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #f1f5f9;
+
+                h5 {
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1e293b;
+                  margin: 0;
+                }
+
+                .completion-date {
+                  font-size: 14px;
+                  color: #64748b;
+                  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+                  padding: 4px 12px;
+                  border-radius: 6px;
+                  font-weight: 500;
+                }
+              }
+
+              .history-body {
+                .vehicle-summary {
+                  margin-bottom: 16px;
+
+                  p {
+                    margin: 4px 0;
+                    font-size: 14px;
+                    color: #475569;
+
+                    strong {
+                      color: #334155;
+                      min-width: 100px;
+                      display: inline-block;
+                    }
+                  }
+                }
+
+                .services-summary, .inspections-summary {
+                  margin-bottom: 16px;
+
+                  h6 {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #374151;
+                    margin: 0 0 8px 0;
+                  }
+
+                  ul {
+                    margin: 0;
+                    padding-left: 20px;
+
+                    li {
+                      font-size: 13px;
+                      color: #64748b;
+                      margin-bottom: 4px;
+                      line-height: 1.4;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+
+      .modal-header {
+        padding: 24px 24px 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+
+        h3 {
+          font-size: 20px;
+          font-weight: 600;
+          color: #111827;
+          margin: 0;
+        }
+
+        .btn-icon {
+          background: none;
+          border: none;
+          font-size: 24px;
+          color: #6b7280;
+          cursor: pointer;
+          padding: 4px;
+
+          &:hover {
+            color: #374151;
+          }
+        }
+      }
+
+      .modal-body {
+        padding: 0 24px;
+
+        .form-group {
+          margin-bottom: 20px;
+
+          label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+          }
+
+          .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+
+            &:focus {
+              outline: none;
+              border-color: #3b82f6;
+              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+          }
+        }
+
+        .error-message {
+          padding: 12px;
+          background: #fef2f2;
+          border: 1px solid #fecaca;
+          border-radius: 6px;
+          font-size: 14px;
+        }
+
+        .advisor-availability-details {
+          margin-top: 20px;
+          padding: 16px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+
+          .availability-info {
+            h4 {
+              margin: 0 0 12px 0;
+              font-size: 16px;
+              font-weight: 600;
+              color: #1e293b;
+            }
+
+            .availability-status {
+              margin-bottom: 16px;
+
+              .status-badge {
+                &.available {
+                  background-color: #d1fae5;
+                  color: #065f46;
+                }
+
+                &.busy {
+                  background-color: #fee2e2;
+                  color: #991b1b;
+                }
+              }
+            }
+
+            .current-appointments,
+            .last-assignment {
+              margin-bottom: 12px;
+
+              h5 {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #374151;
+              }
+
+              p {
+                margin: 0;
+                font-size: 13px;
+                color: #6b7280;
+                line-height: 1.4;
+              }
+            }
+          }
+        }
+      }
+
+      .modal-footer {
+        padding: 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        border-top: 1px solid #e5e7eb;
+
+        .btn {
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+
+        .btn--secondary {
+          background: #f3f4f6;
+          border: 1px solid #d1d5db;
+          color: #374151;
+
+          &:hover:not(:disabled) {
+            background: #e5e7eb;
+          }
+        }
+
+        .btn--primary {
+          background: #3b82f6;
+          border: 1px solid #3b82f6;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #2563eb;
+          }
+        }
+      }
+    }
+  }
+
+  .error-banner {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    color: #dc2626;
+
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+}
+
+// Status badges
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+
+  &.status-in-stock {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &.status-low-stock {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  &.status-out-of-stock {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.status-overstock {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+}
+
+// Button styles
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background: #3b82f6;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #2563eb;
+    }
+  }
+
+  &--secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border-color: #d1d5db;
+
+    &:hover:not(:disabled) {
+      background: #e5e7eb;
+    }
+  }
+
+  &--danger {
+    background: #ef4444;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #dc2626;
+    }
+  }
+
+  i {
+    font-size: 16px;
+  }
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 18px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

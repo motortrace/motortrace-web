@@ -1,0 +1,370 @@
+/* ManageWorkOrderModal Styles */
+
+.overview-tab {
+  .overview-layout {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+
+      .chat-header {
+        padding: 15px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+
+        h4 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+      }
+
+        .chat-messages {
+          flex: 1;
+          padding: 15px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          .no-messages {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px 40px 20px;
+            margin-top: 80px;
+            text-align: center;
+
+            i {
+              font-size: 64px;
+              opacity: 0.5;
+              color: #ccc;
+            }
+
+            p {
+              margin: 15px 0 0 0;
+              font-size: 16px;
+              color: #999;
+            }
+          }        .chat-message {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 10px;
+
+          &.customer-message {
+            align-items: flex-start;
+            align-self: flex-start;
+
+            .message-header {
+              justify-content: flex-start;
+            }
+
+            .message-content {
+              background: #e3f2fd;
+              align-self: flex-start;
+              max-width: 70%;
+              text-align: left;
+            }
+          }
+
+          &.advisor-message {
+            align-items: flex-end;
+            align-self: flex-end;
+
+            .message-header {
+              justify-content: flex-end;
+            }
+
+            .message-content {
+              background: #0969DA;
+              color: white;
+              align-self: flex-end;
+              max-width: 70%;
+              text-align: right;
+            }
+          }
+
+          .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+
+            .sender-avatar {
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              background: #007bff;
+              color: white;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: 600;
+            }
+
+            .sender-name {
+              font-size: 12px;
+              font-weight: 600;
+              color: #666;
+            }
+
+            .message-time {
+              font-size: 10px;
+              color: #999;
+            }
+          }
+
+          .message-content {
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            text-align: left;
+          }
+        }
+      }
+
+      .chat-input {
+        padding: 15px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+
+        textarea {
+          flex: 1;
+          padding: 10px 12px;
+          border: 1px solid #ddd;
+          border-radius: 20px;
+          resize: none;
+          font-family: inherit;
+          font-size: 14px;
+          outline: none;
+        }
+
+        textarea:focus {
+          border-color: #007bff;
+        }
+
+        button {
+          padding: 10px 15px;
+          background: #007bff;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s;
+
+          &:hover:not(:disabled) {
+            background: #0056b3;
+          }
+
+          &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+
+    .info-panel {
+      width: 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .info-section {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+
+        .info-section-header {
+          padding: 12px 15px;
+          background: #f8f9fa;
+          border-bottom: 1px solid #e0e0e0;
+
+          h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+          }
+        }
+
+        .info-section-content {
+          padding: 15px;
+
+          .person-info {
+            display: flex;
+            gap: 12px;
+
+            .person-avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: #007bff;
+              color: white;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              font-weight: 600;
+              flex-shrink: 0;
+            }
+
+            .person-details {
+              flex: 1;
+
+              .person-name {
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 4px;
+              }
+
+              .person-role {
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 8px;
+              }
+
+              .person-contact {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 4px;
+
+                i {
+                  font-size: 14px;
+                }
+              }
+
+              .person-department {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: #666;
+
+                i {
+                  font-size: 14px;
+                }
+              }
+
+              .person-status {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: #28a745;
+
+                i {
+                  font-size: 14px;
+                }
+              }
+            }
+          }
+
+          .vehicle-info {
+            display: flex;
+            gap: 12px;
+
+            .vehicle-image {
+              flex-shrink: 0;
+
+              img {
+                width: 80px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 4px;
+              }
+            }
+
+            .vehicle-details {
+              flex: 1;
+
+              .vehicle-title {
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              }
+
+              .vehicle-info-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 4px;
+
+                i {
+                  font-size: 14px;
+                  width: 16px;
+                }
+              }
+            }
+          }
+
+          .customer-complaint,
+          .internal-notes {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+
+            .complaint-header,
+            .notes-header {
+              margin-bottom: 8px;
+
+              h5 {
+                margin: 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+              }
+            }
+
+            .complaint-content,
+            .notes-content {
+              font-size: 14px;
+              line-height: 1.5;
+              color: #666;
+            }
+          }
+
+          .technicians-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+
+          .no-data {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 20px 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+.error {
+  color: #dc3545;
+  font-size: 14px;
+  text-align: center;
+  padding: 10px;
+}

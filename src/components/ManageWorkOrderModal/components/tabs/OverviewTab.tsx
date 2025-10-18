@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { workOrderService } from '../../../../services/workOrderService';
+import { supabase } from '../../../../lib/supabase';
 
 interface OverviewTabProps {
   workOrder?: any;
 }
 
 interface ChatMessage {
-  id: number;
+  id: string;
   sender: 'customer' | 'advisor';
   message: string;
   timestamp: string;
   senderName: string;
+  profileImage: string | null;
 }
 
 /**
@@ -17,52 +20,104 @@ interface ChatMessage {
  * Displays work order overview with communication panel and customer/vehicle information
  */
 const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      sender: 'customer',
-      message: 'Hi, I dropped off my car this morning. Can you give me an update on the brake inspection?',
-      timestamp: '2024-07-01T10:30:00Z',
-      senderName: 'John Anderson'
-    },
-    {
-      id: 2,
-      sender: 'advisor',
-      message: 'Hello John! We\'ve completed the initial inspection. We found that your brake pads are worn and need replacement. I\'ll send you an estimate shortly.',
-      timestamp: '2024-07-01T11:15:00Z',
-      senderName: 'Mike Johnson'
-    },
-    {
-      id: 3,
-      sender: 'customer',
-      message: 'Thanks for the quick update! How long will the repair take?',
-      timestamp: '2024-07-01T11:20:00Z',
-      senderName: 'John Anderson'
-    },
-    {
-      id: 4,
-      sender: 'advisor',
-      message: 'The brake pad replacement should take about 2-3 hours. We have the parts in stock, so we can complete it today if you approve the estimate.',
-      timestamp: '2024-07-01T11:25:00Z',
-      senderName: 'Mike Johnson'
-    }
-  ]);
-
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [newMessage, setNewMessage] = useState('');
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      const message: ChatMessage = {
-        id: chatMessages.length + 1,
-        sender: 'advisor',
-        message: newMessage,
-        timestamp: new Date().toISOString(),
-        senderName: workOrder?.serviceAdvisor?.userProfile ? 
-          `${workOrder.serviceAdvisor.userProfile.firstName} ${workOrder.serviceAdvisor.userProfile.lastName}` : 
-          'Service Advisor'
+  useEffect(() => {
+    if (workOrder?.id) {
+      fetchMessages();
+
+      // Subscribe to real-time messages
+      console.log('Setting up subscription for workOrder:', workOrder.id);
+      const channel = supabase
+        .channel(`work-order-messages-${workOrder.id}`)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'WorkOrderMessage',
+          filter: `workOrderId=eq.${workOrder.id}`
+        }, (payload) => {
+          console.log('INSERT event received:', payload);
+          console.log('New message received:', payload.new);
+          const newMsg = payload.new;
+          const transformedMsg: ChatMessage = {
+            id: newMsg.id,
+            sender: (newMsg.senderRole === 'SERVICE_ADVISOR' || newMsg.senderRole === 'MANAGER') ? 'advisor' : 'customer',
+            message: newMsg.message,
+            timestamp: newMsg.createdAt,
+            senderName: newMsg.sender.name,
+            profileImage: newMsg.sender.profileImage
+          };
+          setChatMessages(prev => [...prev, transformedMsg]);
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'WorkOrderMessage',
+          filter: `workOrderId=eq.${workOrder.id}`
+        }, (payload) => {
+          console.log('UPDATE event received:', payload);
+          console.log('Message updated:', payload.new);
+          const updatedMsg = payload.new;
+          const transformedMsg: ChatMessage = {
+            id: updatedMsg.id,
+            sender: (updatedMsg.senderRole === 'SERVICE_ADVISOR' || updatedMsg.senderRole === 'MANAGER') ? 'advisor' : 'customer',
+            message: updatedMsg.message,
+            timestamp: updatedMsg.createdAt,
+            senderName: updatedMsg.sender.name,
+            profileImage: updatedMsg.sender.profileImage
+          };
+          setChatMessages(prev => prev.map(msg => msg.id === updatedMsg.id ? transformedMsg : msg));
+        })
+        .subscribe((status, err) => {
+          console.log('Subscription status:', status, err);
+        });
+
+      // Cleanup subscription on unmount or workOrder change
+      return () => {
+        supabase.removeChannel(channel);
       };
-      setChatMessages([...chatMessages, message]);
-      setNewMessage('');
+    }
+  }, [workOrder?.id]);
+
+  const fetchMessages = async () => {
+    setLoading(true);
+    try {
+      const messages = await workOrderService.getWorkOrderMessages(workOrder.id);
+      const transformedMessages = messages.map((msg: any) => ({
+        id: msg.id,
+        sender: (msg.senderRole === 'SERVICE_ADVISOR' || msg.senderRole === 'MANAGER') ? 'advisor' : 'customer',
+        message: msg.message,
+        timestamp: msg.createdAt,
+        senderName: msg.sender.name,
+        profileImage: msg.sender.profileImage
+      }));
+      setChatMessages(transformedMessages);
+      setError('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch messages');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (newMessage.trim()) {
+      try {
+        await workOrderService.sendWorkOrderMessage({
+          workOrderId: workOrder.id,
+          message: newMessage,
+          messageType: 'TEXT',
+          attachments: [] // Add attachments if needed
+        });
+        setNewMessage('');
+        // Refetch messages to include the new one
+        fetchMessages();
+      } catch (err: any) {
+        setError(err.message || 'Failed to send message');
+      }
     }
   };
 
@@ -79,9 +134,24 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
             <h4><i className="bx bx-message-detail"></i> Communication</h4>
           </div>
           <div className="chat-messages">
+            {loading && <div>Loading messages...</div>}
+            {error && <div className="error">{error}</div>}
+            {chatMessages.length === 0 && !loading && !error && (
+              <div className="no-messages">
+                <i className="bx bx-message-square-x" style={{ fontSize: '108px', color: '#ccc' }}></i>
+                <p style={{ color: '#999', marginTop: '10px' }}>No messages sent</p>
+              </div>
+            )}
             {chatMessages.map((msg) => (
-              <div key={msg.id} className={`chat-message ${msg.sender}`}>
+              <div key={msg.id} className={`chat-message ${msg.sender}-message`}>
                 <div className="message-header">
+                  {msg.profileImage ? (
+                    <img src={msg.profileImage} alt={msg.senderName} className="sender-avatar" />
+                  ) : (
+                    <div className="sender-avatar">
+                      {msg.senderName.split(' ').map(name => name[0]).join('').toUpperCase()}
+                    </div>
+                  )}
                   <span className="sender-name">{msg.senderName}</span>
                   <span className="message-time">{formatTime(msg.timestamp)}</span>
                 </div>

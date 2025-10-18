@@ -37,7 +37,10 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
   /**
    * Open Add Inspection Modal
    */
-  const openAddInspectionModal = () => {
+  const openAddInspectionModal = (templateId?: string) => {
+    if (templateId) {
+      setSelectedTemplateId(templateId);
+    }
     setShowAddInspectionModal(true);
   };
 

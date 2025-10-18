@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './AppointmentsPage.scss';
 import { useAuth } from '../../hooks/useAuth';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Types based on the backend API response
 interface Appointment {
@@ -74,19 +78,6 @@ interface ServiceAdvisor {
   estimatesCount: number;
 }
 
-const getStatusBadge = (status: string) => {
-  const badgeClass = {
-    'PENDING': 'status-badge status-low-stock',
-    'CONFIRMED': 'status-badge status-in-stock',
-    'IN_PROGRESS': 'status-badge status-overstock',
-    'COMPLETED': 'status-badge status-in-stock',
-    'CANCELLED': 'status-badge status-out-of-stock',
-    'NO_SHOW': 'status-badge status-out-of-stock',
-  }[status] || 'status-badge';
-  const statusText = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  return <span className={badgeClass}>{statusText}</span>;
-};
-
 const getPriorityBadge = (priority: string) => {
   const priorityText = priority.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   
@@ -150,6 +141,12 @@ const getPriorityBadge = (priority: string) => {
 
 const AppointmentsPage = () => {
   const { token, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const localizer = momentLocalizer(moment);
+  
+  // Determine the path prefix based on current route (serviceadvisor or manager)
+  const pathPrefix = location.pathname.split('/')[1];
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCustomer, setFilterCustomer] = useState('all');
@@ -159,10 +156,9 @@ const AppointmentsPage = () => {
   const [error, setError] = useState('');
   const [serviceAdvisors, setServiceAdvisors] = useState<ServiceAdvisor[]>([]);
   const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
 
   // Modal state
-  const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmingAppointment, setConfirmingAppointment] = useState<Appointment | null>(null);
   
@@ -300,12 +296,6 @@ const AppointmentsPage = () => {
     return matchesSearch && matchesStatus && matchesCustomer && matchesVehicle;
   });
 
-  const handleView = (id: string) => {
-    const appointment = appointments.find((a: Appointment) => a.id === id) || null;
-    setSelectedAppointment(appointment);
-    setViewModalOpen(true);
-  };
-
   const handleConfirm = (id: string) => {
     const appointment = appointments.find((a: Appointment) => a.id === id);
     if (appointment) {
@@ -369,7 +359,6 @@ const AppointmentsPage = () => {
         
         // Close modals and reset form
         setConfirmModalOpen(false);
-        setViewModalOpen(false);
         setConfirmingAppointment(null);
         setConfirmationForm({
           priority: 'NORMAL',
@@ -428,7 +417,6 @@ const AppointmentsPage = () => {
         );
         
         // Close any open modals
-        setViewModalOpen(false);
         setConfirmModalOpen(false);
         
         console.log('Appointment cancelled successfully');
@@ -571,7 +559,7 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/${pathPrefix}/appointment-detail/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
           <button className="btn-icon" title="Confirm" onClick={e => { e.stopPropagation(); handleConfirm(row.id); }}>
@@ -768,7 +756,7 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/${pathPrefix}/appointment-detail/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
         </div>
@@ -780,6 +768,69 @@ const AppointmentsPage = () => {
   const pendingAppointments = filteredAppointments.filter(apt => apt.status === 'PENDING');
   const confirmedAppointments = filteredAppointments.filter(apt => apt.status === 'CONFIRMED');
 
+  // Map calendar appointments to BigCalendar events
+  const calendarEvents = appointments
+    .filter(apt => apt.startTime) // Only show appointments with scheduled times
+    .map(apt => ({
+      id: apt.id,
+      title: `${apt.customer?.name || apt.customerId} – ${apt.vehicle ? `${apt.vehicle.make} ${apt.vehicle.model}` : apt.vehicleId}`,
+      start: new Date(apt.startTime!),
+      end: new Date(apt.startTime!), // Assuming no end time, or add duration if available
+      resource: apt,
+    }));
+
+  const handleEventClick = (event: any) => {
+    // Calendar event clicked - no modal to show
+    console.log('Calendar event clicked:', event);
+  };
+
+  const eventStyleGetter = (event: any) => {
+    let backgroundColor = '#3b82f6'; // default blue
+    let borderColor = '#2563eb';
+    
+    switch (event.resource.status) {
+      case 'PENDING':
+        backgroundColor = '#2A7399';
+        borderColor = '#1e5f7a';
+        break;
+      case 'CONFIRMED':
+        backgroundColor = '#1DB5D5';
+        borderColor = '#1794ad';
+        break;
+      case 'IN_PROGRESS':
+        backgroundColor = '#FECC1B';
+        borderColor = '#d4a816';
+        break;
+      case 'COMPLETED':
+        backgroundColor = '#ED7861';
+        borderColor = '#c55f4e';
+        break;
+      case 'CANCELLED':
+        backgroundColor = '#E95988';
+        borderColor = '#c1476f';
+        break;
+      case 'NO_SHOW':
+        backgroundColor = '#6b7280'; // gray for no show
+        borderColor = '#4b5563';
+        break;
+      default:
+        backgroundColor = '#3b82f6'; // blue
+        borderColor = '#2563eb';
+    }
+
+    return {
+      style: {
+        backgroundColor,
+        borderColor,
+        borderRadius: '4px',
+        opacity: 0.8,
+        color: 'white',
+        border: '0px',
+        display: 'block'
+      }
+    };
+  };
+
   return (
     <div className="appointments-page">
       <div className="page-header">
@@ -788,6 +839,20 @@ const AppointmentsPage = () => {
           <p className="page-subtitle">Manage and confirm appointment requests</p>
         </div>
         <div className="header-actions">
+          <div className="view-toggle">
+            <button 
+              className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
+              onClick={() => setViewMode('table')}
+            >
+              <i className='bx bx-table'></i> Table
+            </button>
+            <button 
+              className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
+              onClick={() => setViewMode('calendar')}
+            >
+              <i className='bx bx-calendar'></i> Calendar
+            </button>
+          </div>
           <div className="search-container">
             <input
               type="text"
@@ -839,120 +904,71 @@ const AppointmentsPage = () => {
         </div>
       </div>
 
-      {/* Incoming Appointment Requests */}
-      <div className="appointments-section">
-        <div className="section-header">
-          <h3 className="section-title">Incoming Appointment Requests</h3>
-          <span className="count-badge">{pendingAppointments.length}</span>
-        </div>
-        <div className="parts-table-container">
-          {loading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div style={{ color: 'red' }}>{error}</div>
-          ) : (
-            <Table
-              columns={incomingColumns}
-              data={pendingAppointments.map(apt => ({ ...apt, uniqueKey: `pending-${apt.id}` }))}
-              onRowClick={(appointment) => handleView(appointment.id)}
-              emptyMessage="No pending appointment requests found."
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Confirmed Appointments */}
-      <div className="appointments-section">
-        <div className="section-header">
-          <h3 className="section-title">Confirmed Appointments</h3>
-          <span className="count-badge">{confirmedAppointments.length}</span>
-        </div>
-        <div className="parts-table-container">
-          {loading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div style={{ color: 'red' }}>{error}</div>
-          ) : (
-            <Table
-              columns={confirmedColumns}
-              data={confirmedAppointments.map(apt => ({ ...apt, uniqueKey: `confirmed-${apt.id}` }))}
-              onRowClick={(appointment) => handleView(appointment.id)}
-              emptyMessage="No confirmed appointments found."
-            />
-          )}
-        </div>
-      </div>
-
-      {/* View Modal */}
-      {viewModalOpen && selectedAppointment && (
-        <div className="modal-overlay" onClick={() => setViewModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Appointment Details</h3>
-              <button className="btn-icon" onClick={() => setViewModalOpen(false)}>
-                <i className='bx bx-x'></i>
-              </button>
+      {viewMode === 'table' ? (
+        <>
+          {/* Incoming Appointment Requests */}
+          <div className="appointments-section">
+            <div className="section-header">
+              <h3 className="section-title">Incoming Appointment Requests</h3>
+              <span className="count-badge">{pendingAppointments.length}</span>
             </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>Customer Information</h4>
-                <p><strong>Name:</strong> {selectedAppointment.customer?.name || 'N/A'}</p>
-                <p><strong>Phone:</strong> {selectedAppointment.customer?.phone || 'N/A'}</p>
-                <p><strong>Email:</strong> {selectedAppointment.customer?.email || 'N/A'}</p>
-              </div>
-              
-              <div className="detail-section">
-                <h4>Vehicle Information</h4>
-                <p><strong>Vehicle:</strong> {selectedAppointment.vehicle?.year} {selectedAppointment.vehicle?.make} {selectedAppointment.vehicle?.model}</p>
-                <p><strong>License Plate:</strong> {selectedAppointment.vehicle?.licensePlate || 'N/A'}</p>
-              </div>
-
-              <div className="detail-section">
-                <h4>Appointment Details</h4>
-                <p><strong>Requested At:</strong> {new Date(selectedAppointment.requestedAt).toLocaleString()}</p>
-                <p><strong>Scheduled Time:</strong> {selectedAppointment.startTime ? new Date(selectedAppointment.startTime).toLocaleString() : 'Not scheduled'}</p>
-                <p><strong>Status:</strong> {getStatusBadge(selectedAppointment.status)}</p>
-                <p><strong>Priority:</strong> {getPriorityBadge(selectedAppointment.priority)}</p>
-                <p><strong>Service Advisor:</strong> {selectedAppointment.assignedTo ? 'Assigned' : 'Unassigned'}</p>
-                {selectedAppointment.notes && (
-                  <p><strong>Notes:</strong> {selectedAppointment.notes}</p>
-                )}
-              </div>
-
-                     {selectedAppointment.cannedServices && selectedAppointment.cannedServices.length > 0 && (
-                       <div className="detail-section">
-                         <h4>Services</h4>
-                         {selectedAppointment.cannedServices.map((service, index) => (
-                           <div key={`${selectedAppointment.id}-service-${index}`} className="service-item">
-                             <p><strong>{service.name}</strong></p>
-                             <p>Code: {service.code}</p>
-                             <p>Duration: {service.duration} minutes</p>
-                             <p>Quantity: {service.quantity}</p>
-                             <p>Price: LKR {typeof service.price === 'number' ? service.price.toFixed(2) : service.price}</p>
-                             {service.notes && <p>Notes: {service.notes}</p>}
-                           </div>
-                         ))}
-                       </div>
-                     )}
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn--secondary" onClick={() => setViewModalOpen(false)}>
-                Close
-              </button>
-              {selectedAppointment.status === 'PENDING' && (
-                <>
-                  <button className="btn btn--success" onClick={() => {
-                    setViewModalOpen(false);
-                    handleConfirm(selectedAppointment.id);
-                  }}>
-                    Confirm Appointment
-                  </button>
-                  <button className="btn btn--danger" onClick={() => handleCancel(selectedAppointment.id)}>
-                    Cancel Appointment
-                  </button>
-                </>
+            <div className="parts-table-container">
+              {loading ? (
+                <div>Loading...</div>
+              ) : error ? (
+                <div style={{ color: 'red' }}>{error}</div>
+              ) : (
+                <Table
+                  columns={incomingColumns}
+                  data={pendingAppointments.map(apt => ({ ...apt, uniqueKey: `pending-${apt.id}` }))}
+                  emptyMessage="No pending appointment requests found."
+                />
               )}
             </div>
+          </div>
+
+          {/* Confirmed Appointments */}
+          <div className="appointments-section">
+            <div className="section-header">
+              <h3 className="section-title">Confirmed Appointments</h3>
+              <span className="count-badge">{confirmedAppointments.length}</span>
+            </div>
+            <div className="parts-table-container">
+              {loading ? (
+                <div>Loading...</div>
+              ) : error ? (
+                <div style={{ color: 'red' }}>{error}</div>
+              ) : (
+                <Table
+                  columns={confirmedColumns}
+                  data={confirmedAppointments.map(apt => ({ ...apt, uniqueKey: `confirmed-${apt.id}` }))}
+                  emptyMessage="No confirmed appointments found."
+                />
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="calendar-section">
+          <div className="section-header">
+            <h3 className="section-title">Appointment Calendar</h3>
+          </div>
+          <div className="calendar-container">
+            {loading ? (
+              <div>Loading calendar...</div>
+            ) : (
+              <Calendar
+                localizer={localizer}
+                events={calendarEvents}
+                startAccessor="start"
+                endAccessor="end"
+                style={{ height: 600 }}
+                onSelectEvent={handleEventClick}
+                views={['month', 'week', 'day']}
+                defaultView="month"
+                eventPropGetter={eventStyleGetter}
+              />
+            )}
           </div>
         </div>
       )}

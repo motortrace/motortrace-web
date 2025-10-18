@@ -4,7 +4,7 @@ import KanbanBoard from '../../components/KanbanBoard/KanbanBoard';
 import { ClipboardList, AlertCircle } from 'lucide-react';
 import './KanbanPage.scss';
 import ManageWorkOrderModal from '../../components/ManageWorkOrderModal';
-import { type WorkOrder, getWorkOrders, updateWorkOrderStatus } from '../../utils/workOrdersApi';
+import { type WorkOrder, getWorkOrders, updateWorkOrderWorkflowStep } from '../../utils/workOrdersApi';
 import { useAuth } from '../../hooks/useAuth';
 
 const KanbanPage: React.FC = () => {
@@ -113,22 +113,22 @@ const KanbanPage: React.FC = () => {
     setSearchTerm(term);
   };
 
-  const handleCardMove = async (cardId: string, newStatus: WorkOrder['status']) => {
+  const handleCardMove = async (cardId: string, newWorkflowStep: WorkOrder['workflowStep']) => {
     try {
-      // Update the work order status in the backend
-      await updateWorkOrderStatus(cardId, newStatus);
+      // Update the work order workflowStep in the backend
+      await updateWorkOrderWorkflowStep(cardId, newWorkflowStep);
       
       // Update local state optimistically
       setWorkOrders(prev =>
         prev.map(item =>
           item.id === cardId
-            ? { ...item, status: newStatus, workflowStep: newStatus }
+            ? { ...item, workflowStep: newWorkflowStep }
             : item
         )
       );
     } catch (err) {
-      console.error('Failed to update work order status:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update work order status');
+      console.error('Failed to update work order workflowStep:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update work order workflowStep');
     }
   };
 
@@ -333,14 +333,16 @@ const KanbanPage: React.FC = () => {
     }
   };
 
-  // Kanban columns for work order stages (mapped to backend statuses)
-  const columns: { id: WorkOrder['status']; title: string; color: string }[] = [
-    { id: 'PENDING', title: 'Pending', color: '#6B7280' },
-    { id: 'ESTIMATE', title: 'Estimate', color: '#f59e0b' },
-    // { id: 'APPROVAL', title: 'Approval', color: '#10B981' },
-    { id: 'IN_PROGRESS', title: 'In Progress', color: '#3B82F6' },
-    { id: 'WAITING_FOR_PARTS', title: 'Waiting for Parts', color: '#8b5cf6' },
-    { id: 'COMPLETED', title: 'Completed', color: '#059669' },
+  // Kanban columns for work order stages (mapped to backend workflowStep)
+  const columns: { id: WorkOrder['workflowStep']; title: string; color: string }[] = [
+    { id: 'RECEIVED', title: 'Received', color: '#6B7280' },
+    { id: 'INSPECTION', title: 'Inspection', color: '#f59e0b' },
+    { id: 'ESTIMATE', title: 'Estimate', color: '#10B981' },
+    // { id: 'APPROVAL', title: 'Approval', color: '#3B82F6' }, // Hidden
+    { id: 'REPAIR', title: 'Repair', color: '#8b5cf6' },
+    { id: 'QC', title: 'QC', color: '#059669' },
+    { id: 'READY', title: 'Ready', color: '#dc2626' },
+    // { id: 'CLOSED', title: 'Closed', color: '#16a34a' }, // Hidden
   ];
 
   if (error) {

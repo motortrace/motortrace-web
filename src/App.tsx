@@ -27,6 +27,7 @@ import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
 import CustomerManagement from './pages/ServiceCenter/CustomerManagement';
 import CustomerProfile from './pages/ServiceCenter/CustomerProfile';
 import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
+import AppointmentDetailPage from './pages/ServiceCenter/AppointmentDetailPage';
 import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
 import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
 import TechnicianProfile from './pages/ServiceCenter/TechnicianProfile';
@@ -109,7 +110,7 @@ function App() {
 
         {/* Service Advisor Dashboard Routes */}
         <Route path="/serviceadvisor" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['serviceadvisor', 'service_advisor', 'advisor']}>
             <DashboardLayout />
           </ProtectedRoute>
         }>
@@ -131,6 +132,7 @@ function App() {
           <Route path="labor-catalog" element={<LaborCatalogPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
+          <Route path="appointment-detail/:id" element={<AppointmentDetailPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
           <Route path="technician/:technicianId" element={<TechnicianProfile />} />
@@ -140,7 +142,7 @@ function App() {
 
         {/* Manager Dashboard Routes */}
         <Route path="/manager" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['manager']}>
             <DashboardLayout />
           </ProtectedRoute>
         }>
@@ -162,6 +164,7 @@ function App() {
           <Route path="labor-catalog" element={<LaborCatalogPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
+          <Route path="appointment-detail/:id" element={<AppointmentDetailPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
           <Route path="technician/:technicianId" element={<TechnicianProfile />} />
@@ -171,7 +174,11 @@ function App() {
 
         <Route path="admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<Navigate to="login" replace />} />
-        <Route path="/admin/*" element={<AdminDashboardLayout />}>
+        <Route path="/admin/*" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminDashboardLayout />
+          </ProtectedRoute>
+        }>
 
           <Route path="dashboard" element={<AdminDashboard />} />
 

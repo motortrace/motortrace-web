@@ -19,31 +19,36 @@ const LoginPage = () => {
   useEffect(() => {
     const checkStatus = async () => {
       const status = await fetchUserStatus();
+      console.log('LoginPage - Checking existing status:', status);
       if (status && status.user) {
-
         const user = status.user;
-
-        // Use the role directly from user object
         const userRole = user.role;
+        console.log('LoginPage - User already logged in with role:', userRole);
 
         if (userRole === 'admin') {
+          console.log('LoginPage - Redirecting admin to /admin/dashboard');
           navigate('/admin/dashboard');
         } 
         else if (userRole === 'service_advisor') {
-          navigate('/servicecenter/dashboard');
+          console.log('LoginPage - Redirecting service_advisor to /serviceadvisor/dashboard');
+          navigate('/serviceadvisor/dashboard');
         } 
-        else if (userRole) {
-          // For other roles, redirect to their dashboard
+        else if (userRole === 'manager') {
+          console.log('LoginPage - Redirecting manager to /manager/dashboard');
+          navigate('/manager/dashboard');
+        }
+        else {
+          console.log('LoginPage - Unknown role, redirecting to /');
           navigate('/');
         }
       } else {
+        console.log('LoginPage - No existing user, showing login form');
         setCheckingStatus(false);
       }
     };
     checkStatus();
   }, [navigate]);
 
-  // Enhanced loading screen
   if (checkingStatus) return (
     <div className="login-page">
       <div style={{
@@ -87,7 +92,6 @@ const LoginPage = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    // Clear error when user starts typing
     if (error) setError('');
   };
 
@@ -107,9 +111,9 @@ const LoginPage = () => {
       });
       
       const data = await res.json();
+      console.log('LoginPage - Login response:', data);
 
       if (!res.ok) {
-        // Handle different error cases with specific messages
         if (res.status === 401) {
           throw new Error(data.error === 'Invalid login credentials'
             ? 'Incorrect email or password. Please try again.'
@@ -126,53 +130,57 @@ const LoginPage = () => {
         }
       }
 
-      // Check if response has the expected structure
       if (!data.data || !data.data.user) {
         throw new Error('Invalid response from server. Please try again.');
       }
 
-      console.log('Login response:', data.data.user);
+      console.log('LoginPage - Login successful, storing credentials');
+      console.log('LoginPage - User data:', data.data.user);
 
       // Store the access token
       if (data.data.access_token) {
         localStorage.setItem('token', data.data.access_token);
-        console.log('Token stored:', data.data.access_token.substring(0, 20) + '...');
+        console.log('LoginPage - Token stored');
       }
 
-      // Store user object if present
+      // Store user object
       if (data.data.user) {
         localStorage.setItem('user', JSON.stringify(data.data.user));
-        console.log('User stored:', data.data.user);
+        console.log('LoginPage - User stored:', data.data.user);
       }
 
-      // Get user for redirection
+      // Get user role for redirection
       const user = data.data.user;
-      const userRole = user?.role;  // Directly from user object, not user_metadata
+      const userRole = user?.role;
 
       if (!userRole) {
         throw new Error('User role information is missing');
       }
 
-      // Redirect based on user role
-      console.log('Redirecting user with role:', userRole);
+      console.log('LoginPage - User role from response:', userRole);
+      console.log('LoginPage - About to redirect to appropriate dashboard');
 
+      // Redirect based on user role
       switch (userRole) {
         case 'admin':
+          console.log('LoginPage - Redirecting to /admin/dashboard');
           navigate('/admin/dashboard');
           break;
         case 'service_advisor':
-          navigate('/servicecenter/dashboard');
+          console.log('LoginPage - Redirecting to /serviceadvisor/dashboard');
+          navigate('/serviceadvisor/dashboard');
           break;
         case 'manager':
-          window.location.href = '/manager/dashboard';
+          console.log('LoginPage - Redirecting to /manager/dashboard');
+          navigate('/manager/dashboard');
           break;
         default:
-          window.location.href = '/';
+          console.log('LoginPage - Unknown role, redirecting to /');
+          navigate('/');
       }
     } catch (err: any) {
-      console.error('Login error:', err);
+      console.error('LoginPage - Login error:', err);
 
-      // Handle specific error cases
       if (err.message.includes('Failed to fetch')) {
         setError('Network error. Please check your connection and try again.');
       } else if (err.message.includes('JSON')) {
@@ -242,9 +250,7 @@ const LoginPage = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Enter your password (min 8 characters)"
-                  required
-                  minLength={8}
+                  placeholder="Enter your password"
                   disabled={loading}
                   autoComplete="current-password"
                 />
