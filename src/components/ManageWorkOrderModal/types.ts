@@ -215,6 +215,7 @@ export interface WorkOrderApproval {
   method: string | null;
   notes: string | null;
   customerSignature: string | null;
+  isFinal?: boolean | null;
   pdfUrl: string | null;
   createdAt: string;
   updatedAt: string;

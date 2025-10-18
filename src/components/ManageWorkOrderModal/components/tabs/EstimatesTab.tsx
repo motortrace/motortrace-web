@@ -20,6 +20,7 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [creatingEstimate, setCreatingEstimate] = useState(false);
+  const [finalizing, setFinalizing] = useState<string | null>(null);
 
   // Function to fetch estimates (extracted for reuse)
   const fetchEstimates = async () => {
@@ -143,6 +144,35 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
       // Error is handled silently - could add error state if needed
     } finally {
       setCreatingEstimate(false);
+    }
+  };
+
+  // Function to finalize an approved estimate (service advisor action)
+  const handleFinalizeEstimate = async (approvalId: string) => {
+    if (!token || !approvalId) return;
+
+    setFinalizing(approvalId);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/approvals/${approvalId}/finalize`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const txt = await response.text();
+        throw new Error(`HTTP error! status: ${response.status} - ${txt}`);
+      }
+
+      // Refresh the estimates list after finalization
+      await fetchEstimates();
+    } catch (err) {
+      console.error('Error finalizing estimate:', err);
+      setError('Failed to finalize estimate');
+    } finally {
+      setFinalizing(null);
     }
   };
 
@@ -288,14 +318,48 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
                     {getStatusBadge(estimate.status)}
                   </td>
                   <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                    <button
-                      className="pdf-btn"
-                      title="View PDF"
-                      onClick={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
-                      style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                    >
-                      <i className="bx bx-file"></i>
-                    </button>
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+                      <button
+                        className="pdf-btn"
+                        title="View PDF"
+                        onClick={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
+                        style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                      >
+                        <i className="bx bx-file"></i>
+                      </button>
+
+                      {/* Finalize button: visible only to service advisors for the latest APPROVED estimate that is not finalized */}
+                      {(() => {
+                        // Debug logging
+                        console.log('Estimate:', estimate.id, 'Status:', estimate.status, 'isFinal:', estimate.isFinal, 'isServiceAdvisor:', isServiceAdvisor);
+
+                        if (estimate.status !== 'APPROVED' || estimate.isFinal) {
+                          return null;
+                        }
+
+                        // Sort estimates by createdAt to find the latest one
+                        const sortedEstimates = [...estimates].sort((a, b) =>
+                          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                        );
+                        const latestEstimate = sortedEstimates[0];
+
+                        console.log('Latest estimate ID:', latestEstimate?.id, 'Current estimate ID:', estimate.id);
+
+                        if (latestEstimate?.id === estimate.id) {
+                          return (
+                            <button
+                              onClick={() => handleFinalizeEstimate(estimate.id)}
+                              disabled={finalizing === estimate.id}
+                              style={{ background: '#0ea5a4', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 10px', fontSize: 13, cursor: 'pointer' }}
+                              title="Finalize Estimate"
+                            >
+                              {finalizing === estimate.id ? 'Finalizing...' : 'Finalize Estimate'}
+                            </button>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </div>
                   </td>
                 </tr>
               );
