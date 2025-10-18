@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './AppointmentsPage.scss';
 import { useAuth } from '../../hooks/useAuth';
@@ -142,7 +142,11 @@ const getPriorityBadge = (priority: string) => {
 const AppointmentsPage = () => {
   const { token, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const localizer = momentLocalizer(moment);
+  
+  // Determine the path prefix based on current route (serviceadvisor or manager)
+  const pathPrefix = location.pathname.split('/')[1];
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCustomer, setFilterCustomer] = useState('all');
@@ -555,7 +559,7 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/serviceadvisor/appointment-detail/${row.id}`); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/${pathPrefix}/appointment-detail/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
           <button className="btn-icon" title="Confirm" onClick={e => { e.stopPropagation(); handleConfirm(row.id); }}>
@@ -752,7 +756,7 @@ const AppointmentsPage = () => {
       align: 'center' as const,
       render: (_: any, row: Appointment) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/serviceadvisor/appointment-detail/${row.id}`); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); navigate(`/${pathPrefix}/appointment-detail/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
         </div>
