@@ -49,6 +49,7 @@
     "@types/google.maps": "^3.58.1",
     "@types/node": "^24.0.3",
     "@types/react": "^19.1.2",
+    "@types/react-big-calendar": "^1.16.3",
     "@types/react-dom": "^19.1.2",
     "@types/react-modal": "^3.16.3",
     "@vitejs/plugin-react": "^4.4.1",

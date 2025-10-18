@@ -52,25 +52,6 @@ interface Appointment {
   }>;
 }
 
-interface ServiceAdvisor {
-  id: string;
-  userProfileId: string;
-  employeeId: string;
-  department: string;
-  createdAt: string;
-  updatedAt: string;
-  userProfile: {
-    id: string;
-    name: string;
-    phone: string;
-    profileImage?: string;
-    role: string;
-  };
-  workOrdersCount: number;
-  appointmentsCount: number;
-  estimatesCount: number;
-}
-
 interface AdvisorAvailability {
   advisorId: string;
   employeeId: string;
@@ -197,8 +178,6 @@ const AppointmentDetailPage = () => {
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [serviceAdvisors, setServiceAdvisors] = useState<ServiceAdvisor[]>([]);
-  const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
 
   // Assignment form state
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -219,50 +198,6 @@ const AppointmentDetailPage = () => {
   const [advisorAvailability, setAdvisorAvailability] = useState<AdvisorAvailability[]>([]);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [availabilityError, setAvailabilityError] = useState('');
-
-  // Fetch service advisors
-  const fetchServiceAdvisors = async () => {
-    if (!token) {
-      console.log('No token available for service advisors fetch');
-      return;
-    }
-
-    setServiceAdvisorsLoading(true);
-    console.log('Fetching service advisors...');
-
-    try {
-      const response = await fetch('http://localhost:3000/service-advisors', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      console.log('Service advisors response status:', response.status);
-      console.log('Service advisors response ok:', response.ok);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Service advisors error response:', errorText);
-        throw new Error(`Failed to fetch service advisors: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log('Service advisors data:', data);
-
-      if (data.success) {
-        setServiceAdvisors(data.data);
-        console.log('Service advisors set successfully:', data.data.length, 'advisors');
-      } else {
-        console.error('Service advisors API returned success: false');
-      }
-    } catch (err) {
-      console.error('Error fetching service advisors:', err);
-    } finally {
-      setServiceAdvisorsLoading(false);
-    }
-  };
 
   // Fetch service history
   const fetchServiceHistory = async (customerId: string) => {
@@ -376,7 +311,6 @@ const AppointmentDetailPage = () => {
   useEffect(() => {
     if (token) {
       fetchAppointment();
-      fetchServiceAdvisors();
     }
   }, [id, token]);
 
@@ -386,6 +320,13 @@ const AppointmentDetailPage = () => {
       fetchServiceHistory(appointment.customerId);
     }
   }, [appointment?.customerId, token]);
+
+  // Fetch advisor availability when assign modal opens
+  useEffect(() => {
+    if (assignModalOpen && appointment?.startTime && token) {
+      fetchAdvisorAvailability();
+    }
+  }, [assignModalOpen, appointment?.startTime, token]);
 
   // Handle appointment assignment
   const handleAssign = async () => {
@@ -512,12 +453,7 @@ const AppointmentDetailPage = () => {
             <>
               <button
                 className="btn btn--primary"
-                onClick={() => {
-                  setAssignModalOpen(true);
-                  if (appointment?.startTime) {
-                    fetchAdvisorAvailability();
-                  }
-                }}
+                onClick={() => setAssignModalOpen(true)}
                 disabled={assignLoading}
               >
                 <i className='bx bx-user-plus'></i> Assign Advisor
@@ -730,92 +666,74 @@ const AppointmentDetailPage = () => {
               </button>
             </div>
             <div className="modal-body">
-              <div className="form-group">
-                <label htmlFor="advisorSelect">Select Service Advisor</label>
-                <select
-                  id="advisorSelect"
-                  value={selectedAdvisorId}
-                  onChange={(e) => setSelectedAdvisorId(e.target.value)}
-                  className="form-select"
-                  disabled={serviceAdvisorsLoading || availabilityLoading}
-                >
-                  <option value="">Choose a service advisor...</option>
-                  {serviceAdvisors.map(advisor => {
-                    const availability = advisorAvailability.find(a => a.advisorId === advisor.id);
-                    return (
-                      <option key={advisor.id} value={advisor.id}>
-                        {advisor.userProfile.name} ({advisor.employeeId})
-                        {availability && (
-                          availability.isAvailable ? ' - Available' : ' - Busy'
-                        )}
-                      </option>
-                    );
-                  })}
-                </select>
-                {serviceAdvisorsLoading && (
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                    Loading service advisors...
-                  </div>
-                )}
-                {availabilityLoading && (
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                    Checking availability...
-                  </div>
-                )}
-                {!serviceAdvisorsLoading && serviceAdvisors.length === 0 && (
-                  <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>
-                    No service advisors found.
-                  </div>
-                )}
-                {availabilityError && (
-                  <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>
-                    Error checking availability: {availabilityError}
-                  </div>
-                )}
-                {!appointment?.startTime && (
-                  <div style={{ fontSize: '12px', color: '#f59e0b', marginTop: '4px' }}>
-                    Note: Appointment must be scheduled to check advisor availability
-                  </div>
-                )}
-              </div>
-
-              {/* Show availability details for selected advisor */}
-              {selectedAdvisorId && appointment?.startTime && advisorAvailability.length > 0 && (
-                <div className="advisor-availability-details">
-                  {(() => {
-                    const availability = advisorAvailability.find(a => a.advisorId === selectedAdvisorId);
-                    if (!availability) return null;
-
-                    return (
-                      <div className="availability-info">
-                        <h4>Advisor Availability</h4>
-                        <div className="availability-status">
-                          <span className={`status-badge ${availability.isAvailable ? 'available' : 'busy'}`}>
-                            {availability.isAvailable ? 'Available' : 'Currently Busy'}
-                          </span>
+              {!appointment?.startTime ? (
+                <div className="no-schedule-message">
+                  <p>Appointment must be scheduled to check advisor availability.</p>
+                  <p>Please schedule the appointment first before assigning an advisor.</p>
+                </div>
+              ) : availabilityLoading ? (
+                <div className="loading-advisors">
+                  <p>Loading advisor availability...</p>
+                </div>
+              ) : availabilityError ? (
+                <div className="error-message">
+                  {availabilityError}
+                </div>
+              ) : advisorAvailability.length > 0 ? (
+                <div className="advisors-grid">
+                  <h4>Select a Service Advisor</h4>
+                  <div className="advisors-cards">
+                    {advisorAvailability.map(advisor => (
+                      <div
+                        key={advisor.advisorId}
+                        className={`advisor-card ${selectedAdvisorId === advisor.advisorId ? 'selected' : ''} ${advisor.isAvailable ? 'available' : 'busy'}`}
+                        onClick={() => setSelectedAdvisorId(advisor.advisorId)}
+                      >
+                        <div className="advisor-card-header">
+                          {advisor.profileImage ? (
+                            <img
+                              src={advisor.profileImage}
+                              alt={advisor.name}
+                              className="advisor-avatar"
+                            />
+                          ) : (
+                            <div className="advisor-avatar-placeholder">
+                              {advisor.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div className="advisor-info">
+                            <h5>{advisor.name}</h5>
+                            <p className="employee-id">{advisor.employeeId}</p>
+                          </div>
+                          <div className="availability-indicator">
+                            <span className={`status-badge ${advisor.isAvailable ? 'available' : 'busy'}`}>
+                              {advisor.isAvailable ? 'Available' : 'Busy'}
+                            </span>
+                          </div>
                         </div>
 
-                        {availability.currentAppointment && (
-                          <div className="current-appointments">
-                            <h5>Current Appointment:</h5>
-                            <p>
-                              {availability.currentAppointment.customerName} - {new Date(availability.currentAppointment.startTime).toLocaleString()}
-                            </p>
-                            <p><strong>Vehicle:</strong> {availability.currentAppointment.vehicleInfo}</p>
-                          </div>
-                        )}
+                        <div className="advisor-card-body">
+                          {advisor.currentAppointment && (
+                            <div className="current-appointment">
+                              <p><strong>Current:</strong> {advisor.currentAppointment.customerName}</p>
+                              <p><strong>Vehicle:</strong> {advisor.currentAppointment.vehicleInfo}</p>
+                              <p><strong>Time:</strong> {new Date(advisor.currentAppointment.startTime).toLocaleString()}</p>
+                            </div>
+                          )}
 
-                        {!availability.hasNeverBeenAssigned && (
-                          <div className="last-assignment">
-                            <h5>Last Assignment:</h5>
-                            <p>
-                              Last assigned: {new Date(availability.lastAssignedAt).toLocaleDateString()} ({availability.lastAppointmentStatus})
-                            </p>
-                          </div>
-                        )}
+                          {!advisor.hasNeverBeenAssigned && (
+                            <div className="last-assignment">
+                              <p><strong>Last Assignment:</strong> {new Date(advisor.lastAssignedAt).toLocaleDateString()}</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    );
-                  })()}
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="no-advisors">
+                  <p>No advisors available at this time.</p>
                 </div>
               )}
 
