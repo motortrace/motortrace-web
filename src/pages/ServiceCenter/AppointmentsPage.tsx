@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './AppointmentsPage.scss';
 import { useAuth } from '../../hooks/useAuth';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { Calendar, momentLocalizer, type View } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -157,6 +157,10 @@ const AppointmentsPage = () => {
   const [serviceAdvisors, setServiceAdvisors] = useState<ServiceAdvisor[]>([]);
   const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
+  
+  // Calendar state
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentView, setCurrentView] = useState<View>('month');
 
   // Modal state
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -780,8 +784,18 @@ const AppointmentsPage = () => {
     }));
 
   const handleEventClick = (event: any) => {
-    // Calendar event clicked - no modal to show
+    // Calendar event clicked - navigate to appointment detail
     console.log('Calendar event clicked:', event);
+    navigate(`/${pathPrefix}/appointment-detail/${event.resource.id}`);
+  };
+
+  // Calendar navigation handlers
+  const handleNavigate = (date: Date) => {
+    setCurrentDate(date);
+  };
+
+  const handleViewChange = (view: View) => {
+    setCurrentView(view);
   };
 
   const eventStyleGetter = (event: any) => {
@@ -836,23 +850,9 @@ const AppointmentsPage = () => {
       <div className="page-header">
         <div className="header-content">
           <h1 className="page-title">Appointments</h1>
-          <p className="page-subtitle">Manage and confirm appointment requests</p>
+          <p className="page-subtitle">Manage appointment requests</p>
         </div>
         <div className="header-actions">
-          <div className="view-toggle">
-            <button 
-              className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-              onClick={() => setViewMode('table')}
-            >
-              <i className='bx bx-table'></i> Table
-            </button>
-            <button 
-              className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
-              onClick={() => setViewMode('calendar')}
-            >
-              <i className='bx bx-calendar'></i> Calendar
-            </button>
-          </div>
           <div className="search-container">
             <input
               type="text"
@@ -904,6 +904,24 @@ const AppointmentsPage = () => {
         </div>
       </div>
 
+      {/* View Toggle Tabs - Moved outside page-header */}
+      <div className="view-toggle-container">
+        <div className="view-toggle">
+          <button 
+            className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
+            onClick={() => setViewMode('table')}
+          >
+            <i className='bx bx-table'></i> Table
+          </button>
+          <button 
+            className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
+            onClick={() => setViewMode('calendar')}
+          >
+            <i className='bx bx-calendar'></i> Calendar
+          </button>
+        </div>
+      </div>
+
       {viewMode === 'table' ? (
         <>
           {/* Incoming Appointment Requests */}
@@ -917,6 +935,16 @@ const AppointmentsPage = () => {
                 <div>Loading...</div>
               ) : error ? (
                 <div style={{ color: 'red' }}>{error}</div>
+              ) : pendingAppointments.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-state-icon">
+                    <i className='bx bx-calendar-x'></i>
+                  </div>
+                  <h4 className="empty-state-title">No Incoming Appointment Requests</h4>
+                  <p className="empty-state-message">
+                    All appointment requests have been processed. New requests will appear here when customers book appointments.
+                  </p>
+                </div>
               ) : (
                 <Table
                   columns={incomingColumns}
@@ -938,6 +966,16 @@ const AppointmentsPage = () => {
                 <div>Loading...</div>
               ) : error ? (
                 <div style={{ color: 'red' }}>{error}</div>
+              ) : confirmedAppointments.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-state-icon">
+                    <i className='bx bx-calendar-check'></i>
+                  </div>
+                  <h4 className="empty-state-title">No Confirmed Appointments</h4>
+                  <p className="empty-state-message">
+                    No appointments have been confirmed yet. Confirmed appointments will appear here once they are processed from incoming requests.
+                  </p>
+                </div>
               ) : (
                 <Table
                   columns={confirmedColumns}
@@ -965,8 +1003,69 @@ const AppointmentsPage = () => {
                 style={{ height: 600 }}
                 onSelectEvent={handleEventClick}
                 views={['month', 'week', 'day']}
+                view={currentView}
+                onView={handleViewChange}
+                date={currentDate}
+                onNavigate={handleNavigate}
                 defaultView="month"
                 eventPropGetter={eventStyleGetter}
+                showMultiDayTimes={true}
+                step={30}
+                timeslots={2}
+                popup={true}
+                popupOffset={30}
+                toolbar={true}
+                components={{
+                  toolbar: (props: any) => (
+                    <div className="calendar-toolbar">
+                      <div className="toolbar-left">
+                        <button 
+                          className="toolbar-btn"
+                          onClick={() => props.onNavigate('TODAY')}
+                        >
+                          Today
+                        </button>
+                        <button 
+                          className="toolbar-btn"
+                          onClick={() => props.onNavigate('PREV')}
+                        >
+                          <i className='bx bx-chevron-left'></i>
+                        </button>
+                        <button 
+                          className="toolbar-btn"
+                          onClick={() => props.onNavigate('NEXT')}
+                        >
+                          <i className='bx bx-chevron-right'></i>
+                        </button>
+                      </div>
+                      <div className="toolbar-center">
+                        <h3 className="toolbar-title">
+                          {props.label}
+                        </h3>
+                      </div>
+                      <div className="toolbar-right">
+                        <button 
+                          className={`toolbar-btn ${props.view === 'month' ? 'active' : ''}`}
+                          onClick={() => props.onView('month')}
+                        >
+                          Month
+                        </button>
+                        <button 
+                          className={`toolbar-btn ${props.view === 'week' ? 'active' : ''}`}
+                          onClick={() => props.onView('week')}
+                        >
+                          Week
+                        </button>
+                        <button 
+                          className={`toolbar-btn ${props.view === 'day' ? 'active' : ''}`}
+                          onClick={() => props.onView('day')}
+                        >
+                          Day
+                        </button>
+                      </div>
+                    </div>
+                  )
+                }}
               />
             )}
           </div>
