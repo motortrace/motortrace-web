@@ -36,14 +36,10 @@ interface Appointment {
   };
   assignedTo?: {
     id: string;
-    supabaseUserId?: string;
-    userProfile?: {
-      id: string;
-      name: string;
-      phone: string;
-      profileImage?: string;
-      role: string;
-    };
+    employeeId: string;
+    name: string;
+    phone: string;
+    profileImage?: string;
   };
   cannedServices?: Array<{
     id: string;
@@ -73,6 +69,25 @@ interface ServiceAdvisor {
   workOrdersCount: number;
   appointmentsCount: number;
   estimatesCount: number;
+}
+
+interface AdvisorAvailability {
+  advisorId: string;
+  employeeId: string;
+  name: string;
+  phone: string;
+  profileImage?: string;
+  isAvailable: boolean;
+  currentAppointment: {
+    id: string;
+    startTime: string;
+    endTime?: string;
+    customerName: string;
+    vehicleInfo: string;
+  } | null;
+  lastAssignedAt: string;
+  lastAppointmentStatus: string;
+  hasNeverBeenAssigned: boolean;
 }
 
 interface ServiceHistoryItem {
@@ -200,6 +215,11 @@ const AppointmentDetailPage = () => {
   const [serviceHistoryLoading, setServiceHistoryLoading] = useState(false);
   const [serviceHistoryError, setServiceHistoryError] = useState('');
 
+  // Advisor availability state
+  const [advisorAvailability, setAdvisorAvailability] = useState<AdvisorAvailability[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState('');
+
   // Fetch service advisors
   const fetchServiceAdvisors = async () => {
     if (!token) {
@@ -279,6 +299,38 @@ const AppointmentDetailPage = () => {
       setServiceHistoryError(err instanceof Error ? err.message : 'Failed to fetch service history');
     } finally {
       setServiceHistoryLoading(false);
+    }
+  };
+
+  // Fetch advisor availability
+  const fetchAdvisorAvailability = async () => {
+    if (!appointment?.startTime) {
+      setAvailabilityError('Appointment must have a scheduled time to check advisor availability');
+      return;
+    }
+
+    setAvailabilityLoading(true);
+    setAvailabilityError('');
+    try {
+      const dateTime = new Date(appointment.startTime).toISOString();
+      const response = await fetch(`http://localhost:3000/appointments/advisors/availability?dateTime=${encodeURIComponent(dateTime)}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch advisor availability');
+      const data = await response.json();
+      if (data.success) {
+        setAdvisorAvailability(data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch advisor availability');
+      }
+    } catch (error) {
+      setAvailabilityError(error instanceof Error ? error.message : 'Failed to fetch advisor availability');
+    } finally {
+      setAvailabilityLoading(false);
     }
   };
 
@@ -460,7 +512,12 @@ const AppointmentDetailPage = () => {
             <>
               <button
                 className="btn btn--primary"
-                onClick={() => setAssignModalOpen(true)}
+                onClick={() => {
+                  setAssignModalOpen(true);
+                  if (appointment?.startTime) {
+                    fetchAdvisorAvailability();
+                  }
+                }}
                 disabled={assignLoading}
               >
                 <i className='bx bx-user-plus'></i> Assign Advisor
@@ -513,26 +570,27 @@ const AppointmentDetailPage = () => {
 
               <div className="info-section">
                 <h4>Assignment Information</h4>
-                {appointment.assignedToId ? (
+                {appointment.assignedTo ? (
                   <div className="advisor-info">
-                    {appointment.assignedTo?.userProfile?.profileImage ? (
+                    {appointment.assignedTo.profileImage ? (
                       <img
-                        src={appointment.assignedTo.userProfile.profileImage}
-                        alt={appointment.assignedTo.userProfile.name}
+                        src={appointment.assignedTo.profileImage}
+                        alt={appointment.assignedTo.name}
                         className="advisor-avatar"
                       />
                     ) : (
                       <div className="advisor-avatar-placeholder">
-                        {appointment.assignedTo?.userProfile?.name.charAt(0).toUpperCase() || 'A'}
+                        {appointment.assignedTo.name.charAt(0).toUpperCase()}
                       </div>
                     )}
                     <div className="advisor-details">
-                      <p><strong>Service Advisor:</strong> {appointment.assignedTo?.userProfile?.name || 'Unknown'}</p>
-                      {appointment.assignedTo?.userProfile?.phone && <p><strong>Phone:</strong> {appointment.assignedTo.userProfile.phone}</p>}
+                      <p><strong>Service Advisor:</strong> {appointment.assignedTo.name}</p>
+                      <p><strong>Employee ID:</strong> {appointment.assignedTo.employeeId}</p>
+                      {appointment.assignedTo.phone && <p><strong>Phone:</strong> {appointment.assignedTo.phone}</p>}
                     </div>
                   </div>
                 ) : (
-                  <p><em>Not assigned to a service advisor</em></p>
+                  <p><em>Not currently assigned</em></p>
                 )}
               </div>
 
@@ -679,18 +737,29 @@ const AppointmentDetailPage = () => {
                   value={selectedAdvisorId}
                   onChange={(e) => setSelectedAdvisorId(e.target.value)}
                   className="form-select"
-                  disabled={serviceAdvisorsLoading}
+                  disabled={serviceAdvisorsLoading || availabilityLoading}
                 >
                   <option value="">Choose a service advisor...</option>
-                  {serviceAdvisors.map(advisor => (
-                    <option key={advisor.id} value={advisor.id}>
-                      {advisor.userProfile.name} ({advisor.employeeId})
-                    </option>
-                  ))}
+                  {serviceAdvisors.map(advisor => {
+                    const availability = advisorAvailability.find(a => a.advisorId === advisor.id);
+                    return (
+                      <option key={advisor.id} value={advisor.id}>
+                        {advisor.userProfile.name} ({advisor.employeeId})
+                        {availability && (
+                          availability.isAvailable ? ' - Available' : ' - Busy'
+                        )}
+                      </option>
+                    );
+                  })}
                 </select>
                 {serviceAdvisorsLoading && (
                   <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
                     Loading service advisors...
+                  </div>
+                )}
+                {availabilityLoading && (
+                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                    Checking availability...
                   </div>
                 )}
                 {!serviceAdvisorsLoading && serviceAdvisors.length === 0 && (
@@ -698,7 +767,57 @@ const AppointmentDetailPage = () => {
                     No service advisors found.
                   </div>
                 )}
+                {availabilityError && (
+                  <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>
+                    Error checking availability: {availabilityError}
+                  </div>
+                )}
+                {!appointment?.startTime && (
+                  <div style={{ fontSize: '12px', color: '#f59e0b', marginTop: '4px' }}>
+                    Note: Appointment must be scheduled to check advisor availability
+                  </div>
+                )}
               </div>
+
+              {/* Show availability details for selected advisor */}
+              {selectedAdvisorId && appointment?.startTime && advisorAvailability.length > 0 && (
+                <div className="advisor-availability-details">
+                  {(() => {
+                    const availability = advisorAvailability.find(a => a.advisorId === selectedAdvisorId);
+                    if (!availability) return null;
+
+                    return (
+                      <div className="availability-info">
+                        <h4>Advisor Availability</h4>
+                        <div className="availability-status">
+                          <span className={`status-badge ${availability.isAvailable ? 'available' : 'busy'}`}>
+                            {availability.isAvailable ? 'Available' : 'Currently Busy'}
+                          </span>
+                        </div>
+
+                        {availability.currentAppointment && (
+                          <div className="current-appointments">
+                            <h5>Current Appointment:</h5>
+                            <p>
+                              {availability.currentAppointment.customerName} - {new Date(availability.currentAppointment.startTime).toLocaleString()}
+                            </p>
+                            <p><strong>Vehicle:</strong> {availability.currentAppointment.vehicleInfo}</p>
+                          </div>
+                        )}
+
+                        {!availability.hasNeverBeenAssigned && (
+                          <div className="last-assignment">
+                            <h5>Last Assignment:</h5>
+                            <p>
+                              Last assigned: {new Date(availability.lastAssignedAt).toLocaleDateString()} ({availability.lastAppointmentStatus})
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
 
               {assignError && (
                 <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>
