@@ -11,6 +11,7 @@ interface ChatMessage {
   message: string;
   timestamp: string;
   senderName: string;
+  profileImage: string | null;
 }
 
 /**
@@ -38,7 +39,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
         sender: msg.senderRole === 'SERVICE_ADVISOR' ? 'advisor' : 'customer',
         message: msg.message,
         timestamp: msg.createdAt,
-        senderName: msg.sender.name
+        senderName: msg.sender.name,
+        profileImage: msg.sender.profileImage
       }));
       setChatMessages(transformedMessages);
       setError('');
@@ -83,8 +85,15 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
             {loading && <div>Loading messages...</div>}
             {error && <div className="error">{error}</div>}
             {chatMessages.map((msg) => (
-              <div key={msg.id} className={`chat-message ${msg.sender}`}>
+              <div key={msg.id} className={`chat-message ${msg.sender}-message`}>
                 <div className="message-header">
+                  {msg.profileImage ? (
+                    <img src={msg.profileImage} alt={msg.senderName} className="sender-avatar" />
+                  ) : (
+                    <div className="sender-avatar">
+                      {msg.senderName.split(' ').map(name => name[0]).join('').toUpperCase()}
+                    </div>
+                  )}
                   <span className="sender-name">{msg.senderName}</span>
                   <span className="message-time">{formatTime(msg.timestamp)}</span>
                 </div>
