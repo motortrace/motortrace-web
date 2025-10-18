@@ -60,6 +60,97 @@ class WorkOrderService {
       throw error;
     }
   }
+
+  // Misc Charges API methods
+  async getMiscCharges(workOrderId: string): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/work-orders/${workOrderId}/misc-charges`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      const result = await this.handleResponse(response);
+      return result.data; // Assuming the response has { success: true, data: [...] }
+    } catch (error) {
+      console.error('Error fetching misc charges:', error);
+      throw error;
+    }
+  }
+
+  async createMiscCharge(workOrderId: string, miscChargeData: {
+    category: string;
+    description: string;
+    amount: number;
+    quantity: number;
+    notes?: string;
+  }): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/work-orders/${workOrderId}/misc-charges`, {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(miscChargeData),
+      });
+
+      const result = await this.handleResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error creating misc charge:', error);
+      throw error;
+    }
+  }
+
+  async updateMiscCharge(miscChargeId: string, miscChargeData: {
+    category?: string;
+    description?: string;
+    amount?: number;
+    quantity?: number;
+    notes?: string;
+  }): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/misc-charges/${miscChargeId}`, {
+        method: 'PUT',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(miscChargeData),
+      });
+
+      const result = await this.handleResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error updating misc charge:', error);
+      throw error;
+    }
+  }
+
+  async deleteMiscCharge(miscChargeId: string): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/misc-charges/${miscChargeId}`, {
+        method: 'DELETE',
+        headers: this.getAuthHeaders(),
+      });
+
+      const result = await this.handleResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error deleting misc charge:', error);
+      throw error;
+    }
+  }
+
+  // Service management
+  async deleteService(serviceId: string): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/services/${serviceId}`, {
+        method: 'DELETE',
+        headers: this.getAuthHeaders(),
+      });
+
+      const result = await this.handleResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error deleting service:', error);
+      throw error;
+    }
+  }
 }
 
 export const workOrderService = new WorkOrderService();

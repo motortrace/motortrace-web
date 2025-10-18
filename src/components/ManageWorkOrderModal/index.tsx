@@ -6,6 +6,7 @@ import InspectionsTab from './components/tabs/InspectionsTab';
 import EstimatesTab from './components/tabs/EstimatesTab';
 import PaymentsTab from './components/tabs/PaymentsTab';
 import ServicesTab from './components/tabs/ServicesTab';
+import MiscChargesTab from './components/tabs/MiscChargesTab';
 import AddInspectionModal from './components/modals/AddInspectionModal';
 import AssignTechnicianModal from './components/modals/AssignTechnicianModal';
 import GenerateInvoiceModal from './components/modals/GenerateInvoiceModal';
@@ -89,8 +90,9 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       });
 
       if (response.ok) {
-        const data = await response.json();
-        modalHook.setTechnicians(data);
+        const result = await response.json();
+        const techniciansData = result.success ? result.data : [];
+        modalHook.setTechnicians(techniciansData);
       }
     } catch (error) {
       console.error('Error fetching technicians:', error);
@@ -192,6 +194,10 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               />
             )}
 
+            {activeTab === 'misc-charges' && (
+              <MiscChargesTab workOrderId={workOrder.id} />
+            )}
+
             {activeTab === 'payments' && (
               <PaymentsTab
                 workOrderId={workOrder.id}
@@ -224,7 +230,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         <AssignTechnicianModal
           show={modalHook.showAssignTechnicianModal}
           onClose={modalHook.closeAssignTechnicianModal}
-          technicians={modalHook.technicians}
+          technicians={Array.isArray(modalHook.technicians) ? modalHook.technicians.map(tech => ({ ...tech, isBusy: false })) : []}
           selectedTechnicianId={modalHook.selectedTechnicianId}
           setSelectedTechnicianId={modalHook.setSelectedTechnicianId}
           onAssign={modalHook.handleAssignInspector}

@@ -235,7 +235,7 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
           <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
             <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>No inspections found for this work order.</div>
             <div style={{ fontSize: 48, color: '#d1d5db' }}>
-              <i className="bx bx-search-alt"></i>
+              <i className="bx bx-sear -alt"></i>
             </div>
           </div>
         ) : (
