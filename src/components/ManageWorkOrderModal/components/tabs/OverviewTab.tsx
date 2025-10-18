@@ -136,6 +136,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
           <div className="chat-messages">
             {loading && <div>Loading messages...</div>}
             {error && <div className="error">{error}</div>}
+            {chatMessages.length === 0 && !loading && !error && (
+              <div className="no-messages">
+                <i className="bx bx-message-square-x" style={{ fontSize: '108px', color: '#ccc' }}></i>
+                <p style={{ color: '#999', marginTop: '10px' }}>No messages sent</p>
+              </div>
+            )}
             {chatMessages.map((msg) => (
               <div key={msg.id} className={`chat-message ${msg.sender}-message`}>
                 <div className="message-header">
