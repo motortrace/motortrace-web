@@ -935,6 +935,16 @@ const AppointmentsPage = () => {
                 <div>Loading...</div>
               ) : error ? (
                 <div style={{ color: 'red' }}>{error}</div>
+              ) : pendingAppointments.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-state-icon">
+                    <i className='bx bx-calendar-x'></i>
+                  </div>
+                  <h4 className="empty-state-title">No Incoming Appointment Requests</h4>
+                  <p className="empty-state-message">
+                    All appointment requests have been processed. New requests will appear here when customers book appointments.
+                  </p>
+                </div>
               ) : (
                 <Table
                   columns={incomingColumns}
@@ -956,6 +966,16 @@ const AppointmentsPage = () => {
                 <div>Loading...</div>
               ) : error ? (
                 <div style={{ color: 'red' }}>{error}</div>
+              ) : confirmedAppointments.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-state-icon">
+                    <i className='bx bx-calendar-check'></i>
+                  </div>
+                  <h4 className="empty-state-title">No Confirmed Appointments</h4>
+                  <p className="empty-state-message">
+                    No appointments have been confirmed yet. Confirmed appointments will appear here once they are processed from incoming requests.
+                  </p>
+                </div>
               ) : (
                 <Table
                   columns={confirmedColumns}
