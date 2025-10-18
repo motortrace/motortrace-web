@@ -5,7 +5,7 @@ import AssignTechnicianModal from '../modals/AssignTechnicianModal';
 
 interface InspectionsTabProps {
   workOrderId: string;
-  onOpenAddInspectionModal: () => void;
+  onOpenAddInspectionModal: (templateId?: string) => void;
   onOpenAssignTechnicianModal: (inspectionId: string) => void;
   isServiceAdvisor: boolean;
 }
@@ -169,7 +169,7 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
             <button 
               className="btn btn--secondary" 
               style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-              onClick={onOpenAddInspectionModal}
+              onClick={() => onOpenAddInspectionModal()}
             >
               <i className="bx bx-plus"></i>
               Add Inspection
@@ -216,7 +216,7 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
                   <button 
                     className="btn btn--primary" 
                     style={{ width: '100%', padding: '8px 16px', fontSize: 14 }}
-                    onClick={onOpenAddInspectionModal}
+                    onClick={() => onOpenAddInspectionModal(inspection.id)}
                   >
                     Add Inspection
                   </button>
