@@ -10,6 +10,13 @@ interface InspectionsTabProps {
   isServiceAdvisor: boolean;
 }
 
+interface RecommendedInspection {
+  image: string;
+  name: string;
+  itemCount: number;
+  category: string;
+}
+
 /**
  * InspectionsTab Component
  * Displays work order inspections with API integration, attachments, and technician assignment
@@ -29,11 +36,16 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedInspectionId, setSelectedInspectionId] = useState<string | null>(null);
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>('');
+  const [recommendedInspections, setRecommendedInspections] = useState<RecommendedInspection[]>([]);
+  const [loadingRecommended, setLoadingRecommended] = useState(true);
   const { technicians, assignTechnicianToLabor, fetchTechnicians } = useTechnicians();
 
   useEffect(() => {
     if (!workOrderId) return;
     setLoading(true);
+    setLoadingRecommended(true);
+
+    // Fetch existing inspections
     fetch(`http://localhost:3000/inspection-templates/work-orders/inspections?workOrderId=${workOrderId}`)
       .then(res => res.json())
       .then(apiRes => {
@@ -58,6 +70,22 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
       .catch(() => {
         setError('Failed to fetch inspections');
         setLoading(false);
+      });
+
+    // Fetch recommended inspections
+    fetch(`http://localhost:3000/canned-services/work-orders/${workOrderId}/inspection-templates`)
+      .then(res => res.json())
+      .then(apiRes => {
+        if (apiRes.success) {
+          setRecommendedInspections(apiRes.data || []);
+        } else {
+          setRecommendedInspections([]);
+        }
+        setLoadingRecommended(false);
+      })
+      .catch(() => {
+        setRecommendedInspections([]);
+        setLoadingRecommended(false);
       });
 
     // Fetch approvals
@@ -159,138 +187,177 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
         </div>
       </div>
 
-      {inspections.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
-          <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>No inspections found for this work order.</div>
-          <div style={{ fontSize: 48, color: '#d1d5db' }}>
-            <i className="bx bx-search-alt"></i>
+      {/* Recommended Inspections Section */}
+      <div className="recommended-inspections-section" style={{ marginBottom: 32 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1f2937', marginBottom: 16 }}>Recommended Inspections</h3>
+        {loadingRecommended ? (
+          <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>Loading recommended inspections...</div>
+        ) : recommendedInspections.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>No recommended inspections available.</div>
+        ) : (
+          <div className="recommended-inspections-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+            {recommendedInspections.map((inspection, index) => (
+              <div key={index} className="recommended-inspection-card" style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+                <div style={{ height: 120, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={inspection.image} alt={inspection.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ padding: 16 }}>
+                  <h4 style={{ fontSize: 16, fontWeight: 600, color: '#1f2937', marginBottom: 4 }}>{inspection.name}</h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <span style={{ fontSize: 14, color: '#6b7280' }}>{inspection.category}</span>
+                    <span style={{ fontSize: 14, color: '#6b7280' }}>{inspection.itemCount} items</span>
+                  </div>
+                  <button 
+                    className="btn btn--primary" 
+                    style={{ width: '100%', padding: '8px 16px', fontSize: 14 }}
+                    onClick={onOpenAddInspectionModal}
+                  >
+                    Add Inspection
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      ) : (
-      <div className="inspection-summary-table-container full-width-table">
-        <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb' }}>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Date</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Name</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Category</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {inspections.map((inspection) => {
-              const template: Partial<InspectionTemplate> = inspection.template || {};
-              return (
-                <React.Fragment key={inspection.id}>
-                  <tr>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        {isTechnicianAssigned(inspection.inspector) ? (
-                          <>
-                        {getTechnicianImage(inspection.inspector) ? (
-                          <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
-                        ) : (
-                          <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
-                            {getTechnicianName(inspection.inspector)?.[0] || '?'}
-                          </div>
-                        )}
-                        <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
-                          </>
-                        ) : (
-                          <span style={{ 
-                            fontWeight: 500, 
-                            color: '#6b7280',
-                            fontStyle: 'italic'
-                          }}>
-                            Not Assigned
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                        {isTechnicianAssigned(inspection.inspector) ? (
-                      <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
-                        ) : (
-                          <span style={{
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: '500',
-                            background: '#374151',
-                            color: '#ffffff'
-                          }}>
-                            Not Assigned
-                          </span>
-                        )}
-                    </td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                      <div className="inspection-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
-                        <button 
-                          className="view-btn"
-                          title="View Inspection"
-                          onClick={() => {
-                            if (pendingApproval && pendingApproval.inspectionPdfUrl) {
-                              window.open(pendingApproval.inspectionPdfUrl, '_blank');
-                            } else {
-                              alert('No inspection PDF available');
-                            }
-                          }}
-                        >
-                          <i className="bx bx-box"></i>
-                        </button>
-                          {!isServiceAdvisor && (
-                            <button 
-                              className="assign-btn"
-                              title="Assign Technician"
-                              onClick={() => {
-                                setSelectedInspectionId(inspection.id);
-                                setShowAssignModal(true);
-                              }}
-                              style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                            >
-                              <i className="bx bx-user-plus"></i>
-                            </button>
-                          )}
-                      </div>
-                    </td>
-                  </tr>
-                  {/* Attachments section for this inspection */}
-                  <tr>
-                    <td colSpan={6} style={{ padding: '12px 10px', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                      <div style={{ marginTop: 8 }}>
-                        <div style={{ fontWeight: 600, color: '#374151', marginBottom: 8 }}>Attachments</div>
-                        {loadingAttachments[inspection.id] ? (
-                          <div>Loading attachments...</div>
-                        ) : (attachments[inspection.id] && attachments[inspection.id].length > 0 ? (
-                          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                            {attachments[inspection.id].map(att => (
-                              <div key={att.id} style={{ width: 100, textAlign: 'center', background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', padding: 8 }}>
-                                <div style={{ width: 80, height: 80, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: 6, overflow: 'hidden' }}>
-                                  <img src={att.fileUrl} alt={att.fileName || 'Attachment'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
-                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>{att.fileName || 'Image'}</div>
-                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{att.uploadedAt ? new Date(att.uploadedAt).toLocaleString() : ''}</div>
+        )}
+      </div>
+
+      {/* Existing Inspections Section */}
+      <div className="existing-inspections-section">
+        <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1f2937', marginBottom: 16 }}>Existing Inspections</h3>
+
+        {inspections.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
+            <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>No inspections found for this work order.</div>
+            <div style={{ fontSize: 48, color: '#d1d5db' }}>
+              <i className="bx bx-search-alt"></i>
+            </div>
+          </div>
+        ) : (
+          <div className="inspection-summary-table-container full-width-table">
+            <table className="inspection-summary-table styled-table" style={{ width: '100%', minWidth: 900, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
+              <thead>
+                <tr style={{ background: '#f9fafb' }}>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Technician</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Date</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Name</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Template Category</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {inspections.map((inspection) => {
+                  const template: Partial<InspectionTemplate> = inspection.template || {};
+                  return (
+                    <React.Fragment key={inspection.id}>
+                      <tr>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                            {isTechnicianAssigned(inspection.inspector) ? (
+                              <>
+                            {getTechnicianImage(inspection.inspector) ? (
+                              <img src={getTechnicianImage(inspection.inspector)} alt={getTechnicianName(inspection.inspector)} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} />
+                            ) : (
+                              <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 600, fontSize: 13 }}>
+                                {getTechnicianName(inspection.inspector)?.[0] || '?'}
                               </div>
+                            )}
+                            <span style={{ fontWeight: 500 }}>{getTechnicianName(inspection.inspector)}</span>
+                              </>
+                            ) : (
+                              <span style={{ 
+                                fontWeight: 500, 
+                                color: '#6b7280',
+                                fontStyle: 'italic'
+                              }}>
+                                Not Assigned
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{inspection.date ? new Date(inspection.date).toLocaleString() : '-'}</td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                            {isTechnicianAssigned(inspection.inspector) ? (
+                          <span className={`estimate-status ${inspection.isCompleted ? 'approved' : 'pending'}`}>{inspection.isCompleted ? 'Completed' : 'In Progress'}</span>
+                            ) : (
+                              <span style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                background: '#374151',
+                                color: '#ffffff'
+                              }}>
+                                Not Assigned
+                              </span>
+                            )}
+                        </td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.name || '-'}</td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>{template?.category || '-'}</td>
+                        <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                          <div className="inspection-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                            <button 
+                              className="view-btn"
+                              title="View Inspection"
+                              onClick={() => {
+                                if (pendingApproval && pendingApproval.inspectionPdfUrl) {
+                                  window.open(pendingApproval.inspectionPdfUrl, '_blank');
+                                } else {
+                                  alert('No inspection PDF available');
+                                }
+                              }}
+                            >
+                              <i className="bx bx-box"></i>
+                            </button>
+                              {!isServiceAdvisor && (
+                                <button 
+                                  className="assign-btn"
+                                  title="Assign Technician"
+                                  onClick={() => {
+                                    setSelectedInspectionId(inspection.id);
+                                    setShowAssignModal(true);
+                                  }}
+                                  style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                                >
+                                  <i className="bx bx-user-plus"></i>
+                                </button>
+                              )}
+                          </div>
+                        </td>
+                      </tr>
+                      {/* Attachments section for this inspection */}
+                      <tr>
+                        <td colSpan={6} style={{ padding: '12px 10px', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
+                          <div style={{ marginTop: 8 }}>
+                            <div style={{ fontWeight: 600, color: '#374151', marginBottom: 8 }}>Attachments</div>
+                            {loadingAttachments[inspection.id] ? (
+                              <div>Loading attachments...</div>
+                            ) : (attachments[inspection.id] && attachments[inspection.id].length > 0 ? (
+                              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                                {attachments[inspection.id].map(att => (
+                                  <div key={att.id} style={{ width: 100, textAlign: 'center', background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', padding: 8 }}>
+                                    <div style={{ width: 80, height: 80, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', borderRadius: 6, overflow: 'hidden' }}>
+                                      <img src={att.fileUrl} alt={att.fileName || 'Attachment'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </div>
+                                    <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>{att.fileName || 'Image'}</div>
+                                    <div style={{ fontSize: 11, color: '#9ca3af' }}>{att.uploadedAt ? new Date(att.uploadedAt).toLocaleString() : ''}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div style={{ color: '#9ca3af', fontSize: 13 }}>No attachments found.</div>
                             ))}
                           </div>
-                        ) : (
-                          <div style={{ color: '#9ca3af', fontSize: 13 }}>No attachments found.</div>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                </React.Fragment>
-              );
-            })}
-          </tbody>
-        </table>
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-      )}
 
       {/* Assign Technician Modal */}
       <AssignTechnicianModal
