@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { workOrderService } from '../../../../services/workOrderService';
+import { supabase } from '../../../../lib/supabase';
 
 interface OverviewTabProps {
   workOrder?: any;
@@ -27,6 +28,57 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
   useEffect(() => {
     if (workOrder?.id) {
       fetchMessages();
+
+      // Subscribe to real-time messages
+      console.log('Setting up subscription for workOrder:', workOrder.id);
+      const channel = supabase
+        .channel(`work-order-messages-${workOrder.id}`)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'WorkOrderMessage',
+          filter: `workOrderId=eq.${workOrder.id}`
+        }, (payload) => {
+          console.log('INSERT event received:', payload);
+          console.log('New message received:', payload.new);
+          const newMsg = payload.new;
+          const transformedMsg: ChatMessage = {
+            id: newMsg.id,
+            sender: (newMsg.senderRole === 'SERVICE_ADVISOR' || newMsg.senderRole === 'MANAGER') ? 'advisor' : 'customer',
+            message: newMsg.message,
+            timestamp: newMsg.createdAt,
+            senderName: newMsg.sender.name,
+            profileImage: newMsg.sender.profileImage
+          };
+          setChatMessages(prev => [...prev, transformedMsg]);
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'WorkOrderMessage',
+          filter: `workOrderId=eq.${workOrder.id}`
+        }, (payload) => {
+          console.log('UPDATE event received:', payload);
+          console.log('Message updated:', payload.new);
+          const updatedMsg = payload.new;
+          const transformedMsg: ChatMessage = {
+            id: updatedMsg.id,
+            sender: (updatedMsg.senderRole === 'SERVICE_ADVISOR' || updatedMsg.senderRole === 'MANAGER') ? 'advisor' : 'customer',
+            message: updatedMsg.message,
+            timestamp: updatedMsg.createdAt,
+            senderName: updatedMsg.sender.name,
+            profileImage: updatedMsg.sender.profileImage
+          };
+          setChatMessages(prev => prev.map(msg => msg.id === updatedMsg.id ? transformedMsg : msg));
+        })
+        .subscribe((status, err) => {
+          console.log('Subscription status:', status, err);
+        });
+
+      // Cleanup subscription on unmount or workOrder change
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [workOrder?.id]);
 
