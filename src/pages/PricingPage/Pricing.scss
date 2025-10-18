@@ -1,404 +1,696 @@
-// Import variables from your existing variables file
-// Variables (matching your existing theme)
-$primary-color: #2563eb;
-$primary-dark: #1d4ed8;
-$primary-light: #93c5fd;
-$secondary-color: #0d9488;
-$accent-color: #34d399;
-$success-color: #10b981;
-$warning-color: #f59e0b;
-$danger-color: #ef4444;
-$text-primary: #1f2937;
-$text-secondary: #6b7280;
-$background-light: #f9fafb;
-$white: #ffffff;
-$border-color: #e5e7eb;
-$neutral-100: #f1f5f9;
-$neutral-300: #cbd5e1;
+// ==================== VARIABLES ====================
+$ep-color-blue: #3b82f6;
+$ep-color-blue-dark: #2563eb;
+$ep-color-blue-light: #eff6ff;
+$ep-color-teal: #14b8a6;
+$ep-color-teal-dark: #0d9488;
+$ep-color-teal-light: #f0fdfa;
+$ep-color-emerald: #10b981;
+$ep-color-emerald-dark: #059669;
+$ep-color-emerald-light: #f0fdf4;
+$ep-color-white: #ffffff;
+$ep-color-gray-50: #f9fafb;
+$ep-color-gray-100: #f3f4f6;
+$ep-color-gray-200: #e5e7eb;
+$ep-color-gray-600: #4b5563;
+$ep-color-gray-700: #374151;
+$ep-color-gray-900: #111827;
+$ep-color-success: #10b981;
+$ep-color-green: #10b981;
 
-// Mixins
-@mixin flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+// ==================== MIXINS ====================
+@mixin ep-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@mixin card-shadow {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+@mixin ep-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-@mixin card-shadow-hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+@mixin ep-shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-// Keyframes
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@mixin ep-shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+@mixin ep-shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-5px);
-    }
+@mixin ep-shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-// Main Pricing Section
-.pricing-section {
-    min-height: 100vh;
-    padding: 60px 0 40px;
-    background: linear-gradient(135deg, $background-light 0%, $white 100%);
-    position: relative;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2393c5fd' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-        pointer-events: none;
-    }
-
-    &__container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-        position: relative;
-        z-index: 1;
-    }
-
-    &__header {
-        text-align: center;
-        margin-top: 48px;
-        margin-bottom: 40px;
-        animation: fadeInUp 1s ease-out;
-
-        .pricing-section__title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: $text-primary;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, $text-primary, $primary-color);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-
-            @media (max-width: 768px) {
-                font-size: 1.5rem;
-            }
-        }
-
-        .pricing-section__subtitle {
-            font-size: 1rem;
-            color: $text-secondary;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
-
-            @media (max-width: 768px) {
-                font-size: 0.95rem;
-            }
-        }
-    }
-
-    &__cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 18px;
-        margin-bottom: 40px;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-
-        @media (max-width: 768px) {
-            grid-template-columns: 1fr;
-            gap: 18px;
-        }
-
-        @media (max-width: 500px) {
-            grid-template-columns: minmax(220px, 1fr);
-        }
-    }
-
-    &__bottom {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        margin-top: 24px;
-        padding-top: 24px;
-        border-top: 1px solid $border-color;
-
-        @media (max-width: 768px) {
-            grid-template-columns: 1fr;
-            gap: 18px;
-            text-align: center;
-        }
-    }
-
-    &__support {
-        text-align: left;
-        animation: fadeInUp 1s ease-out 0.8s both;
-
-        @media (max-width: 768px) {
-            text-align: center;
-        }
-
-        h4 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: $text-primary;
-            margin-bottom: 12px;
-        }
-
-        p {
-            color: $text-secondary;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-    }
+@mixin ep-transition($prop: all, $duration: 0.3s, $timing: ease) {
+  transition: $prop $duration $timing;
 }
 
-// Pricing Cards
-.pricing-card {
-    background: $white;
-    border-radius: 20px;
-    padding: 20px 16px;
-    @include card-shadow;
-    border: 1px solid $border-color;
-    position: relative;
-    transition: all 0.3s ease;
-    animation: scaleIn 0.8s ease-out;
+// ==================== KEYFRAMES ====================
+@keyframes ep-blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes ep-fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ep-scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// ==================== MAIN CONTAINER ====================
+.ep-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $ep-color-white 0%, $ep-color-gray-50 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+// ==================== BACKGROUND SHAPES ====================
+.ep-bg-shapes {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ep-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: multiply;
+  filter: blur(120px);
+  opacity: 0.3;
+  animation: ep-blob 7s infinite;
+
+  &-1 {
+    width: 288px;
+    height: 288px;
+    top: 80px;
+    left: 40px;
+    background: #93c5fd;
+  }
+
+  &-2 {
+    width: 288px;
+    height: 288px;
+    top: 160px;
+    right: 40px;
+    background: #99f6e4;
+    animation-delay: 2s;
+  }
+
+  &-3 {
+    width: 288px;
+    height: 288px;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #86efac;
+    animation-delay: 4s;
+  }
+}
+
+// ==================== CONTENT WRAPPER ====================
+.ep-content {
+  position: relative;
+  z-index: 10;
+}
+
+// ==================== HERO SECTION ====================
+.ep-hero {
+  padding: 96px 16px 48px;
+
+  @media (max-width: 768px) {
+    padding: 80px 16px 40px;
+  }
+}
+
+.ep-hero__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ep-hero__badge {
+  display: inline-block;
+  margin-bottom: 24px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 9999px;
+}
+
+.ep-hero__badge-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e40af;
+  margin: 0;
+}
+
+.ep-hero__title {
+  font-size: 3.75rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, $ep-color-gray-900, $ep-color-blue-dark, #0d7377);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  animation: ep-fadeInUp 1s ease-out;
+
+  @media (max-width: 640px) {
+    font-size: 2.25rem;
+  }
+}
+
+.ep-hero__subtitle {
+  font-size: 1.25rem;
+  color: $ep-color-gray-600;
+  margin-bottom: 48px;
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+
+  @media (max-width: 640px) {
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+}
+
+// ==================== TRUST BADGES ====================
+.ep-trust-badges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto 48px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.ep-trust-badge {
+  background: rgba($ep-color-white, 0.8);
+  backdrop-filter: blur(4px);
+  border: 1px solid $ep-color-gray-200;
+  border-radius: 8px;
+  padding: 16px;
+  @include ep-shadow-sm;
+  @include ep-transition(box-shadow, 0.3s, ease);
+
+  &:hover {
+    @include ep-shadow-md;
+  }
+}
+
+.ep-trust-badge__icon {
+  width: 24px;
+  height: 24px;
+  color: $ep-color-blue;
+  margin: 0 auto 8px;
+}
+
+.ep-trust-badge__label {
+  color: $ep-color-gray-900;
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin: 0 0 8px;
+}
+
+.ep-trust-badge__value {
+  color: $ep-color-gray-600;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+// ==================== SERVICES SECTION ====================
+.ep-services {
+  padding: 80px 16px;
+
+  @media (max-width: 768px) {
+    padding: 60px 16px;
+  }
+}
+
+.ep-services__header {
+  max-width: 1200px;
+  margin: 0 auto 64px;
+  text-align: center;
+}
+
+.ep-services__title {
+    margin-top: 2.5rem;
+    text-align: left;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: $ep-color-gray-900;
+  margin-bottom: 16px;
+
+  @media (max-width: 640px) {
+    font-size: 1.875rem;
+  }
+}
+
+.ep-services__subtitle {
+    text-align: left;
+  font-size: 1.125rem;
+  color: $ep-color-gray-600;
+
+  @media (max-width: 640px) {
+    font-size: 1rem;
+  }
+}
+
+// ==================== CARDS GRID ====================
+.ep-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+// ==================== SERVICE CARD ====================
+.ep-service-card {
+  position: relative;
+  background: $ep-color-white;
+  border: 2px solid $ep-color-gray-200;
+  border-radius: 16px;
+  padding: 32px;
+  @include ep-shadow-lg;
+  @include ep-transition(all, 0.3s, ease);
+  animation: ep-scaleIn 0.8s ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &--highlight {
+    border-color: $ep-color-blue;
+    @include ep-shadow-xl;
+    box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2);
+  }
+
+  &:hover {
+    @include ep-shadow-xl;
+  }
+
+  &--hovered {
+    transform: scale(1.05);
+
+    .ep-service-card__icon {
+      transform: scale(1.1);
+    }
+  }
+
+  &--highlight.ep-service-card--hovered {
+    box-shadow: 0 25px 30px -5px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.ep-service-card__accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 128px;
+  height: 128px;
+  border-radius: 0 0 0 48px;
+  opacity: 0.5;
+}
+
+.ep-service-card__badge {
+  position: relative;
+  z-index: 10;
+  display: inline-block;
+  margin-bottom: 16px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+
+  &--primary {
+    background: linear-gradient(135deg, $ep-color-blue, $ep-color-blue-dark);
+    color: $ep-color-white;
+  }
+
+  &--secondary {
+    background: $ep-color-gray-100;
+    color: $ep-color-gray-700;
+  }
+}
+
+.ep-service-card__icon {
+  position: relative;
+  z-index: 10;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  @include ep-flex-center;
+  margin-bottom: 24px;
+  @include ep-transition(transform, 0.3s, ease);
+  @include ep-shadow-md;
+}
+
+.ep-service-card__icon-svg {
+  width: 32px;
+  height: 32px;
+  color: $ep-color-white;
+}
+
+.ep-service-card__title {
+  position: relative;
+  z-index: 10;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $ep-color-gray-900;
+  margin: 0 0 8px;
+}
+
+.ep-service-card__description {
+  position: relative;
+  z-index: 10;
+  font-size: 0.875rem;
+  color: $ep-color-gray-600;
+  margin: 0 0 24px;
+  flex-grow: 1;
+}
+
+.ep-service-card__features {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 24px;
+  space: 12px;
+}
+
+.ep-service-card__feature-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  color: $ep-color-gray-700;
+  font-size: 0.875rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.ep-service-card__feature-icon {
+  width: 20px;
+  height: 20px;
+  color: $ep-color-success;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ep-service-card__feature-text {
+  line-height: 1.4;
+}
+
+.ep-service-card__footer {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-top: 1px solid $ep-color-gray-200;
+  border-bottom: 1px solid $ep-color-gray-200;
+  padding-top: 24px;
+}
+
+.ep-service-card__duration {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: $ep-color-gray-600;
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.ep-service-card__price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $ep-color-gray-900;
+  margin: 0;
+
+  &--highlight {
+    color: $ep-color-blue;
+  }
+}
+
+.ep-service-card__button {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  @include ep-flex-center;
+  gap: 8px;
+  @include ep-transition(all, 0.3s, ease);
+
+  &--primary {
+    color: $ep-color-white;
+    @include ep-shadow-md;
 
     &:hover {
-        @include card-shadow-hover;
-        transform: translateY(-8px);
+      @include ep-shadow-lg;
+      transform: translateY(-2px);
     }
+  }
 
-    &--service {
-        animation-delay: 0.2s;
-        
-        .pricing-card__icon {
-            background: linear-gradient(135deg, $primary-color, $primary-dark);
-        }
+  &--secondary {
+    background: linear-gradient(135deg, $ep-color-gray-100, $ep-color-gray-50);
+    color: $ep-color-gray-700;
+    border: 1px solid $ep-color-gray-200;
 
-        .pricing-card__button {
-            background: linear-gradient(135deg, $primary-color, $primary-dark) !important;
-            
-            &:hover {
-                background: linear-gradient(135deg, $primary-dark, #1e40af) !important;
-                transform: translateY(-2px);
-            }
-        }
+    &:hover {
+      background: linear-gradient(135deg, $ep-color-gray-200, $ep-color-gray-100);
     }
-
-    &--parts {
-        animation-delay: 0.4s;
-        
-        .pricing-card__icon {
-            background: linear-gradient(135deg, $secondary-color, #0f766e);
-        }
-
-        .pricing-card__button {
-            background: linear-gradient(135deg, $secondary-color, #0f766e) !important;
-            
-            &:hover {
-                background: linear-gradient(135deg, #0f766e, #134e4a) !important;
-                transform: translateY(-2px);
-            }
-        }
-    }
-
-    &__header {
-        text-align: center;
-        margin-bottom: 16px;
-
-        .pricing-card__icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            @include flex-center;
-            color: $white;
-            margin: 0 auto 10px;
-            transition: transform 0.3s ease;
-
-            &:hover {
-                transform: scale(1.1);
-            }
-        }
-
-        .pricing-card__title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: $text-primary;
-            margin-bottom: 6px;
-        }
-
-        .pricing-card__description {
-            color: $text-secondary;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-    }
-
-    &__price {
-        text-align: center;
-        margin-bottom: 18px;
-        padding: 10px 0;
-        border-top: 1px solid $border-color;
-        border-bottom: 1px solid $border-color;
-
-        .price-currency {
-            font-size: 1rem;
-            font-weight: 600;
-            color: $text-secondary;
-            vertical-align: top;
-        }
-
-        .price-amount {
-            font-size: 2rem;
-            font-weight: 800;
-            color: $primary-color;
-            margin: 0 8px;
-        }
-
-        .price-period {
-            font-size: 0.9rem;
-            color: $text-secondary;
-            font-weight: 500;
-        }
-    }
-
-    &__features {
-        margin-bottom: 14px;
-
-        .features-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: $text-primary;
-            margin-bottom: 10px;
-        }
-
-        .features-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-
-            .feature-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                margin-bottom: 7px;
-                color: $text-secondary;
-                font-size: 0.8rem;
-
-                svg {
-                    color: $success-color;
-                    flex-shrink: 0;
-                }
-
-                &:last-child {
-                    margin-bottom: 0;
-                }
-            }
-        }
-    }
-
-    &__stats {
-        margin-bottom: 12px;
-        padding: 10px 0;
-        border-top: 1px solid $border-color;
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: $text-secondary;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-bottom: 6px;
-
-            &:last-child {
-                margin-bottom: 0;
-            }
-
-            svg {
-                color: $primary-color;
-                flex-shrink: 0;
-            }
-        }
-    }
-
-    &__button {
-        margin-bottom: 10px !important;
-        border-radius: 8px !important;
-        transition: all 0.3s ease !important;
-    }
-
-    &__note {
-        text-align: center;
-        color: $text-secondary;
-        font-size: 0.7rem;
-        font-style: italic;
-        margin: 0;
-    }
+  }
 }
 
-// Responsive Design
-@media (max-width: 1024px) {
-    .pricing-section {
-        padding: 100px 0 60px;
-
-        &__cards {
-            grid-template-columns: 1fr;
-            max-width: 500px;
-            margin: 0 auto 60px;
-        }
-    }
+.ep-service-card__button-icon {
+  width: 16px;
+  height: 16px;
 }
 
-@media (max-width: 768px) {
-    .pricing-section {
-        padding: 80px 0 40px;
+// ==================== CTA SECTION ====================
+.ep-cta {
+  padding: 24px 16px;
 
-        &__container {
-            padding: 0 15px;
-        }
+  @media (max-width: 768px) {
+    padding: 48px 16px;
+  }
+}
 
-        &__header {
-            margin-bottom: 60px;
-        }
-    }
+.ep-cta__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, $ep-color-blue 0%, $ep-color-teal 100%);
+  padding: 48px;
+  @include ep-shadow-xl;
 
-    .pricing-card {
-        padding: 30px 20px;
+  @media (max-width: 768px) {
+    padding: 32px;
+  }
+}
 
-        &__price {
-            .price-amount {
-                font-size: 2.8rem;
-            }
-        }
-    }
+.ep-cta__bg-shapes {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.ep-cta__bg-circle {
+  position: absolute;
+  background: $ep-color-white;
+  border-radius: 50%;
+
+  &--1 {
+    width: 160px;
+    height: 160px;
+    top: 0;
+    right: 0;
+  }
+
+  &--2 {
+    width: 160px;
+    height: 160px;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+.ep-cta__content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+.ep-cta__title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: $ep-color-white;
+  margin-bottom: 16px;
+
+  @media (max-width: 640px) {
+    font-size: 1.5rem;
+  }
+}
+
+.ep-cta__subtitle {
+  font-size: 1.125rem;
+  color: rgba($ep-color-white, 0.9);
+  margin-bottom: 32px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: 640px) {
+    font-size: 1rem;
+  }
+}
+
+.ep-cta__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: $ep-color-white;
+  color: $ep-color-blue;
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  border: none;
+  cursor: pointer;
+  @include ep-shadow-lg;
+  @include ep-transition(all, 0.3s, ease);
+
+  &:hover {
+    background: $ep-color-gray-50;
+    @include ep-shadow-xl;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 640px) {
+    font-size: 1rem;
+    padding: 12px 24px;
+  }
+}
+
+.ep-cta__button-icon {
+  width: 24px;
+  height: 24px;
+}
+
+// ==================== FOOTER CTA ====================
+.ep-footer-cta {
+  padding: 48px 16px;
+  border-top: 1px solid $ep-color-gray-200;
+
+  @media (max-width: 768px) {
+    padding: 32px 16px;
+  }
+}
+
+.ep-footer-cta__inner {
+  max-width: 1024px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ep-footer-cta__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $ep-color-gray-900;
+  margin-bottom: 12px;
+
+  @media (max-width: 640px) {
+    font-size: 1.25rem;
+  }
+}
+
+.ep-footer-cta__subtitle {
+  color: $ep-color-gray-600;
+  margin-bottom: 24px;
+  font-size: 1rem;
+
+  @media (max-width: 640px) {
+    font-size: 0.875rem;
+  }
+}
+
+.ep-footer-cta__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $ep-color-blue;
+  background: none;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  @include ep-transition(color, 0.3s, ease);
+
+  &:hover {
+    color: $ep-color-blue-dark;
+  }
+}
+
+.ep-footer-cta__link-icon {
+  width: 16px;
+  height: 16px;
 }
