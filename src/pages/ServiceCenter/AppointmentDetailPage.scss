@@ -138,7 +138,7 @@
 
                   strong {
                     color: #374151;
-                    min-width: 80px;
+                    min-width: 120px;
                     display: inline-block;
                   }
                 }
@@ -484,6 +484,58 @@
           border: 1px solid #fecaca;
           border-radius: 6px;
           font-size: 14px;
+        }
+
+        .advisor-availability-details {
+          margin-top: 20px;
+          padding: 16px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+
+          .availability-info {
+            h4 {
+              margin: 0 0 12px 0;
+              font-size: 16px;
+              font-weight: 600;
+              color: #1e293b;
+            }
+
+            .availability-status {
+              margin-bottom: 16px;
+
+              .status-badge {
+                &.available {
+                  background-color: #d1fae5;
+                  color: #065f46;
+                }
+
+                &.busy {
+                  background-color: #fee2e2;
+                  color: #991b1b;
+                }
+              }
+            }
+
+            .current-appointments,
+            .last-assignment {
+              margin-bottom: 12px;
+
+              h5 {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #374151;
+              }
+
+              p {
+                margin: 0;
+                font-size: 13px;
+                color: #6b7280;
+                line-height: 1.4;
+              }
+            }
+          }
         }
       }
 

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { workOrderService } from '../../../../services/workOrderService';
 
 interface OverviewTabProps {
   workOrder?: any;
 }
 
 interface ChatMessage {
-  id: number;
+  id: string;
   sender: 'customer' | 'advisor';
   message: string;
   timestamp: string;
@@ -17,52 +18,52 @@ interface ChatMessage {
  * Displays work order overview with communication panel and customer/vehicle information
  */
 const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      sender: 'customer',
-      message: 'Hi, I dropped off my car this morning. Can you give me an update on the brake inspection?',
-      timestamp: '2024-07-01T10:30:00Z',
-      senderName: 'John Anderson'
-    },
-    {
-      id: 2,
-      sender: 'advisor',
-      message: 'Hello John! We\'ve completed the initial inspection. We found that your brake pads are worn and need replacement. I\'ll send you an estimate shortly.',
-      timestamp: '2024-07-01T11:15:00Z',
-      senderName: 'Mike Johnson'
-    },
-    {
-      id: 3,
-      sender: 'customer',
-      message: 'Thanks for the quick update! How long will the repair take?',
-      timestamp: '2024-07-01T11:20:00Z',
-      senderName: 'John Anderson'
-    },
-    {
-      id: 4,
-      sender: 'advisor',
-      message: 'The brake pad replacement should take about 2-3 hours. We have the parts in stock, so we can complete it today if you approve the estimate.',
-      timestamp: '2024-07-01T11:25:00Z',
-      senderName: 'Mike Johnson'
-    }
-  ]);
-
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [newMessage, setNewMessage] = useState('');
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    if (workOrder?.id) {
+      fetchMessages();
+    }
+  }, [workOrder?.id]);
+
+  const fetchMessages = async () => {
+    setLoading(true);
+    try {
+      const messages = await workOrderService.getWorkOrderMessages(workOrder.id);
+      const transformedMessages = messages.map((msg: any) => ({
+        id: msg.id,
+        sender: msg.senderRole === 'SERVICE_ADVISOR' ? 'advisor' : 'customer',
+        message: msg.message,
+        timestamp: msg.createdAt,
+        senderName: msg.sender.name
+      }));
+      setChatMessages(transformedMessages);
+      setError('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch messages');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      const message: ChatMessage = {
-        id: chatMessages.length + 1,
-        sender: 'advisor',
-        message: newMessage,
-        timestamp: new Date().toISOString(),
-        senderName: workOrder?.serviceAdvisor?.userProfile ? 
-          `${workOrder.serviceAdvisor.userProfile.firstName} ${workOrder.serviceAdvisor.userProfile.lastName}` : 
-          'Service Advisor'
-      };
-      setChatMessages([...chatMessages, message]);
-      setNewMessage('');
+      try {
+        await workOrderService.sendWorkOrderMessage({
+          workOrderId: workOrder.id,
+          message: newMessage,
+          messageType: 'TEXT',
+          attachments: [] // Add attachments if needed
+        });
+        setNewMessage('');
+        // Refetch messages to include the new one
+        fetchMessages();
+      } catch (err: any) {
+        setError(err.message || 'Failed to send message');
+      }
     }
   };
 
@@ -79,6 +80,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
             <h4><i className="bx bx-message-detail"></i> Communication</h4>
           </div>
           <div className="chat-messages">
+            {loading && <div>Loading messages...</div>}
+            {error && <div className="error">{error}</div>}
             {chatMessages.map((msg) => (
               <div key={msg.id} className={`chat-message ${msg.sender}`}>
                 <div className="message-header">
