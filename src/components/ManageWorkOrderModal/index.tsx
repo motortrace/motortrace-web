@@ -145,10 +145,10 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
             </div>
           </div>
           <div className="modal-header-actions">
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
-            </button>
+            </button> */}
             {!isServiceAdvisor && (
               <button 
                 className="btn btn--secondary" 
@@ -187,15 +187,15 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               <ServicesTab workOrderId={workOrder.id} />
             )}
 
+            {activeTab === 'misc-charges' && (
+              <MiscChargesTab workOrderId={workOrder.id} />
+            )}
+
             {activeTab === 'estimates' && (
               <EstimatesTab
                 workOrderId={workOrder.id}
                 isServiceAdvisor={isServiceAdvisor}
               />
-            )}
-
-            {activeTab === 'misc-charges' && (
-              <MiscChargesTab workOrderId={workOrder.id} />
             )}
 
             {activeTab === 'payments' && (
