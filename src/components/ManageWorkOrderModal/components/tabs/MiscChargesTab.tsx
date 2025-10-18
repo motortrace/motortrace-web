@@ -23,7 +23,7 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
   const [formData, setFormData] = useState({
     category: 'OTHER' as MiscChargeCategory,
     description: '',
-    amount: 0,
+    unitPrice: 0,
     quantity: 1,
     notes: ''
   });
@@ -54,7 +54,14 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
 
     try {
       const data = await workOrderService.getMiscCharges(workOrderId);
-      setMiscCharges(Array.isArray(data) ? data : []);
+      // Ensure numeric fields are properly converted
+      const processedData = Array.isArray(data) ? data.map(charge => ({
+        ...charge,
+        unitPrice: Number(charge.unitPrice) || 0,
+        quantity: Number(charge.quantity) || 1,
+        subtotal: Number(charge.subtotal) || 0
+      })) : [];
+      setMiscCharges(processedData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Error fetching misc charges:', err);
@@ -74,7 +81,7 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
       const chargeData = {
         category: formData.category,
         description: formData.description,
-        amount: formData.amount,
+        amount: formData.unitPrice,
         quantity: formData.quantity,
         notes: formData.notes || undefined
       };
@@ -115,7 +122,7 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
     setFormData({
       category: 'OTHER',
       description: '',
-      amount: 0,
+      unitPrice: 0,
       quantity: 1,
       notes: ''
     });
@@ -130,8 +137,8 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
     setFormData({
       category: charge.category,
       description: charge.description,
-      amount: charge.amount / charge.quantity, // Store unit price
-      quantity: charge.quantity,
+      unitPrice: Number(charge.unitPrice) || 0, // Unit price
+      quantity: Number(charge.quantity) || 1,
       notes: charge.notes || ''
     });
     setEditingCharge(charge);
@@ -188,7 +195,7 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
             Misc Charges
           </div>
           <div style={{ fontSize: '14px', color: '#6b7280' }}>
-            Total: LKR {totalMiscCharges.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            Total: LKR {(Number(totalMiscCharges) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
         </div>
         <button
@@ -245,11 +252,11 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
                     {charge.quantity}
                   </td>
                   <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                    LKR {(charge.amount / charge.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    LKR {(Number(charge.unitPrice) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
                   <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                     <span style={{ fontWeight: '600', color: '#111827' }}>
-                      LKR {charge.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      LKR {(Number(charge.subtotal) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </span>
                   </td>
                   <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
@@ -346,8 +353,8 @@ const MiscChargesTab: React.FC<MiscChargesTabProps> = ({ workOrderId }) => {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                    value={formData.unitPrice}
+                    onChange={(e) => setFormData({ ...formData, unitPrice: parseFloat(e.target.value) || 0 })}
                     style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px' }}
                     required
                   />

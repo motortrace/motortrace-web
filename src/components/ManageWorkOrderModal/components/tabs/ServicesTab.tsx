@@ -84,7 +84,14 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   const fetchMiscCharges = async () => {
     try {
       const data = await workOrderService.getMiscCharges(workOrderId);
-      setMiscCharges(Array.isArray(data) ? data : []);
+      // Ensure numeric fields are properly converted
+      const processedData = Array.isArray(data) ? data.map(charge => ({
+        ...charge,
+        unitPrice: Number(charge.unitPrice) || 0,
+        quantity: Number(charge.quantity) || 1,
+        subtotal: Number(charge.subtotal) || 0
+      })) : [];
+      setMiscCharges(processedData);
     } catch (err) {
       console.error('Error fetching misc charges:', err);
       setMiscCharges([]);

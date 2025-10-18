@@ -234,7 +234,7 @@ export interface WorkOrderMiscCharge {
   workOrderId: string;
   category: MiscChargeCategory;
   description: string;
-  amount: number;
+  unitPrice: number;
   quantity: number;
   subtotal: number;
   notes?: string | null;
