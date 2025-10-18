@@ -328,24 +328,13 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
                         <i className="bx bx-file"></i>
                       </button>
 
-                      {/* Finalize button: visible only to service advisors for the latest APPROVED estimate that is not finalized */}
+                      {/* Finalize button: visible when estimate is APPROVED, not finalized, and of type ESTIMATE */}
                       {(() => {
                         // Debug logging
-                        console.log('Estimate:', estimate.id, 'Status:', estimate.status, 'isFinal:', estimate.isFinal, 'isServiceAdvisor:', isServiceAdvisor);
+                        console.log('Estimate:', estimate.id, 'Status:', estimate.status, 'isFinal:', estimate.isFinal, 'Type:', estimate.type, 'isServiceAdvisor:', isServiceAdvisor);
 
-                        if (estimate.status !== 'APPROVED' || estimate.isFinal) {
-                          return null;
-                        }
-
-                        // Sort estimates by createdAt to find the latest one
-                        const sortedEstimates = [...estimates].sort((a, b) =>
-                          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                        );
-                        const latestEstimate = sortedEstimates[0];
-
-                        console.log('Latest estimate ID:', latestEstimate?.id, 'Current estimate ID:', estimate.id);
-
-                        if (latestEstimate?.id === estimate.id) {
+                        // Show button when: isServiceAdvisor is true, isFinal is FALSE, status is APPROVED, and it's an ESTIMATE type
+                        if (isServiceAdvisor && estimate.status === 'APPROVED' && estimate.isFinal === false && estimate.type === 'ESTIMATE') {
                           return (
                             <button
                               onClick={() => handleFinalizeEstimate(estimate.id)}
