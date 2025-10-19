@@ -66,6 +66,9 @@ const Dashboard = () => {
   } | null>(null);
   const [userProfileLoading, setUserProfileLoading] = useState(false);
   const [userProfileError, setUserProfileError] = useState('');
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsError, setNotificationsError] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -211,11 +214,51 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch notifications
+  const fetchNotifications = async () => {
+    if (!token) {
+      console.log('No token available for notifications fetch');
+      return;
+    }
+
+    setNotificationsLoading(true);
+    setNotificationsError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/notifications?limit=20', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch notifications: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setNotifications(data.data);
+        console.log('Notifications loaded:', data.data.length);
+      } else {
+        throw new Error(data.message || 'Failed to fetch notifications');
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setNotificationsError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!authLoading && token) {
       fetchAppointments();
       fetchGeneralStats();
       fetchUserProfile();
+      fetchNotifications();
     }
   }, [token, authLoading]);
 
@@ -277,17 +320,7 @@ const Dashboard = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '20px',
-                position: 'relative',
-                transition: 'all 0.2s',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f8fafc';
-                e.currentTarget.style.borderColor = '#cbd5e1';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
-                e.currentTarget.style.borderColor = '#e2e8f0';
+                position: 'relative'
               }}
             >
               <i className='bx bx-bell'></i>
@@ -296,12 +329,20 @@ const Dashboard = () => {
                 position: 'absolute',
                 top: '8px',
                 right: '8px',
-                width: '8px',
-                height: '8px',
+                width: '16px',
+                height: '16px',
                 borderRadius: '50%',
                 backgroundColor: '#ef4444',
-                border: '2px solid white'
-              }} />
+                border: '2px solid white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                fontWeight: '600',
+                color: 'white'
+              }}>
+                {notifications.filter(n => !n.isRead).length || 0}
+              </div>
             </button>
             
             {/* Notification Dropdown */}
