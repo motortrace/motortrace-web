@@ -19,4 +19,5 @@ export interface WorkOrder {
       name: string;
       profilePhoto: string;
     }[];
+    source?: 'WALK_IN' | 'APPOINTMENT' | 'PHONE' | 'ONLINE' | 'OTHER';
   }

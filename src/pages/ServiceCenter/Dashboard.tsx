@@ -195,7 +195,7 @@ const Dashboard = () => {
             color: '#1e293b',
             margin: '0 0 0.25rem 0'
           }}>
-            Manager Dashboard
+            Service Manager Dashboard
           </h1>
           <p style={{
             color: '#64748b',
