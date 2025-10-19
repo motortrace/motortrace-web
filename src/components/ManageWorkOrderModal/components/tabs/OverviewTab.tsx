@@ -90,7 +90,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
       // Start polling chat messages every 30 seconds
       chatPollingRef.current = setInterval(() => {
         fetchMessages();
-      }, 30000); // 30 seconds
+      }, 3000); // 30 seconds
 
       // Cleanup interval on unmount or workOrder change
       return () => {
