@@ -907,13 +907,13 @@ const AppointmentsPage = () => {
       {/* View Toggle Tabs - Moved outside page-header */}
       <div className="view-toggle-container">
         <div className="view-toggle">
-          <button 
+          <button
             className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
             onClick={() => setViewMode('table')}
           >
             <i className='bx bx-table'></i> Table
           </button>
-          <button 
+          <button
             className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
             onClick={() => setViewMode('calendar')}
           >
