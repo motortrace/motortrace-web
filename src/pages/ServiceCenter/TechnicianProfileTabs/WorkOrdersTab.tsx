@@ -1,4 +1,5 @@
 import React from 'react';
+import { FileText, User, Car, Calendar, AlertTriangle, Wrench, Eye } from 'lucide-react';
 
 interface WorkOrder {
   id: string;
@@ -102,10 +103,6 @@ const WorkOrdersTab: React.FC<WorkOrdersTabProps> = ({ workOrders }) => {
 
   return (
     <div className="work-orders-tab">
-      <div className="work-orders-header">
-        <h3>Recent Work Orders</h3>
-        <span className="work-orders-count">{workOrders.length} work orders</span>
-      </div>
 
       {workOrders.length > 0 ? (
         <div className="work-orders-list">
@@ -113,10 +110,13 @@ const WorkOrdersTab: React.FC<WorkOrdersTabProps> = ({ workOrders }) => {
             <div key={workOrder.id} className="work-order-card">
               <div className="work-order-header">
                 <div className="work-order-info">
-                  <h4 className="work-order-number">{workOrder.workOrderNumber}</h4>
-                  <span className={`work-order-status ${getStatusColor(workOrder.status)}`}>
-                    {workOrder.status.replace('_', ' ')}
-                  </span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                    <h4 className="work-order-number">{workOrder.workOrderNumber}</h4>
+                    <span className={`work-order-status ${getStatusColor(workOrder.status)}`}>
+                      {workOrder.status.replace('_', ' ')}
+                    </span>
+                  </div>
+
                 </div>
                 <div className="work-order-amount">
                   {formatCurrency(workOrder.totalAmount)}
@@ -125,46 +125,57 @@ const WorkOrdersTab: React.FC<WorkOrdersTabProps> = ({ workOrders }) => {
 
               <div className="work-order-details">
                 <div className="detail-row">
+                  <User size={16} className="detail-icon" />
                   <span className="detail-label">Customer:</span>
                   <span className="detail-value">{workOrder.customer.name}</span>
                 </div>
                 <div className="detail-row">
+                  <Car size={16} className="detail-icon" />
                   <span className="detail-label">Vehicle:</span>
                   <span className="detail-value">
                     {workOrder.vehicle.year} {workOrder.vehicle.make} {workOrder.vehicle.model}
                   </span>
                 </div>
                 <div className="detail-row">
+                  <Calendar size={16} className="detail-icon" />
                   <span className="detail-label">Created:</span>
                   <span className="detail-value">{formatDate(workOrder.createdAt)}</span>
                 </div>
                 <div className="detail-row">
+                  <AlertTriangle size={16} className="detail-icon" />
                   <span className="detail-label">Priority:</span>
                   <span className="detail-value">{workOrder.priority}</span>
                 </div>
                 <div className="detail-row">
+                  <Wrench size={16} className="detail-icon" />
                   <span className="detail-label">Job Type:</span>
                   <span className="detail-value">{workOrder.jobType}</span>
                 </div>
                 {workOrder.complaint && (
                   <div className="detail-row">
+                    <FileText size={16} className="detail-icon" />
                     <span className="detail-label">Complaint:</span>
                     <span className="detail-value">{workOrder.complaint}</span>
                   </div>
                 )}
               </div>
 
-              <div className="work-order-footer">
-                <button className="btn-view-details">
-                  View Details
-                </button>
-              </div>
+              {/* <div className="work-order-footer" >
+                <div className="work-order-actions">
+                  <button className="btn-view-details" >
+                    <Eye size={16} />
+                    View Details
+                  </button>
+                </div>
+              </div> */}
             </div>
           ))}
         </div>
       ) : (
         <div className="no-work-orders">
-          <p>No recent work orders found</p>
+          <div className="empty-state-icon">📋</div>
+          <h3>No Work Orders Yet</h3>
+          <p>This technician hasn't been assigned any work orders recently. New assignments will appear here once they're created.</p>
         </div>
       )}
     </div>
