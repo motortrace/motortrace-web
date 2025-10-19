@@ -6,9 +6,9 @@ import InspectionsTab from './components/tabs/InspectionsTab';
 import EstimatesTab from './components/tabs/EstimatesTab';
 import PaymentsTab from './components/tabs/PaymentsTab';
 import ServicesTab from './components/tabs/ServicesTab';
+import MiscChargesTab from './components/tabs/MiscChargesTab';
 import AddInspectionModal from './components/modals/AddInspectionModal';
 import AssignTechnicianModal from './components/modals/AssignTechnicianModal';
-import GenerateInvoiceModal from './components/modals/GenerateInvoiceModal';
 import { useWorkOrderModal } from './hooks/useWorkOrderModal';
 import { useInspections } from './hooks/useInspections';
 import { isServiceAdvisorRole } from './utils/helpers';
@@ -89,8 +89,9 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       });
 
       if (response.ok) {
-        const data = await response.json();
-        modalHook.setTechnicians(data);
+        const result = await response.json();
+        const techniciansData = result.success ? result.data : [];
+        modalHook.setTechnicians(techniciansData);
       }
     } catch (error) {
       console.error('Error fetching technicians:', error);
@@ -143,15 +144,15 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
             </div>
           </div>
           <div className="modal-header-actions">
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
-            </button>
-            {!isServiceAdvisor && (
+            </button> */}
+            {!isServiceAdvisor && workOrder?.status !== 'PAID' && (
               <button 
                 className="btn btn--secondary" 
                 style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#3b82f6', color: '#fff', borderColor: '#3b82f6' }}
-                onClick={modalHook.openGenerateInvoiceModal}
+                onClick={modalHook.handleGenerateInvoice}
               >
                 <i className="bx bx-receipt"></i>
                 Generate Invoice
@@ -183,6 +184,10 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
             {/* Services tab */}
             {activeTab === 'services' && (
               <ServicesTab workOrderId={workOrder.id} />
+            )}
+
+            {activeTab === 'misc-charges' && (
+              <MiscChargesTab workOrderId={workOrder.id} />
             )}
 
             {activeTab === 'estimates' && (
@@ -224,26 +229,11 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         <AssignTechnicianModal
           show={modalHook.showAssignTechnicianModal}
           onClose={modalHook.closeAssignTechnicianModal}
-          technicians={modalHook.technicians}
+          technicians={Array.isArray(modalHook.technicians) ? modalHook.technicians.map(tech => ({ ...tech, isBusy: false })) : []}
           selectedTechnicianId={modalHook.selectedTechnicianId}
           setSelectedTechnicianId={modalHook.setSelectedTechnicianId}
           onAssign={modalHook.handleAssignInspector}
           getTechnicianDisplayName={modalHook.getTechnicianDisplayName}
-        />
-
-        {/* Generate Invoice Modal */}
-        <GenerateInvoiceModal
-          show={modalHook.showGenerateInvoiceModal}
-          onClose={modalHook.closeGenerateInvoiceModal}
-          workOrder={workOrder}
-          invoiceDueDate={modalHook.invoiceDueDate}
-          setInvoiceDueDate={modalHook.setInvoiceDueDate}
-          invoiceTerms={modalHook.invoiceTerms}
-          setInvoiceTerms={modalHook.setInvoiceTerms}
-          invoiceNotes={modalHook.invoiceNotes}
-          setInvoiceNotes={modalHook.setInvoiceNotes}
-          isGeneratingInvoice={modalHook.isGeneratingInvoice}
-          onGenerate={modalHook.handleGenerateInvoice}
         />
       </div>
     </div>

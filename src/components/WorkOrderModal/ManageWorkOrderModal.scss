@@ -2378,6 +2378,16 @@ $grey-na: #e5e7eb;
     color: #ffffff;
   }
 
+  &--approved {
+    background-color: #06b6d4;
+    color: #ffffff;
+  }
+
+  &--rejected {
+    background-color: #ef4444;
+    color: #ffffff;
+  }
+
   &--pending {
     background-color: #3b82f6;
     color: #ffffff;

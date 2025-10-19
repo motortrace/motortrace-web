@@ -14,7 +14,6 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
   // Modal visibility states
   const [showAddInspectionModal, setShowAddInspectionModal] = useState(false);
   const [showAssignTechnicianModal, setShowAssignTechnicianModal] = useState(false);
-  const [showGenerateInvoiceModal, setShowGenerateInvoiceModal] = useState(false);
 
   // Form states for Add Inspection Modal
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
@@ -24,7 +23,7 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
   const [selectedInspectionId, setSelectedInspectionId] = useState<string>('');
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>('');
 
-  // Form states for Generate Invoice Modal
+  // Form states for Generate Invoice (used for defaults)
   const [invoiceDueDate, setInvoiceDueDate] = useState<string>('');
   const [invoiceTerms, setInvoiceTerms] = useState('Net 14');
   const [invoiceNotes, setInvoiceNotes] = useState('Payment due within 14 days');
@@ -68,27 +67,6 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
     setShowAssignTechnicianModal(false);
     setSelectedInspectionId('');
     setSelectedTechnicianId('');
-  };
-
-  /**
-   * Open Generate Invoice Modal with default due date (14 days from now)
-   */
-  const openGenerateInvoiceModal = () => {
-    const today = new Date();
-    const dueDate = new Date(today.setDate(today.getDate() + 14));
-    const formattedDate = dueDate.toISOString().split('T')[0];
-    setInvoiceDueDate(formattedDate);
-    setShowGenerateInvoiceModal(true);
-  };
-
-  /**
-   * Close Generate Invoice Modal and reset form
-   */
-  const closeGenerateInvoiceModal = () => {
-    setShowGenerateInvoiceModal(false);
-    setInvoiceDueDate('');
-    setInvoiceTerms('Net 14');
-    setInvoiceNotes('Payment due within 14 days');
   };
 
   /**
@@ -221,9 +199,6 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
   const handleGenerateInvoice = async () => {
     console.log('=== Generate Invoice Debug ===');
     console.log('Work Order ID:', workOrderId);
-    console.log('Invoice Due Date:', invoiceDueDate);
-    console.log('Invoice Terms:', invoiceTerms);
-    console.log('Invoice Notes:', invoiceNotes);
     console.log('Token:', token ? 'Present' : 'Missing');
 
     if (!workOrderId) {
@@ -236,30 +211,18 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
       return;
     }
 
-    if (!invoiceDueDate) {
-      console.error('No invoice due date');
-      return;
-    }
-
     setIsGeneratingInvoice(true);
 
     try {
-      const payload = {
-        workOrderId,
-        dueDate: new Date(invoiceDueDate).toISOString(),
-        notes: invoiceNotes || undefined,
-        terms: invoiceTerms || undefined,
-      };
+      // No payload needed - all info derived from workOrderId
+      console.log('Request Payload: None (workOrderId in URL)');
 
-      console.log('Request Payload:', payload);
-
-      const response = await fetch('http://localhost:3000/invoices', {
+      const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}/generate-invoice`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
       });
 
       console.log('Response Status:', response.status);
@@ -268,7 +231,6 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
 
       if (response.ok) {
         console.log('Successfully generated invoice');
-        closeGenerateInvoiceModal();
         if (onSuccess) {
           onSuccess();
         } else {
@@ -289,7 +251,6 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
     // Modal visibility states
     showAddInspectionModal,
     showAssignTechnicianModal,
-    showGenerateInvoiceModal,
 
     // Form states
     selectedTemplateId,
@@ -318,8 +279,6 @@ export const useWorkOrderModal = ({ workOrderId, onSuccess }: UseWorkOrderModalP
     closeAddInspectionModal,
     openAssignTechnicianModal,
     closeAssignTechnicianModal,
-    openGenerateInvoiceModal,
-    closeGenerateInvoiceModal,
 
     // Handler functions
     handleAssignInspector,
