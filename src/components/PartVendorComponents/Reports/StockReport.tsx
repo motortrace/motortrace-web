@@ -294,9 +294,9 @@ export const StockReport: React.FC<StockReportProps> = ({
       // Determine the API endpoint based on report type
       let endpoint = '';
       if (reportType === 'low-stock') {
-        endpoint = 'http://localhost:3000/api/analytics/low-stock';
+        endpoint = 'http://localhost:3000/inventory/analytics/low-stock';
       } else {
-        endpoint = 'http://localhost:3000/api/analytics/out-of-stock';
+        endpoint = 'http://localhost:3000/inventory/analytics/out-of-stock';
       }
 
       // Add category filter if specified and not "All Categories"

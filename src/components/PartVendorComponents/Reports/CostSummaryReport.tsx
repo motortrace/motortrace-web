@@ -392,7 +392,7 @@ export const CostSummaryReport: React.FC<CostSummaryReportProps> = ({
       setError(null);
       
       // Build the API endpoint with filters
-      let endpoint = 'http://localhost:3000/api/analytics/cost-summary';
+      let endpoint = 'http://localhost:3000/inventory/analytics/cost-summary';
       const params = new URLSearchParams();
       
       if (dateFrom) params.append('dateFrom', dateFrom);
@@ -410,12 +410,37 @@ export const CostSummaryReport: React.FC<CostSummaryReportProps> = ({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data: CostSummaryApiResponse = await response.json();
-      console.log('Fetched cost summary:', data);
-      
-      setSummary(data.summary);
-      setMonthlyTrend(data.monthlyTrend || []);
-      setCategoryBreakdown(data.categoryBreakdown || []);
+      const dataRaw = await response.json();
+      console.log('Fetched cost summary:', dataRaw);
+
+      const payload = dataRaw?.data ?? dataRaw;
+
+      const summaryPayload = payload?.summary ?? payload ?? {};
+      const monthlyTrendPayload = payload?.monthlyTrend ?? payload?.monthly_trend ?? payload?.monthlyTrend ?? [];
+      const categoryBreakdownPayload = payload?.categoryBreakdown ?? payload?.category_breakdown ?? [];
+
+      const normalizedSummary = {
+        totalCost: Number(summaryPayload.totalCost ?? summaryPayload.total_cost ?? 0),
+        totalIssuances: Number(summaryPayload.totalIssuances ?? summaryPayload.total_issuances ?? 0),
+        averageCostPerIssuance: Number(summaryPayload.averageCostPerIssuance ?? summaryPayload.average_cost_per_issuance ?? 0),
+        highestMonthlyCost: Number(summaryPayload.highestMonthlyCost ?? summaryPayload.highest_monthly_cost ?? 0)
+      };
+
+      const normalizedMonthlyTrend: MonthlyCost[] = (Array.isArray(monthlyTrendPayload) ? monthlyTrendPayload : []).map((m: any) => ({
+        month: m.month ?? m.label ?? '',
+        cost: Number(m.cost ?? m.total ?? 0),
+        issuances: Number(m.issuances ?? m.count ?? 0)
+      }));
+
+      const normalizedCategoryBreakdown: CategoryCost[] = (Array.isArray(categoryBreakdownPayload) ? categoryBreakdownPayload : []).map((c: any) => ({
+        category: c.category ?? c.name ?? 'Unknown',
+        cost: Number(c.cost ?? c.total ?? 0),
+        percentage: Number(c.percentage ?? 0)
+      }));
+
+      setSummary(normalizedSummary);
+      setMonthlyTrend(normalizedMonthlyTrend);
+      setCategoryBreakdown(normalizedCategoryBreakdown);
       
     } catch (err) {
       console.error('Error fetching cost summary:', err);

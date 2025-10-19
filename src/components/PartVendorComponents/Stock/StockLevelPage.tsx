@@ -76,8 +76,8 @@ const StockLevelPage: React.FC = () => {
       setError(null);
       
       const endpoint = tab === 'low' 
-        ? 'http://localhost:3000/api/analytics/low-stock'
-        : 'http://localhost:3000/api/analytics/out-of-stock';
+        ? 'http://localhost:3000/inventory/analytics/low-stock'
+        : 'http://localhost:3000/inventory/analytics/out-of-stock';
       
       const response = await fetch(endpoint);
       
@@ -220,7 +220,7 @@ const filteredByCategory = useMemo(() => {
         minquantity: updateData.minquantity
       }
 
-      const response = await fetch(`http://localhost:3000/api/inventory/update/${updateData.id}`, {
+      const response = await fetch(`http://localhost:3000/inventory/update/${updateData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -114,7 +114,7 @@ const ProductMetricsCard: React.FC = () => {
   const fetchMetrics = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3000/api/analytics/inventory');
+      const response = await fetch('http://localhost:3000/inventory/analytics');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

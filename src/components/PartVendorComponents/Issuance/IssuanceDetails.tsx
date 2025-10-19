@@ -139,14 +139,56 @@ const IssuanceDetails: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:3000/api/issuances/${id}`);
+      const response = await fetch(`http://localhost:3000/inventory/issuances/${id}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      setIssuance(data);
+
+      // Normalize detail response: backend may return { success: true, data: {...} } or raw object
+      let raw: any = null;
+      if (data && data.data) {
+        raw = data.data;
+      } else {
+        raw = data;
+      }
+
+      // Ensure parts is an array
+      const rawParts = Array.isArray(raw.parts) ? raw.parts : [];
+
+      // Map API camelCase fields to the snake_case shape the component expects
+      const normalizedParts = rawParts.map((p: any) => {
+        const product = p.product || p.Product || {};
+        return {
+          id: p.id ?? p.issuanceId ?? 0,
+          product_id: p.productId ?? p.product_id ?? product.id ?? 0,
+          product_name: product.productname ?? product.productName ?? product.product_name ?? product.name ?? '',
+          quantity: p.quantity ?? p.qty ?? 0,
+          notes: p.notes ?? '',
+          image: product.image ?? '',
+          price: product.price ?? p.price ?? ''
+        } as IssuedPart;
+      });
+
+      const normalized: Issuance = {
+        id: raw.id ?? raw.ID ?? 0,
+        issuance_number: raw.issuanceNumber ?? raw.issuance_number ?? raw.issuanceId ?? raw.id ?? '',
+        date_issued: raw.dateIssued ?? raw.date_issued ?? raw.createdAt ?? raw.created_at ?? '',
+        technician_name: raw.technicianName ?? raw.technician_name ?? raw.technician ?? '',
+        recipient: raw.recipient ?? raw.to ?? '',
+        issued_by: raw.issuedBy ?? raw.issued_by ?? raw.issuedBy ?? '',
+        service_job: raw.serviceJob ?? raw.service_job ?? raw.service_job ?? '',
+        car_details: raw.carDetails ?? raw.car_details ?? raw.car ?? '',
+        notes: raw.notes ?? '',
+        total_quantity: raw.totalQuantity ?? raw.total_quantity ?? raw.total_quantity ?? normalizedParts.reduce((s: number, p: IssuedPart) => s + (p.quantity || 0), 0),
+        created_at: raw.createdAt ?? raw.created_at ?? '',
+        updated_at: raw.updatedAt ?? raw.updated_at ?? '',
+        parts: normalizedParts
+      };
+
+      setIssuance(normalized);
     } catch (err) {
       console.error('Error fetching issuance details:', err);
       setError(`Failed to load issuance details. Please try again.${id}`);

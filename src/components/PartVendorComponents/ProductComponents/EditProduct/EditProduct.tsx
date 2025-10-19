@@ -38,7 +38,7 @@ const EditProduct: React.FC<EditProductProps> = ({ category, existingData, onSav
           ? 'Out of Stock' 
           : 'Low Stock';
 
-      const response = await fetch(`http://localhost:3000/api/products/${existingData.id}`, {
+      const response = await fetch(`http://localhost:3000/inventory/products/${existingData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

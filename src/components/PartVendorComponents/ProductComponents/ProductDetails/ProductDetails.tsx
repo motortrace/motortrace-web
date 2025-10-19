@@ -1163,8 +1163,65 @@ const ProductDetails: React.FC = () => {
   try {
     setLoading(true);
     // apiRequest already parses the JSON, so no need for response.json()
-    const data = await apiRequest('http://localhost:3000/api/products');
-    setProducts(data);
+    const data = await apiRequest('http://localhost:3000/inventory/products');
+
+    // Normalize response shapes:
+    // - older API returned an array
+    // - new Supabase/prisma endpoint returns { success: true, data: [...] }
+    let items: any[] = [];
+    if (Array.isArray(data)) {
+      items = data;
+    } else if (data && Array.isArray(data.data)) {
+      items = data.data;
+    } else if (data && data.success && Array.isArray(data.data)) {
+      items = data.data;
+    } else {
+      // unknown shape — keep items empty
+      items = [];
+    }
+
+    // Map and coerce fields to the Product interface expected by this component
+    const normalized: Product[] = items.map((it: any) => ({
+      id: it.id != null ? String(it.id) : '',
+      productname: it.productname ?? it.productName ?? '',
+      category: it.category ?? '',
+      subcategory: it.subcategory ?? '',
+      description: it.description ?? '',
+      price: it.price != null ? String(it.price) : '',
+      rating: Number(it.rating ?? 0),
+      reviewcount: Number(it.reviewcount ?? it.reviewCount ?? 0),
+      availability: it.availability ?? 'Out of Stock',
+      image: it.image ?? '',
+      stock: Number(it.stock ?? 0),
+      compatibility: it.compatibility ?? '',
+      position: it.position ?? '',
+      brand: it.brand ?? '',
+      finish: it.finish ?? '',
+      material: it.material ?? '',
+      surfaceuse: it.surfaceuse ?? it.surfaceUse ?? '',
+      type: it.type ?? '',
+      color: it.color ?? '',
+      volume: it.volume ?? '',
+      mountingfeatures: it.mountingfeatures ?? it.mountingFeatures ?? '',
+      colorcode: it.colorcode ?? it.colorCode ?? '',
+      quantity: Number(it.quantity ?? 0),
+      minquantity: Number(it.minquantity ?? it.minQuantity ?? 0),
+      discounttype: it.discounttype ?? '',
+      discountvalue: Number(it.discountvalue ?? it.discountValue ?? 0),
+      warranty: it.warranty ?? '',
+      manufacturer: it.manufacturer ?? '',
+      manufactureddate: it.manufactureddate ?? it.manufacturedDate ?? '',
+      expirydate: it.expirydate ?? it.expiryDate ?? '',
+      notes: it.notes ?? '',
+      resistance: it.resistance ?? '',
+      drytime: it.drytime ?? it.dryTime ?? '',
+      applicationmethod: it.applicationmethod ?? it.applicationMethod ?? '',
+      voltage: it.voltage ?? '',
+      amprating: it.amprating ?? it.ampRating ?? '',
+      connectortype: it.connectortype ?? it.connectorType ?? ''
+    }));
+
+    setProducts(normalized);
     setError(null);
   } catch (err) {
     setError('Failed to fetch products. Please try again later.');
@@ -1254,7 +1311,7 @@ const handleDeleteConfirm = async () => {
       setIsDeleting(true);
       
       // Call your delete API endpoint
-      const response = await fetch(`http://localhost:3000/api/products/${productToDelete.id}`, {
+      const response = await fetch(`http://localhost:3000/inventory/products/${productToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

@@ -117,14 +117,27 @@ const OrderMetricsCard: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch('http://localhost:3000/api/analytics/order-metrics');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Try the inventory endpoint first, fall back to the older /api path on 404
+      const primaryUrl = 'http://localhost:3000/inventory/analytics/order-metrics';
+      const fallbackUrl = 'http://localhost:3000/api/analytics/order-metrics';
+
+      let response = await fetch(primaryUrl);
+
+      if (!response.ok && response.status === 404) {
+        console.warn(`Primary metrics endpoint returned 404, trying fallback: ${fallbackUrl}`);
+        response = await fetch(fallbackUrl);
       }
-      
-      const data: MetricsApiResponse = await response.json();
+
+      if (!response.ok) {
+        // Try to include server error body if possible
+        const text = await response.text().catch(() => '');
+        throw new Error(`HTTP error! status: ${response.status}${text ? ' - ' + text : ''}`);
+      }
+
+      const raw = await response.json();
+      // handle wrapper { success: true, data: { metrics, changes } }
+      const payload = raw?.data ?? raw;
+      const data: MetricsApiResponse = payload;
       
       // Defensive defaults in case some fields are missing from the API
       const totalIssuances = data.metrics?.totalIssuances ?? 0;
@@ -177,7 +190,7 @@ const OrderMetricsCard: React.FC = () => {
   if (loading) {
     return (
       <div className="order-metrics-row">
-        {[1, 2, 3, 4, 5].map((item) => (
+        {[1, 2, 3].map((item) => (
           <div className="order-metrics-card loading" key={item}>
             <div className="order-metrics-card__content">
               <div className="loading-spinner"></div>

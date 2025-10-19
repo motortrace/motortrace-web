@@ -63,7 +63,7 @@ export const UsageReport: React.FC<UsageReportProps> = ({
       setError(null);
       
       // Build the API endpoint with filters
-      let endpoint = 'http://localhost:3000/api/analytics/parts-usage';
+      let endpoint = 'http://localhost:3000/inventory/analytics/parts-usage';
       const params = new URLSearchParams();
       
       if (dateFrom) params.append('dateFrom', dateFrom);
@@ -81,12 +81,42 @@ export const UsageReport: React.FC<UsageReportProps> = ({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data: UsageApiResponse = await response.json();
-      console.log('Fetched usage data:', data);
-      
-      setUsageData(data.topParts || []);
-      setCategoryData(data.categoryDistribution || []);
-      setSummary(data.summary);
+      const dataRaw = await response.json();
+      console.log('Fetched usage data:', dataRaw);
+
+      // Normalize response: accept either raw shape or wrapper { success, data }
+      const payload = (dataRaw && dataRaw.data) ? dataRaw.data : dataRaw;
+
+      const topParts = Array.isArray(payload?.topParts) ? payload.topParts : (Array.isArray(payload) ? payload : []);
+      const categoryDistribution = Array.isArray(payload?.categoryDistribution) ? payload.categoryDistribution : [];
+      const summaryPayload = payload?.summary ?? {};
+
+      // Coerce numeric fields and provide defaults
+      const normalizedTopParts: UsageData[] = topParts.map((p: any) => ({
+        product_id: p.product_id ?? p.productId ?? p.product_id ?? 0,
+        product_name: p.product_name ?? p.productName ?? p.productname ?? '',
+        category: p.category ?? '',
+        frequency: Number(p.frequency ?? 0),
+        total_quantity: Number(p.total_quantity ?? p.totalQuantity ?? 0),
+        average_per_issuance: Number(p.average_per_issuance ?? p.averagePerIssuance ?? p.average_per_issuance ?? 0)
+      }));
+
+      const normalizedCategoryData: CategoryData[] = categoryDistribution.map((c: any) => ({
+        category: c.category ?? c.name ?? 'Unknown',
+        quantity: Number(c.quantity ?? 0),
+        percentage: Number(c.percentage ?? 0)
+      }));
+
+      const normalizedSummary = {
+        totalPartsIssued: Number(summaryPayload.totalPartsIssued ?? summaryPayload.total_parts_issued ?? 0),
+        totalIssuances: Number(summaryPayload.totalIssuances ?? summaryPayload.total_issuances ?? 0),
+        uniqueParts: Number(summaryPayload.uniqueParts ?? summaryPayload.unique_parts ?? 0),
+        averagePartsPerIssuance: Number(summaryPayload.averagePartsPerIssuance ?? summaryPayload.average_parts_per_issuance ?? 0)
+      };
+
+      setUsageData(normalizedTopParts);
+      setCategoryData(normalizedCategoryData);
+      setSummary(normalizedSummary);
       
     } catch (err) {
       console.error('Error fetching usage data:', err);

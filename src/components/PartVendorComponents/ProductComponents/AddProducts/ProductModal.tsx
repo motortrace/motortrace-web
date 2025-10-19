@@ -127,22 +127,52 @@ const handleSave = async () => {
     
     try {
       // Prepare the data for API - clean up empty values
-      const productToSave = Object.fromEntries(
+      let productToSave: any = Object.fromEntries(
         Object.entries(formData).filter(([_, value]) => 
           value !== '' && value !== null && value !== undefined
         )
       );
-      // Add default values
-      productToSave.rating = 0;
-      productToSave.reviewcount = 0;
-      productToSave.availability = formData.quantity > formData.minquantity 
+      // Coerce numeric fields to numbers to match backend expectations
+      const numericFields = ['quantity', 'minquantity', 'stock', 'discountvalue', 'reviewcount', 'rating'];
+      for (const nf of numericFields) {
+        if (productToSave[nf] !== undefined) {
+          const n = Number(productToSave[nf]);
+          if (!Number.isNaN(n)) productToSave[nf] = n;
+        }
+      }
+      // Ensure price is a trimmed string (backend in GET returns price as string)
+      if (productToSave.price !== undefined) {
+        productToSave.price = String(productToSave.price).trim();
+      }
+
+      // Add default values and normalize field names expected by backend
+      productToSave.rating = productToSave.rating ?? 0;
+      productToSave.reviewcount = productToSave.reviewcount ?? 0;
+      productToSave.availability = productToSave.quantity > productToSave.minquantity 
         ? 'In Stock' 
-        : formData.quantity === 0 
+        : productToSave.quantity === 0 
           ? 'Out of Stock' 
           : 'Low Stock';
+
+      // Some backends expect camelCase keys (e.g., productName). Ensure we send both forms to be safe.
+      if (productToSave.productname && !productToSave.productName) {
+        productToSave.productName = String(productToSave.productname);
+      }
+      // Also ensure lowercase key exists (some code reads this)
+      if (productToSave.productName && !productToSave.productname) {
+        productToSave.productname = String(productToSave.productName);
+      }
+
+      // Ensure category and price are present with expected key casing
+      if (productToSave.category && typeof productToSave.category !== 'string') {
+        productToSave.category = String(productToSave.category);
+      }
+      if (productToSave.price !== undefined && productToSave.price !== null) {
+        productToSave.price = String(productToSave.price);
+      }
       
       // Call your API endpoint - use the correct endpoint
-      const response = await fetch('http://localhost:3000/api/products', {
+      const response = await fetch('http://localhost:3000/inventory/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,12 +180,28 @@ const handleSave = async () => {
         body: JSON.stringify(productToSave),
       });
       if (response.ok) {
-        const savedProduct = await response.json();
+        const savedProduct = await response.json().catch(() => null);
         onSave(savedProduct);
         onClose();
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server error: ${response.status}`);
+        // Try to parse JSON message or fallback to text
+        let errorMessage = `Server error: ${response.status}`;
+        try {
+          const errJson = await response.json();
+          // Backend might send { message: '...' } or { error: '...' } or { success: false, message: '...' }
+          errorMessage = errJson.message || errJson.error || (errJson?.detail && JSON.stringify(errJson.detail)) || JSON.stringify(errJson) || errorMessage;
+          console.error('Backend error response (json):', errJson);
+        } catch (e) {
+          const text = await response.text().catch(() => '');
+          if (text) {
+            errorMessage = text;
+            console.error('Backend error response (text):', text);
+          }
+        }
+        // Surface the backend error so you can debug in the browser console and UI
+        console.error('Error saving product:', errorMessage);
+        alert(`Error saving product: ${errorMessage}`);
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error saving product:', error);

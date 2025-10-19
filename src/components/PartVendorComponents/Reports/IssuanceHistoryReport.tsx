@@ -263,7 +263,7 @@ export const IssuanceHistoryReport: React.FC<IssuanceHistoryReportProps> = ({
       setError(null);
       
       // Build the API endpoint with filters
-      let endpoint = 'http://localhost:3000/api/issuances';
+      let endpoint = 'http://localhost:3000/inventory/issuances';
       const params = new URLSearchParams();
       
       if (dateFrom) params.append('dateFrom', dateFrom);
@@ -283,7 +283,21 @@ export const IssuanceHistoryReport: React.FC<IssuanceHistoryReportProps> = ({
       
       const data = await response.json();
       console.log('Fetched issuances:', data);
-      setIssuances(data);
+
+      // Normalize response to array
+      let items: any[] = [];
+      if (Array.isArray(data)) {
+        items = data;
+      } else if (data && Array.isArray((data as any).data)) {
+        items = (data as any).data;
+      } else if (data && Array.isArray((data as any).issuances)) {
+        items = (data as any).issuances;
+      } else {
+        console.warn('Unexpected issuances response shape:', data);
+        items = [];
+      }
+
+      setIssuances(items);
       
     } catch (err) {
       console.error('Error fetching issuances:', err);
