@@ -73,6 +73,14 @@ const Dashboard = () => {
   const notificationRef = useRef<HTMLDivElement>(null);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
+  const [pendingAppointments, setPendingAppointments] = useState(0);
+  const [pendingAppointmentsLoading, setPendingAppointmentsLoading] = useState(false);
+  const [technicianStats, setTechnicianStats] = useState<{
+    totalTechnicians: number;
+    activeTechnicians: number;
+    availableTechnicians: number;
+  } | null>(null);
+  const [technicianStatsLoading, setTechnicianStatsLoading] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -256,6 +264,64 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch pending appointments count
+  const fetchPendingAppointments = async () => {
+    if (!token) return;
+
+    setPendingAppointmentsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/appointments/pending', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pending appointments: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setPendingAppointments(data.data.length || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching pending appointments:', err);
+    } finally {
+      setPendingAppointmentsLoading(false);
+    }
+  };
+
+  // Fetch technician statistics
+  const fetchTechnicianStats = async () => {
+    if (!token) return;
+
+    setTechnicianStatsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/technicians/statistics', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch technician statistics: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setTechnicianStats(data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching technician statistics:', err);
+    } finally {
+      setTechnicianStatsLoading(false);
+    }
+  };
+
   const notificationPollingRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -264,6 +330,8 @@ const Dashboard = () => {
       fetchGeneralStats();
       fetchUserProfile();
       fetchNotifications();
+      fetchPendingAppointments();
+      fetchTechnicianStats();
     }
   }, [token, authLoading]);
 
@@ -442,99 +510,29 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Main Layout - Two Sections */}
+      {/* Top 3 Stat Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: '16px',
-        alignItems: 'start'
+        marginBottom: '16px'
       }}>
-        {/* Left Section */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px'
-        }}>
-          {/* Top 3 Metric Cards */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '16px'
-          }}>
-            {generalStatsLoading ? (
-              <>
-                <MetricCard title="Total Customers" amount="Loading..." />
-                <MetricCard title="Total Vehicles" amount="Loading..." />
-                <MetricCard title="Total Technicians" amount="Loading..." />
-              </>
-            ) : generalStatsError ? (
-              <>
-                <MetricCard title="Total Customers" amount="0" />
-                <MetricCard title="Total Vehicles" amount="0" />
-                <MetricCard title="Total Technicians" amount="0" />
-              </>
-            ) : generalStats ? (
-              <>
-                <MetricCard
-                  title="Total Customers"
-                  amount={generalStats.totalCustomers.toString()}
-                />
-                <MetricCard
-                  title="Total Vehicles"
-                  amount={generalStats.totalVehicles.toString()}
-                />
-                <MetricCard
-                  title="Total Technicians"
-                  amount={generalStats.totalTechnicians.toString()}
-                />
-              </>
-            ) : (
-              <>
-                <MetricCard title="Total Customers" amount="--" />
-                <MetricCard title="Total Vehicles" amount="--" />
-                <MetricCard title="Total Technicians" amount="--" />
-              </>
-            )}
-          </div>
-
-          {/* Work Order Statistics Chart */}
-          <WorkOrderStatistics />
-        </div>
-
-        {/* Right Section - Calendar */}
-        <div style={{
-          height: '100%'
-        }}>
-          {appointmentsLoading ? (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '400px',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0'
-            }}>
-              Loading appointments...
-            </div>
-          ) : appointmentsError ? (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '400px',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0',
-              color: '#ef4444'
-            }}>
-              Error loading appointments: {appointmentsError}
-            </div>
-          ) : (
-            <MiniCalendar appointments={appointments} />
-          )}
-        </div>
+        <MetricCard
+          title="Pending Appointments"
+          amount={pendingAppointmentsLoading ? 'Loading...' : pendingAppointments.toString()}
+        />
+        <MetricCard
+          title="Active Technicians"
+          amount={technicianStatsLoading ? 'Loading...' : (technicianStats?.activeTechnicians.toString() || '0')}
+        />
+        <MetricCard
+          title="Available Technicians"
+          amount={technicianStatsLoading ? 'Loading...' : (technicianStats?.availableTechnicians.toString() || '0')}
+        />
       </div>
+
+      {/* Work Order Statistics Chart */}
+      <WorkOrderStatistics />
 
       {/* Currently Working Technicians Section */}
       <div style={{
