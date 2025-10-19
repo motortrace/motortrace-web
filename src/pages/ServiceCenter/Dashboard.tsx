@@ -81,6 +81,8 @@ const Dashboard = () => {
     availableTechnicians: number;
   } | null>(null);
   const [technicianStatsLoading, setTechnicianStatsLoading] = useState(false);
+  const [serviceAdvisorsCount, setServiceAdvisorsCount] = useState(0);
+  const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -322,6 +324,35 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch service advisors count
+  const fetchServiceAdvisorsCount = async () => {
+    if (!token) return;
+
+    setServiceAdvisorsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/service-advisors/count', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch service advisors count: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setServiceAdvisorsCount(data.data.count || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching service advisors count:', err);
+    } finally {
+      setServiceAdvisorsLoading(false);
+    }
+  };
+
   const notificationPollingRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -332,6 +363,7 @@ const Dashboard = () => {
       fetchNotifications();
       fetchPendingAppointments();
       fetchTechnicianStats();
+      fetchServiceAdvisorsCount();
     }
   }, [token, authLoading]);
 
@@ -519,15 +551,15 @@ const Dashboard = () => {
       }}>
         <MetricCard
           title="Pending Appointments"
-          amount={pendingAppointmentsLoading ? 'Loading...' : pendingAppointments.toString()}
+          amount={pendingAppointmentsLoading ? 'Loading...' : pendingAppointments?.toString() || '0'}
         />
         <MetricCard
           title="Active Technicians"
-          amount={technicianStatsLoading ? 'Loading...' : (technicianStats?.activeTechnicians.toString() || '0')}
+          amount={technicianStatsLoading ? 'Loading...' : technicianStats?.activeTechnicians?.toString() || '0'}
         />
         <MetricCard
-          title="Available Technicians"
-          amount={technicianStatsLoading ? 'Loading...' : (technicianStats?.availableTechnicians.toString() || '0')}
+          title="Service Advisors"
+          amount={serviceAdvisorsLoading ? 'Loading...' : serviceAdvisorsCount?.toString() || '0'}
         />
       </div>
 
