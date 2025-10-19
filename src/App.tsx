@@ -33,6 +33,7 @@ import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
 import TechnicianProfile from './pages/ServiceCenter/TechnicianProfile';
 import ServiceDetailPage from './pages/ServiceCenter/ServiceDetailPage';
 import LaborCatalogPage from './pages/ServiceCenter/LaborCatalogPage';
+import SettingsPage from './pages/ServiceCenter/SettingsPage';
 
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
@@ -138,6 +139,7 @@ function App() {
           <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
+          
         </Route>
 
         {/* Manager Dashboard Routes */}
@@ -170,6 +172,7 @@ function App() {
           <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         <Route path="admin/login" element={<AdminLogin />} />
