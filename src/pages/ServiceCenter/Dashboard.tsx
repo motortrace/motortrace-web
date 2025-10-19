@@ -327,17 +327,17 @@ const Dashboard = () => {
               {/* Notification Badge */}
               <div style={{
                 position: 'absolute',
-                top: '8px',
-                right: '8px',
-                width: '16px',
-                height: '16px',
+                top: '6px',
+                right: '6px',
+                width: '20px',
+                height: '20px',
                 borderRadius: '50%',
                 backgroundColor: '#ef4444',
                 border: '2px solid white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '10px',
+                fontSize: '12px',
                 fontWeight: '600',
                 color: 'white'
               }}>
@@ -357,7 +357,7 @@ const Dashboard = () => {
                 boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
                 borderRadius: '12px'
               }}>
-                <Notifications />
+                <Notifications notifications={notifications} />
               </div>
             )}
           </div>
