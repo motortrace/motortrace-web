@@ -2,7 +2,7 @@
 import React from 'react';
 import ServicesTab from './tabs/ServicesTab';
 import PartsTab from './tabs/PartsTab';
-import InspectionsTab from './tabs/InspectionsTabs';
+// import InspectionsTab from './tabs/InspectionsTabs';
 import NotesTab from './tabs/NotesTab';
 import type { ServicePackage, PartItem } from './types/jobCard.types';
 
@@ -49,13 +49,9 @@ export const JobCardTabs: React.FC<JobCardTabsProps> = ({
         )}
         {activeTab === 'parts' && <PartsTab partItems={partItems} />}
         {activeTab === 'inspections' && (
-          <InspectionsTab 
-            workOrderId="WO-2024-001"
-            customerName="Amber Miller"
-            vehicleInfo="2020 Audi A4 Premium"
-            licensePlate="ABC-1234"
-            technician="Chuck Ivanes"
-          />
+          <div className="inspections-placeholder">
+            <p>Inspections functionality coming soon...</p>
+          </div>
         )}
         {activeTab === 'notes' && <NotesTab notes={notes} onNotesChange={setNotes} />}
       </div>

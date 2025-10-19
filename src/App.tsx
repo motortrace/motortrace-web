@@ -6,31 +6,33 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
 import Dashboard from './pages/ServiceCenter/Dashboard';
+import ServiceAdvisorDashboard from './pages/ServiceCenter/ServiceAdvisorDashboard';
 import KanbanPage from './pages/ServiceCenter/KanbanPage';
-import AppointmentPage from './pages/ServiceCenter/Appointment/AppointmentPage';
 import TestTablePage from './pages/ServiceCenter/TestTablePage';
 import JobCard from './pages/ServiceCenter/JobCard/JobCard';
-import TechnicianSchedulingPage from './pages/ServiceCenter/TechnicianScheduling/TechnicianSchedulingPage';
 import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
-import SupplierConnectionPage from './pages/ServiceCenter/Suppliers/SupplierConnectionPage';
-import PartsSearch from './pages/ServiceCenter/PartsSearch/PartsSearch';
 import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import PricingPage from './pages/PricingPage/PricingPage';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
-import AppointmentDetails from './pages/ServiceCenter/Appointment/AppointmentDetails';
-import EstimatesInvoices from './pages/ServiceCenter/EstimatesInvoices';
-import DigitalInspections from './pages/ServiceCenter/DigitalInspections';
-import Calendar from './pages/ServiceCenter/Calendar';
+import InspectionTemplates from './pages/ServiceCenter/InspectionTemplates';
+import InspectionRecordsPage from './pages/ServiceCenter/InspectionRecordsPage';
+import InspectionDetailPage from './pages/ServiceCenter/InspectionDetailPage';
 import TimelineBoardPage from './pages/ServiceCenter/TimelineBoardPage';
 import CannedServices from './pages/ServiceCenter/Services/CannedServices';
+import ServicesPage from './pages/ServiceCenter/ServicesPage';
 import WorkOrdersPage from './pages/ServiceCenter/WorkOrdersPage';
-import AutoRepairReviews from './pages/ServiceCenter/Reviews/AutoRepairReviews';
-import AutoRepairChat from './pages/ServiceCenter/AutoRepairChat/AutoRepairChat';
 import EditProfile from './pages/ServiceCenter/EditProfile';
 import EmployeeManagement from './pages/ServiceCenter/EmployeeManagement';
-import OrderHistory from './pages/ServiceCenter/OrderHistory';
-
+import CustomerManagement from './pages/ServiceCenter/CustomerManagement';
+import CustomerProfile from './pages/ServiceCenter/CustomerProfile';
+import AppointmentsPage from './pages/ServiceCenter/AppointmentsPage';
+import AppointmentDetailPage from './pages/ServiceCenter/AppointmentDetailPage';
+import InvoicesPage from './pages/ServiceCenter/InvoicesPage';
+import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
+import TechnicianProfile from './pages/ServiceCenter/TechnicianProfile';
+import ServiceDetailPage from './pages/ServiceCenter/ServiceDetailPage';
+import LaborCatalogPage from './pages/ServiceCenter/LaborCatalogPage';
 
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
@@ -55,7 +57,6 @@ import CustomerSummaryPage from './pages/PartVendor/CustomerPages/CustomerSummar
 import ReviewPage from './pages/PartVendor/ReviewPages/ReviewPage';
 import CustomerDetailsPage from './pages/PartVendor/CustomerPages/CustomerDetailsPage';
 import AcceptedOrderDetailsPage from './pages/PartVendor/OrderPages/AcceptedOrderDetailsPage';
-import ReportPage from './pages/PartVendor/ReportPages/ReportPage';
 import DeclinedOrderDetailsPage from './pages/PartVendor/OrderPages/DeclinedOrderDetailsPage';
 import CompletedOrderDetailsPage from './pages/PartVendor/OrderPages/CompletedOrderDetailsPage';
 import FailedOrderDetailsPage from './pages/PartVendor/OrderPages/FailedOrderDetailsPage';
@@ -76,10 +77,15 @@ function NotFoundRedirect() {
     try {
       user = JSON.parse(localStorage.getItem('user') || '{}');
     } catch { }
+    
+    console.log('User role:', user?.role); // Debug log to see actual role
+    
     if (user && user.role === 'admin') {
       navigate('/admin/dashboard', { replace: true });
-    } else if (user && user.role === 'service_center') {
-      navigate('/servicecenter/dashboard', { replace: true });
+    } else if (user && (user.role === 'serviceadvisor' || user.role === 'service_advisor' || user.role === 'advisor')) {
+      navigate('/serviceadvisor/dashboard', { replace: true });
+    } else if (user && user.role === 'manager') {
+      navigate('/manager/dashboard', { replace: true });
     } else {
       navigate('/index', { replace: true });
     }
@@ -104,9 +110,41 @@ function App() {
         {/* Auth Callback Route */}
         <Route path="/auth/callback" element={<AuthCallback />} />
 
-        {/* Protected Dashboard Routes */}
-        <Route path="/servicecenter" element={
-          <ProtectedRoute>
+        {/* Service Advisor Dashboard Routes */}
+        <Route path="/serviceadvisor" element={
+          <ProtectedRoute allowedRoles={['serviceadvisor', 'service_advisor', 'advisor']}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<ServiceAdvisorDashboard />} />
+          <Route path="workflow" element={<KanbanPage />} />
+          <Route path="workorders" element={<WorkOrdersPage />} />
+          <Route path="table" element={<TestTablePage />} />
+          <Route path="jobcard" element={<JobCard />} />
+          <Route path="inventory" element={<PartsInventory />} />
+          <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="invoice-detail/:id" element={<InvoiceDetailPage />} />
+          <Route path="inspection-templates" element={<InspectionTemplates />} />
+          <Route path="inspection-records" element={<InspectionRecordsPage />} />
+          <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
+          <Route path="timeline-board" element={<TimelineBoardPage />} />
+          <Route path="services" element={<ServicesPage />} />
+          <Route path="service/:id" element={<ServiceDetailPage />} />
+          <Route path="labor-catalog" element={<LaborCatalogPage />} />
+          <Route path="work-order" element={<WorkOrdersPage />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
+          <Route path="appointment-detail/:id" element={<AppointmentDetailPage />} />
+          <Route path="profile" element={<EditProfile />} />
+          <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="technician/:technicianId" element={<TechnicianProfile />} />
+          <Route path="customer" element={<CustomerManagement />} />
+          <Route path="customer/:customerId" element={<CustomerProfile />} />
+        </Route>
+
+        {/* Manager Dashboard Routes */}
+        <Route path="/manager" element={
+          <ProtectedRoute allowedRoles={['manager']}>
             <DashboardLayout />
           </ProtectedRoute>
         }>
@@ -114,32 +152,35 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="workflow" element={<KanbanPage />} />
           <Route path="workorders" element={<WorkOrdersPage />} />
-          <Route path="appointments">
-            <Route index element={<AppointmentPage />} />
-            <Route path="details" element={<AppointmentDetails />} />
-          </Route>
           <Route path="table" element={<TestTablePage />} />
           <Route path="jobcard" element={<JobCard />} />
-          <Route path="scheduling" element={<TechnicianSchedulingPage />} />
           <Route path="inventory" element={<PartsInventory />} />
-          <Route path="suppliers" element={<SupplierConnectionPage />} />
-          <Route path="parts-order" element={<PartsSearch />} />
-          <Route path="order-history" element={<OrderHistory />} />
-          <Route path="reports" element={<EstimatesInvoices />} />
-          <Route path="inspections" element={<DigitalInspections />} />
-          <Route path="calendar" element={<Calendar />} />
+          <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="invoice-detail/:id" element={<InvoiceDetailPage />} />
+          <Route path="inspection-templates" element={<InspectionTemplates />} />
+          <Route path="inspection-records" element={<InspectionRecordsPage />} />
+          <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
-          <Route path="services" element={<CannedServices />} />
+          <Route path="services" element={<ServicesPage />} />
+          <Route path="service/:id" element={<ServiceDetailPage />} />
+          <Route path="labor-catalog" element={<LaborCatalogPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
-          <Route path="reviews" element={<AutoRepairReviews />} />
-          <Route path="chat" element={<AutoRepairChat />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
+          <Route path="appointment-detail/:id" element={<AppointmentDetailPage />} />
           <Route path="profile" element={<EditProfile />} />
           <Route path="employee-management" element={<EmployeeManagement />} />
+          <Route path="technician/:technicianId" element={<TechnicianProfile />} />
+          <Route path="customer" element={<CustomerManagement />} />
+          <Route path="customer/:customerId" element={<CustomerProfile />} />
         </Route>
 
         <Route path="admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<Navigate to="login" replace />} />
-        <Route path="/admin/*" element={<AdminDashboardLayout />}>
+        <Route path="/admin/*" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminDashboardLayout />
+          </ProtectedRoute>
+        }>
 
           <Route path="dashboard" element={<AdminDashboard />} />
 
@@ -190,7 +231,6 @@ function App() {
           <Route path="ServiceCenterCustomerDetails" element={<ServiceCenterCustomerDetailsPage />} />
           <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage />} />
           <Route path="CompletedOrders" element={<CompletedOrderDetailsPage />} />
-          <Route path="ReportsSummary" element={<ReportPage />} />
           <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage />} />
           <Route path="FailedOrderDetailsPage" element={<FailedOrderDetailsPage />} />
           <Route path="ProductList" element={<ProductList />} />

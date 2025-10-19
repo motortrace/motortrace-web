@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // Variables
 $primary-color: #2563eb;
 $secondary-color: #f8fafc;
@@ -696,7 +698,7 @@ $orange-text: #c2410c;
                                                 color: $primary-color;
 
                                                 &:hover {
-                                                    color: darken($primary-color, 10%);
+                                                    color: color.adjust($primary-color, $lightness: -10%);
                                                 }
                                             }
 

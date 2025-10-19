@@ -1,682 +1,638 @@
-import React, { useEffect, useRef } from 'react';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
+import React, { useState, useRef, useEffect } from 'react';
+import WorkOrderStatistics from '../../components/WorkOrderStatistics/WorkOrderStatistics';
+import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
+import Notifications from '../../components/Notifications/Notifications';
+import { useAuth } from '../../hooks/useAuth';
+import { useWorkingTechnicians } from '../../hooks/useWorkingTechnicians';
 
 // MetricCard Component
 interface MetricCardProps {
   title: string;
   amount: string;
-  change: string;
-  changeType: 'positive' | 'negative';
-  period?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({
   title,
-  amount,
-  change,
-  changeType,
-  period = 'vs last month'
+  amount
 }) => {
   return (
     <div style={{
       backgroundColor: 'white',
-      padding: '24px',
-      borderRadius: '12px',
+      padding: '16px',
+      borderRadius: '8px',
       border: '1px solid #e2e8f0',
       position: 'relative'
     }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '16px'
+      <h3 style={{
+        fontSize: '12px',
+        fontWeight: '500',
+        color: '#64748b',
+        margin: '0 0 8px 0'
       }}>
-        <h3 style={{
-          fontSize: '14px',
-          fontWeight: '500',
-          color: '#64748b',
-          margin: 0
-        }}>
-          {title}
-        </h3>
-        <button style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: '4px',
-          borderRadius: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <i className='bx bx-right-top-arrow-circle' style={{
-            fontSize: '20px',
-            color: '#64748b'
-          }}></i>
-        </button>
-      </div>
+        {title}
+      </h3>
       
       <div style={{
-        fontSize: '28px',
+        fontSize: '22px',
         fontWeight: '700',
         color: '#1e293b',
-        marginBottom: '12px'
+        marginBottom: '8px'
       }}>
         {amount}
       </div>
       
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontSize: '14px'
-      }}>
-        <span style={{
-          color: changeType === 'positive' ? '#10b981' : '#ef4444',
-          fontWeight: '500'
-        }}>
-          {changeType === 'positive' ? '↑' : '↓'} {change}
-        </span>
-        <span style={{
-          color: '#64748b'
-        }}>
-          {period}
-        </span>
-      </div>
     </div>
   );
 };
 
 const Dashboard = () => {
-  const revenueChartRef = useRef(null);
-  const salesChartRef = useRef(null);
-  const appointmentChartRef = useRef(null);
-  const customerChartRef = useRef(null);
-
-  const revenueChart = useRef(null);
-  const salesChart = useRef(null);
-  const appointmentChart = useRef(null);
-  const customerChart = useRef(null);
+  const { token, loading: authLoading } = useAuth();
+  const { technicians: workingTechnicians, loading: techniciansLoading, error: techniciansError } = useWorkingTechnicians();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointmentsLoading, setAppointmentsLoading] = useState(false);
+  const [appointmentsError, setAppointmentsError] = useState('');
+  const [generalStats, setGeneralStats] = useState<{
+    totalCustomers: number;
+    totalVehicles: number;
+    totalTechnicians: number;
+  } | null>(null);
+  const [generalStatsLoading, setGeneralStatsLoading] = useState(false);
+  const [generalStatsError, setGeneralStatsError] = useState('');
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Revenue Chart
-    if (revenueChartRef.current) {
-      const ctx = revenueChartRef.current.getContext('2d');
-      if (revenueChart.current) {
-        revenueChart.current.destroy();
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
       }
-      revenueChart.current = new ChartJS(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            data: [25000, 28000, 26000, 32000, 29000, 30000],
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99, 102, 241, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              display: false
-            },
-            x: {
-              display: false
-            }
-          },
-          elements: {
-            point: {
-              radius: 0
-            }
-          }
-        }
-      });
-    }
+    };
 
-    // Daily Sales Chart
-    if (salesChartRef.current) {
-      const ctx = salesChartRef.current.getContext('2d');
-      if (salesChart.current) {
-        salesChart.current.destroy();
-      }
-      salesChart.current = new ChartJS(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            data: [8000, 12000, 9000, 11000, 10500, 10000],
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              display: false
-            },
-            x: {
-              display: false
-            }
-          },
-          elements: {
-            point: {
-              radius: 0
-            }
-          }
-        }
-      });
-    }
-
-    // Appointment Statistics Chart
-    if (appointmentChartRef.current) {
-      const ctx = appointmentChartRef.current.getContext('2d');
-      if (appointmentChart.current) {
-        appointmentChart.current.destroy();
-      }
-      appointmentChart.current = new ChartJS(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [
-            {
-              label: 'Appointments',
-              data: [15, 30, 22, 35, 32, 38, 45],
-              backgroundColor: '#6366f1',
-              borderRadius: 4
-            },
-            {
-              label: 'Cancelled',
-              data: [3, 8, 5, 6, 4, 7, 8],
-              backgroundColor: '#ef4444',
-              borderRadius: 4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 50,
-              grid: {
-                color: '#f3f4f6'
-              }
-            },
-            x: {
-              grid: {
-                display: false
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Customer Chart
-    if (customerChartRef.current) {
-      const ctx = customerChartRef.current.getContext('2d');
-      if (customerChart.current) {
-        customerChart.current.destroy();
-      }
-      customerChart.current = new ChartJS(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [
-            {
-              label: 'New Customers',
-              data: [42, 45, 48, 46, 50, 48, 44],
-              borderColor: '#10b981',
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              tension: 0.4
-            },
-            {
-              label: 'Returning Customers',
-              data: [35, 38, 40, 44, 42, 38, 35],
-              borderColor: '#6366f1',
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              tension: 0.4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 60,
-              grid: {
-                color: '#f3f4f6'
-              }
-            },
-            x: {
-              grid: {
-                display: false
-              }
-            }
-          },
-          elements: {
-            point: {
-              radius: 4
-            }
-          }
-        }
-      });
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      if (revenueChart.current) revenueChart.current.destroy();
-      if (salesChart.current) salesChart.current.destroy();
-      if (appointmentChart.current) appointmentChart.current.destroy();
-      if (customerChart.current) customerChart.current.destroy();
+      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [showNotifications]);
 
-  const appointments = [
-    {
-      id: 1,
-      name: 'Devon Lane',
-      phone: '(671) 555-0110',
-      time: '04:00 PM',
-      date: '18th Nov 2022',
-      email: 'dolores.chambers@example.com',
-      service: 'Car Diagnostic',
-      car: 'Toyota Corolla 1.3',
-      registration: 'A45-123',
-      avatar: 'DL'
-    },
-    {
-      id: 2,
-      name: 'Annette Black',
-      phone: '(217) 555-0113',
-      time: '04:00 PM',
-      date: '18th Nov 2022',
-      email: 'jessica.hanson@example.com',
-      service: 'Inner Cleaning',
-      car: 'Honda Yaris',
-      registration: 'B45-123',
-      avatar: 'AB'
-    },
-    {
-      id: 3,
-      name: 'Robert Fox',
-      phone: '(209) 555-0104',
-      time: '04:00 PM',
-      date: '18th Nov 2022',
-      email: 'nevaeh.simmons@example.com',
-      service: 'Car Diagnostic',
-      car: 'Citroen',
-      registration: 'C45-123',
-      avatar: 'RF'
+  // Fetch confirmed appointments
+  const fetchAppointments = async () => {
+    if (!token) {
+      console.log('No token available for appointments fetch');
+      return;
     }
-  ];
+
+    setAppointmentsLoading(true);
+    setAppointmentsError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/appointments?status=CONFIRMED', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch appointments: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Transform string dates to Date objects for MiniCalendar
+        const transformedAppointments = data.data.map((appointment: any) => ({
+          ...appointment,
+          startTime: new Date(appointment.startTime),
+          endTime: new Date(appointment.endTime)
+        }));
+        setAppointments(transformedAppointments);
+        console.log('Confirmed appointments loaded:', transformedAppointments.length);
+      } else {
+        throw new Error(data.message || 'Failed to fetch appointments');
+      }
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      setAppointmentsError(err instanceof Error ? err.message : 'Failed to fetch appointments');
+    } finally {
+      setAppointmentsLoading(false);
+    }
+  };
+
+  // Fetch general statistics
+  const fetchGeneralStats = async () => {
+    if (!token) {
+      console.log('No token available for general stats fetch');
+      return;
+    }
+
+    setGeneralStatsLoading(true);
+    setGeneralStatsError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/work-orders/statistics/general', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch general statistics: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setGeneralStats(data.data);
+        console.log('General statistics loaded:', data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch general statistics');
+      }
+    } catch (err) {
+      console.error('Error fetching general statistics:', err);
+      setGeneralStatsError(err instanceof Error ? err.message : 'Failed to fetch general statistics');
+    } finally {
+      setGeneralStatsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!authLoading && token) {
+      fetchAppointments();
+      fetchGeneralStats();
+    }
+  }, [token, authLoading]);
 
   return (
     <div style={{
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      backgroundColor: '#f8fafc',
+      // backgroundColor: '#f8fafc',
       minHeight: '100vh',
-      padding: '24px'
+      padding: '16px'
     }}>
       {/* Add Boxicons CSS */}
       <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
       
-      {/* Metrics Cards */}
+      {/* Page Header */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '24px',
-        marginBottom: '32px'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '1rem',
+        marginBottom: '2rem'
       }}>
-        <MetricCard
-          title="Revenue"
-          amount="30,000 LKR"
-          change="12%"
-          changeType="positive"
-          period="vs last month"
-        />
-        <MetricCard
-          title="Daily Sales"
-          amount="10,000 LKR"
-          change="8%"
-          changeType="positive"
-          period="vs last month"
-        />
-        <MetricCard
-          title="Average Appointment Time"
-          amount="3 hrs"
-          change="5%"
-          changeType="negative"
-          period="vs last month"
-        />
-        <MetricCard
-          title="Customer Ratings"
-          amount="4.27/5"
-          change="2%"
-          changeType="positive"
-          period="vs last month"
-        />
+        <div style={{
+          flex: 1
+        }}>
+          <h1 style={{
+            fontSize: '28px',
+            fontWeight: '600',
+            color: '#1e293b',
+            margin: '0 0 0.25rem 0'
+          }}>
+            Service Manager Dashboard
+          </h1>
+          <p style={{
+            color: '#64748b',
+            fontSize: '16px',
+            margin: 0
+          }}>
+            Welcome back! Here's your overview for today.
+          </p>
+        </div>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
+        }}>
+          {/* Notification Button */}
+          <div style={{ position: 'relative', height: '56px' }} ref={notificationRef}>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: 'white',
+                color: '#64748b',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                position: 'relative',
+                transition: 'all 0.2s',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f8fafc';
+                e.currentTarget.style.borderColor = '#cbd5e1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.borderColor = '#e2e8f0';
+              }}
+            >
+              <i className='bx bx-bell'></i>
+              {/* Notification Badge */}
+              <div style={{
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#ef4444',
+                border: '2px solid white'
+              }} />
+            </button>
+            
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div style={{
+                position: 'absolute',
+                top: '66px',
+                right: '0',
+                width: '400px',
+                height: '500px',
+                zIndex: 1000,
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                borderRadius: '12px'
+              }}>
+                <Notifications />
+              </div>
+            )}
+          </div>
+          
+          {/* Manager Profile */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '12px 16px',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            height: '56px'
+          }}>
+            {/* Profile Image */}
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              backgroundColor: '#2563eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}>
+              MS
+            </div>
+            
+            {/* Profile Info */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2px'
+            }}>
+              <div style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1e293b',
+                lineHeight: '1.2'
+              }}>
+                Michael Smith
+              </div>
+              <div style={{
+                fontSize: '14px',
+                color: '#64748b',
+                lineHeight: '1.2'
+              }}>
+                michael.smith@motortrace.com
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Charts Row */}
+      
+      {/* Main Layout - Two Sections */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: '24px',
-        marginBottom: '32px'
+        gap: '16px',
+        alignItems: 'start'
       }}>
-        {/* Appointment Statistics */}
+        {/* Left Section */}
         <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '12px',
-          border: '1px solid #e2e8f0'
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px'
         }}>
+          {/* Top 3 Metric Cards */}
           <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '24px'
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '16px'
           }}>
-            <div>
-              <h3 style={{ 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                color: '#1e293b', 
-                margin: '0 0 8px 0',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <i className='bx bx-calendar' style={{ fontSize: '20px', color: '#6366f1' }}></i>
-                Appointment Statistics
-              </h3>
-            </div>
-            <select style={{
-              padding: '8px 12px',
-              border: '1px solid #e2e8f0',
-              borderRadius: '6px',
-              fontSize: '14px'
-            }}>
-              <option>This Week</option>
-            </select>
+            {generalStatsLoading ? (
+              <>
+                <MetricCard title="Total Customers" amount="Loading..." />
+                <MetricCard title="Total Vehicles" amount="Loading..." />
+                <MetricCard title="Total Technicians" amount="Loading..." />
+              </>
+            ) : generalStatsError ? (
+              <>
+                <MetricCard title="Total Customers" amount="0" />
+                <MetricCard title="Total Vehicles" amount="0" />
+                <MetricCard title="Total Technicians" amount="0" />
+              </>
+            ) : generalStats ? (
+              <>
+                <MetricCard
+                  title="Total Customers"
+                  amount={generalStats.totalCustomers.toString()}
+                />
+                <MetricCard
+                  title="Total Vehicles"
+                  amount={generalStats.totalVehicles.toString()}
+                />
+                <MetricCard
+                  title="Total Technicians"
+                  amount={generalStats.totalTechnicians.toString()}
+                />
+              </>
+            ) : (
+              <>
+                <MetricCard title="Total Customers" amount="--" />
+                <MetricCard title="Total Vehicles" amount="--" />
+                <MetricCard title="Total Technicians" amount="--" />
+              </>
+            )}
           </div>
-          <div style={{
-            display: 'flex',
-            gap: '16px',
-            marginBottom: '16px',
-            fontSize: '12px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ width: '8px', height: '8px', backgroundColor: '#6366f1', borderRadius: '50%' }}></div>
-              Appointments
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ width: '8px', height: '8px', backgroundColor: '#ef4444', borderRadius: '50%' }}></div>
-              Cancelled
-            </div>
-          </div>
-          <div style={{ height: '200px' }}>
-            <canvas ref={appointmentChartRef}></canvas>
-          </div>
-          <div style={{ fontSize: '12px', color: '#64748b', textAlign: 'center', marginTop: '8px' }}>
-            Wednesday: Appointments <strong>22</strong>, Cancelled <strong>5</strong>
-          </div>
+          
+          {/* Work Order Statistics Chart */}
+          <WorkOrderStatistics />
         </div>
 
-        {/* Customers Chart */}
+        {/* Right Section - Calendar */}
         <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '12px',
-          border: '1px solid #e2e8f0'
+          height: '100%'
         }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '24px'
-          }}>
-            <h3 style={{ 
-              fontSize: '18px', 
-              fontWeight: '600', 
-              color: '#1e293b', 
-              margin: 0,
+          {appointmentsLoading ? (
+            <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              justifyContent: 'center',
+              height: '400px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0'
             }}>
-              <i className='bx bx-group' style={{ fontSize: '20px', color: '#6366f1' }}></i>
-              Customers
-            </h3>
-            <select style={{
-              padding: '8px 12px',
+              Loading appointments...
+            </div>
+          ) : appointmentsError ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '400px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
               border: '1px solid #e2e8f0',
-              borderRadius: '6px',
-              fontSize: '14px'
+              color: '#ef4444'
             }}>
-              <option>Last Week</option>
-            </select>
-          </div>
-          <div style={{
-            display: 'flex',
-            gap: '16px',
-            marginBottom: '16px',
-            fontSize: '12px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%' }}></div>
-              New Customers
+              Error loading appointments: {appointmentsError}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ width: '8px', height: '8px', backgroundColor: '#6366f1', borderRadius: '50%' }}></div>
-              Returning Customers
-            </div>
-          </div>
-          <div style={{ height: '200px' }}>
-            <canvas ref={customerChartRef}></canvas>
-          </div>
-          <div style={{ fontSize: '12px', color: '#64748b', textAlign: 'center', marginTop: '8px' }}>
-            Thursday: Returning Customers <strong>44</strong>
-          </div>
+          ) : (
+            <MiniCalendar appointments={appointments} />
+          )}
         </div>
       </div>
 
-      {/* Appointment Table */}
+      {/* Currently Working Technicians Section */}
       <div style={{
+        marginTop: '24px',
         backgroundColor: 'white',
-        borderRadius: '12px',
+        borderRadius: '8px',
         border: '1px solid #e2e8f0',
         overflow: 'hidden'
       }}>
+        {/* Section Header */}
         <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '24px 24px 16px'
+          padding: '16px 20px',
+          borderBottom: '1px solid #e2e8f0',
+          backgroundColor: 'white'
         }}>
-          <h3 style={{ 
-            fontSize: '18px', 
-            fontWeight: '600', 
-            color: '#1e293b', 
-            margin: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
+          <h3 style={{
+            fontSize: '16px',
+            fontWeight: '600',
+            color: '#1e293b',
+            margin: 0
           }}>
-            <i className='bx bx-calendar-check' style={{ fontSize: '20px', color: '#6366f1' }}></i>
-            Appointment of the week
+            Currently Working Technicians
           </h3>
-          <button style={{
-            background: 'none',
-            border: 'none',
-            color: '#6366f1',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}>
-            See More
-          </button>
         </div>
-        
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f8fafc' }}>
-              <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#64748b' }}>Name</th>
-              <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#64748b' }}>Time & Date</th>
-              <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#64748b' }}>Email</th>
-              <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#64748b' }}>Service Required</th>
-              <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#64748b' }}>Car Model & Registration No</th>
-              <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#64748b' }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.map((appointment, index) => (
-              <tr key={appointment.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: '16px 24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      backgroundColor: '#6366f1',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: 'white'
-                    }}>
-                      {appointment.avatar}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '14px', fontWeight: '500', color: '#1e293b' }}>
-                        {appointment.name}
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <i className='bx bx-phone' style={{ fontSize: '12px' }}></i>
-                        {appointment.phone}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1e293b' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <i className='bx bx-time' style={{ fontSize: '14px', color: '#64748b' }}></i>
-                    {appointment.time}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                    <i className='bx bx-calendar' style={{ fontSize: '12px' }}></i>
-                    {appointment.date}
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1e293b' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <i className='bx bx-envelope' style={{ fontSize: '14px', color: '#64748b' }}></i>
-                    {appointment.email}
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  <div style={{
-                    display: 'flex',
+
+        {/* Technicians Table */}
+        <div style={{ padding: '16px 20px' }}>
+          {techniciansLoading ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+              color: '#64748b'
+            }}>
+              Loading technicians...
+            </div>
+          ) : techniciansError ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+              color: '#ef4444'
+            }}>
+              Error loading technicians: {techniciansError}
+            </div>
+          ) : workingTechnicians.length === 0 ? (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+              color: '#64748b'
+            }}>
+              <i className='bx bx-user-x' style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}></i>
+              <div style={{ fontSize: '16px', fontWeight: '500' }}>No technicians currently working</div>
+            </div>
+          ) : (
+            <>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1fr 2fr 1fr auto',
+                gap: '16px',
+                alignItems: 'center',
+                padding: '12px 0',
+                borderBottom: '1px solid #f1f5f9',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#64748b',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                <div>Technician</div>
+                <div>Work Order</div>
+                <div>Task Type</div>
+                <div>Task Description</div>
+                <div>Time Worked</div>
+                <div>Actions</div>
+              </div>
+
+              {workingTechnicians.map((technician, index) => {
+                const formatTime = (minutes: number) => {
+                  const hours = Math.floor(minutes / 60);
+                  const mins = minutes % 60;
+                  return `${hours}:${mins.toString().padStart(2, '0')}`;
+                };
+
+                return (
+                  <div key={index} style={{
+                    display: 'grid',
+                    gridTemplateColumns: '2fr 1fr 1fr 2fr 1fr auto',
+                    gap: '16px',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '6px 12px',
-                    backgroundColor: appointment.service === 'Car Diagnostic' ? '#fef3c7' : '#dcfce7',
-                    borderRadius: '16px',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    width: 'fit-content'
+                    padding: '16px 0',
+                    borderBottom: '1px solid #f1f5f9'
                   }}>
-                    <i className={appointment.service === 'Car Diagnostic' ? 'bx bx-wrench' : 'bx bx-spray-can'} 
-                       style={{ fontSize: '14px' }}></i>
-                    {appointment.service}
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1e293b' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <i className='bx bx-car' style={{ fontSize: '14px', color: '#64748b' }}></i>
-                    {appointment.car}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
-                    {appointment.registration}
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <button style={{
-                      padding: '8px 12px',
-                      backgroundColor: '#343438',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      cursor: 'pointer',
+                    {/* Technician Name with Avatar */}
+                    <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '12px'
                     }}>
-                      <i className='bx bx-show' style={{ fontSize: '14px' }}></i>
-                      View Details
-                    </button>
-                    <button style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px'
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: '#e2e8f0',
+                        backgroundImage: `url(${technician.technicianImage})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        border: '2px solid #f1f5f9'
+                      }} />
+                      <div>
+                        <div style={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#1e293b',
+                          marginBottom: '2px'
+                        }}>
+                          {technician.technicianName}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Work Order Number */}
+                    <div style={{
+                      fontSize: '13px',
+                      color: '#475569',
+                      fontWeight: '500'
                     }}>
-                      <i className='bx bx-dots-horizontal-rounded' style={{ fontSize: '18px', color: '#64748b' }}></i>
-                    </button>
+                      {technician.workOrderNumber}
+                    </div>
+
+                    {/* Task Type */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start'
+                    }}>
+                      <span style={{
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: technician.taskType === 'Labor' ? '#059669' : '#dc2626',
+                        backgroundColor: technician.taskType === 'Labor' ? '#d1fae5' : '#fee2e2',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        textAlign: 'center',
+                        width: 'fit-content'
+                      }}>
+                        {technician.taskType}
+                      </span>
+                    </div>
+
+                    {/* Task Description */}
+                    <div style={{
+                      fontSize: '13px',
+                      color: '#475569'
+                    }}>
+                      {technician.taskDescription}
+                    </div>
+
+                    {/* Time Worked */}
+                    <div style={{
+                      fontSize: '13px',
+                      color: '#475569',
+                      fontWeight: '500'
+                    }}>
+                      {formatTime(technician.timeWorkedMinutes)}
+                      {technician.expectedMinutes && (
+                        <div style={{
+                          fontSize: '11px',
+                          color: '#64748b',
+                          marginTop: '2px'
+                        }}>
+                          / {formatTime(technician.expectedMinutes)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Button */}
+                    <div>
+                      <button style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '6px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: 'white',
+                        color: '#64748b',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s',
+                        fontSize: '16px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f8fafc';
+                        e.currentTarget.style.borderColor = '#cbd5e1';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                      }}
+                      onClick={() => console.log('View technician:', technician.technicianName)}
+                      >
+                        <i className='bx bx-show'></i>
+                      </button>
+                    </div>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                );
+              })}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,511 @@
+// src/components/Admin/ServiceAndPackageManagement/ViewModal.scss
+// Extends the base modal styles from ServiceForm.scss
+
+.spm-modal-content--large {
+  max-width: 800px;
+  
+  @media (max-width: 768px) {
+    max-width: 95vw;
+  }
+}
+
+.spm-modal__header {
+  background: linear-gradient(135deg, #1c1c1c 0%, #3a3a3a 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: white;
+  }
+}
+
+.spm-modal__close {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.spm-modal__body {
+  padding: 2rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 120px);
+  background: #ffffff;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+// Service Details Styles
+.spm-service-details {
+  .spm-service-details__info {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .spm-service-details__info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    transition: all 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    &:hover {
+      background: rgba(102, 126, 234, 0.02);
+      margin: 0 -0.5rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      border-radius: 8px;
+    }
+
+    strong {
+      color: #374151;
+      font-weight: 600;
+      min-width: 130px;
+      font-size: 0.875rem;
+    }
+
+    svg {
+      color: #667eea;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Package Details Styles
+.spm-package-details {
+  .spm-package-details__info {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+  }
+
+  .spm-package-details__info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    transition: all 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    &:hover {
+      background: rgba(102, 126, 234, 0.02);
+      margin: 0 -0.5rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      border-radius: 8px;
+    }
+
+    strong {
+      color: #374151;
+      font-weight: 600;
+      min-width: 130px;
+      font-size: 0.875rem;
+    }
+
+    svg {
+      color: #667eea;
+      flex-shrink: 0;
+    }
+  }
+
+  .spm-package-details__services {
+    h3 {
+      color: #1f2937;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 1.5rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e2e8f0;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 1px;
+      }
+    }
+
+    p {
+      color: #6b7280;
+      font-style: italic;
+      text-align: center;
+      padding: 2rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 2px dashed #d1d5db;
+      margin: 0;
+    }
+  }
+
+  .spm-package-details__service-item {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+
+      &::before {
+        transform: scaleX(1);
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .spm-service-item__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 1rem;
+
+      h4 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        line-height: 1.4;
+        flex: 1;
+      }
+
+      .spm-service-item__price {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        letter-spacing: 0.025em;
+      }
+    }
+
+    .spm-service-item__description {
+      color: #6b7280;
+      margin: 0 0 1rem 0;
+      line-height: 1.6;
+      font-size: 0.875rem;
+    }
+
+    .spm-service-item__meta {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+
+      .spm-service-item__duration,
+      .spm-service-item__rate {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+
+        svg {
+          color: #9ca3af;
+        }
+      }
+
+      .spm-service-item__rate {
+        background: #f8fafc;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+      }
+    }
+  }
+}
+
+// Status Styles
+.spm-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.875rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 0.5rem;
+  transition: all 0.2s ease;
+
+  &.available {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 1px solid #86efac;
+    
+    &::before {
+      content: '●';
+      margin-right: 0.5rem;
+      color: #10b981;
+      animation: spmPulseGreen 2s infinite;
+    }
+  }
+
+  &.unavailable {
+    background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+    color: #7f1d1d;
+    border: 1px solid #fca5a5;
+    
+    &::before {
+      content: '●';
+      margin-right: 0.5rem;
+      color: #ef4444;
+      animation: spmPulseRed 2s infinite;
+    }
+  }
+}
+
+// Animations
+@keyframes spmPulseGreen {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes spmPulseRed {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .spm-modal__body {
+    padding: 1.5rem;
+  }
+  
+  .spm-service-details__info,
+  .spm-package-details__info {
+    padding: 1.25rem;
+  }
+
+  .spm-service-details__info-item,
+  .spm-package-details__info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    strong {
+      min-width: unset;
+      font-size: 0.8rem;
+      color: #667eea;
+    }
+  }
+
+  .spm-package-details__service-item {
+    padding: 1.25rem;
+
+    .spm-service-item__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+
+      .spm-service-item__price {
+        align-self: flex-end;
+      }
+    }
+
+    .spm-service-item__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+
+      .spm-service-item__rate {
+        align-self: flex-start;
+      }
+    }
+  }
+
+  .spm-status {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .spm-modal__header {
+    padding: 1rem 1.5rem;
+    
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  .spm-modal__body {
+    padding: 1rem;
+    max-height: calc(100vh - 100px);
+  }
+
+  .spm-service-details__info,
+  .spm-package-details__info {
+    padding: 1rem;
+  }
+
+  .spm-package-details__service-item {
+    padding: 1rem;
+  }
+
+  .spm-package-details__services h3 {
+    font-size: 1.125rem;
+  }
+}
+
+// Dark mode support (optional)
+@media (prefers-color-scheme: dark) {
+  .spm-modal__body {
+    background: #1f2937;
+  }
+
+  .spm-service-details__info,
+  .spm-package-details__info {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-color: #6b7280;
+    
+    .spm-service-details__info-item,
+    .spm-package-details__info-item {
+      border-bottom-color: rgba(107, 114, 128, 0.3);
+      
+      strong {
+        color: #f9fafb;
+      }
+    }
+  }
+
+  .spm-package-details__service-item {
+    background: #374151;
+    border-color: #6b7280;
+    
+    .spm-service-item__header h4 {
+      color: #f9fafb;
+    }
+    
+    .spm-service-item__description {
+      color: #d1d5db;
+    }
+    
+    .spm-service-item__meta {
+      border-top-color: #4b5563;
+      
+      .spm-service-item__duration,
+      .spm-service-item__rate {
+        color: #d1d5db;
+      }
+      
+      .spm-service-item__rate {
+        background: #4b5563;
+        border-color: #6b7280;
+      }
+    }
+  }
+
+  .spm-package-details__services h3 {
+    color: #f9fafb;
+  }
+}

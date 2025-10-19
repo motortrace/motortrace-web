@@ -1,27 +1,17 @@
 import React from 'react';
 import KanbanColumn from '../KanbanColumn/KanbanColumn';
 import './KanbanBoard.scss';
-
-interface WorkOrder {
-  id: string;
-  workOrderNumber: string;
-  customer: string;
-  vehicle: string;
-  assignedTechnician: string;
-  status: 'created' | 'inspection' | 'estimation' | 'in-progress' | 'waiting-for-parts' | 'invoice';
-  description?: string;
-  priority: 'high' | 'medium' | 'low';
-}
+import { type WorkOrder } from '../../utils/workOrdersApi';
 
 interface KanbanColumnDef {
-  id: WorkOrder['status'];
+  id: WorkOrder['workflowStep'];
   title: string;
   color: string;
 }
 
 interface KanbanBoardProps {
   workOrders: WorkOrder[];
-  onCardMove: (cardId: string, newStatus: WorkOrder['status']) => void;
+  onCardMove: (cardId: string, newStatus: WorkOrder['workflowStep']) => void;
   searchTerm: string;
   priorityFilter: string;
   technicianFilter: string;
@@ -44,16 +34,22 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   columns,
   onCardClick
 }) => {
-  const filterWorkOrders = (items: WorkOrder[], status: WorkOrder['status']) => {
+  const filterWorkOrders = (items: WorkOrder[], workflowStep: WorkOrder['workflowStep']) => {
     return items.filter(item => {
-      const matchesStatus = item.status === status;
+      const matchesStatus = item.workflowStep === workflowStep;
+      const customerName = item.customer ? `${item.customer.firstName} ${item.customer.lastName}` : '';
+      const vehicleInfo = item.vehicle ? `${item.vehicle.year} ${item.vehicle.make} ${item.vehicle.model}` : '';
+      const serviceAdvisorName = item.serviceAdvisor ? `${item.serviceAdvisor.userProfile.firstName} ${item.serviceAdvisor.userProfile.lastName}` : '';
+      
       const matchesSearch = searchTerm === '' ||
         item.workOrderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.assignedTechnician.toLowerCase().includes(searchTerm.toLowerCase());
+        customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vehicleInfo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        serviceAdvisorName.toLowerCase().includes(searchTerm.toLowerCase());
+      
       const matchesPriority = priorityFilter === '' || item.priority === priorityFilter;
-      const matchesTechnician = technicianFilter === '' || item.assignedTechnician.toLowerCase().includes(technicianFilter.toLowerCase());
+      const matchesTechnician = technicianFilter === '' || serviceAdvisorName.toLowerCase().includes(technicianFilter.toLowerCase());
+      
       return matchesStatus && matchesSearch && matchesPriority && matchesTechnician;
     });
   };
@@ -66,7 +62,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             key={column.id}
             title={column.title}
             color={column.color}
-            count={workOrders.filter(item => item.status === column.id).length}
+            count={workOrders.filter(item => item.workflowStep === column.id).length}
             serviceItems={filterWorkOrders(workOrders, column.id)}
             onCardMove={onCardMove}
             columnId={column.id}

@@ -1,3 +1,4 @@
+// src/components/Admin/ServiceAndPackageManagement/ServiceList.tsx
 import React, { useState, useEffect } from 'react';
 import { Plus, Wrench, Search } from 'lucide-react';
 import type { Service } from '../../../types/ServicesAndPackages';
@@ -5,6 +6,7 @@ import { ServiceCard } from './ServiceCard';
 
 interface ServicesListProps {
   services: Service[];
+  loading?: boolean;
   onAddNew: () => void;
   onView: (service: Service) => void;
   onEdit: (service: Service) => void;
@@ -29,6 +31,7 @@ const EmptyState: React.FC<{ onAddNew: () => void }> = ({ onAddNew }) => (
 
 export const ServicesList: React.FC<ServicesListProps> = ({
   services,
+  loading,
   onAddNew,
   onView,
   onEdit,
@@ -52,13 +55,13 @@ export const ServicesList: React.FC<ServicesListProps> = ({
   // Filter and search logic
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.detailedDescription.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'All Statuses' || 
-                         (statusFilter === 'Available' && service.isAvailable) ||
-                         (statusFilter === 'Unavailable' && !service.isAvailable);
-    
+      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      service.code.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === 'All Statuses' ||
+      (statusFilter === 'Available' && service.isActive) ||
+      (statusFilter === 'Unavailable' && !service.isActive);
+
     return matchesSearch && matchesStatus;
   });
 
@@ -66,19 +69,19 @@ export const ServicesList: React.FC<ServicesListProps> = ({
   const parseDurationToMinutes = (duration: string): number => {
     const lower = duration.toLowerCase();
     let totalMinutes = 0;
-    
+
     // Extract hours
     const hoursMatch = lower.match(/(\d+)\s*h/);
     if (hoursMatch) {
       totalMinutes += parseInt(hoursMatch[1]) * 60;
     }
-    
+
     // Extract minutes
     const minutesMatch = lower.match(/(\d+)\s*m/);
     if (minutesMatch) {
       totalMinutes += parseInt(minutesMatch[1]);
     }
-    
+
     // If no matches found, try to extract just numbers (assume minutes)
     if (totalMinutes === 0) {
       const numberMatch = duration.match(/(\d+)/);
@@ -86,7 +89,7 @@ export const ServicesList: React.FC<ServicesListProps> = ({
         totalMinutes = parseInt(numberMatch[1]);
       }
     }
-    
+
     return totalMinutes;
   };
 
@@ -98,13 +101,13 @@ export const ServicesList: React.FC<ServicesListProps> = ({
       case 'Name (Z-A)':
         return b.name.localeCompare(a.name);
       case 'Price (Low to High)':
-        return a.price - b.price;
+        return a.hourlyRate - b.hourlyRate;
       case 'Price (High to Low)':
-        return b.price - a.price;
+        return b.hourlyRate - a.hourlyRate;
       case 'Duration (Short to Long)':
-        return parseDurationToMinutes(a.duration) - parseDurationToMinutes(b.duration);
+        return a.estimatedHours - b.estimatedHours;
       case 'Duration (Long to Short)':
-        return parseDurationToMinutes(b.duration) - parseDurationToMinutes(a.duration);
+        return b.estimatedHours - a.estimatedHours;
       default:
         return 0;
     }
@@ -112,13 +115,13 @@ export const ServicesList: React.FC<ServicesListProps> = ({
 
   const displayedServices = sortedServices.slice(0, displayCount);
   const hasMore = displayCount < sortedServices.length;
-  
+
   const handleLoadMore = () => {
     setDisplayCount(prev => Math.min(prev + itemsPerPage, sortedServices.length));
   };
 
   // Show empty state when no services exist at all
-  if (services.length === 0) {
+  if (services.length === 0 && !loading) {
     return <EmptyState onAddNew={onAddNew} />;
   }
 
@@ -243,7 +246,7 @@ export const ServicesList: React.FC<ServicesListProps> = ({
           <div className="no-data-description" style={{ fontSize: '14px', color: '#64748b', marginBottom: 20, maxWidth: 400, margin: '0 auto 20px' }}>
             No services match your current search and filter criteria. Try adjusting your filters or search term.
           </div>
-          <button 
+          <button
             className="no-data-action"
             onClick={() => {
               setSearchTerm('');

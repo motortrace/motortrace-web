@@ -36,8 +36,16 @@ export const useAuth = () => {
         return;
       }
 
+      // Set initial state with token (don't wait for verification)
+      setAuthState(prev => ({
+        ...prev,
+        token,
+        loading: false,
+        isAuthenticated: true
+      }));
+
       try {
-        // Verify token with backend
+        // Try to verify token with backend (optional)
         const response = await fetch('http://localhost:3000/auth/verify', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -46,31 +54,34 @@ export const useAuth = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setAuthState({
+          setAuthState(prev => ({
+            ...prev,
             user: data.user,
             token,
             loading: false,
             isAuthenticated: true
-          });
+          }));
         } else {
-          // Token invalid, clear it
-          localStorage.removeItem('token');
-          setAuthState({
+          // If verification fails, keep the token but don't set user data
+          console.warn('Token verification failed, but keeping token for now');
+          setAuthState(prev => ({
+            ...prev,
             user: null,
-            token: null,
+            token,
             loading: false,
-            isAuthenticated: false
-          });
+            isAuthenticated: true
+          }));
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
-        localStorage.removeItem('token');
-        setAuthState({
+        // Network error - don't clear token, just log the error
+        console.warn('Auth verification failed due to network error, keeping token:', error);
+        setAuthState(prev => ({
+          ...prev,
           user: null,
-          token: null,
+          token,
           loading: false,
-          isAuthenticated: false
-        });
+          isAuthenticated: true
+        }));
       }
     };
 

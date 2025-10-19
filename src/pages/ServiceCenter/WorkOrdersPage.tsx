@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
-import type { WorkOrder } from '../../types/WorkOrder';
 import './WorkOrdersPage.scss';
-import ManageWorkOrderModal from '../../components/WorkOrderModal/ManageWorkOrderModal';
+import ManageWorkOrderModal from '../../components/ManageWorkOrderModal';
+import { getWorkOrders } from '../../utils/workOrdersApi';
+import type { WorkOrder } from '../../utils/workOrdersApi';
 
-const getStatusBadge = (status: WorkOrder['status']) => {
+const getStatusBadge = (status: string) => {
   const badgeClass = {
-    'opened': 'status-badge status-in-stock',
-    'in-progress': 'status-badge status-low-stock',
-    'on-hold': 'status-badge status-out-of-stock',
-    'completed': 'status-badge status-overstock',
-  }[status];
-
-  const statusText = {
-    'opened': 'Opened',
-    'in-progress': 'In Progress',
-    'on-hold': 'On Hold',
-    'completed': 'Completed',
-  }[status];
-
+    'RECEIVED': 'status-badge status-in-stock',
+    'ESTIMATE': 'status-badge status-low-stock',
+    'APPROVAL': 'status-badge status-out-of-stock',
+    'IN_PROGRESS': 'status-badge status-overstock',
+    'WAITING_FOR_PARTS': 'status-badge status-out-of-stock',
+    'COMPLETED': 'status-badge status-in-stock',
+    'CANCELLED': 'status-badge status-out-of-stock',
+  }[status] || 'status-badge';
+  const statusText = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   return <span className={badgeClass}>{statusText}</span>;
 };
 
@@ -27,87 +24,47 @@ const WorkOrdersPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCustomer, setFilterCustomer] = useState('all');
   const [filterVehicle, setFilterVehicle] = useState('all');
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   // Modal state
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
 
-  // Sample work orders data
-  const [workOrders] = useState<WorkOrder[]>([
-    {
-      id: 'WO-001',
-      title: 'Brake Pad Replacement',
-      customer: 'John Doe',
-      vehicle: '2018 Honda Accord',
-      year: 2018,
-      amount: 245.00,
-      hours: { left: 1.5, billed: 2 },
-      tags: ['brakes', 'maintenance'],
-      status: 'opened',
-      assignedPeople: [
-        { id: 'T1', name: 'Mike Smith', profilePhoto: 'https://randomuser.me/api/portraits/men/32.jpg' }
-      ]
-    },
-    {
-      id: 'WO-002',
-      title: 'Oil Change & Inspection',
-      customer: 'Jane Smith',
-      vehicle: '2020 Toyota Camry',
-      year: 2020,
-      amount: 89.99,
-      hours: { left: 0.5, billed: 1 },
-      tags: ['oil', 'inspection'],
-      status: 'in-progress',
-      assignedPeople: [
-        { id: 'T2', name: 'Sara Lee', profilePhoto: 'https://randomuser.me/api/portraits/women/44.jpg' },
-        { id: 'T3', name: 'Tom Brown', profilePhoto: 'https://randomuser.me/api/portraits/men/45.jpg' }
-      ]
-    },
-    {
-      id: 'WO-003',
-      title: 'Battery Replacement',
-      customer: 'Carlos Rivera',
-      vehicle: '2017 Ford F-150',
-      year: 2017,
-      amount: 179.50,
-      hours: { left: 0, billed: 1 },
-      tags: ['battery'],
-      status: 'on-hold',
-      assignedPeople: []
-    },
-    {
-      id: 'WO-004',
-      title: 'Tire Rotation',
-      customer: 'Emily Chen',
-      vehicle: '2022 Tesla Model 3',
-      year: 2022,
-      amount: 59.99,
-      hours: { left: 0, billed: 0.5 },
-      tags: ['tires'],
-      status: 'completed',
-      assignedPeople: [
-        { id: 'T4', name: 'Alex Kim', profilePhoto: 'https://randomuser.me/api/portraits/men/46.jpg' }
-      ]
-    }
-  ]);
+  useEffect(() => {
+    setLoading(true);
+    getWorkOrders()
+      .then((data) => {
+        setWorkOrders(Array.isArray(data) ? data : data.data || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError('Failed to fetch work orders');
+        setLoading(false);
+      });
+  }, []);
 
   // Unique filter values
-  const uniqueCustomers = [...new Set(workOrders.map(w => w.customer))];
-  const uniqueVehicles = [...new Set(workOrders.map(w => w.vehicle))];
+  const uniqueCustomers = [...new Set(workOrders.map((w: WorkOrder) => w.customer?.firstName ? `${w.customer.firstName} ${w.customer.lastName}` : w.customerId))];
+  const uniqueVehicles = [...new Set(workOrders.map((w: WorkOrder) => w.vehicle?.make ? `${w.vehicle.year} ${w.vehicle.make} ${w.vehicle.model}` : w.vehicleId))];
 
   // Filtering logic
-  const filteredWorkOrders = workOrders.filter(order => {
-    const matchesSearch = order.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.vehicle.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredWorkOrders = workOrders.filter((order: WorkOrder) => {
+    const customerName = order.customer?.firstName ? `${order.customer.firstName} ${order.customer.lastName}` : order.customerId;
+    const vehicleName = order.vehicle?.make ? `${order.vehicle.year} ${order.vehicle.make} ${order.vehicle.model}` : order.vehicleId;
+    const title = order.complaint || '';
+    const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicleName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
-    const matchesCustomer = filterCustomer === 'all' || order.customer === filterCustomer;
-    const matchesVehicle = filterVehicle === 'all' || order.vehicle === filterVehicle;
+    const matchesCustomer = filterCustomer === 'all' || customerName === filterCustomer;
+    const matchesVehicle = filterVehicle === 'all' || vehicleName === filterVehicle;
     return matchesSearch && matchesStatus && matchesCustomer && matchesVehicle;
   });
 
   const handleView = (id: string) => {
-    const wo = workOrders.find(w => w.id === id) || null;
+    const wo = workOrders.find((w: WorkOrder) => w.id === id) || null;
     setSelectedWorkOrder(wo);
     setViewModalOpen(true);
   };
@@ -120,72 +77,60 @@ const WorkOrdersPage = () => {
 
   const columns: TableColumn<WorkOrder>[] = [
     {
-      key: 'id',
+      key: 'workOrderNumber',
       label: 'Work Order',
       sortable: true,
-      render: (value) => <strong>{String(value)}</strong>
+      render: (value: any) => <strong>{String(value)}</strong>
     },
     {
-      key: 'title',
+      key: 'complaint',
       label: 'Title',
       sortable: true,
-      render: (value, row) => <span>{String(value)}</span>
+      render: (value: any) => <span>{String(value)}</span>
     },
     {
       key: 'customer',
       label: 'Customer',
       sortable: true,
-      render: (value) => <span>{String(value)}</span>
+      render: (_: any, row: WorkOrder) => <span>{row.customer?.firstName ? `${row.customer.firstName} ${row.customer.lastName}` : row.customerId}</span>
     },
     {
       key: 'vehicle',
       label: 'Vehicle',
       sortable: true,
-      render: (value, row) => <span>{String(value)}</span>
+      render: (_: any, row: WorkOrder) => <span>{row.vehicle?.make ? `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}` : row.vehicleId}</span>
     },
     {
-      key: 'amount',
+      key: 'estimatedTotal',
       label: 'Amount',
       sortable: true,
-      align: 'right',
-      render: (value) => `LKR ${Number(value).toFixed(2)}`
+      align: 'right' as const,
+      render: (value: any) => value ? `LKR ${Number(value).toFixed(2)}` : '-'
     },
     {
       key: 'status',
       label: 'Status',
       sortable: true,
-      align: 'center',
-      render: (status) => getStatusBadge(status as WorkOrder['status'])
+      align: 'center' as const,
+      render: (status: any) => getStatusBadge(status)
     },
     {
-      key: 'assignedPeople',
-      label: 'Assigned',
-      render: (_, row) => (
-        <div style={{ display: 'flex', gap: 4 }}>
-          {row.assignedPeople && row.assignedPeople.length > 0 ? (
-            row.assignedPeople.slice(0, 2).map(person => (
-              <img
-                key={person.id}
-                src={person.profilePhoto}
-                alt={person.name}
-                title={person.name}
-                style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #fff', boxShadow: '0 1px 2px rgba(0,0,0,0.08)' }}
-              />
-            ))
-          ) : (
-            <span style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Unassigned</span>
-          )}
-          {row.assignedPeople && row.assignedPeople.length > 2 && (
-            <span style={{ fontSize: 11, color: '#888', marginLeft: 2 }}>+{row.assignedPeople.length - 2}</span>
-          )}
-        </div>
-      )
+      key: 'serviceAdvisor',
+      label: 'Service Advisor',
+      render: (_: any, row: WorkOrder) => {
+        const advisor = row.serviceAdvisor?.userProfile;
+        return advisor ? (
+          <span>{advisor.firstName} {advisor.lastName}</span>
+        ) : (
+          <span style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Unknown</span>
+        );
+      }
     },
     {
       key: 'actions',
       label: 'Actions',
-      align: 'center',
-      render: (_, row) => (
+      align: 'center' as const,
+      render: (_: any, row: WorkOrder) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
           <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); handleView(row.id); }}>
             <i className='bx bx-show'></i>
@@ -198,13 +143,13 @@ const WorkOrdersPage = () => {
           </button>
         </div>
       )
-    }
+    },
   ];
 
   return (
     <div className="work-orders-page">
       <div className="page-header">
-        <h2 className="page-title"></h2>
+        <h2 className="page-title">Work Orders</h2>
         <button className="btn btn--primary" style={{ marginLeft: 'auto' }}>
           <i className='bx bx-plus'></i>
           Create Work Order
@@ -229,10 +174,13 @@ const WorkOrdersPage = () => {
             className="filter-select"
           >
             <option value="all">All Statuses</option>
-            <option value="opened">Opened</option>
-            <option value="in-progress">In Progress</option>
-            <option value="on-hold">On Hold</option>
-            <option value="completed">Completed</option>
+            <option value="RECEIVED">Received</option>
+            <option value="ESTIMATE">Estimate</option>
+            <option value="APPROVAL">Approval</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="WAITING_FOR_PARTS">Waiting for Parts</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
           </select>
           <select
             value={filterCustomer}
@@ -260,7 +208,7 @@ const WorkOrdersPage = () => {
             <i className='bx bx-filter'></i>
             Advanced Filters
           </button>
-          <button className="btn btn--ghost">
+          <button className="btn btn--ghost" onClick={() => window.location.reload()}>
             <i className='bx bx-refresh'></i>
             Refresh
           </button>
@@ -268,15 +216,21 @@ const WorkOrdersPage = () => {
       </div>
 
       <div className="parts-table-container">
-        <Table
-          columns={columns}
-          data={filteredWorkOrders}
-          onRowClick={(order) => console.log('View work order details:', order.title)}
-          emptyMessage="No work orders found matching your search criteria."
-        />
+        {loading ? (
+          <div>Loading...</div>
+        ) : error ? (
+          <div style={{ color: 'red' }}>{error}</div>
+        ) : (
+          <Table
+            columns={columns}
+            data={filteredWorkOrders}
+            onRowClick={(order) => handleView(order.id)}
+            emptyMessage="No work orders found matching your search criteria."
+          />
+        )}
       </div>
 
-      <ManageWorkOrderModal open={viewModalOpen} onClose={() => setViewModalOpen(false)} />
+  <ManageWorkOrderModal open={viewModalOpen} onClose={() => setViewModalOpen(false)} workOrder={selectedWorkOrder} />
     </div>
   );
 };

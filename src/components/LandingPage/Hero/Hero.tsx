@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { UserCog, Calendar, Check, X, Clock, BarChart3, DollarSign, Car, Wrench, PackageSearch } from "lucide-react"
+import { Calendar, Clock, Car, Wrench, Users, Smartphone } from "lucide-react"
 
 import "../../../styles/variables.scss"
 import './Hero.scss';
@@ -23,34 +23,47 @@ const Hero: React.FC<HeroSectionProps> = ({ className = '' }) => {
                 <div className="hero-section__content">
 
                     <h1 className="hero-section__title">
-                        Your All-in-One
+                        Your Trusted
                     </h1>
                     <h1 className="hero-section__title">
-                        Car Care Platform
+                        Car Service Partner
                     </h1>
 
                     <div className="hero-section__description">
-                        <p>
-                            <strong>Streamline your automotive business</strong> with our comprehensive platform. 
-                            Whether you're a car owner, service center, or spare parts seller, Motor Trace 
-                            connects everyone in the automotive ecosystem.
+                        <p style={{ textAlign: 'justify', paddingRight: '6rem' }}>
+                            Simplify car care with MotorTrace. Book services, track your repairs live, and keep your entire service history in one easy-to-use mobile app.
                         </p>
 
                     </div>
 
+                    {/* <div className="hero-section__stats">
+                        <div className="stat-item">
+                            <div className="stat-number">1000+</div>
+                            <div className="stat-label">Vehicles Serviced</div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-number">500+</div>
+                            <div className="stat-label">Happy Customers</div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-number">5★</div>
+                            <div className="stat-label">Trusted Rating</div>
+                        </div>
+                    </div> */}
+
                     <div className="hero-section__stats">
-                        <div className="stat-item">
-                            <div className="stat-number">200+</div>
-                            <div className="stat-label">Active Service Centers</div>
-                        </div>
-                        <div className="stat-item">
-                            <div className="stat-number">400+</div>
-                            <div className="stat-label">Happy Car Users</div>
-                        </div>
-                        <div className="stat-item">
-                            <div className="stat-number">50+</div>
-                            <div className="stat-label">Spare Parts Sellers</div>
-                        </div>
+                        <Stack direction="row" spacing={1.5} style={{ marginLeft: '5rem' }}>
+                            <Button variant="contained" color="primary" size="large"
+                                sx={{
+                                    textTransform: 'none', fontFamily: 'Poppins, sans-serif',
+                                    padding: '10px 25px',
+                                    backgroundColor: 'var(--color-primary)',
+                                    '&:hover': { backgroundColor: 'var(--color-primary-dark)' }
+                                }}>
+                                <Smartphone style={{ marginRight: "7.5px" }} />
+                                Download MotorTrace Mobile App
+                            </Button>
+                        </Stack>
                     </div>
                 </div>
 
@@ -64,11 +77,11 @@ const Hero: React.FC<HeroSectionProps> = ({ className = '' }) => {
                         />
                     </div>
 
-                    {/* Enhanced Floating Dashboard Elements */}
+                    {/* Service Progress Tracking Card */}
                     <div className="hero-section__floating-card hero-section__floating-card--assign">
                         <div className="card-header">
-                            <span className="card-icon"><UserCog size={20} /></span>
-                            <span className="card-title">Assign Technicians</span>
+                            <span className="card-icon"><Clock size={20} /></span>
+                            <span className="card-title">Track Service Progress</span>
                         </div>
                         <div className="card-content">
                             <div className="technician-item">
@@ -77,7 +90,7 @@ const Hero: React.FC<HeroSectionProps> = ({ className = '' }) => {
                                 </div>
                                 <div className="technician-info">
                                     <div className="technician-name">Amal Perera</div>
-                                    <div className="technician-status">Available Now</div>
+                                    <div className="technician-status">Oil Change - 100%</div>
                                 </div>
                                 <div className="status-indicator status-indicator--active"></div>
                             </div>
@@ -87,55 +100,51 @@ const Hero: React.FC<HeroSectionProps> = ({ className = '' }) => {
                                 </div>
                                 <div className="technician-info">
                                     <div className="technician-name">Sirimal Silva</div>
-                                    <div className="technician-status">On Break</div>
+                                    <div className="technician-status">Brake Service - 25%</div>
                                 </div>
                                 <div className="status-indicator"></div>
                             </div>
                         </div>
                     </div>
 
-                    {/* New Manage Bookings Card */}
+                    {/* Upcoming Appointments Card */}
                     <div className="hero-section__floating-card hero-section__floating-card--bookings">
                         <div className="card-header">
                             <span className="card-icon"><Calendar size={20} /></span>
-                            <span className="card-title">Manage Bookings</span>
+                            <span className="card-title">View Work Order Flow</span>
                         </div>
                         <div className="card-content">
-                            <div className="booking-item booking-item--new">
+                            <div className="booking-item booking-item--confirmed">
                                 <div className="booking-info">
-                                    <div className="booking-customer">Vishva Fernando</div>
+                                    <div className="booking-customer">Amal Perera</div>
                                     <div className="booking-service">
                                         <Car size={12} />
-                                        <span>Oil Change </span>
+                                        <span>Oil Change</span>
                                     </div>
                                     <div className="booking-time">
                                         <Clock size={10} />
-                                        <span>3:00 PM Tommorow</span>
+                                        <span>Completed at 10:55 AM </span>
                                     </div>
                                 </div>
-                                <div className="booking-actions">
-                                    <button className="action-btn action-btn--accept">
-                                        <Check size={14} />
-                                    </button>
-                                    <button className="action-btn action-btn--decline">
-                                        <X size={14} />
-                                    </button>
+                                <div className="booking-status booking-status--confirmed">
+                                    ✓ Done
                                 </div>
                             </div>
-                            <div className="booking-item booking-item--confirmed">
+                            <div className="booking-item booking-item--new">
                                 <div className="booking-info">
-                                    <div className="booking-customer">Ashen Bandara</div>
+                                    <div className="booking-customer">Sirimal Silva</div>
                                     <div className="booking-service">
                                         <Wrench size={12} />
                                         <span>Brake Repair</span>
                                     </div>
                                     <div className="booking-time">
                                         <Clock size={10} />
-                                        <span>11:30 AM Today</span>
+                                        <span>Started at 11:00 AM </span>
                                     </div>
+
                                 </div>
-                                <div className="booking-status booking-status--confirmed">
-                                    ✓ Confirmed
+                                <div className="booking-status booking-status--in-progress">
+                                    🔄 In Progress
                                 </div>
                             </div>
                         </div>
@@ -150,59 +159,37 @@ const Hero: React.FC<HeroSectionProps> = ({ className = '' }) => {
                                 <div className="rating-stars">
                                     <span>⭐⭐⭐⭐⭐</span>
                                 </div>
-                                <div className="review-text">"Excellent service!"</div>
+                                <div className="review-text">"Love the app! Real-time updates are amazing!"</div>
                             </div>
                         </div>
                     </div>
 
-                    {/* New Quick Stats Card */}
+                    {/* App Usage Stats Card */}
                     <div className="hero-section__floating-card hero-section__floating-card--stats">
                         <div className="card-content">
                             <div className="quick-stat">
                                 <div className="stat-icon">
-                                    {/* 📊 */}
-                                    <BarChart3 color="var(--color-primary)" />
+                                    <Car color="var(--color-primary)" />
                                 </div>
                                 <div className="stat-info">
-                                    <div className="stat-value">15</div>
-                                    <div className="stat-desc">Today's Bookings</div>
+                                    <div className="stat-value">500+</div>
+                                    <div className="stat-desc">Vehicles Serviced</div>
                                 </div>
                             </div>
                             <div className="quick-stat">
                                 <div className="stat-icon">
-                                    {/* 💰 */}
-                                    <DollarSign color = 'var(--color-primary)' />
+                                    <Users color='var(--color-primary)' />
                                 </div>
                                 <div className="stat-info">
-                                    <div className="stat-value">LKR 45K</div>
-                                    <div className="stat-desc">Daily Revenue</div>
+                                    <div className="stat-value">350+</div>
+                                    <div className="stat-desc">Happy Customers</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="button-container">
-                    <Stack direction="row" spacing={1.5}>
-                        <Button variant="outlined" color="primary" size="large" 
-                                sx={{ textTransform: 'none', fontFamily: 'Poppins, sans-serif'}}>
-                            <Car style={{ marginRight: "5px" }} />
-                            Download App
-                        </Button>
 
-                        <Button variant="outlined" color="primary" size="large" 
-                                sx={{ textTransform: 'none', fontFamily: 'Poppins, sans-serif'}}>
-                            <Wrench style={{ marginRight: "5px" }}/>
-                            Register Workshop  
-                        </Button>
-
-                        <Button variant="outlined" color="primary" size="large" 
-                                sx={{ textTransform: 'none', fontFamily: 'Poppins, sans-serif'}}>
-                            <PackageSearch style={{ marginRight: "5px" }} />
-                            Join as Seller
-                        </Button>
-                    </Stack>
-                </div>
             </div>
         </section>
     );

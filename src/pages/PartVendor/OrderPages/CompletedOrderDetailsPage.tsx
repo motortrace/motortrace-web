@@ -11,7 +11,7 @@ const mockOrder = {
   itemsCount: 3,
   subtotal: 30000,
   discount: 1500,
-  shipping: 800,
+  shippingCost: 800,
   tax: 500,
   total: 29800,
   paymentMethod: 'Visa Credit Card',
@@ -30,7 +30,7 @@ const mockOrder = {
     city: 'Colombo',
     country: 'Sri Lanka',
   },
-  shipping: {
+  shippingAddress: {
     addressLine1: '456 Shipping Ave',
     city: 'Kandy',
     country: 'Sri Lanka',

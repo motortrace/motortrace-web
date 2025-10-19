@@ -1,5 +1,5 @@
 // src/components/SalesOverviewChart/SalesOverviewChart.scss
-@import '../../../../styles/variables.scss';
+@use '../../../../styles/variables' as *;
 
 .sales-overview-chart {
   background: white;

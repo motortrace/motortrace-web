@@ -1,4 +1,4 @@
-@import '../../../../styles/variables.scss';
+@use '../../../../styles/variables' as *;
 
 .customer-metrics-panel {
   display: flex;

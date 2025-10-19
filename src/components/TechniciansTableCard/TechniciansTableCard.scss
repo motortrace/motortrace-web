@@ -1,0 +1,232 @@
+@import '../../styles/variables.scss';
+
+.technicians-table-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: 100%;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  &__count {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+
+  &__content {
+    height: calc(100% - 80px);
+    overflow-y: auto;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  }
+
+  &__table {
+    width: 100%;
+  }
+
+  &__table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
+    padding: 12px 0;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  &__col-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__table-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
+    height: 80px;
+    padding: 0;
+    border-bottom: 1px solid #f1f3f4;
+    transition: all 0.2s ease;
+    align-items: center;
+
+    &:hover {
+      background: #fafbfc;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__col {
+    display: flex;
+    align-items: center;
+  }
+
+  &__technician {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  &__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  &__work-order {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__work-order-id {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3b82f6;
+    background: #eff6ff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  &__task-type {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    background: #64748b;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  &__work-order-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+  }
+
+  &__customer {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  &__vehicle {
+    font-size: 11px;
+    color: #9ca3af;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .technicians-table-card {
+    padding: 16px;
+
+    &__table-header {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    &__row {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px 0;
+    }
+
+    &__col-header {
+      display: none;
+    }
+
+    &__col {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      &--image {
+        flex-direction: row;
+      }
+    }
+
+    &__avatar {
+      width: 50px;
+      height: 50px;
+    }
+
+    &__name {
+      font-size: 13px;
+    }
+
+    &__work-order-title {
+      font-size: 13px;
+    }
+  }
+}

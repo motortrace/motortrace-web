@@ -48,16 +48,9 @@
       transform: translateY(-2px);
     }
 
-    &--appointments,
     &--payments {
       padding: 0;
     }
-  }
-
-  &__card--appointments {
-    overflow-x: auto;
-    width: 100%;
-    box-sizing: border-box;
   }
 
   &__card-main--centered {
@@ -121,7 +114,6 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem; // was 1.5rem
-    .dashboard__card--appointments &,
     .dashboard__card--payments & {
       padding: 1.5rem 1.5rem 0;
       margin-bottom: 0;
@@ -283,127 +275,6 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-  }
-
-  // Appointments Card
-  &__appointments-header {
-    display: grid;
-    grid-template-columns: minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) min-content;
-    gap: 1rem;
-    padding: 0.75rem 1rem; // was 1.25rem 1.5rem
-    border-bottom: 2px solid var(--color-neutral-200);
-    background: var(--color-neutral-50);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-neutral-700);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    width: 100%;
-    box-sizing: border-box;
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-      padding: 1rem;
-    }
-  }
-  &__appointments-list {
-    max-height: 400px;
-    overflow-y: auto;
-    overflow-x: auto;
-    &::-webkit-scrollbar { width: 6px; }
-    &::-webkit-scrollbar-track { background: var(--color-neutral-50); }
-    &::-webkit-scrollbar-thumb { background: var(--color-neutral-200); border-radius: 3px; }
-  }
-  &__appointment-row {
-    display: grid;
-    grid-template-columns: minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) min-content;
-    gap: 0.75rem; // was 1rem
-    padding: 0.75rem 1rem; // was 1.25rem 1.5rem
-    border-bottom: 1px solid var(--color-neutral-100);
-    transition: background 0.2s, transform 0.2s;
-    width: 100%;
-    box-sizing: border-box;
-    &:hover {
-      background: var(--color-neutral-50);
-      transform: translateX(4px);
-    }
-    &:last-child { border-bottom: none; }
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-      padding: 1rem;
-    }
-  }
-  &__appointment-col {
-    display: flex;
-    align-items: center;
-  }
-  &__appointment-client {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  &__client-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--color-carbon);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.95rem;
-    font-weight: 700;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
-    transition: transform 0.2s;
-    .dashboard__appointment-row:hover & {
-      transform: scale(1.1);
-    }
-  }
-  &__client-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  &__client-name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--color-carbon);
-  }
-  &__client-service {
-    font-size: 0.8rem;
-    color: var(--color-neutral-600);
-    font-weight: 500;
-  }
-  &__appointment-time {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  &__appointment-date {
-    font-size: 0.8rem;
-    color: var(--color-carbon);
-    font-weight: 600;
-  }
-  &__appointment-hour {
-    font-size: 0.8rem;
-    color: var(--color-neutral-600);
-    font-weight: 500;
-  }
-  &__license-plate {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--color-carbon);
-    background: var(--color-neutral-100);
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
-    border: 1px solid var(--color-neutral-200);
-    text-align: center;
-    transition: background 0.2s, color 0.2s;
-    .dashboard__appointment-row:hover & {
-      background: var(--color-carbon);
-      color: white;
-    }
   }
 
   // Status Badges (flat style)

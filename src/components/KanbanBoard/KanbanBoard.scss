@@ -1,5 +1,5 @@
 // KanbanBoard.scss
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
 .kanban-board {
     flex: 1;

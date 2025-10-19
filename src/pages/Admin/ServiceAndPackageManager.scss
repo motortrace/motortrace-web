@@ -1,4 +1,4 @@
-/* ServicePackageManager.scss */
+/* ServicePackageManager.scss - Updated to remove conflicts with ServiceCard.scss */
 
 /* CSS Variables */
 :root {
@@ -65,8 +65,8 @@
     font-weight: 600;
 }
 
-/* Button Styles */
-.spm-btn {
+/* Button Styles - Only for non-service-card buttons */
+.spm-main-btn {
     border: none;
     border-radius: 6px;
     font-weight: 500;
@@ -81,20 +81,19 @@
     justify-content: center;
 }
 
-.spm-btn--primary {
+.spm-main-btn--primary {
     background: var(--spm-color-info);
     color: white;
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
-    
 }
 
-.spm-btn--primary:hover {
+.spm-main-btn--primary:hover {
     background: #0284c7;
     transform: translateY(-1px);
 }
 
-.spm-btn--secondary {
+.spm-main-btn--secondary {
     background: var(--spm-color-surface);
     color: var(--spm-color-primary);
     border: 1px solid var(--spm-color-border);
@@ -102,32 +101,8 @@
     font-size: 0.875rem;
 }
 
-.spm-btn--secondary:hover {
+.spm-main-btn--secondary:hover {
     background: var(--spm-color-border);
-    transform: translateY(-1px);
-}
-
-.spm-btn--danger {
-    background: var(--spm-color-danger);
-    color: white;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-}
-
-.spm-btn--danger:hover {
-    background: #dc2626;
-    transform: translateY(-1px);
-}
-
-.spm-btn--warning {
-    background: var(--spm-color-warning);
-    color: white;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-}
-
-.spm-btn--warning:hover {
-    background: #d97706;
     transform: translateY(-1px);
 }
 
@@ -184,15 +159,24 @@
     }
 }
 
-/* Services Grid */
+/* Services Grid - Simplified for compatibility */
 .spm-services-grid {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-/* Service Card */
-.spm-service-card {
+/* 
+REMOVED SERVICE CARD STYLES - These are now handled by ServiceCard.scss
+The following styles have been removed to prevent conflicts:
+- .spm-service-card
+- .spm-service-card__*
+- .spm-btn (renamed to .spm-main-btn)
+- All service card related button styles
+*/
+
+/* Package Card Specific Styles - Only for packages, not services */
+.spm-package-card {
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -203,28 +187,28 @@
     min-height: 200px;
 }
 
-.spm-service-card:hover {
+.spm-package-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-.spm-service-card--unavailable {
+.spm-package-card--unavailable {
     opacity: 0.7;
 }
 
-.spm-service-card__image {
+.spm-package-card__image {
     position: relative;
     width: 300px;
     flex-shrink: 0;
 }
 
-.spm-service-card__image img {
+.spm-package-card__image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.spm-service-card__unavailable-overlay {
+.spm-package-card__unavailable-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -239,14 +223,14 @@
     font-size: 0.875rem;
 }
 
-.spm-service-card__content {
+.spm-package-card__content {
     padding: 1.5rem;
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-.spm-service-card__name {
+.spm-package-card__name {
     font-family: 'poppins';
     font-size: 1.25rem;
     font-weight: 700;
@@ -254,14 +238,14 @@
     color: var(--spm-color-primary);
 }
 
-.spm-service-card__description {
+.spm-package-card__description {
     color: var(--spm-color-secondary);
     line-height: 1.5;
     margin-bottom: 1rem;
     flex: 1;
 }
 
-.spm-service-card__meta {
+.spm-package-card__meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -270,13 +254,13 @@
     border-bottom: 1px solid var(--spm-color-border);
 }
 
-.spm-service-card__price {
+.spm-package-card__price {
     font-size: 1.125rem;
     font-weight: 700;
     color: var(--spm-color-info);
 }
 
-.spm-service-card__duration {
+.spm-package-card__duration {
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -284,13 +268,12 @@
     font-size: 0.875rem;
 }
 
-.spm-service-card__actions {
+.spm-package-card__actions {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-/* Package Card Specific Styles */
 .spm-package-card__services {
     margin-bottom: 1rem;
 }
@@ -331,8 +314,8 @@
     font-weight: 600;
 }
 
-/* Modal Styles */
-.spm-modal-overlay {
+/* Modal Styles - Generic modals (not service-specific) */
+.spm-main-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -346,7 +329,7 @@
     padding: 1rem;
 }
 
-.spm-modal-content {
+.spm-main-modal-content {
     background: white;
     border-radius: 12px;
     max-width: 600px;
@@ -356,28 +339,28 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
-.spm-modal-content--large {
+.spm-main-modal-content--large {
     max-width: 800px;
 }
 
-.spm-modal__header {
+.spm-main-modal__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
     border-bottom: 1px solid var(--spm-color-border);
-    position: sticky;   /* This makes it stick */
-    top: 0;             /* Stick to the top */
-    background: white;  /* So it doesn’t show the content underneath */
-    z-index: 2;         /* Ensure it stays above the body content */
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
 }
 
-.spm-modal__header h2 {
+.spm-main-modal__header h2 {
     font-size: 1.25rem;
     font-weight: 600;
 }
 
-.spm-modal__close {
+.spm-main-modal__close {
     background: none;
     border: none;
     cursor: pointer;
@@ -387,16 +370,16 @@
     transition: all 0.3s ease;
 }
 
-.spm-modal__close:hover {
+.spm-main-modal__close:hover {
     background: var(--spm-color-surface);
     color: var(--spm-color-primary);
 }
 
-.spm-modal__body {
+.spm-main-modal__body {
     padding: 1.5rem;
 }
 
-.spm-modal__image {
+.spm-main-modal__image {
     width: 100%;
     height: 200px;
     object-fit: cover;
@@ -404,7 +387,7 @@
     margin-bottom: 1rem;
 }
 
-/* Service Details */
+/* Service Details - For non-card service views */
 .spm-service-details {
     display: flex;
     flex-direction: column;
@@ -601,10 +584,6 @@
     margin: 0;
 }
 
-.spm-service-checkbox__checkmark {
-    /* Custom checkbox styles can be added here if needed */
-}
-
 .spm-service-checkbox__info {
     display: flex;
     justify-content: space-between;
@@ -637,17 +616,17 @@
         padding: 0 1rem 2rem;
     }
 
-    .spm-service-card {
+    .spm-package-card {
         flex-direction: column;
         min-height: auto;
     }
 
-    .spm-service-card__image {
+    .spm-package-card__image {
         width: 100%;
         height: 200px;
     }
 
-    .spm-service-card__actions {
+    .spm-package-card__actions {
         justify-content: center;
     }
 
@@ -655,7 +634,7 @@
         grid-template-columns: 1fr;
     }
 
-    .spm-modal-content {
+    .spm-main-modal-content {
         margin: 1rem;
         max-width: none;
     }
@@ -675,18 +654,151 @@
         font-size: 0.875rem;
     }
 
-    .spm-service-card__actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .spm-service-card__actions .spm-btn {
-        justify-content: center;
-    }
-
     .spm-section-header {
         flex-direction: column;
         gap: 1rem;
         align-items: stretch;
     }
+}
+
+
+
+
+
+
+
+/* Professional Loading Styles */
+.spm-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.spm-loading-spinner {
+  text-align: center;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--spm-color-border);
+}
+
+.spm-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--spm-color-border);
+  border-top: 3px solid var(--spm-color-info);
+  border-radius: 50%;
+  animation: spm-spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spm-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spm-loading-spinner p {
+  color: var(--spm-color-secondary);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Enhanced Error Banner */
+.spm-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: spm-slide-in 0.3s ease;
+}
+
+@keyframes spm-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spm-error-banner__actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.spm-error-banner__actions button {
+  background: transparent;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.spm-error-banner__actions button:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* Skeleton Loading for Lists */
+.spm-skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spm-skeleton-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.spm-skeleton-line {
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+  animation: spm-skeleton-loading 1.5s infinite;
+}
+
+.spm-skeleton-line--short {
+  width: 60%;
+}
+
+.spm-skeleton-line--medium {
+  width: 80%;
+}
+
+.spm-skeleton-line--long {
+  width: 100%;
+}
+
+@keyframes spm-skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

@@ -3,7 +3,6 @@ import DashboardHeader from '../../layouts/DashboardHeader/DashboardHeader';
 import MetricCard from '../../components/MetricCard/MetricCard';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import './EstimatesInvoices.scss';
-import EstimateInvoiceModal from '../../components/EstimateInvoiceModal/EstimateInvoiceModal';
 
 interface EstimateInvoice {
   id: string;
@@ -77,9 +76,19 @@ const EstimatesInvoices = () => {
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('all');
   const [filterDateRange, setFilterDateRange] = useState('all');
 
-  // Modal state
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
+  // Get user role from localStorage
+  const getUserRole = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user?.role || 'serviceadvisor';
+    } catch {
+      return 'serviceadvisor';
+    }
+  };
+
+  const userRole = getUserRole();
+  const isServiceAdvisor = userRole === 'serviceadvisor' || userRole === 'service_advisor' || userRole === 'advisor';
+
 
   // Sample data with realistic estimates and invoices
   const [documents, setDocuments] = useState<EstimateInvoice[]>([
@@ -258,8 +267,7 @@ const EstimatesInvoices = () => {
   });
 
   const handleViewDocument = (docId: string) => {
-    setSelectedDocId(docId);
-    setModalOpen(true);
+    console.log('View document:', docId);
   };
 
   const handleEditDocument = (docId: string) => {
@@ -372,7 +380,7 @@ const EstimatesInvoices = () => {
           >
             <i className='bx bx-edit'></i>
           </button>
-          {row.type === 'invoice' && row.paymentStatus === 'pending' && (
+          {row.type === 'invoice' && row.paymentStatus === 'pending' && !isServiceAdvisor && (
             <button 
               className="btn-icon" 
               title="Record Payment" 
@@ -510,7 +518,6 @@ const EstimatesInvoices = () => {
         onRowClick={(doc) => handleViewDocument(doc.id)}
         emptyMessage="No documents found matching your search criteria."
       />
-      <EstimateInvoiceModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 };

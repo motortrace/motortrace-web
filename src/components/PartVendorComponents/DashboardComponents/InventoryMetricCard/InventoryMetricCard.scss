@@ -1,5 +1,5 @@
 // src/components/InventoryMetricCard/InventoryMetricCard.scss
-@import '../../../../styles/variables.scss';
+@use '../../../../styles/variables' as *;
 
 .inventory-metric-card {
   background: white;

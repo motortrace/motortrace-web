@@ -17,6 +17,19 @@ export const JobCardHeader: React.FC<JobCardHeaderProps> = ({
   invoiceGenerated,
   setInvoiceGenerated
 }) => {
+  // Get user role from localStorage
+  const getUserRole = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user?.role || 'serviceadvisor';
+    } catch {
+      return 'serviceadvisor';
+    }
+  };
+
+  const userRole = getUserRole();
+  const isServiceAdvisor = userRole === 'serviceadvisor' || userRole === 'service_advisor' || userRole === 'advisor';
+
   const statusOptions = [
     { value: 'under-inspection', label: 'Under inspection' },
     { value: 'waiting-for-parts', label: 'Waiting for parts' },
@@ -47,22 +60,27 @@ export const JobCardHeader: React.FC<JobCardHeaderProps> = ({
         <div className="job-card__header-actions">
           <button className="btn btn--secondary">Print</button>
           <button className="btn btn--secondary">Email</button>
-          {!estimateGenerated ? (
-            <button
-              className="btn btn--primary"
-              onClick={() => setEstimateGenerated(true)}
-            >
-              Generate and send estimate
-            </button>
-          ) : !invoiceGenerated ? (
-            <button
-              className="btn btn--primary"
-              onClick={() => setInvoiceGenerated(true)}
-            >
-              Generate and send invoice
-            </button>
-          ) : (
-            <button className="btn btn--primary" disabled>Invoice Sent</button>
+          {/* Only show invoice buttons for manager/admin roles, not for service advisors */}
+          {!isServiceAdvisor && (
+            <>
+              {!estimateGenerated ? (
+                <button
+                  className="btn btn--primary"
+                  onClick={() => setEstimateGenerated(true)}
+                >
+                  Generate and send estimate
+                </button>
+              ) : !invoiceGenerated ? (
+                <button
+                  className="btn btn--primary"
+                  onClick={() => setInvoiceGenerated(true)}
+                >
+                  Generate and send invoice
+                </button>
+              ) : (
+                <button className="btn btn--primary" disabled>Invoice Sent</button>
+              )}
+            </>
           )}
         </div>
       </div>

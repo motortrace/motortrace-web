@@ -10,7 +10,7 @@ const DashboardLayout: React.FC = () => {
     <div className="dashboard-layout">
       <Sidebar />
       <main className="main-content">
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="page-content">
           <Outlet key={location.pathname} />
         </div>

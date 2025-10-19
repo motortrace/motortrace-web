@@ -1,4 +1,4 @@
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
 .table-container {
     background: white;
@@ -76,6 +76,14 @@
         display: flex;
         align-items: center;
         gap: 4px;
+  
+        &.align-right {
+          justify-content: flex-end;
+        }
+  
+        &.align-center {
+          justify-content: center;
+        }
   
         .sort-icon {
           font-size: 9px;
