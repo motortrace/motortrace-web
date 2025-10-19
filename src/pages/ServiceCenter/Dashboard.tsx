@@ -59,6 +59,13 @@ const Dashboard = () => {
   } | null>(null);
   const [generalStatsLoading, setGeneralStatsLoading] = useState(false);
   const [generalStatsError, setGeneralStatsError] = useState('');
+  const [userProfile, setUserProfile] = useState<{
+    name: string;
+    email: string;
+    profileImageUrl?: string;
+  } | null>(null);
+  const [userProfileLoading, setUserProfileLoading] = useState(false);
+  const [userProfileError, setUserProfileError] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -161,10 +168,54 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch user profile
+  const fetchUserProfile = async () => {
+    if (!token) {
+      console.log('No token available for user profile fetch');
+      return;
+    }
+
+    setUserProfileLoading(true);
+    setUserProfileError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user profile: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUserProfile({
+          name: data.data.name,
+          email: data.data.email,
+          profileImageUrl: data.data.profileImage
+        });
+        console.log('User profile loaded:', data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch user profile');
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+      setUserProfileError(err instanceof Error ? err.message : 'Failed to fetch user profile');
+    } finally {
+      setUserProfileLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!authLoading && token) {
       fetchAppointments();
       fetchGeneralStats();
+      fetchUserProfile();
     }
   }, [token, authLoading]);
 
@@ -287,15 +338,19 @@ const Dashboard = () => {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              backgroundColor: '#2563eb',
+              backgroundColor: userProfile?.profileImageUrl ? 'transparent' : '#2563eb',
+              backgroundImage: userProfile?.profileImageUrl ? `url(${userProfile.profileImageUrl})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
               fontSize: '14px',
-              fontWeight: '600'
+              fontWeight: '600',
+              border: userProfile?.profileImageUrl ? '2px solid #e2e8f0' : 'none'
             }}>
-              MS
+              {!userProfile?.profileImageUrl && (userProfileLoading ? '...' : userProfile ? userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'MS')}
             </div>
             
             {/* Profile Info */}
@@ -310,14 +365,14 @@ const Dashboard = () => {
                 color: '#1e293b',
                 lineHeight: '1.2'
               }}>
-                Michael Smith
+                {userProfileLoading ? 'Loading...' : userProfile?.name || 'Michael Smith'}
               </div>
               <div style={{
                 fontSize: '14px',
                 color: '#64748b',
                 lineHeight: '1.2'
               }}>
-                michael.smith@motortrace.com
+                {userProfileLoading ? 'Loading...' : userProfile?.email || 'michael.smith@motortrace.com'}
               </div>
             </div>
           </div>
