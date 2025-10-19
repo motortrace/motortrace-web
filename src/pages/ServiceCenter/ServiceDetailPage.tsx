@@ -83,12 +83,14 @@ const ServiceDetailPage = () => {
     if (isArchived) {
       return (
         <span className="status-badge status-archived">
+          <i className='bx bx-archive'></i>
           Archived
         </span>
       );
     }
     return (
       <span className={`status-badge ${isAvailable ? 'status-available' : 'status-unavailable'}`}>
+        <i className={`bx ${isAvailable ? 'bx-check-circle' : 'bx-x-circle'}`}></i>
         {isAvailable ? 'Available' : 'Unavailable'}
       </span>
     );
@@ -151,12 +153,18 @@ const ServiceDetailPage = () => {
     <div className="service-detail-page">
       {/* Header Actions */}
       <div className="service-header-actions">
-        <button className="btn btn--ghost" onClick={handleBack}>
+        <button 
+          className="btn btn--ghost" 
+          onClick={handleBack}
+        >
           <i className='bx bx-arrow-back'></i>
           Back to Services
         </button>
         <div className="action-buttons">
-          <button className="btn btn--ghost" onClick={handleToggleAvailability}>
+          <button 
+            className={`btn btn--ghost ${service.isAvailable ? 'btn--available' : 'btn--unavailable'}`}
+            onClick={handleToggleAvailability}
+          >
             <i className={`bx ${service.isAvailable ? 'bx-pause' : 'bx-play'}`}></i>
             {service.isAvailable ? 'Disable' : 'Enable'}
           </button>
@@ -200,10 +208,12 @@ const ServiceDetailPage = () => {
           <div className="details-grid">
             <div className="detail-item">
               <span className="detail-label">Category</span>
-              <span className="detail-value category-badge" style={{
-                backgroundColor: `hsl(${(service.category || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0) % 360}, 70%, 90%)`,
-                color: `hsl(${(service.category || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0) % 360}, 70%, 30%)`
-              }}>
+              <span 
+                className="detail-value category-badge"
+                style={{
+                  '--category-hue': `${(service.category || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0) % 360}`
+                } as React.CSSProperties}
+              >
                 {service.category || 'N/A'}
               </span>
             </div>
@@ -217,7 +227,7 @@ const ServiceDetailPage = () => {
             </div>
             <div className="detail-item">
               <span className="detail-label">Optional Labor</span>
-              <span className="detail-value">
+              <span className={`detail-value has-optional-labor ${service.hasOptionalLabor ? 'yes' : 'no'}`}>
                 <i className={`bx ${service.hasOptionalLabor ? 'bx-check-circle' : 'bx-x-circle'}`}></i>
                 {service.hasOptionalLabor ? 'Yes' : 'No'}
               </span>
@@ -241,7 +251,10 @@ const ServiceDetailPage = () => {
         <div className="labor-operations-section">
           <div className="section-header">
             <h3>Labor Operations</h3>
-            <button className="btn btn--primary btn--small" onClick={handleAddLabor}>
+            <button 
+              className="btn btn--primary btn--small" 
+              onClick={handleAddLabor}
+            >
               <i className='bx bx-plus'></i>
               Add Labor
             </button>
@@ -294,13 +307,26 @@ const ServiceDetailPage = () => {
 
         {/* Timestamps */}
         <div className="timestamps-section">
-          <div className="timestamp-item">
-            <span className="timestamp-label">Created</span>
-            <span className="timestamp-value">{formatDate(service.createdAt)}</span>
-          </div>
-          <div className="timestamp-item">
-            <span className="timestamp-label">Last Updated</span>
-            <span className="timestamp-value">{formatDate(service.updatedAt)}</span>
+          <h3>Service Timeline</h3>
+          <div className="timestamps-grid">
+            <div className="timestamp-item">
+              <div className="timestamp-icon">
+                <i className='bx bx-calendar-plus'></i>
+              </div>
+              <div className="timestamp-content">
+                <span className="timestamp-label">Created</span>
+                <span className="timestamp-value">{formatDate(service.createdAt)}</span>
+              </div>
+            </div>
+            <div className="timestamp-item">
+              <div className="timestamp-icon">
+                <i className='bx bx-calendar-edit'></i>
+              </div>
+              <div className="timestamp-content">
+                <span className="timestamp-label">Last Updated</span>
+                <span className="timestamp-value">{formatDate(service.updatedAt)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
