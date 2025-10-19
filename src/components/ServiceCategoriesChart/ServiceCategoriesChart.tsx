@@ -9,9 +9,11 @@ interface CategoryData {
 
 interface ServiceCategoriesChartProps {
   className?: string;
+  services?: any[];
+  categoryColorMap?: { [key: string]: string };
 }
 
-const ServiceCategoriesChart: React.FC<ServiceCategoriesChartProps> = ({ className }) => {
+const ServiceCategoriesChart: React.FC<ServiceCategoriesChartProps> = ({ className, services, categoryColorMap }) => {
   const [data, setData] = useState<CategoryData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,8 +31,32 @@ const ServiceCategoriesChart: React.FC<ServiceCategoriesChartProps> = ({ classNa
   ];
 
   useEffect(() => {
-    fetchCategoriesData();
-  }, []);
+    if (services) {
+      computeCategoriesData(services);
+    } else {
+      fetchCategoriesData();
+    }
+  }, [services]);
+
+  const computeCategoriesData = (services: any[]) => {
+    const categoryMap = new Map<string, { count: number; revenue: number }>();
+    services.forEach(service => {
+      const category = service.category || 'Uncategorized';
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, { count: 0, revenue: 0 });
+      }
+      const current = categoryMap.get(category)!;
+      current.count += 1;
+      current.revenue += parseFloat(service.price) || 0;
+    });
+    const data: CategoryData[] = Array.from(categoryMap.entries()).map(([category, stats]) => ({
+      category,
+      serviceCount: stats.count,
+      totalRevenue: stats.revenue,
+    }));
+    setData(data);
+    setLoading(false);
+  };
 
   const fetchCategoriesData = async () => {
     try {
@@ -115,7 +141,7 @@ const ServiceCategoriesChart: React.FC<ServiceCategoriesChartProps> = ({ classNa
                   className="bar-fill"
                   style={{
                     width: `${(item.serviceCount / maxServiceCount) * 100}%`,
-                    backgroundColor: blueColorPalette[index % blueColorPalette.length]
+                    backgroundColor: categoryColorMap ? categoryColorMap[item.category] || blueColorPalette[index % blueColorPalette.length] : blueColorPalette[index % blueColorPalette.length]
                   }}
                 ></div>
               </div>
