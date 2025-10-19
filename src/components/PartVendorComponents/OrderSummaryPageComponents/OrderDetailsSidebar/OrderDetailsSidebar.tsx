@@ -37,7 +37,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
 
   const handleCustomerNavigate = () => {
     // const encodedName = encodeURIComponent(customer.name);
-    navigate(`/PartVendor/CustomerDetails`);
+    navigate(`/inventorymanager/CustomerDetails`);
   };
 
   return (

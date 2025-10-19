@@ -90,7 +90,7 @@ const IssuanceList: React.FC = () => {
   const paginatedIssuances = issuances.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   const handleViewDetails = (id: number) => {
-    navigate(`/partvendor/issuancedetails/${id}`);
+    navigate(`/inventorymanager/issuancedetails/${id}`);
   };
 
   // Format date for display

@@ -24,35 +24,35 @@ const menuGroups: MenuGroup[] = [
   {
     title: 'Issuances',
     items: [
-      { id: 'orders', label: 'Issuance', icon: 'bx bx-shopping-bag', route: '/PartVendor/OrderSummary' },
-      // { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/PartVendor/IncomeSummary' },
+      { id: 'orders', label: 'Issuance', icon: 'bx bx-shopping-bag', route: '/inventorymanager/OrderSummary' },
+      // { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/inventorymanager/IncomeSummary' },
     ]
   },
   // {
   //   title: 'Reviews',
   //   items: [
-  //     { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/PartVendor/ReviewPage' },
-  //     // { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/PartVendor/RatingsPage' },
+  //     { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/inventorymanager/ReviewPage' },
+  //     // { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/inventorymanager/RatingsPage' },
   //   ]
   // },
   {
     title: 'Inventory',
     items: [
-      { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/PartVendor/ProductList' },
-      { id: 'stock', label: 'Stock level', icon: 'bx bx-error', route: '/PartVendor/StockLevel' },
+      { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/inventorymanager/ProductList' },
+      { id: 'stock', label: 'Stock level', icon: 'bx bx-error', route: '/inventorymanager/StockLevel' },
       
     ]
   },
     //   {
     //   title: 'Customers',
     //   items: [
-    //     { id: 'customer', label: 'Customers', icon: 'bx bx-grid-alt', route: '/PartVendor/CustomerSummary' },
+    //     { id: 'customer', label: 'Customers', icon: 'bx bx-grid-alt', route: '/inventorymanager/CustomerSummary' },
     //   ]
     // },
   {
     title: 'Reports',
     items: [
-      { id: 'reports', label: 'Reports', icon: 'bx bx-bar-chart-alt-2', route: '/PartVendor/ReportsSummary' },
+      { id: 'reports', label: 'Reports', icon: 'bx bx-bar-chart-alt-2', route: '/inventorymanager/ReportsSummary' },
     ]
   },
   {

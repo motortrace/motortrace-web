@@ -1,5 +1,5 @@
 import DashboardLayout from './layouts/DashboardLayout';
-import PartVendorDashboardLayout from './layouts/PartVendorLayout/PartVendorLayout';
+import InventoryManagerLayout from './layouts/PartVendorLayout/PartVendorLayout';
 
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -86,6 +86,8 @@ function NotFoundRedirect() {
       navigate('/serviceadvisor/dashboard', { replace: true });
     } else if (user && user.role === 'manager') {
       navigate('/manager/dashboard', { replace: true });
+    } else if (user && user.role === 'inventorymanager') {
+      navigate('/inventorymanager/ProductList', { replace: true });
     } else {
       navigate('/index', { replace: true });
     }
@@ -217,8 +219,12 @@ function App() {
         <Route path="*" element={<NotFoundRedirect />} />
 
         {/* Part Vendor */}
-        <Route path="/partvendor" element={<PartVendorDashboardLayout />}>
-          <Route index element={<Navigate to="/partvendor/ProductList" replace />} />
+        <Route path="/inventorymanager" element={
+          <ProtectedRoute allowedRoles={['inventorymanager']}>
+            <InventoryManagerLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="/inventorymanager/ProductList" replace />} />
           {/* dashboard removed - ProductList is now the default root for PartVendor */}
           <Route path="OrderSummary" element={<OrderSummary />} />
           {/* <Route path="/inventory/issuance" element={<IssuanceList />} />
@@ -237,7 +243,7 @@ function App() {
           <Route path="AddProduct" element={<AddProduct />} />
           <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
           <Route path="StockLevel" element={<StockLevel />} />
-          <Route path="/partvendor/issuancedetails/:id" element={<IssuanceDetails />} />
+          <Route path="/inventorymanager/issuancedetails/:id" element={<IssuanceDetails />} />
 
         </Route>
       </Routes>

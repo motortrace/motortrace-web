@@ -30,7 +30,7 @@ const PendingOrderDetailsPage = () => {
   const confirmAccept = () => {
     setAcceptModalOpen(false);
     // Save state if needed here
-    navigate('/PartVendor/AcceptedOrders'); // ✅ redirect to accepted order page
+    navigate('/inventorymanager/AcceptedOrders'); // ✅ redirect to accepted order page
   };
 
   const confirmDecline = () => {
@@ -38,7 +38,7 @@ const PendingOrderDetailsPage = () => {
     const state = { declineReason };
     setDeclineReason('');
     // Save state if needed here
-    navigate('/PartVendor/DeclinedOrderDetailsPage', { state }); // Redirect to declined order details page with reason
+    navigate('/inventorymanager/DeclinedOrderDetailsPage', { state }); // Redirect to declined order details page with reason
   };
 
   return (

@@ -77,6 +77,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
         setRedirect('/manager/dashboard');
       } else if (role === 'serviceadvisor' || role === 'service_advisor' || role === 'advisor') {
         setRedirect('/serviceadvisor/dashboard');
+      } else if (role === 'inventorymanager') {
+        setRedirect('/inventorymanager/ProductList');
       } else {
         setRedirect('/login');
       }
