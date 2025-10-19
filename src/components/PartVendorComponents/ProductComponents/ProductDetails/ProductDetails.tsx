@@ -7,10 +7,6 @@ import ProductViewPanel from '../ViewProduct/ProductViewPanel';
 import EditProduct from '../EditProduct/EditProduct'; 
 
 import brakePadsImg from '../../../../assets/images/brakePads.png';
-import engineOilImg from '../../../../assets/images/QuartzEngineOil.png';
-import spark from '../../../../assets/images/spark.png';
-import battery from '../../../../assets/images/battery.png';
-import belt from '../../../../assets/images/timingBelt.png';
 
 export interface Product {
   id: string;
@@ -65,13 +61,13 @@ const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({
   onConfirm, 
   productname 
 }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [internalDeleting, setInternalDeleting] = useState(false);
 
   const handleConfirm = async () => {
-    setIsDeleting(true);
+    setInternalDeleting(true);
     await new Promise(resolve => setTimeout(resolve, 800));
-    onConfirm();
-    setIsDeleting(false);
+    await onConfirm();
+    setInternalDeleting(false);
   };
 
   if (!isOpen) return null;
@@ -100,16 +96,16 @@ const DeleteConfirmationPopup: React.FC<DeleteConfirmationPopupProps> = ({
           <button 
             className="delete-modal-btn delete-modal-btn--cancel" 
             onClick={onClose}
-            disabled={isDeleting}
+            disabled={internalDeleting}
           >
             Cancel
           </button>
           <button 
             className="delete-modal-btn delete-modal-btn--delete" 
             onClick={handleConfirm}
-            disabled={isDeleting}
+            disabled={internalDeleting}
           >
-            {isDeleting ? (
+            {internalDeleting ? (
               <>
                 <div className="delete-spinner"></div>
                 Deleting...
@@ -1123,7 +1119,6 @@ const ProductDetails: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
@@ -1308,7 +1303,7 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
 const handleDeleteConfirm = async () => {
   if (productToDelete) {
     try {
-      setIsDeleting(true);
+      // deletion in-progress handled by popup; show overall loading if needed
       
       // Call your delete API endpoint
       const response = await fetch(`http://localhost:3000/inventory/products/${productToDelete.id}`, {
@@ -1340,7 +1335,7 @@ const handleDeleteConfirm = async () => {
       // Close modal and reset state
       setIsDeleteModalOpen(false);
       setProductToDelete(null);
-      setIsDeleting(false);
+      // ensure no lingering deletion flags
     }
   }
 };

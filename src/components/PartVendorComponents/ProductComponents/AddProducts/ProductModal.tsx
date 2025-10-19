@@ -13,7 +13,7 @@ interface ProductModalProps {
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) => {
     const [activeTab, setActiveTab] = useState('engine-fluids');
     const [image, setImage] = useState<File | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  // submission indicator is intentionally omitted here; UI disables via modal close
 
  const [formData, setFormData] = useState({
     // Common fields
@@ -123,7 +123,7 @@ const validateForm = (): boolean => {
 const handleSave = async () => {
     if (!validateForm()) return;
     
-    setIsSubmitting(true);
+  // submission flag removed - UI will close modal on success
     
     try {
       // Prepare the data for API - clean up empty values
@@ -207,7 +207,7 @@ const handleSave = async () => {
       console.error('Error saving product:', error);
     //   alert(`Error saving product: ${error.message}. Please try again.`);
     } finally {
-      setIsSubmitting(false);
+      // no-op: submission state handled by modal lifecycle
     }
   };
 

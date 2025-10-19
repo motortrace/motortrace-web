@@ -22,13 +22,7 @@ const PartVendorSideBar: React.FC = () => {
 
 const menuGroups: MenuGroup[] = [
   {
-    title: 'Overview',
-    items: [
-      { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: '/PartVendor/dashboard' },
-    ]
-  },
-  {
-    title: 'Orders',
+    title: 'Issuances',
     items: [
       { id: 'orders', label: 'Issuance', icon: 'bx bx-shopping-bag', route: '/PartVendor/OrderSummary' },
       // { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/PartVendor/IncomeSummary' },
@@ -62,10 +56,8 @@ const menuGroups: MenuGroup[] = [
     ]
   },
   {
-    title: 'Profile',
+    title: 'Account',
     items: [
-      { id: 'profile', label: 'Profile', icon: 'bx bx-user', route: '/PartVendor/ProfilePartVendor' },
-      // { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/PartVendor/Settings' },
       { id: 'logout', label: 'Log Out', icon: 'bx bx-log-out', route: '/logout' },
     ]
   }

@@ -350,16 +350,7 @@ interface CategoryCost {
   percentage: number;
 }
 
-interface CostSummaryApiResponse {
-  summary: {
-    totalCost: number;
-    totalIssuances: number;
-    averageCostPerIssuance: number;
-    highestMonthlyCost: number;
-  };
-  monthlyTrend: MonthlyCost[];
-  categoryBreakdown: CategoryCost[];
-}
+// API response interface omitted; the component normalizes incoming payloads dynamically
 
 interface CostSummaryReportProps {
   dateFrom?: string;
@@ -679,7 +670,7 @@ export const CostSummaryReport: React.FC<CostSummaryReportProps> = ({
           </div>
 
           <div className="table-body">
-            {categoryBreakdown.map((category, index) => (
+            {categoryBreakdown.map((category) => (
               <div key={category.category} className="table-row">
                 <div className="cell category-cell">
                   <div className="category-info">

@@ -47,7 +47,7 @@ import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
 import IncomeManagement from './pages/Admin/IncomeManagement';
 
 
-import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
+// PartVendor dashboard removed - ProductList is the default
 import OrderSummary from './pages/PartVendor/OrderPages/OrderSummary';
 import PendingOrderDetailsPage from './pages/PartVendor/OrderPages/PendingOrderDetailsPage';
 import IncomeSummaryPage from './pages/PartVendor/IncomePages/IncomeSummaryPage';
@@ -67,7 +67,6 @@ import CancelledBookings from './pages/Admin/CancelledBookings';
 import ServicePackageManager from './pages/Admin/ServicePackageManager';
 import StockLevel from './pages/PartVendor/StockLevel/StockLevel';
 import IssuanceDetails from './components/PartVendorComponents/Issuance/IssuanceDetails';
-import IssuanceList from './components/PartVendorComponents/Issuance/IssuanceList';
 
 
 function NotFoundRedirect() {
@@ -178,8 +177,8 @@ function App() {
 
         {/* Part Vendor */}
         <Route path="/partvendor" element={<PartVendorDashboardLayout />}>
-          <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
-          <Route path="dashboard" element={<PartVendorDashboard />} />
+          <Route index element={<Navigate to="/partvendor/ProductList" replace />} />
+          {/* dashboard removed - ProductList is now the default root for PartVendor */}
           <Route path="OrderSummary" element={<OrderSummary />} />
           {/* <Route path="/inventory/issuance" element={<IssuanceList />} />
           <Route path="/inventory/issuance/:id" element={<IssuanceDetails />} /> */}

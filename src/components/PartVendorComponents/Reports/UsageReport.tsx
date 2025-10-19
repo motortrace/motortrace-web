@@ -19,16 +19,7 @@ interface CategoryData {
   percentage: number;
 }
 
-interface UsageApiResponse {
-  topParts: UsageData[];
-  summary: {
-    totalPartsIssued: number;
-    totalIssuances: number;
-    uniqueParts: number;
-    averagePartsPerIssuance: number;
-  };
-  categoryDistribution: CategoryData[];
-}
+// UsageApiResponse was removed because the component normalizes responses dynamically
 
 interface UsageReportProps {
   dateFrom?: string;
@@ -297,8 +288,8 @@ export const UsageReport: React.FC<UsageReportProps> = ({
                   dataKey="quantity"
                   label={({ category, quantity }) => `${category}: ${quantity}`}
                 >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  {categoryData.map((_, i) => (
+                    <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip formatter={(value) => [`${value} units`, 'Quantity']} />

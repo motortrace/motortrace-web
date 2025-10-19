@@ -417,7 +417,7 @@ export const IssuanceHistoryReport: React.FC<IssuanceHistoryReportProps> = ({
             <h2>Issuance History Report</h2>
             <p>
               {dateFrom && dateTo 
-                ? `${formatDate(dateFrom)} - ${formatDate(dateTo)} - ` 
+                ? `${formatDate(String(dateFrom))} - ${formatDate(String(dateTo))} - ` 
                 : ''}
               {filteredIssuances.length} issuances found
             </p>
@@ -497,7 +497,7 @@ export const IssuanceHistoryReport: React.FC<IssuanceHistoryReportProps> = ({
               
               <div className="cell parts-cell">
                 <div className="parts-list">
-                  {issuance.parts.map((part, index) => (
+                  {issuance.parts.map((part) => (
                     <div key={part.id} className="part-item">
                       <Package size={12} />
                       <span>{part.product_name} (x{part.quantity})</span>
