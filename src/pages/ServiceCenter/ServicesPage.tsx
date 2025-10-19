@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import CreateCannedServiceModal from '../../components/CreateCannedServiceModal';
 import ServicePopularityChart from '../../components/ServicePopularityChart/ServicePopularityChart';
@@ -31,6 +31,7 @@ interface Service {
 
 const ServicesPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [services, setServices] = useState<Service[]>([]);
@@ -39,9 +40,7 @@ const ServicesPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const getCategoryColor = (category: string) => {
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
-    const index = category ? category.split('').reduce((a, b) => a + b.charCodeAt(0), 0) % colors.length : 0;
-    return colors[index];
+    return categoryColorMap[category] || '#CCCCCC'; // default color if not found
   };
 
   useEffect(() => {
@@ -83,14 +82,29 @@ const ServicesPage = () => {
   // Filtering logic
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesCategory = filterCategory === 'all' || service.category === filterCategory;
-    
+
     return matchesSearch && matchesCategory;
   });
 
   // Unique filter values
   const uniqueCategories = [...new Set(services.map(s => s.category).filter(Boolean))];
+
+  // Color map for distinct categories
+  const categoryColorMap: { [key: string]: string } = {};
+  const colors = [
+    '#6FCFB5', // balanced aqua
+    '#5DDAD3', // mint teal
+    '#5EC2E3', // ocean blue
+    '#8ED1A5', // leafy green
+    '#FFE37E', // warm yellow
+    '#CC88D9', // lilac purple
+    '#8EDFC9', // soft seafoam
+  ];
+  uniqueCategories.forEach((category, index) => {
+    categoryColorMap[category] = colors[index % colors.length];
+  });
 
   const columns: TableColumn<Service>[] = [
     {
@@ -152,7 +166,7 @@ const ServicesPage = () => {
       align: 'center',
       render: (_: any, row: Service) => (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); console.log('Navigating to service:', row.id); navigate(`service/${row.id}`); }}>
+          <button className="btn-icon" title="View" onClick={e => { e.stopPropagation(); console.log('Navigating to service:', row.id); navigate(`/${location.pathname.split('/')[1]}/service/${row.id}`); }}>
             <i className='bx bx-show'></i>
           </button>
         </div>
@@ -189,7 +203,7 @@ const ServicesPage = () => {
               ))}
             </select>
           </div>
-          <button className="action-btn secondary" onClick={() => navigate('labor-catalog')}>
+          <button className="action-btn secondary" onClick={() => navigate(`/${location.pathname.split('/')[1]}/labor-catalog`)}>
             <i className="bx bx-list-ul"></i>
             View Labor Catalog
           </button>
@@ -200,13 +214,15 @@ const ServicesPage = () => {
         </div>
       </div>
 
-      {/* Service Analytics Charts */}
-      <div className="services-analytics">
-        <div className="analytics-row">
-          <ServicePopularityChart className="analytics-chart" />
-          <ServiceCategoriesChart className="analytics-chart" />
+      {/* Service Analytics Charts - Only show when no filters applied */}
+      {filterCategory === 'all' && !searchTerm && (
+        <div className="services-analytics">
+          <div className="analytics-row">
+            <ServicePopularityChart className="analytics-chart" />
+            <ServiceCategoriesChart className="analytics-chart" services={services} categoryColorMap={categoryColorMap} />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="parts-table-container">
         {loading ? (
@@ -217,7 +233,7 @@ const ServicesPage = () => {
           <Table
             columns={columns}
             data={filteredServices}
-            onRowClick={(service) => navigate(`service/${service.id}`)}
+            onRowClick={(service) => navigate(`/${location.pathname.split('/')[1]}/service/${service.id}`)}
             emptyMessage="No services found matching your search criteria."
           />
         )}

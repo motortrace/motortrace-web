@@ -70,7 +70,7 @@ const ServicePopularityChart: React.FC<ServicePopularityChartProps> = ({ classNa
       <div className={`service-popularity-chart ${className}`}>
         <div className="chart-header">
           <h3>Service Popularity</h3>
-          <p>Which services are booked most often?</p>
+          <p>Our Best-Performing Services at a Glance</p>
         </div>
         <div className="chart-loading">
           <div className="loading-spinner"></div>
@@ -85,7 +85,7 @@ const ServicePopularityChart: React.FC<ServicePopularityChartProps> = ({ classNa
       <div className={`service-popularity-chart ${className}`}>
         <div className="chart-header">
           <h3>Service Popularity</h3>
-          <p>Which services are booked most often?</p>
+          <p>Our Best-Performing Services at a Glance</p>
         </div>
         <div className="chart-error">
           <p>{error}</p>
@@ -101,7 +101,7 @@ const ServicePopularityChart: React.FC<ServicePopularityChartProps> = ({ classNa
     <div className={`service-popularity-chart ${className}`}>
       <div className="chart-header">
         <h3>Service Popularity</h3>
-        <p>Which services are booked most often?</p>
+        <p>Our Best-Performing Services at a Glance</p>
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={300}>
