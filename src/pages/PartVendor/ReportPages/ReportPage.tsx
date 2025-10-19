@@ -489,7 +489,7 @@ export const ReportPage: React.FC = () => {
             {/* Issuance History Report */}
             {selectedReport === 'issuance-history' && (
               <IssuanceHistoryReport
-                issuances={issuances}
+                // issuances={issuances}
                 dateFrom={currentFilters.dateFrom}
                 dateTo={currentFilters.dateTo}
               />
@@ -498,7 +498,7 @@ export const ReportPage: React.FC = () => {
             {/* Parts Usage Report */}
             {selectedReport === 'parts-usage' && (
               <UsageReport
-                issuances={issuances}
+                // issuances={issuances}
                 dateFrom={currentFilters.dateFrom}
                 dateTo={currentFilters.dateTo}
               />

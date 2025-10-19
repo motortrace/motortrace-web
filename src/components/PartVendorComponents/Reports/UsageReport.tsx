@@ -1,122 +1,166 @@
 // src/components/reports/UsageReport.tsx
-import React from 'react';
-import { TrendingUp, Package, Calendar, BarChart3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Package, Calendar, BarChart3, Loader } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-// import { Issuance } from '../../types/Issuance';
 import './UsageReport.scss';
 
-export interface IssuedPart {
-  id: string;
-  sku?: string;
-  name: string;
-  imageUrl?: string;
-  qty: number;
-  notes?: string;
-  price?: number;
-}
-
-export interface Issuance {
-  id: string;
-  issuanceNumber: string;
-  dateIssued: string; // ISO-like or display date
-  technicianName: string;
-  recipient?: string; // e.g., workshop/store or customer (used as "To whom")
-  quantity: number; // total quantity issued
-  parts: IssuedPart[];
-  notes?: string;
-  issuedBy?: string; // who created the issuance
-  serviceJob?: string;
-  carDetails?: string;
-}
-
-interface UsageReportProps {
-  issuances: Issuance[];
-  dateFrom?: string;
-  dateTo?: string;
-}
-
 interface UsageData {
-  partName: string;
-  totalQuantity: number;
-  frequency: number;
+  product_id: number;
+  product_name: string;
   category: string;
-  averagePerIssuance: number;
+  frequency: number;
+  total_quantity: number;
+  average_per_issuance: number;
 }
 
 interface CategoryData {
-  name: string;
-  value: number;
-  color: string;
+  category: string;
+  quantity: number;
+  percentage: number;
+}
+
+interface UsageApiResponse {
+  topParts: UsageData[];
+  summary: {
+    totalPartsIssued: number;
+    totalIssuances: number;
+    uniqueParts: number;
+    averagePartsPerIssuance: number;
+  };
+  categoryDistribution: CategoryData[];
+}
+
+interface UsageReportProps {
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 const COLORS = ['#667eea', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16'];
 
 export const UsageReport: React.FC<UsageReportProps> = ({ 
-  issuances, 
   dateFrom, 
   dateTo 
 }) => {
-  const filteredIssuances = issuances.filter(issuance => {
-    const issueDate = new Date(issuance.dateIssued);
-    const fromDate = dateFrom ? new Date(dateFrom) : null;
-    const toDate = dateTo ? new Date(dateTo) : null;
-    
-    if (fromDate && issueDate < fromDate) return false;
-    if (toDate && issueDate > toDate) return false;
-    return true;
+  const [usageData, setUsageData] = useState<UsageData[]>([]);
+  const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
+  const [summary, setSummary] = useState({
+    totalPartsIssued: 0,
+    totalIssuances: 0,
+    uniqueParts: 0,
+    averagePartsPerIssuance: 0
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const generateUsageData = (): UsageData[] => {
-    const partUsage = new Map<string, { quantity: number; frequency: number; category: string }>();
-    
-    filteredIssuances.forEach(issuance => {
-      issuance.parts.forEach(part => {
-        const key = part.name;
-        const existing = partUsage.get(key) || { quantity: 0, frequency: 0, category: 'General' };
-        partUsage.set(key, {
-          quantity: existing.quantity + part.qty,
-          frequency: existing.frequency + 1,
-          category: existing.category
-        });
+  // Fetch usage data from API
+  useEffect(() => {
+    fetchUsageData();
+  }, [dateFrom, dateTo]);
+
+  const fetchUsageData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Build the API endpoint with filters
+      let endpoint = 'http://localhost:3000/api/analytics/parts-usage';
+      const params = new URLSearchParams();
+      
+      if (dateFrom) params.append('dateFrom', dateFrom);
+      if (dateTo) params.append('dateTo', dateTo);
+      
+      if (params.toString()) {
+        endpoint += `?${params.toString()}`;
+      }
+
+      console.log('Fetching usage data from:', endpoint);
+      
+      const response = await fetch(endpoint);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data: UsageApiResponse = await response.json();
+      console.log('Fetched usage data:', data);
+      
+      setUsageData(data.topParts || []);
+      setCategoryData(data.categoryDistribution || []);
+      setSummary(data.summary);
+      
+    } catch (err) {
+      console.error('Error fetching usage data:', err);
+      setError('Failed to load usage data. Please try again.');
+      setUsageData([]);
+      setCategoryData([]);
+      setSummary({
+        totalPartsIssued: 0,
+        totalIssuances: 0,
+        uniqueParts: 0,
+        averagePartsPerIssuance: 0
       });
-    });
-
-    return Array.from(partUsage.entries())
-      .map(([partName, data]) => ({
-        partName,
-        totalQuantity: data.quantity,
-        frequency: data.frequency,
-        category: data.category,
-        averagePerIssuance: Math.round((data.quantity / data.frequency) * 100) / 100
-      }))
-      .sort((a, b) => b.totalQuantity - a.totalQuantity)
-      .slice(0, 10);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const generateCategoryData = (): CategoryData[] => {
-    const categoryUsage = new Map<string, number>();
-    
-    filteredIssuances.forEach(issuance => {
-      issuance.parts.forEach(part => {
-        const category = 'General'; // You can map this from part data if available
-        categoryUsage.set(category, (categoryUsage.get(category) || 0) + part.qty);
-      });
-    });
-
-    return Array.from(categoryUsage.entries())
-      .map(([name, value], index) => ({
-        name,
-        value,
-        color: COLORS[index % COLORS.length]
-      }))
-      .sort((a, b) => b.value - a.value);
+  const handleRetry = () => {
+    fetchUsageData();
   };
 
-  const usageData = generateUsageData();
-  const categoryData = generateCategoryData();
-  const totalPartsIssued = filteredIssuances.reduce((sum, issuance) => sum + issuance.quantity, 0);
-  const totalIssuances = filteredIssuances.length;
-  const uniqueParts = new Set(filteredIssuances.flatMap(i => i.parts.map(p => p.name))).size;
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="usage-report">
+        <div className="report-header">
+          <div className="header-left">
+            <div className="report-icon">
+              <TrendingUp size={24} />
+            </div>
+            <div className="header-text">
+              <h2>Parts Usage Report</h2>
+              <p>Loading usage data...</p>
+            </div>
+          </div>
+        </div>
+        <div className="loading-state">
+          <Loader size={32} className="spinner" />
+          <p>Analyzing parts usage patterns...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="usage-report">
+        <div className="report-header">
+          <div className="header-left">
+            <div className="report-icon">
+              <TrendingUp size={24} />
+            </div>
+            <div className="header-text">
+              <h2>Parts Usage Report</h2>
+              <p>Error loading data</p>
+            </div>
+          </div>
+        </div>
+        <div className="error-state">
+          <p>{error}</p>
+          <button onClick={handleRetry} className="retry-btn">
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="usage-report">
@@ -129,37 +173,44 @@ export const UsageReport: React.FC<UsageReportProps> = ({
             <h2>Parts Usage Report</h2>
             <p>
               Analysis of most frequently issued parts
-              {dateFrom && ` from ${new Date(dateFrom).toLocaleDateString()}`}
-              {dateTo && ` to ${new Date(dateTo).toLocaleDateString()}`}
+              {dateFrom && ` from ${formatDate(dateFrom)}`}
+              {dateTo && ` to ${formatDate(dateTo)}`}
             </p>
           </div>
+        </div>
+        <div className="header-actions">
+          <button className="refresh-btn" onClick={fetchUsageData} title="Refresh data">
+            ⟳
+          </button>
         </div>
       </div>
 
       <div className="report-summary">
         <div className="summary-card">
-          <div className="summary-number">{totalPartsIssued}</div>
+          <div className="summary-number">{summary.totalPartsIssued}</div>
           <div className="summary-label">Total Parts Issued</div>
           <div className="summary-icon">
             <Package size={20} />
           </div>
         </div>
         <div className="summary-card">
-          <div className="summary-number">{totalIssuances}</div>
+          <div className="summary-number">{summary.totalIssuances}</div>
           <div className="summary-label">Total Issuances</div>
           <div className="summary-icon">
             <Calendar size={20} />
           </div>
         </div>
         <div className="summary-card">
-          <div className="summary-number">{uniqueParts}</div>
+          <div className="summary-number">{summary.uniqueParts}</div>
           <div className="summary-label">Unique Parts</div>
           <div className="summary-icon">
             <BarChart3 size={20} />
           </div>
         </div>
         <div className="summary-card">
-          <div className="summary-number">{totalIssuances > 0 ? Math.round(totalPartsIssued / totalIssuances) : 0}</div>
+          <div className="summary-number">
+            {summary.averagePartsPerIssuance.toFixed(1)}
+          </div>
           <div className="summary-label">Avg Parts Per Issuance</div>
           <div className="summary-icon">
             <TrendingUp size={20} />
@@ -178,7 +229,7 @@ export const UsageReport: React.FC<UsageReportProps> = ({
               <BarChart data={usageData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis 
-                  dataKey="partName" 
+                  dataKey="product_name" 
                   tick={{ fontSize: 12 }}
                   angle={-45}
                   textAnchor="end"
@@ -186,13 +237,15 @@ export const UsageReport: React.FC<UsageReportProps> = ({
                 />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip 
+                  formatter={(value) => [`${value} units`, 'Quantity']}
+                  labelFormatter={(label) => `Part: ${label}`}
                   contentStyle={{
                     backgroundColor: 'white',
                     border: '1px solid #e2e8f0',
                     borderRadius: '8px'
                   }}
                 />
-                <Bar dataKey="totalQuantity" fill="#667eea" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="total_quantity" fill="#667eea" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -211,14 +264,14 @@ export const UsageReport: React.FC<UsageReportProps> = ({
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  dataKey="value"
-                //   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  dataKey="quantity"
+                  label={({ category, quantity }) => `${category}: ${quantity}`}
                 >
                   {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip formatter={(value) => [`${value} units`, 'Quantity']} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -228,50 +281,68 @@ export const UsageReport: React.FC<UsageReportProps> = ({
       <div className="detailed-table">
         <div className="table-header">
           <h3>Detailed Usage Analysis</h3>
+          <p>Top performing parts based on usage frequency and quantity</p>
         </div>
         
         <div className="table-content">
           <div className="table-header-row">
             <div className="header-cell">Part Name</div>
+            <div className="header-cell">Category</div>
             <div className="header-cell">Total Quantity</div>
             <div className="header-cell">Frequency</div>
             <div className="header-cell">Avg per Issuance</div>
-            <div className="header-cell">Usage Trend</div>
+            <div className="header-cell">Demand Level</div>
           </div>
 
           <div className="table-body">
-            {usageData.map((part, index) => (
-              <div key={part.partName} className="table-row">
-                <div className="cell">
-                  <div className="part-info">
-                    <div className="rank">#{index + 1}</div>
-                    <div className="part-details">
-                      <div className="part-name">{part.partName}</div>
-                      <div className="part-category">{part.category}</div>
+            {usageData.map((part, index) => {
+              const demandLevel = part.total_quantity > 50 ? 'High' : part.total_quantity > 20 ? 'Medium' : 'Low';
+              const demandColor = part.total_quantity > 50 ? '#ef4444' : part.total_quantity > 20 ? '#f59e0b' : '#10b981';
+              
+              return (
+                <div key={part.product_id} className="table-row">
+                  <div className="cell">
+                    <div className="part-info">
+                      <div className="rank">#{index + 1}</div>
+                      <div className="part-details">
+                        <div className="part-name">{part.product_name}</div>
+                        <div className="part-id">ID: {part.product_id}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="cell">
+                    <span className="category-badge">{part.category}</span>
+                  </div>
+                  
+                  <div className="cell">
+                    <span className="quantity-badge">{part.total_quantity}</span>
+                  </div>
+                  
+                  <div className="cell">
+                    <span className="frequency-text">{part.frequency} times</span>
+                  </div>
+                  
+                  <div className="cell">
+                    <span className="average-text">
+                      {part.average_per_issuance.toFixed(1)}
+                    </span>
+                  </div>
+                  
+                  <div className="cell">
+                    <div 
+                      className="demand-indicator"
+                      style={{ 
+                        backgroundColor: `${demandColor}20`,
+                        color: demandColor
+                      }}
+                    >
+                      {demandLevel} Demand
                     </div>
                   </div>
                 </div>
-                
-                <div className="cell">
-                  <span className="quantity-badge">{part.totalQuantity}</span>
-                </div>
-                
-                <div className="cell">
-                  <span className="frequency-text">{part.frequency} times</span>
-                </div>
-                
-                <div className="cell">
-                  <span className="average-text">{part.averagePerIssuance}</span>
-                </div>
-                
-                <div className="cell">
-                  <div className="trend-indicator">
-                    <TrendingUp size={16} className="trend-up" />
-                    <span>High Demand</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
