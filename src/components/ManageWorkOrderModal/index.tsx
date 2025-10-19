@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
@@ -30,6 +31,7 @@ import '../WorkOrderModal/ManageWorkOrderModal.scss';
  */
 const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder, onUpdate }) => {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Initialize modal hook
@@ -148,6 +150,16 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
             </button> */}
+            {workOrder && workOrder.appointmentId && (
+              <button 
+                className="btn btn--secondary" 
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                onClick={() => navigate(`/manager/appointment-detail/${workOrder.appointmentId}`)}
+              >
+                <i className="bx bx-calendar-event"></i>
+                View Appointment Details
+              </button>
+            )}
             {!isServiceAdvisor && workOrder?.status !== 'PAID' && (
               <button 
                 className="btn btn--secondary" 
