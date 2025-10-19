@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import WorkOrderStatistics from '../../components/WorkOrderStatistics/WorkOrderStatistics';
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
 import Notifications from '../../components/Notifications/Notifications';
+import ConfirmationDialog from '../../components/ConfirmationDialog';
 import { useAuth } from '../../hooks/useAuth';
 import { useWorkingTechnicians } from '../../hooks/useWorkingTechnicians';
 
@@ -31,7 +32,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       }}>
         {title}
       </h3>
-      
+
       <div style={{
         fontSize: '22px',
         fontWeight: '700',
@@ -40,7 +41,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       }}>
         {amount}
       </div>
-      
+
     </div>
   );
 };
@@ -70,6 +71,8 @@ const Dashboard = () => {
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [notificationsError, setNotificationsError] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -271,7 +274,7 @@ const Dashboard = () => {
     }}>
       {/* Add Boxicons CSS */}
       <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
-      
+
       {/* Page Header */}
       <div style={{
         display: 'flex',
@@ -344,7 +347,7 @@ const Dashboard = () => {
                 {notifications.filter(n => !n.isRead).length || 0}
               </div>
             </button>
-            
+
             {/* Notification Dropdown */}
             {showNotifications && (
               <div style={{
@@ -361,7 +364,7 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          
+
           {/* Manager Profile */}
           <div style={{
             display: 'flex',
@@ -393,7 +396,7 @@ const Dashboard = () => {
             }}>
               {!userProfile?.profileImageUrl && (userProfileLoading ? '...' : userProfile ? userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'MS')}
             </div>
-            
+
             {/* Profile Info */}
             <div style={{
               display: 'flex',
@@ -419,7 +422,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Main Layout - Two Sections */}
       <div style={{
         display: 'grid',
@@ -474,7 +477,7 @@ const Dashboard = () => {
               </>
             )}
           </div>
-          
+
           {/* Work Order Statistics Chart */}
           <WorkOrderStatistics />
         </div>
@@ -710,15 +713,18 @@ const Dashboard = () => {
                         transition: 'all 0.2s',
                         fontSize: '16px'
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f8fafc';
-                        e.currentTarget.style.borderColor = '#cbd5e1';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white';
-                        e.currentTarget.style.borderColor = '#e2e8f0';
-                      }}
-                      onClick={() => console.log('View technician:', technician.technicianName)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                          e.currentTarget.style.borderColor = '#cbd5e1';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'white';
+                          e.currentTarget.style.borderColor = '#e2e8f0';
+                        }}
+                        onClick={() => {
+                          setConfirmMessage(`Are you sure you want to view details for ${technician.technicianName}?`);
+                          setIsConfirmDialogOpen(true);
+                        }}
                       >
                         <i className='bx bx-show'></i>
                       </button>
@@ -730,6 +736,20 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        message={confirmMessage}
+        onConfirm={() => {
+          console.log('Confirmed action');
+          setIsConfirmDialogOpen(false);
+        }}
+        onCancel={() => {
+          console.log('Cancelled action');
+          setIsConfirmDialogOpen(false);
+        }}
+      />
     </div>
   );
 };

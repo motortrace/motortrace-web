@@ -1,0 +1,107 @@
+// Overlay - covers full screen with semi-transparent background
+.confirmation-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+// Dialog container - centered white box
+.confirmation-dialog-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+// Message text
+.confirmation-dialog-message {
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: #333;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+// Button container
+.confirmation-dialog-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+// Base button styles
+.confirmation-dialog-button {
+  padding: 0.625rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+
+  &:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+// No button - neutral/secondary style
+.confirmation-dialog-button-no {
+  background-color: #e5e7eb;
+  color: #374151;
+
+  &:hover {
+    background-color: #d1d5db;
+  }
+
+  &:active {
+    background-color: #9ca3af;
+  }
+}
+
+// Yes button - primary/confirm style
+.confirmation-dialog-button-yes {
+  background-color: #3b82f6;
+  color: white;
+
+  &:hover {
+    background-color: #2563eb;
+  }
+
+  &:active {
+    background-color: #1d4ed8;
+  }
+}
+
+// Mobile responsive adjustments
+@media (max-width: 640px) {
+  .confirmation-dialog-container {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+
+  .confirmation-dialog-message {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .confirmation-dialog-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .confirmation-dialog-button {
+    width: 100%;
+  }
+}

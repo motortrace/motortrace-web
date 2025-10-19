@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
+import ConfirmationDialog from '../../components/ConfirmationDialog';
 import './WorkOrdersPage.scss';
 import ManageWorkOrderModal from '../../components/ManageWorkOrderModal';
 import { getWorkOrders } from '../../utils/workOrdersApi';
@@ -31,6 +32,11 @@ const WorkOrdersPage = () => {
   // Modal state
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
+  
+  // Delete confirmation state
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteWorkOrderId, setDeleteWorkOrderId] = useState<string | null>(null);
+  const [deleteWorkOrderNumber, setDeleteWorkOrderNumber] = useState<string>('');
 
   useEffect(() => {
     setLoading(true);
@@ -71,8 +77,15 @@ const WorkOrdersPage = () => {
   const handleEdit = (id: string) => {
     console.log('Edit work order', id);
   };
+  const handleDeleteClick = (id: string, workOrderNumber: string) => {
+    setDeleteWorkOrderId(id);
+    setDeleteWorkOrderNumber(workOrderNumber);
+    setIsDeleteConfirmOpen(true);
+  };
   const handleDelete = (id: string) => {
     console.log('Delete work order', id);
+    // TODO: Implement actual delete API call here
+    setWorkOrders(prev => prev.filter(wo => wo.id !== id));
   };
 
   const columns: TableColumn<WorkOrder>[] = [
@@ -138,7 +151,7 @@ const WorkOrdersPage = () => {
           <button className="btn-icon" title="Edit" onClick={e => { e.stopPropagation(); handleEdit(row.id); }}>
             <i className='bx bx-edit'></i>
           </button>
-          <button className="btn-icon btn-danger" title="Delete" onClick={e => { e.stopPropagation(); handleDelete(row.id); }}>
+          <button className="btn-icon btn-danger" title="Delete" onClick={e => { e.stopPropagation(); handleDeleteClick(row.id, row.workOrderNumber); }}>
             <i className='bx bx-trash'></i>
           </button>
         </div>
@@ -230,7 +243,24 @@ const WorkOrdersPage = () => {
         )}
       </div>
 
-  <ManageWorkOrderModal open={viewModalOpen} onClose={() => setViewModalOpen(false)} workOrder={selectedWorkOrder} />
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isDeleteConfirmOpen}
+        message={`Are you sure you want to delete work order ${deleteWorkOrderNumber}? This action cannot be undone.`}
+        onConfirm={() => {
+          if (deleteWorkOrderId) {
+            handleDelete(deleteWorkOrderId);
+          }
+          setIsDeleteConfirmOpen(false);
+          setDeleteWorkOrderId(null);
+        }}
+        onCancel={() => {
+          setIsDeleteConfirmOpen(false);
+          setDeleteWorkOrderId(null);
+        }}
+      />
+
+      <ManageWorkOrderModal open={viewModalOpen} onClose={() => setViewModalOpen(false)} workOrder={selectedWorkOrder} />
     </div>
   );
 };

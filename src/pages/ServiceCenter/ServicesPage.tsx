@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import CreateCannedServiceModal from '../../components/CreateCannedServiceModal';
+import ConfirmationDialog from '../../components/ConfirmationDialog';
 import ServicePopularityChart from '../../components/ServicePopularityChart/ServicePopularityChart';
 import ServiceCategoriesChart from '../../components/ServiceCategoriesChart/ServiceCategoriesChart';
 import './ServicesPage.scss';
@@ -38,6 +39,11 @@ const ServicesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isToggleConfirmOpen, setIsToggleConfirmOpen] = useState(false);
+  const [toggleServiceId, setToggleServiceId] = useState<string | null>(null);
+  const [toggleServiceName, setToggleServiceName] = useState<string>('');
+  const [toggleToAvailable, setToggleToAvailable] = useState<boolean>(false);
 
   const getCategoryColor = (category: string) => {
     return categoryColorMap[category] || '#CCCCCC'; // default color if not found
@@ -153,7 +159,10 @@ const ServicesPage = () => {
             checked={!!value}
             onChange={e => {
               e.stopPropagation();
-              handleToggleAvailability(row.id);
+              setToggleServiceId(row.id);
+              setToggleServiceName(row.name);
+              setToggleToAvailable(!value);
+              setIsToggleConfirmOpen(true);
             }}
           />
           <span className="slider round"></span>
@@ -207,7 +216,7 @@ const ServicesPage = () => {
             <i className="bx bx-list-ul"></i>
             View Labor Catalog
           </button>
-          <button className="action-btn primary" onClick={() => setIsCreateModalOpen(true)}>
+          <button className="action-btn primary" onClick={() => setIsConfirmDialogOpen(true)}>
             <i className="bx bx-plus"></i>
             Create Service
           </button>
@@ -238,6 +247,36 @@ const ServicesPage = () => {
           />
         )}
       </div>
+
+      {/* Confirmation Dialog for Create Service */}
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        message="Are you sure you want to create a new service?"
+        onConfirm={() => {
+          setIsConfirmDialogOpen(false);
+          setIsCreateModalOpen(true);
+        }}
+        onCancel={() => {
+          setIsConfirmDialogOpen(false);
+        }}
+      />
+
+      {/* Confirmation Dialog for Toggle Availability */}
+      <ConfirmationDialog
+        isOpen={isToggleConfirmOpen}
+        message={`Are you sure you want to ${toggleToAvailable ? 'enable' : 'disable'} "${toggleServiceName}"?`}
+        onConfirm={() => {
+          if (toggleServiceId) {
+            handleToggleAvailability(toggleServiceId);
+          }
+          setIsToggleConfirmOpen(false);
+          setToggleServiceId(null);
+        }}
+        onCancel={() => {
+          setIsToggleConfirmOpen(false);
+          setToggleServiceId(null);
+        }}
+      />
 
       {/* Create Canned Service Modal */}
       <CreateCannedServiceModal

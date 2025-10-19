@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
+import ConfirmationDialog from '../../components/ConfirmationDialog';
 import './AppointmentsPage.scss';
 import { useAuth } from '../../hooks/useAuth';
 import { Calendar, momentLocalizer, type View } from 'react-big-calendar';
@@ -165,6 +166,11 @@ const AppointmentsPage = () => {
   // Modal state
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmingAppointment, setConfirmingAppointment] = useState<Appointment | null>(null);
+  
+  // Cancel confirmation state
+  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
+  const [cancelAppointmentId, setCancelAppointmentId] = useState<string | null>(null);
+  const [cancelCustomerName, setCancelCustomerName] = useState<string>('');
   
   // Confirmation form state
   const [confirmationForm, setConfirmationForm] = useState({
@@ -380,6 +386,12 @@ const AppointmentsPage = () => {
     }
   };
 
+  const handleCancelClick = (id: string, customerName: string) => {
+    setCancelAppointmentId(id);
+    setCancelCustomerName(customerName);
+    setIsCancelConfirmOpen(true);
+  };
+
   const handleCancel = async (id: string) => {
     if (!token) {
       setError('No access token available');
@@ -569,7 +581,7 @@ const AppointmentsPage = () => {
           <button className="btn-icon" title="Confirm" onClick={e => { e.stopPropagation(); handleConfirm(row.id); }}>
             <i className='bx bx-check'></i>
           </button>
-          <button className="btn-icon btn-danger" title="Cancel" onClick={e => { e.stopPropagation(); handleCancel(row.id); }}>
+          <button className="btn-icon btn-danger" title="Cancel" onClick={e => { e.stopPropagation(); handleCancelClick(row.id, row.customer?.name || row.customerId); }}>
             <i className='bx bx-x'></i>
           </button>
         </div>
@@ -1071,6 +1083,23 @@ const AppointmentsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Cancel Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isCancelConfirmOpen}
+        message={`Are you sure you want to cancel the appointment for ${cancelCustomerName}?`}
+        onConfirm={() => {
+          if (cancelAppointmentId) {
+            handleCancel(cancelAppointmentId);
+          }
+          setIsCancelConfirmOpen(false);
+          setCancelAppointmentId(null);
+        }}
+        onCancel={() => {
+          setIsCancelConfirmOpen(false);
+          setCancelAppointmentId(null);
+        }}
+      />
 
       {/* Confirmation Modal */}
       {confirmModalOpen && confirmingAppointment && (
