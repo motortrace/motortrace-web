@@ -71,7 +71,7 @@ const getPaymentStatusBadge = (paymentStatus?: EstimateInvoice['paymentStatus'])
 
 const EstimatesInvoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'estimate' | 'invoice'>('all');
+  const [activeTab, setActiveTab] = useState<'estimates' | 'invoices'>('estimates');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('all');
   const [filterDateRange, setFilterDateRange] = useState('all');
@@ -240,16 +240,19 @@ const EstimatesInvoices = () => {
     }
   ]);
 
-  // Calculate metrics
-  const totalEstimates = documents.filter(doc => doc.type === 'estimate').length;
-  const totalInvoices = documents.filter(doc => doc.type === 'invoice').length;
-  const pendingEstimates = documents.filter(doc => doc.type === 'estimate' && doc.status === 'sent').length;
-  const overdueInvoices = documents.filter(doc => doc.type === 'invoice' && doc.paymentStatus === 'overdue').length;
-  const totalRevenue = documents
-    .filter(doc => doc.type === 'invoice' && doc.paymentStatus === 'paid')
+  // Calculate metrics based on active tab
+  const estimates = documents.filter(doc => doc.type === 'estimate');
+  const invoices = documents.filter(doc => doc.type === 'invoice');
+  
+  const totalEstimates = estimates.length;
+  const totalInvoices = invoices.length;
+  const pendingEstimates = estimates.filter(doc => doc.status === 'sent').length;
+  const overdueInvoices = invoices.filter(doc => doc.paymentStatus === 'overdue').length;
+  const totalRevenue = invoices
+    .filter(doc => doc.paymentStatus === 'paid')
     .reduce((sum, doc) => sum + doc.grandTotal, 0);
-  const pendingRevenue = documents
-    .filter(doc => doc.type === 'invoice' && doc.paymentStatus === 'pending')
+  const pendingRevenue = invoices
+    .filter(doc => doc.paymentStatus === 'pending')
     .reduce((sum, doc) => sum + doc.grandTotal, 0);
 
   // Filter documents based on search and filters
@@ -259,11 +262,11 @@ const EstimatesInvoices = () => {
                          doc.vehicleInfo.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doc.licensePlate.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesType = filterType === 'all' || doc.type === filterType;
+    const matchesTab = activeTab === 'estimates' ? doc.type === 'estimate' : doc.type === 'invoice';
     const matchesStatus = filterStatus === 'all' || doc.status === filterStatus;
     const matchesPaymentStatus = filterPaymentStatus === 'all' || doc.paymentStatus === filterPaymentStatus;
     
-    return matchesSearch && matchesType && matchesStatus && matchesPaymentStatus;
+    return matchesSearch && matchesTab && matchesStatus && matchesPaymentStatus;
   });
 
   const handleViewDocument = (docId: string) => {
@@ -452,6 +455,59 @@ const EstimatesInvoices = () => {
       </div>
 
       <div className="document-controls">
+        {/* Tabs */}
+        <div className="tabs-container" style={{ marginBottom: 24 }}>
+          <div className="tabs" style={{ 
+            display: 'flex', 
+            borderBottom: '2px solid #e5e7eb',
+            background: '#f8fafc',
+            borderRadius: '8px 8px 0 0',
+            padding: '4px',
+            gap: '4px'
+          }}>
+            <button
+              className={`tab-button ${activeTab === 'estimates' ? 'active' : ''}`}
+              onClick={() => setActiveTab('estimates')}
+              style={{
+                flex: 1,
+                padding: '12px 20px',
+                border: 'none',
+                borderRadius: '6px',
+                background: activeTab === 'estimates' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: activeTab === 'estimates' ? '#fff' : '#6b7280',
+                fontWeight: activeTab === 'estimates' ? 600 : 500,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: activeTab === 'estimates' ? '0 2px 4px rgba(102, 126, 234, 0.3)' : 'none',
+                fontSize: '14px'
+              }}
+            >
+              <i className='bx bx-file' style={{ marginRight: 8 }}></i>
+              Estimates ({documents.filter(doc => doc.type === 'estimate').length})
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'invoices' ? 'active' : ''}`}
+              onClick={() => setActiveTab('invoices')}
+              style={{
+                flex: 1,
+                padding: '12px 20px',
+                border: 'none',
+                borderRadius: '6px',
+                background: activeTab === 'invoices' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: activeTab === 'invoices' ? '#fff' : '#6b7280',
+                fontWeight: activeTab === 'invoices' ? 600 : 500,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: activeTab === 'invoices' ? '0 2px 4px rgba(102, 126, 234, 0.3)' : 'none',
+                fontSize: '14px'
+              }}
+            >
+              <i className='bx bx-receipt' style={{ marginRight: 8 }}></i>
+              Invoices ({documents.filter(doc => doc.type === 'invoice').length})
+            </button>
+          </div>
+        </div>
+
         <div className="search-filters">
           <div className="search-box">
             <i className='bx bx-search search-icon'></i>
@@ -463,15 +519,6 @@ const EstimatesInvoices = () => {
               className="search-input"
             />
           </div>
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value as 'all' | 'estimate' | 'invoice')}
-            className="filter-select"
-          >
-            <option value="all">All Documents</option>
-            <option value="estimate">Estimates Only</option>
-            <option value="invoice">Invoices Only</option>
-          </select>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -488,17 +535,19 @@ const EstimatesInvoices = () => {
             <option value="overdue">Overdue</option>
             <option value="cancelled">Cancelled</option>
           </select>
-          <select
-            value={filterPaymentStatus}
-            onChange={(e) => setFilterPaymentStatus(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Payment Status</option>
-            <option value="pending">Pending</option>
-            <option value="partial">Partial</option>
-            <option value="paid">Paid</option>
-            <option value="overdue">Overdue</option>
-          </select>
+          {activeTab === 'invoices' && (
+            <select
+              value={filterPaymentStatus}
+              onChange={(e) => setFilterPaymentStatus(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Payment Status</option>
+              <option value="pending">Pending</option>
+              <option value="partial">Partial</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          )}
         </div>
         <div className="quick-actions">
           <button className="btn btn--ghost">
@@ -512,14 +561,172 @@ const EstimatesInvoices = () => {
         </div>
       </div>
 
-      <Table 
-        columns={columns}
-        data={filteredDocuments}
-        onRowClick={(doc) => handleViewDocument(doc.id)}
-        emptyMessage="No documents found matching your search criteria."
-      />
+      {activeTab === 'estimates' ? (
+        <div className="estimates-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+          {filteredDocuments.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
+              No estimates found matching your search criteria.
+            </div>
+          ) : (
+            filteredDocuments.map((estimate) => (
+              <EstimateCard
+                key={estimate.id}
+                estimate={estimate}
+                onView={handleViewDocument}
+                onEdit={handleEditDocument}
+                onSend={handleSendDocument}
+                onDelete={handleDeleteDocument}
+              />
+            ))
+          )}
+        </div>
+      ) : (
+        <Table 
+          columns={columns}
+          data={filteredDocuments}
+          onRowClick={(doc) => handleViewDocument(doc.id)}
+          emptyMessage="No invoices found matching your search criteria."
+        />
+      )}
     </div>
   );
 };
 
-export default EstimatesInvoices; 
+const EstimateCard: React.FC<{ estimate: EstimateInvoice; onView: (id: string) => void; onEdit: (id: string) => void; onSend: (id: string) => void; onDelete: (id: string) => void }> = ({ 
+  estimate, 
+  onView, 
+  onEdit, 
+  onSend, 
+  onDelete
+}) => {
+  const getVehicleImage = (_vehicleInfo: string) => {
+    // You can implement logic to get vehicle image based on vehicle info
+    // For now, return a default car image
+    return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
+  };
+
+  return (
+    <div className="estimate-card" style={{ 
+      background: '#fff', 
+      borderRadius: 12, 
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+      border: '1px solid #e5e7eb', 
+      overflow: 'hidden',
+      transition: 'all 0.2s ease',
+      cursor: 'pointer'
+    }}
+    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+    onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'}
+    >
+      <div style={{ height: 120, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={getVehicleImage(estimate.vehicleInfo)} alt={estimate.vehicleInfo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+      <div style={{ padding: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+          <h4 style={{ fontSize: 16, fontWeight: 600, color: '#1f2937', margin: 0 }}>{estimate.documentNumber}</h4>
+          {getStatusBadge(estimate.status, estimate.type)}
+        </div>
+        <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 4 }}>{estimate.customerName}</div>
+        <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 12 }}>{estimate.vehicleInfo} - {estimate.licensePlate}</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#1f2937', marginBottom: 16 }}>LKR{estimate.grandTotal.toFixed(2)}</div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            className="btn btn--primary" 
+            style={{ 
+              flex: 1, 
+              padding: '10px 16px', 
+              fontSize: 14,
+              fontWeight: 500,
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onClick={() => onView(estimate.id)}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <i className='bx bx-show' style={{ marginRight: 6 }}></i>
+            View
+          </button>
+          <button 
+            className="btn btn--secondary" 
+            style={{ 
+              flex: 1, 
+              padding: '10px 16px', 
+              fontSize: 14,
+              fontWeight: 500,
+              borderRadius: 8,
+              background: '#f8fafc',
+              border: '1px solid #d1d5db',
+              color: '#374151',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onClick={() => onEdit(estimate.id)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#e5e7eb';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#f8fafc';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <i className='bx bx-edit' style={{ marginRight: 6 }}></i>
+            Edit
+          </button>
+          {estimate.status === 'draft' && (
+            <button 
+              className="btn btn--secondary" 
+              style={{ 
+                flex: 1, 
+                padding: '10px 16px', 
+                fontSize: 14,
+                fontWeight: 500,
+                borderRadius: 8,
+                background: '#f8fafc',
+                border: '1px solid #d1d5db',
+                color: '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={() => onSend(estimate.id)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#e5e7eb';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#f8fafc';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <i className='bx bx-send' style={{ marginRight: 6 }}></i>
+              Send
+            </button>
+          )}
+          <button 
+            className="btn-icon" 
+            title="Delete" 
+            onClick={() => onDelete(estimate.id)}
+            style={{ 
+              padding: '10px', 
+              background: '#ef4444', 
+              color: '#fff', 
+              border: 'none', 
+              borderRadius: 8, 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <i className='bx bx-trash'></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}; 
