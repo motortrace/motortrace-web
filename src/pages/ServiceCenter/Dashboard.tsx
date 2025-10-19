@@ -256,12 +256,31 @@ const Dashboard = () => {
     }
   };
 
+  const notificationPollingRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (!authLoading && token) {
       fetchAppointments();
       fetchGeneralStats();
       fetchUserProfile();
       fetchNotifications();
+    }
+  }, [token, authLoading]);
+
+  // Polling for notifications only
+  useEffect(() => {
+    if (!authLoading && token) {
+      // Start polling notifications every 30 seconds
+      notificationPollingRef.current = setInterval(() => {
+        fetchNotifications();
+      }, 30000); // 30 seconds
+
+      // Cleanup interval on unmount
+      return () => {
+        if (notificationPollingRef.current) {
+          clearInterval(notificationPollingRef.current);
+        }
+      };
     }
   }, [token, authLoading]);
 
