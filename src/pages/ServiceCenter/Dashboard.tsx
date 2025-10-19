@@ -10,33 +10,41 @@ import { useWorkingTechnicians } from '../../hooks/useWorkingTechnicians';
 interface MetricCardProps {
   title: string;
   amount: string;
+  bgColor?: string;
+  textColor?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({
   title,
-  amount
+  amount,
+  bgColor = 'white',
+  textColor = '#1e293b'
 }) => {
   return (
     <div style={{
-      backgroundColor: 'white',
-      padding: '16px',
-      borderRadius: '8px',
-      border: '1px solid #e2e8f0',
-      position: 'relative'
+      backgroundColor: bgColor,
+      padding: '20px',
+      borderRadius: '12px',
+      border: 'none',
+      position: 'relative',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
     }}>
       <h3 style={{
-        fontSize: '12px',
-        fontWeight: '500',
-        color: '#64748b',
-        margin: '0 0 8px 0'
+        fontSize: '13px',
+        fontWeight: '600',
+        color: textColor,
+        opacity: 0.8,
+        margin: '0 0 12px 0',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px'
       }}>
         {title}
       </h3>
 
       <div style={{
-        fontSize: '22px',
+        fontSize: '32px',
         fontWeight: '700',
-        color: '#1e293b',
+        color: textColor,
         marginBottom: '8px'
       }}>
         {amount}
@@ -552,14 +560,20 @@ const Dashboard = () => {
         <MetricCard
           title="Pending Appointments"
           amount={pendingAppointmentsLoading ? 'Loading...' : pendingAppointments?.toString() || '0'}
+          bgColor="#dbeafe"
+          textColor="#1e40af"
         />
         <MetricCard
           title="Active Technicians"
           amount={technicianStatsLoading ? 'Loading...' : technicianStats?.activeTechnicians?.toString() || '0'}
+          bgColor="#dcfce7"
+          textColor="#15803d"
         />
         <MetricCard
           title="Service Advisors"
           amount={serviceAdvisorsLoading ? 'Loading...' : serviceAdvisorsCount?.toString() || '0'}
+          bgColor="#fef3c7"
+          textColor="#b45309"
         />
       </div>
 
