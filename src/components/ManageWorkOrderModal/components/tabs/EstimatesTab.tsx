@@ -68,6 +68,30 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
   const approvedEstimates = estimates.filter(e => e.status === 'APPROVED').length;
   const pendingEstimates = estimates.filter(e => e.status === 'PENDING').length;
 
+  // Separate estimates and invoices
+  const estimateItems = estimates.filter(e => e.type === 'ESTIMATE');
+  const invoiceItems = estimates.filter(e => e.type === 'INVOICE');
+
+  const getTypeBadge = (type: string) => {
+    const typeConfig = {
+      'ESTIMATE': { bg: '#dbeafe', color: '#1e40af', text: 'Estimate' },
+      'INVOICE': { bg: '#d1fae5', color: '#065f46', text: 'Invoice' }
+    };
+    const config = typeConfig[type as keyof typeof typeConfig] || { bg: '#f3f4f6', color: '#374151', text: type };
+    return (
+      <span style={{
+        padding: '4px 8px',
+        borderRadius: '4px',
+        fontSize: '12px',
+        fontWeight: '500',
+        background: config.bg,
+        color: config.color
+      }}>
+        {config.text}
+      </span>
+    );
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       'PENDING': { bg: '#fef3c7', color: '#92400e', text: 'Pending' },
@@ -242,120 +266,220 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
 
       {estimates.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
-          <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>No estimates found for this work order.</div>
+          <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>No estimates or invoices found for this work order.</div>
           <div style={{ fontSize: 48, color: '#d1d5db' }}>
             <i className="bx bx-calculator"></i>
           </div>
         </div>
       ) : (
-      <div className="estimates-table-container full-width-table">
-        <table className="estimates-table styled-table" style={{ width: '100%', minWidth: 600, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb' }}>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Approved At</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Method</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Created By</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {estimates.map((estimate) => {
-              return (
-                <tr key={estimate.id}>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                    {estimate.approvedAt ? new Date(estimate.approvedAt).toLocaleDateString() : getUnavailableBadge('Not Approved')}
-                  </td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                    {estimate.method ? estimate.method : getUnavailableBadge('No Method')}
-                  </td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                      {isProfileAvailable(estimate.approvedBy) ? (
-                        <>
-                          {getProfileImage(estimate.approvedBy) ? (
-                            <img
-                              src={getProfileImage(estimate.approvedBy)}
-                              alt={getProfileName(estimate.approvedBy)}
-                              style={{
-                                width: 26,
-                                height: 26,
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                border: '1px solid #e5e7eb'
-                              }}
-                            />
-                          ) : (
-                            <div style={{
-                              width: 26,
-                              height: 26,
-                              borderRadius: '50%',
-                              background: '#f3f4f6',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: '#6b7280',
-                              fontWeight: 600,
-                              fontSize: 13
-                            }}>
-                              {getProfileName(estimate.approvedBy)?.[0] || '?'}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          {/* Estimates Table */}
+          {estimateItems.length > 0 && (
+            <div>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '16px' }}>
+                Estimates
+              </h3>
+              <div className="estimates-table-container full-width-table">
+                <table className="estimates-table styled-table" style={{ width: '100%', minWidth: 600, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
+                  <thead>
+                    <tr style={{ background: '#f9fafb' }}>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Type</th>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Approved At</th>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Method</th>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Created By</th>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {estimateItems.map((estimate) => {
+                      return (
+                        <tr key={estimate.id}>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                            {getTypeBadge(estimate.type || 'ESTIMATE')}
+                          </td>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                            {estimate.approvedAt ? new Date(estimate.approvedAt).toLocaleDateString() : getUnavailableBadge('Not Approved')}
+                          </td>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                            {estimate.method ? estimate.method : getUnavailableBadge('No Method')}
+                          </td>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                              {isProfileAvailable(estimate.approvedBy) ? (
+                                <>
+                                  {getProfileImage(estimate.approvedBy) ? (
+                                    <img
+                                      src={getProfileImage(estimate.approvedBy)}
+                                      alt={getProfileName(estimate.approvedBy)}
+                                      style={{
+                                        width: 26,
+                                        height: 26,
+                                        borderRadius: '50%',
+                                        objectFit: 'cover',
+                                        border: '1px solid #e5e7eb'
+                                      }}
+                                    />
+                                  ) : (
+                                    <div style={{
+                                      width: 26,
+                                      height: 26,
+                                      borderRadius: '50%',
+                                      background: '#f3f4f6',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      color: '#6b7280',
+                                      fontWeight: 600,
+                                      fontSize: 13
+                                    }}>
+                                      {getProfileName(estimate.approvedBy)?.[0] || '?'}
+                                    </div>
+                                  )}
+                                  <span style={{ fontWeight: 500 }}>{getProfileName(estimate.approvedBy)}</span>
+                                </>
+                              ) : (
+                                <span style={{
+                                  fontWeight: 500,
+                                  color: '#6b7280',
+                                  fontStyle: 'italic'
+                                }}>
+                                  N/A
+                                </span>
+                              )}
                             </div>
-                          )}
-                          <span style={{ fontWeight: 500 }}>{getProfileName(estimate.approvedBy)}</span>
-                        </>
-                      ) : (
-                        <span style={{
-                          fontWeight: 500,
-                          color: '#6b7280',
-                          fontStyle: 'italic'
-                        }}>
-                          N/A
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                    {getStatusBadge(estimate.status)}
-                  </td>
-                  <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-                      <button
-                        className="pdf-btn"
-                        title="View PDF"
-                        onClick={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
-                        style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                      >
-                        <i className="bx bx-file"></i>
-                      </button>
+                          </td>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                            {getStatusBadge(estimate.status)}
+                          </td>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+                              <button
+                                className="pdf-btn"
+                                title="View PDF"
+                                onClick={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
+                                style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                              >
+                                <i className="bx bx-file"></i>
+                              </button>
 
-                      {/* Finalize button: visible when estimate is APPROVED, not finalized, and of type ESTIMATE */}
-                      {(() => {
-                        // Debug logging
-                        console.log('Estimate:', estimate.id, 'Status:', estimate.status, 'isFinal:', estimate.isFinal, 'Type:', estimate.type, 'isServiceAdvisor:', isServiceAdvisor);
+                              {/* Finalize button: visible when estimate is APPROVED, not finalized, and of type ESTIMATE */}
+                              {(() => {
+                                // Debug logging
+                                console.log('Estimate:', estimate.id, 'Status:', estimate.status, 'isFinal:', estimate.isFinal, 'Type:', estimate.type, 'isServiceAdvisor:', isServiceAdvisor);
 
-                        // Show button when: isServiceAdvisor is true, isFinal is FALSE, status is APPROVED, and it's an ESTIMATE type
-                        if (isServiceAdvisor && estimate.status === 'APPROVED' && estimate.isFinal === false && estimate.type === 'ESTIMATE') {
-                          return (
+                                // Show button when: isServiceAdvisor is true, isFinal is FALSE, status is APPROVED, and it's an ESTIMATE type
+                                if (isServiceAdvisor && estimate.status === 'APPROVED' && estimate.isFinal === false && estimate.type === 'ESTIMATE') {
+                                  return (
+                                    <button
+                                      onClick={() => handleFinalizeEstimate(estimate.id)}
+                                      disabled={finalizing === estimate.id}
+                                      style={{ background: '#0ea5a4', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 10px', fontSize: 13, cursor: 'pointer' }}
+                                      title="Finalize Estimate"
+                                    >
+                                      {finalizing === estimate.id ? 'Finalizing...' : 'Finalize Estimate'}
+                                    </button>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Invoices Table */}
+          {invoiceItems.length > 0 && (
+            <div>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '16px' }}>
+                Invoices
+              </h3>
+              <div className="invoices-table-container full-width-table">
+                <table className="invoices-table styled-table" style={{ width: '100%', minWidth: 400, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
+                  <thead>
+                    <tr style={{ background: '#f9fafb' }}>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Type</th>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Created By</th>
+                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invoiceItems.map((invoice) => {
+                      return (
+                        <tr key={invoice.id}>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                            {getTypeBadge(invoice.type || 'INVOICE')}
+                          </td>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                              {isProfileAvailable(invoice.approvedBy) ? (
+                                <>
+                                  {getProfileImage(invoice.approvedBy) ? (
+                                    <img
+                                      src={getProfileImage(invoice.approvedBy)}
+                                      alt={getProfileName(invoice.approvedBy)}
+                                      style={{
+                                        width: 26,
+                                        height: 26,
+                                        borderRadius: '50%',
+                                        objectFit: 'cover',
+                                        border: '1px solid #e5e7eb'
+                                      }}
+                                    />
+                                  ) : (
+                                    <div style={{
+                                      width: 26,
+                                      height: 26,
+                                      borderRadius: '50%',
+                                      background: '#f3f4f6',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      color: '#6b7280',
+                                      fontWeight: 600,
+                                      fontSize: 13
+                                    }}>
+                                      {getProfileName(invoice.approvedBy)?.[0] || '?'}
+                                    </div>
+                                  )}
+                                  <span style={{ fontWeight: 500 }}>{getProfileName(invoice.approvedBy)}</span>
+                                </>
+                              ) : (
+                                <span style={{
+                                  fontWeight: 500,
+                                  color: '#6b7280',
+                                  fontStyle: 'italic'
+                                }}>
+                                  N/A
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                             <button
-                              onClick={() => handleFinalizeEstimate(estimate.id)}
-                              disabled={finalizing === estimate.id}
-                              style={{ background: '#0ea5a4', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 10px', fontSize: 13, cursor: 'pointer' }}
-                              title="Finalize Estimate"
+                              className="pdf-btn"
+                              title="View PDF"
+                              onClick={() => invoice.pdfUrl && window.open(invoice.pdfUrl, '_blank')}
+                              style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease', margin: '0 auto' }}
                             >
-                              {finalizing === estimate.id ? 'Finalizing...' : 'Finalize Estimate'}
+                              <i className="bx bx-file"></i>
                             </button>
-                          );
-                        }
-                        return null;
-                      })()}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

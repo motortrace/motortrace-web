@@ -158,12 +158,12 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
 
   /**
    * Check if a service is locked (cannot be assigned technicians)
-   * Services are locked when they are in ESTIMATED status (awaiting approval)
+   * Services are locked when they are in PENDING status (awaiting approval)
    * or when work has already started
    */
   const isServiceLocked = (service: WorkOrderService): boolean => {
-    // Services in ESTIMATED status are locked during approval process
-    if (service.status === 'ESTIMATED') {
+    // Services in PENDING status are locked during approval process
+    if (service.status === 'PENDING') {
       return true;
     }
     // Services that have started work are also locked
@@ -172,12 +172,12 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
 
   /**
    * Check if a labor item is locked (cannot be assigned technicians)
-   * Labor items are locked when their parent service is in ESTIMATED status
+   * Labor items are locked when their parent service is in PENDING or ESTIMATED status
    * or when work has already started on the labor item
    */
   const isLaborLocked = (labor: WorkOrderLaborItem, serviceStatus: ServiceStatus): boolean => {
-    // Labor items are locked when the parent service is in ESTIMATED status
-    if (serviceStatus === 'ESTIMATED') {
+    // Labor items are locked when the parent service is in PENDING or ESTIMATED status
+    if (serviceStatus === 'PENDING' || serviceStatus === 'ESTIMATED') {
       return true;
     }
     // Labor items that have started work are also locked
@@ -429,7 +429,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                               transition: 'all 0.2s ease',
                               opacity: isServiceLocked(service) ? 0.6 : 1
                             }}
-                            title={isServiceLocked(service) ? (service.status === 'ESTIMATED' ? "Cannot assign technician - service is awaiting customer approval" : "Cannot assign technician - work has already started") : "Assign technician to all labor items"}
+                            title={isServiceLocked(service) ? (service.status === 'PENDING' ? "Cannot assign technician - service is pending approval" : "Cannot assign technician - work has already started") : "Assign technician to all labor items"}
                           >
                             <i className="bx bx-user-check" style={{ fontSize: '16px' }}></i>
                           </button>
@@ -572,7 +572,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                           transition: 'all 0.2s ease',
                                           opacity: isLaborLocked(labor, service.status) ? 0.6 : 1
                                         }}
-                                        title={isLaborLocked(labor, service.status) ? (service.status === 'ESTIMATED' ? "Cannot assign technician - service is awaiting customer approval" : "Cannot assign technician - work has already started") : "Assign technician to this labor item"}
+                                        title={isLaborLocked(labor, service.status) ? ((service.status === 'PENDING' || service.status === 'ESTIMATED') ? "Cannot assign technician - service is awaiting approval" : "Cannot assign technician - work has already started") : "Assign technician to this labor item"}
                                       >
                                         <i className="bx bx-user-plus" style={{ fontSize: '14px' }}></i>
                                       </button>
