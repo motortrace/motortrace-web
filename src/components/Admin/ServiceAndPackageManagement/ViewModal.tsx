@@ -1,6 +1,6 @@
 // src/components/Admin/ServiceAndPackageManagement/ViewModal.tsx
 import React from 'react';
-import { X, Clock, Check } from 'lucide-react';
+import { X, Clock } from 'lucide-react';
 import type { Service, Package } from '../../../types/ServicesAndPackages';
 import "./ViewModal.scss"
 
@@ -12,13 +12,18 @@ interface ViewModalProps {
 }
 
 // Update ViewModal.tsx with proper null checks
-export const ViewModal: React.FC<ViewModalProps> = ({ 
-  service, 
-  package: pkg, 
-  services, 
-  onClose 
+export const ViewModal: React.FC<ViewModalProps> = ({
+  service,
+  package: pkg,
+  services,
+  onClose
 }) => {
-  if (!service && !pkg) return null;
+  console.log('ViewModal rendered with:', { service, pkg, services: services?.length });
+
+  if (!service && !pkg) {
+    console.log('ViewModal: No service or package provided, returning null');
+    return null;
+  }
 
   const formatDuration = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
@@ -37,13 +42,13 @@ export const ViewModal: React.FC<ViewModalProps> = ({
   return (
     <div className="spm-modal-overlay" onClick={onClose}>
       <div className="spm-modal-content spm-modal-content--large" onClick={e => e.stopPropagation()}>
-        <div className="spm-modal__header">
+        <div className="spm-modal-header">
           <h2>{service?.name || pkg?.name}</h2>
-          <button className="spm-modal__close" onClick={onClose}>
+          <button className="spm-modal-close" onClick={onClose} title="Close">
             <X size={20} />
           </button>
         </div>
-        
+
         <div className="spm-modal__body">
           {service && (
             <div className="spm-service-details">
