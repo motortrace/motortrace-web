@@ -72,10 +72,6 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
      */
     const getStatusBadgeClass = (status: string) => {
         const statusMap: Record<string, string> = {
-            PENDING: 'status-badge--pending',
-            ESTIMATED: 'status-badge--estimated',
-            APPROVED: 'status-badge--approved',
-            REJECTED: 'status-badge--rejected',
             ORDERED: 'status-badge--in-progress',
             RECEIVED: 'status-badge--approved',
             INSTALLED: 'status-badge--completed',
@@ -138,10 +134,6 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
      * Check if a part can be assigned a technician
      */
     const canAssignTechnician = (part: WorkOrderPart): boolean => {
-        // Can't assign if in PENDING or ESTIMATED status (awaiting approval)
-        if (part.status === 'PENDING' || part.status === 'ESTIMATED') {
-            return false;
-        }
         // Can't assign if already installed
         if (part.status === 'INSTALLED') {
             return false;
@@ -153,9 +145,6 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
      * Get tooltip message for assign button
      */
     const getAssignTooltip = (part: WorkOrderPart): string => {
-        if (part.status === 'PENDING' || part.status === 'ESTIMATED') {
-            return 'Cannot assign technician - part is awaiting approval';
-        }
         if (part.status === 'INSTALLED') {
             return 'Part already installed';
         }
@@ -258,9 +247,7 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
                 <button
                     onClick={() => setShowAddPartModal(true)}
                     className="btn btn--primary"
-                    disabled={parts.some(p => p.status === 'ESTIMATED')}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: parts.some(p => p.status === 'ESTIMATED') ? 0.6 : 1 }}
-                    title={parts.some(p => p.status === 'ESTIMATED') ? 'Cannot add parts while estimate is pending approval' : 'Add Part'}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                     <i className="bx bx-plus"></i>
                     Add Part

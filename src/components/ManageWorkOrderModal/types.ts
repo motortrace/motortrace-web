@@ -134,7 +134,7 @@ export interface CannedService {
   price: number;
 }
 
-export type ServiceStatus = 'PENDING' | 'ESTIMATED' | 'APPROVED' | 'REJECTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type LaborStatus = 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 export interface WorkOrderLaborItem {
   id: string;
@@ -145,7 +145,7 @@ export interface WorkOrderLaborItem {
   technician?: TechnicianProfile | null;
   startTime?: string | null;
   endTime?: string | null;
-  status: ServiceStatus;
+  status: LaborStatus;
   notes?: string | null;
   serviceId: string;
   estimatedMinutes?: number | null;
@@ -163,7 +163,6 @@ export interface WorkOrderService {
   quantity: number;
   unitPrice: number;
   subtotal: number;
-  status: ServiceStatus;
   notes?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -351,7 +350,7 @@ export interface InventoryItem {
   isOEM: boolean;
 }
 
-export type PartStatus = 'PENDING' | 'ESTIMATED' | 'APPROVED' | 'REJECTED' | 'ORDERED' | 'RECEIVED' | 'INSTALLED' | 'RETURNED';
+export type PartStatus = 'ORDERED' | 'RECEIVED' | 'INSTALLED' | 'RETURNED';
 
 export interface WorkOrderPart {
   id: string;
