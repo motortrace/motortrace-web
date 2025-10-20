@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { inspectionTemplatesApi } from '../../utils/inspectionTemplatesApi';
 import type { InspectionTemplate } from '../../types/InspectionTemplate';
+import CreateInspectionTemplateModal from '../../components/CreateInspectionTemplate/CreateInspectionTemplateModal';
 import './InspectionTemplates.scss';
 
 const InspectionTemplates: React.FC = () => {
@@ -10,6 +11,7 @@ const InspectionTemplates: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [expandedTemplates, setExpandedTemplates] = useState<Set<string>>(new Set());
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
 
   useEffect(() => {
@@ -49,6 +51,19 @@ const InspectionTemplates: React.FC = () => {
   });
 
   const categories = Array.from(new Set(templates.map(t => t.category).filter(Boolean)));
+
+  const handleCreateTemplateSuccess = () => {
+    // Refresh the templates list
+    const fetchTemplates = async () => {
+      try {
+        const response = await inspectionTemplatesApi.getTemplates();
+        setTemplates(response);
+      } catch (err) {
+        console.error('Error refreshing templates:', err);
+      }
+    };
+    fetchTemplates();
+  };
 
   if (loading) {
     return (
@@ -111,7 +126,7 @@ const InspectionTemplates: React.FC = () => {
               ))}
             </select>
           </div>
-          <button className="action-btn primary">
+          <button className="action-btn primary" onClick={() => setIsCreateModalOpen(true)}>
             <i className="bx bx-plus"></i>
             Create Template
           </button>
@@ -240,6 +255,12 @@ const InspectionTemplates: React.FC = () => {
           )}
         </div>
       </div>
+
+      <CreateInspectionTemplateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateTemplateSuccess}
+      />
     </div>
   );
 };
