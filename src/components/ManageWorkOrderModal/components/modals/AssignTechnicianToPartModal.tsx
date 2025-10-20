@@ -21,6 +21,15 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Reset form when modal opens or part changes
+    React.useEffect(() => {
+        if (open) {
+            // Pre-select currently assigned technician if exists
+            setSelectedTechnicianId(part.installedBy?.id || '');
+            setError(null);
+        }
+    }, [open, part]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -49,7 +58,7 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
             <div
                 className="manage-workorder-modal"
                 onClick={(e) => e.stopPropagation()}
-                style={{ maxWidth: '500px', maxHeight: '90vh', overflow: 'auto' }}
+                style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflow: 'auto' }}
             >
                 <div className="modal-header">
                     <div className="modal-title">
@@ -61,8 +70,8 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                     </button>
                 </div>
 
-                <div className="modal-body">
-                    <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+                <div className="modal-body" style={{ width: '100%' }}>
+                    <form onSubmit={handleSubmit} style={{ padding: '24px', width: '100%', boxSizing: 'border-box' }}>
                         {/* Part Info */}
                         <div
                             style={{
@@ -71,6 +80,8 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                                 borderRadius: '8px',
                                 padding: '16px',
                                 marginBottom: '24px',
+                                width: '100%',
+                                boxSizing: 'border-box',
                             }}
                         >
                             <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '8px' }}>
@@ -104,7 +115,7 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                         )}
 
                         {/* Technician Selection */}
-                        <div style={{ marginBottom: '24px' }}>
+                        <div style={{ marginBottom: '24px', width: '100%' }}>
                             <label
                                 style={{
                                     display: 'block',
@@ -117,7 +128,7 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                                 Select Technician *
                             </label>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
                                 {technicians.length === 0 ? (
                                     <div
                                         style={{
@@ -135,8 +146,9 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                                         const isCurrentlyAssigned = part.installedBy?.id === tech.id;
 
                                         return (
-                                            <label
+                                            <div
                                                 key={tech.id}
+                                                onClick={() => setSelectedTechnicianId(tech.id)}
                                                 style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -146,17 +158,10 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                                                     cursor: 'pointer',
                                                     backgroundColor: selectedTechnicianId === tech.id ? '#eef2ff' : '#fff',
                                                     transition: 'all 0.2s ease',
+                                                    width: '100%',
+                                                    boxSizing: 'border-box',
                                                 }}
                                             >
-                                                <input
-                                                    type="radio"
-                                                    name="technician"
-                                                    value={tech.id}
-                                                    checked={selectedTechnicianId === tech.id}
-                                                    onChange={(e) => setSelectedTechnicianId(e.target.value)}
-                                                    style={{ marginRight: '12px' }}
-                                                />
-
                                                 {tech.userProfile?.profileImage ? (
                                                     <img
                                                         src={tech.userProfile.profileImage}
@@ -168,6 +173,7 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                                                             objectFit: 'cover',
                                                             marginRight: '12px',
                                                             border: '2px solid #e5e7eb',
+                                                            flexShrink: 0,
                                                         }}
                                                     />
                                                 ) : (
@@ -184,13 +190,14 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                                                             fontSize: '14px',
                                                             fontWeight: '600',
                                                             color: '#6366f1',
+                                                            flexShrink: 0,
                                                         }}
                                                     >
                                                         {displayName.charAt(0)}
                                                     </div>
                                                 )}
 
-                                                <div style={{ flex: 1 }}>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
                                                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827' }}>
                                                         {displayName}
                                                         {isCurrentlyAssigned && (
@@ -227,7 +234,7 @@ const AssignTechnicianToPartModal: React.FC<AssignTechnicianToPartModalProps> = 
                                                         </div>
                                                     )}
                                                 </div>
-                                            </label>
+                                            </div>
                                         );
                                     })
                                 )}
