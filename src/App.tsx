@@ -174,6 +174,23 @@ function App() {
           <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
+          {/* Inventory Manager Pages */}
+          <Route path="OrderSummary" element={<OrderSummary />} />
+          <Route path="PendingOrderDetails" element={<PendingOrderDetailsPage />} />
+          <Route path="IncomeSummary" element={<IncomeSummaryPage />} />
+          <Route path="CustomerSummary" element={<CustomerSummaryPage />} />
+          <Route path="ReviewPage" element={<ReviewPage />} />
+          <Route path="CustomerDetails" element={<CustomerDetailsPage />} />
+          <Route path="ServiceCenterCustomerDetails" element={<ServiceCenterCustomerDetailsPage />} />
+          <Route path="AcceptedOrders" element={<AcceptedOrderDetailsPage />} />
+          <Route path="CompletedOrders" element={<CompletedOrderDetailsPage />} />
+          <Route path="DeclinedOrderDetailsPage" element={<DeclinedOrderDetailsPage />} />
+          <Route path="FailedOrderDetailsPage" element={<FailedOrderDetailsPage />} />
+          <Route path="ProductList" element={<ProductList />} />
+          <Route path="AddProduct" element={<AddProduct />} />
+          <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
+          <Route path="StockLevel" element={<StockLevel />} />
+          <Route path="issuancedetails/:id" element={<IssuanceDetails />} />
         </Route>
 
         <Route path="admin/login" element={<AdminLogin />} />
