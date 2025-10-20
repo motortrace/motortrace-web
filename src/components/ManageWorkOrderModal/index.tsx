@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
 import InspectionsTab from './components/tabs/InspectionsTab';
 import EstimatesTab from './components/tabs/EstimatesTab';
-import PaymentsTab from './components/tabs/PaymentsTab';
 import ServicesTab from './components/tabs/ServicesTab';
+import MiscChargesTab from './components/tabs/MiscChargesTab';
 import AddInspectionModal from './components/modals/AddInspectionModal';
 import AssignTechnicianModal from './components/modals/AssignTechnicianModal';
-import GenerateInvoiceModal from './components/modals/GenerateInvoiceModal';
 import { useWorkOrderModal } from './hooks/useWorkOrderModal';
 import { useInspections } from './hooks/useInspections';
 import { isServiceAdvisorRole } from './utils/helpers';
@@ -30,6 +30,7 @@ import '../WorkOrderModal/ManageWorkOrderModal.scss';
  */
 const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder, onUpdate }) => {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Initialize modal hook
@@ -89,8 +90,9 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
       });
 
       if (response.ok) {
-        const data = await response.json();
-        modalHook.setTechnicians(data);
+        const result = await response.json();
+        const techniciansData = result.success ? result.data : [];
+        modalHook.setTechnicians(techniciansData);
       }
     } catch (error) {
       console.error('Error fetching technicians:', error);
@@ -143,20 +145,37 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
             </div>
           </div>
           <div className="modal-header-actions">
-            <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* <button className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
-            </button>
-            {!isServiceAdvisor && (
+            </button> */}
+            {workOrder && workOrder.appointmentId && (
+              <button 
+                className="btn btn--secondary" 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px',
+                  backgroundColor: '#3A72ED',
+                  color: '#fff',
+                  borderColor: '#3A72ED'
+                }}
+                onClick={() => navigate(`/manager/appointment-detail/${workOrder.appointmentId}`)}
+              >
+                <i className="bx bx-calendar-event"></i>
+                View Appointment Details
+              </button>
+            )}
+            {/* {!isServiceAdvisor && workOrder?.status !== 'PAID' && (
               <button 
                 className="btn btn--secondary" 
                 style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#3b82f6', color: '#fff', borderColor: '#3b82f6' }}
-                onClick={modalHook.openGenerateInvoiceModal}
+                onClick={modalHook.handleGenerateInvoice}
               >
                 <i className="bx bx-receipt"></i>
                 Generate Invoice
               </button>
-            )}
+            )} */}
             <button className="close-btn" onClick={handleClose} title="Close">
               <i className="bx bx-x"></i>
             </button>
@@ -185,15 +204,12 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               <ServicesTab workOrderId={workOrder.id} />
             )}
 
-            {activeTab === 'estimates' && (
-              <EstimatesTab
-                workOrderId={workOrder.id}
-                isServiceAdvisor={isServiceAdvisor}
-              />
+            {activeTab === 'misc-charges' && (
+              <MiscChargesTab workOrderId={workOrder.id} />
             )}
 
-            {activeTab === 'payments' && (
-              <PaymentsTab
+            {activeTab === 'estimates' && (
+              <EstimatesTab
                 workOrderId={workOrder.id}
                 isServiceAdvisor={isServiceAdvisor}
               />
@@ -224,26 +240,11 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
         <AssignTechnicianModal
           show={modalHook.showAssignTechnicianModal}
           onClose={modalHook.closeAssignTechnicianModal}
-          technicians={modalHook.technicians}
+          technicians={Array.isArray(modalHook.technicians) ? modalHook.technicians.map(tech => ({ ...tech, isBusy: false })) : []}
           selectedTechnicianId={modalHook.selectedTechnicianId}
           setSelectedTechnicianId={modalHook.setSelectedTechnicianId}
           onAssign={modalHook.handleAssignInspector}
           getTechnicianDisplayName={modalHook.getTechnicianDisplayName}
-        />
-
-        {/* Generate Invoice Modal */}
-        <GenerateInvoiceModal
-          show={modalHook.showGenerateInvoiceModal}
-          onClose={modalHook.closeGenerateInvoiceModal}
-          workOrder={workOrder}
-          invoiceDueDate={modalHook.invoiceDueDate}
-          setInvoiceDueDate={modalHook.setInvoiceDueDate}
-          invoiceTerms={modalHook.invoiceTerms}
-          setInvoiceTerms={modalHook.setInvoiceTerms}
-          invoiceNotes={modalHook.invoiceNotes}
-          setInvoiceNotes={modalHook.setInvoiceNotes}
-          isGeneratingInvoice={modalHook.isGeneratingInvoice}
-          onGenerate={modalHook.handleGenerateInvoice}
         />
       </div>
     </div>

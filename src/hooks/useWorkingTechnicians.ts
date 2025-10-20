@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { technicianService } from '../services/technicianService';
 
 export interface WorkingTechnician {
+  technicianId: string;
   technicianName: string;
   technicianImage: string;
   workOrderNumber: string;

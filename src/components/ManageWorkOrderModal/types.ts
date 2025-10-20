@@ -134,7 +134,7 @@ export interface CannedService {
   price: number;
 }
 
-export type ServiceStatus = 'ESTIMATED' | 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type ServiceStatus = 'PENDING' | 'ESTIMATED' | 'APPROVED' | 'REJECTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 export interface WorkOrderLaborItem {
   id: string;
@@ -165,11 +165,6 @@ export interface WorkOrderService {
   subtotal: number;
   status: ServiceStatus;
   notes?: string | null;
-  customerApproved: boolean;
-  customerRejected: boolean;
-  approvedAt?: string | null;
-  rejectedAt?: string | null;
-  customerNotes?: string | null;
   createdAt: string;
   updatedAt: string;
   laborItems?: WorkOrderLaborItem[];
@@ -220,6 +215,8 @@ export interface WorkOrderApproval {
   method: string | null;
   notes: string | null;
   customerSignature: string | null;
+  isFinal?: boolean | null;
+  type?: string | null;
   pdfUrl: string | null;
   createdAt: string;
   updatedAt: string;
@@ -228,6 +225,23 @@ export interface WorkOrderApproval {
     name: string;
     profileImage?: string | null;
   } | null;
+}
+
+// ==================== Misc Charges Types ====================
+
+export type MiscChargeCategory = 'DIAGNOSTIC' | 'LABOR' | 'TOWING' | 'STORAGE' | 'DISPOSAL' | 'ENVIRONMENTAL' | 'ADMIN' | 'OTHER';
+
+export interface WorkOrderMiscCharge {
+  id: string;
+  workOrderId: string;
+  category: MiscChargeCategory;
+  description: string;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ==================== Payment Types ====================
