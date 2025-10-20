@@ -31,45 +31,56 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
   isProfileAvailable
 }) => {
   return (
-    <div className="estimate-card" style={{ 
-      background: '#fff', 
-      borderRadius: 12, 
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
-      border: '1px solid #e5e7eb', 
-      overflow: 'hidden',
-      transition: 'all 0.2s ease',
-      cursor: 'pointer'
-    }}
-    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-    onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'}
+    <div 
+      className="estimate-card" 
+      style={{ 
+        background: '#fff', 
+        borderRadius: 12, 
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)', 
+        border: '1px solid #e5e7eb', 
+        overflow: 'hidden',
+        transition: 'all 0.2s ease'
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)'}
+      onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'}
     >
-      <div style={{ padding: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {getTypeBadge(estimate.type || 'ESTIMATE')}
+      {/* Header with badges */}
+      <div style={{ 
+        padding: '16px 20px', 
+        borderBottom: '1px solid #f3f4f6',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        {getTypeBadge(estimate.type || 'ESTIMATE')}
+        {getStatusBadge(estimate.status)}
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: '20px' }}>
+        {/* Creator Info */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>
+            Created By
           </div>
-          {getStatusBadge(estimate.status)}
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
           {isProfileAvailable(estimate.approvedBy) ? (
-            <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               {getProfileImage(estimate.approvedBy) ? (
                 <img
                   src={getProfileImage(estimate.approvedBy)!}
                   alt={getProfileName(estimate.approvedBy)}
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     borderRadius: '50%',
                     objectFit: 'cover',
-                    border: '2px solid #e5e7eb'
+                    border: '2px solid #f3f4f6'
                   }}
                 />
               ) : (
                 <div style={{
-                  width: 40,
-                  height: 40,
+                  width: 36,
+                  height: 36,
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   display: 'flex',
@@ -77,117 +88,134 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
                   justifyContent: 'center',
                   color: '#fff',
                   fontWeight: 600,
-                  fontSize: 16
+                  fontSize: 14
                 }}>
                   {getProfileName(estimate.approvedBy)?.[0] || '?'}
                 </div>
               )}
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: '#1f2937', marginBottom: 2 }}>
-                  {getProfileName(estimate.approvedBy)}
-                </div>
-                <div style={{ fontSize: 12, color: '#6b7280' }}>Created By</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#1f2937' }}>
+                {getProfileName(estimate.approvedBy)}
               </div>
-            </>
+            </div>
           ) : (
-            <div style={{ fontSize: 14, color: '#6b7280', fontStyle: 'italic' }}>
-              Created By: N/A
+            <div style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic' }}>
+              Not available
             </div>
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <button 
-            className="btn btn--primary" 
             onClick={onViewPdf}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              fontSize: 14,
+              fontWeight: 500,
+              borderRadius: 8,
+              background: '#3b82f6',
+              border: 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#2563eb'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#3b82f6'}
           >
-            <i className='bx bx-file' style={{ marginRight: 6 }}></i>
+            <i className='bx bx-file-blank' style={{ fontSize: 18 }}></i>
             View PDF
           </button>
+
           {onApprove && (
             <button 
-              className="btn btn--success" 
-              style={{ 
-                flex: 1, 
-                padding: '10px 16px', 
+              onClick={onApprove}
+              disabled={isApproving}
+              style={{
+                width: '100%',
+                padding: '10px 16px',
                 fontSize: 14,
                 fontWeight: 500,
                 borderRadius: 8,
-                background: '#10b981',
-                border: '1px solid #10b981',
+                background: isApproving ? '#9ca3af' : '#10b981',
+                border: 'none',
                 color: '#fff',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                cursor: isApproving ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                opacity: isApproving ? 0.7 : 1
               }}
-              onClick={onApprove}
-              disabled={isApproving}
               onMouseEnter={(e) => {
-                if (!isApproving) {
-                  e.currentTarget.style.background = '#059669';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }
+                if (!isApproving) e.currentTarget.style.background = '#059669';
               }}
               onMouseLeave={(e) => {
-                if (!isApproving) {
-                  e.currentTarget.style.background = '#10b981';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }
+                if (!isApproving) e.currentTarget.style.background = '#10b981';
               }}
             >
               {isApproving ? (
                 <>
-                  <i className='bx bx-loader-alt bx-spin' style={{ marginRight: 6 }}></i>
+                  <i className='bx bx-loader-alt bx-spin' style={{ fontSize: 18 }}></i>
                   Approving...
                 </>
               ) : (
                 <>
-                  <i className='bx bx-check' style={{ marginRight: 6 }}></i>
-                  Approve
+                  <i className='bx bx-check-circle' style={{ fontSize: 18 }}></i>
+                  Approve Estimate
                 </>
               )}
             </button>
           )}
+
           {onFinalize && (
             <button 
-              className="btn btn--secondary" 
-              style={{ 
-                flex: 1, 
-                padding: '10px 16px', 
+              onClick={onFinalize}
+              disabled={isFinalizing}
+              style={{
+                width: '100%',
+                padding: '10px 16px',
                 fontSize: 14,
                 fontWeight: 500,
                 borderRadius: 8,
-                background: '#f8fafc',
+                background: isFinalizing ? '#e5e7eb' : '#f8fafc',
                 border: '1px solid #d1d5db',
-                color: '#374151',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                color: isFinalizing ? '#9ca3af' : '#374151',
+                cursor: isFinalizing ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                opacity: isFinalizing ? 0.7 : 1
               }}
-              onClick={onFinalize}
-              disabled={isFinalizing}
               onMouseEnter={(e) => {
                 if (!isFinalizing) {
-                  e.currentTarget.style.background = '#e5e7eb';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.background = '#f3f4f6';
+                  e.currentTarget.style.borderColor = '#9ca3af';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isFinalizing) {
                   e.currentTarget.style.background = '#f8fafc';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = '#d1d5db';
                 }
               }}
             >
               {isFinalizing ? (
                 <>
-                  <i className='bx bx-loader-alt bx-spin' style={{ marginRight: 6 }}></i>
+                  <i className='bx bx-loader-alt bx-spin' style={{ fontSize: 18 }}></i>
                   Finalizing...
                 </>
               ) : (
                 <>
-                  <i className='bx bx-check' style={{ marginRight: 6 }}></i>
-                  Finalize
+                  <i className='bx bx-check-double' style={{ fontSize: 18 }}></i>
+                  Finalize Estimate
                 </>
               )}
             </button>
@@ -618,17 +646,12 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
       {/* Approval Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={showApprovalConfirm}
-        title="Approve Estimate"
-        message={`Are you sure you want to approve this estimate? This action cannot be undone.`}
-        confirmText="Approve"
-        cancelText="Cancel"
+        message="Are you sure you want to approve this estimate? This action cannot be undone."
         onConfirm={handleApproveEstimate}
         onCancel={() => {
           setShowApprovalConfirm(false);
           setApprovalToApprove(null);
         }}
-        loading={isApproving}
-        type="success"
       />
     </div>
   );
