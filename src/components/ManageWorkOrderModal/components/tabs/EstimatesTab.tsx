@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../hooks/useAuth';
 import type { WorkOrderApproval } from '../../types';
+import ConfirmationDialog from '../../../ConfirmationDialog';
 
 interface EstimateCardProps {
   estimate: WorkOrderApproval;
   onViewPdf: () => void;
   onFinalize?: () => void;
+  onApprove?: () => void;
   isFinalizing: boolean;
+  isApproving: boolean;
   getTypeBadge: (type: string) => React.ReactElement;
   getStatusBadge: (status: string) => React.ReactElement;
   getProfileName: (approvedBy: any) => string;
@@ -18,7 +21,9 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
   estimate,
   onViewPdf,
   onFinalize,
+  onApprove,
   isFinalizing,
+  isApproving,
   getTypeBadge,
   getStatusBadge,
   getProfileName,
@@ -101,6 +106,49 @@ const EstimateCard: React.FC<EstimateCardProps> = ({
             <i className='bx bx-file' style={{ marginRight: 6 }}></i>
             View PDF
           </button>
+          {onApprove && (
+            <button 
+              className="btn btn--success" 
+              style={{ 
+                flex: 1, 
+                padding: '10px 16px', 
+                fontSize: 14,
+                fontWeight: 500,
+                borderRadius: 8,
+                background: '#10b981',
+                border: '1px solid #10b981',
+                color: '#fff',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={onApprove}
+              disabled={isApproving}
+              onMouseEnter={(e) => {
+                if (!isApproving) {
+                  e.currentTarget.style.background = '#059669';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isApproving) {
+                  e.currentTarget.style.background = '#10b981';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }
+              }}
+            >
+              {isApproving ? (
+                <>
+                  <i className='bx bx-loader-alt bx-spin' style={{ marginRight: 6 }}></i>
+                  Approving...
+                </>
+              ) : (
+                <>
+                  <i className='bx bx-check' style={{ marginRight: 6 }}></i>
+                  Approve
+                </>
+              )}
+            </button>
+          )}
           {onFinalize && (
             <button 
               className="btn btn--secondary" 
@@ -169,6 +217,11 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
   const [error, setError] = useState('');
   const [creatingEstimate, setCreatingEstimate] = useState(false);
   const [finalizing, setFinalizing] = useState<string | null>(null);
+
+  // Approval confirmation state
+  const [showApprovalConfirm, setShowApprovalConfirm] = useState(false);
+  const [approvalToApprove, setApprovalToApprove] = useState<WorkOrderApproval | null>(null);
+  const [isApproving, setIsApproving] = useState(false);
 
   // Function to fetch estimates (extracted for reuse)
   const fetchEstimates = async () => {
@@ -335,6 +388,45 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
     }
   };
 
+  // Function to approve a pending estimate
+  const handleApproveEstimate = async () => {
+    if (!approvalToApprove || !token) return;
+
+    setIsApproving(true);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/approvals/${approvalToApprove.id}/approve`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          notes: 'Estimate approved manually'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to approve estimate: ${response.statusText}`);
+      }
+
+      // Refresh the estimates list after approval
+      await fetchEstimates();
+    } catch (err) {
+      console.error('Error approving estimate:', err);
+      setError('Failed to approve estimate');
+    } finally {
+      setIsApproving(false);
+      setShowApprovalConfirm(false);
+      setApprovalToApprove(null);
+    }
+  };
+
+  // Function to handle approval button click
+  const handleApprovalClick = (estimate: WorkOrderApproval) => {
+    setApprovalToApprove(estimate);
+    setShowApprovalConfirm(true);
+  };
+
   return (
     <div className="tab-content estimates-tab">
       {/* Header with search and action buttons */}
@@ -420,7 +512,9 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
                     key={estimate.id}
                     estimate={estimate}
                     onViewPdf={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
+                    onApprove={estimate.status === 'PENDING' ? () => handleApprovalClick(estimate) : undefined}
                     onFinalize={isServiceAdvisor && estimate.status === 'APPROVED' && estimate.isFinal === false && estimate.type === 'ESTIMATE' ? () => handleFinalizeEstimate(estimate.id) : undefined}
+                    isApproving={isApproving}
                     isFinalizing={finalizing === estimate.id}
                     getTypeBadge={getTypeBadge}
                     getStatusBadge={getStatusBadge}
@@ -520,6 +614,22 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
           )}
         </div>
       )}
+
+      {/* Approval Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showApprovalConfirm}
+        title="Approve Estimate"
+        message={`Are you sure you want to approve this estimate? This action cannot be undone.`}
+        confirmText="Approve"
+        cancelText="Cancel"
+        onConfirm={handleApproveEstimate}
+        onCancel={() => {
+          setShowApprovalConfirm(false);
+          setApprovalToApprove(null);
+        }}
+        loading={isApproving}
+        type="success"
+      />
     </div>
   );
 };
