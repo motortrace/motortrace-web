@@ -1,6 +1,8 @@
-import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
+import Notifications from '../../components/Notifications/Notifications';
+import { useAuth } from '../../hooks/useAuth';
 
 // Work Order Status data
 const workOrderData = [
@@ -14,35 +16,7 @@ const workOrderData = [
 const totalWorkOrders = workOrderData.reduce((sum, item) => sum + item.value, 0);
 
 // Sample assigned appointments data for service advisor
-const assignedAppointments = [
-  {
-    id: '1',
-    startTime: '2024-09-13T09:00:00Z',
-    endTime: '2024-09-13T10:00:00Z',
-    customer: {
-      firstName: 'John',
-      lastName: 'Doe'
-    }
-  },
-  {
-    id: '2',
-    startTime: '2024-09-13T14:00:00Z',
-    endTime: '2024-09-13T15:30:00Z',
-    customer: {
-      firstName: 'Jane',
-      lastName: 'Smith'
-    }
-  },
-  {
-    id: '3',
-    startTime: '2024-09-13T16:00:00Z',
-    endTime: '2024-09-13T17:00:00Z',
-    customer: {
-      firstName: 'Mike',
-      lastName: 'Wilson'
-    }
-  }
-];
+const assignedAppointments: any[] = [];
 
 // Metric Card Component
 interface MetricCardProps {
@@ -110,16 +84,16 @@ const WorkOrderStatusGauge: React.FC = () => {
       }}>
         Work Order Status
       </h3>
-      
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'flex-start', 
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
         gap: '20px',
         height: '200px'
       }}>
         {/* Gauge Chart */}
-        <div style={{ 
-          flex: '1', 
+        <div style={{
+          flex: '1',
           position: 'relative',
           height: '180px'
         }}>
@@ -142,7 +116,7 @@ const WorkOrderStatusGauge: React.FC = () => {
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-          
+
           {/* Center number positioned BELOW the arc - moved UP closer */}
           <div style={{
             position: 'absolute',
@@ -169,7 +143,7 @@ const WorkOrderStatusGauge: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Legend positioned to the RIGHT */}
         <div style={{
           display: 'flex',
@@ -212,10 +186,107 @@ const WorkOrderStatusGauge: React.FC = () => {
 };
 
 const ServiceAdvisorDashboard = () => {
+  const { token } = useAuth();
+  const [userProfile, setUserProfile] = useState<{
+    name: string;
+    email: string;
+    profileImageUrl?: string;
+  } | null>(null);
+  const [userProfileLoading, setUserProfileLoading] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const notificationRef = React.useRef<HTMLDivElement>(null);
+
+  // Fetch user profile
+  const fetchUserProfile = async () => {
+    if (!token) {
+      console.log('No token available for user profile fetch');
+      return;
+    }
+
+    setUserProfileLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:3000/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user profile: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUserProfile({
+          name: data.data.name,
+          email: data.data.email,
+          profileImageUrl: data.data.profileImage
+        });
+        console.log('User profile loaded:', data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch user profile');
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+    } finally {
+      setUserProfileLoading(false);
+    }
+  };
+
+  // Fetch notifications
+  const fetchNotifications = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch('http://localhost:3000/notifications', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data.success ? data.data : []);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchUserProfile();
+      fetchNotifications();
+    }
+  }, [token]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
+
   return (
     <div style={{
       padding: '16px',
-    //   backgroundColor: '#f8fafc',
+      //   backgroundColor: '#f8fafc',
       minHeight: '100vh'
     }}>
       {/* Page Header */}
@@ -250,6 +321,64 @@ const ServiceAdvisorDashboard = () => {
           alignItems: 'center',
           gap: '16px'
         }}>
+          {/* Notification Button */}
+          <div style={{ position: 'relative', height: '56px' }} ref={notificationRef}>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: 'white',
+                color: '#64748b',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                position: 'relative'
+              }}
+            >
+              <i className='bx bx-bell'></i>
+              {/* Notification Badge */}
+              <div style={{
+                position: 'absolute',
+                top: '6px',
+                right: '6px',
+                width: '20px',
+                height: '20px',
+                borderRadius: '50%',
+                backgroundColor: '#ef4444',
+                border: '2px solid white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: 'white'
+              }}>
+                {notifications.filter(n => !n.isRead).length || 0}
+              </div>
+            </button>
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div style={{
+                position: 'absolute',
+                top: '66px',
+                right: '0',
+                width: '400px',
+                height: '500px',
+                zIndex: 1000,
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                borderRadius: '12px'
+              }}>
+                <Notifications notifications={notifications} />
+              </div>
+            )}
+          </div>
+
           {/* Service Advisor Profile */}
           <div style={{
             display: 'flex',
@@ -259,24 +388,29 @@ const ServiceAdvisorDashboard = () => {
             backgroundColor: 'white',
             borderRadius: '12px',
             border: '1px solid #e2e8f0',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            height: '56px'
           }}>
             {/* Profile Image */}
             <div style={{
-              width: '48px',
-              height: '48px',
+              width: '36px',
+              height: '36px',
               borderRadius: '50%',
-              backgroundColor: '#2563eb',
+              backgroundColor: userProfile?.profileImageUrl ? 'transparent' : '#2563eb',
+              backgroundImage: userProfile?.profileImageUrl ? `url(${userProfile.profileImageUrl})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontSize: '18px',
-              fontWeight: '600'
+              fontSize: '14px',
+              fontWeight: '600',
+              border: userProfile?.profileImageUrl ? '2px solid #e2e8f0' : 'none'
             }}>
-              JD
+              {!userProfile?.profileImageUrl && (userProfileLoading ? '...' : userProfile ? userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'SA')}
             </div>
-            
+
             {/* Profile Info */}
             <div style={{
               display: 'flex',
@@ -289,14 +423,14 @@ const ServiceAdvisorDashboard = () => {
                 color: '#1e293b',
                 lineHeight: '1.2'
               }}>
-                John Doe
+                {userProfileLoading ? 'Loading...' : userProfile?.name || 'Service Advisor'}
               </div>
               <div style={{
                 fontSize: '14px',
                 color: '#64748b',
                 lineHeight: '1.2'
               }}>
-                john.doe@motortrace.com
+                {userProfileLoading ? 'Loading...' : userProfile?.email || 'advisor@motortrace.com'}
               </div>
             </div>
           </div>
@@ -338,7 +472,7 @@ const ServiceAdvisorDashboard = () => {
               icon="bx bx-star"
             />
           </div>
-          
+
           {/* Work Order Status Gauge */}
           <WorkOrderStatusGauge />
         </div>
@@ -496,15 +630,15 @@ const ServiceAdvisorDashboard = () => {
                   transition: 'all 0.2s',
                   fontSize: '16px'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#cbd5e1';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                }}
-                onClick={() => console.log('View appointment:', appointment.id)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                    e.currentTarget.style.borderColor = '#cbd5e1';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.borderColor = '#e2e8f0';
+                  }}
+                  onClick={() => console.log('View appointment:', appointment.id)}
                 >
                   <i className='bx bx-show'></i>
                 </button>
