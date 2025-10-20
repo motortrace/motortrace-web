@@ -7,12 +7,14 @@ export interface WorkOrder {
     year: number;
     estimateNumber?: string;
     amount: number;
+    paidAmount?: number; // Total amount paid
     hours: {
       left: number;
       billed: number;
     };
     tags: string[];
     status: 'opened' | 'in-progress' | 'on-hold' | 'completed';
+    isApproved?: boolean; // Flag to indicate if estimate is approved
     image?: string;
     assignedPeople?: {
       id: string;

@@ -5,30 +5,210 @@ import './ProductModal.scss';
 import './AddProduct.scss'
 
 interface ProductModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (productData: any) => void;
 }
 
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) => {
-  const [activeTab, setActiveTab] = useState('engine-fluids');
-  const [image, setImage] = useState<File | null>(null);
+    const [activeTab, setActiveTab] = useState('engine-fluids');
+    const [image, setImage] = useState<File | null>(null);
+  // submission indicator is intentionally omitted here; UI disables via modal close
 
-  // Reset tab to Engine & Fluids every time modal opens
+ const [formData, setFormData] = useState({
+    // Common fields
+    productname: '',
+    category: 'Engine & Fluids',
+    subcategory: '',
+    description: '',
+    price: '',
+    quantity: 0,
+    brand: '',
+    compatibility: '',
+    image: '',
+    stock: 0,
+    minquantity: 1,
+
+    fluidType: '',
+    specification: '',
+    volume: '',
+    replacementCycle: '',
+    boilingPoint: '',
+    partType: '',
+    material: '',
+    position: '',
+    size: '',
+    finish: '',
+    mountingfeatures: '',
+    electronicFeatures: '',
+    colorcode: '',
+    color: '',
+    surfaceuse: '',
+    resistance: '',
+    drytime: '',
+    applicationmethod: '',
+    voltage: '',
+    amprating: '',
+    connectortype: '',
+    warranty: '',
+    manufacturer: '',
+    manufactureddate: '',
+    expirydate: '',
+    notes: '',
+    discounttype: '',
+    discountvalue: 0,
+    type: ''
+  });
+
   React.useEffect(() => {
     if (isOpen) {
       setActiveTab('engine-fluids');
     }
   }, [isOpen]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setImage(file);
+
+ const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      [field]: value,
+      category: getCategoryFromTab(activeTab)
+    }));
   };
 
-  const handleSave = () => {
-    onSave();
-    onClose();
+const getCategoryFromTab = (tab: string): string => {
+    const tabMap: {[key: string]: string} = {
+      'engine-fluids': 'Engine & Fluids',
+      'wear-tear': 'Wear & Tear Parts',
+      'exterior-body': 'Exterior & Body Parts',
+      'paints-coatings': 'Paints & Coatings',
+      'engine-drivetrain': 'Engine & Drivetrain Components',
+      'electrical': 'Electrical Components',
+      'accessories': 'Accessories & Add-ons'
+    };
+    return tabMap[tab] || 'Engine & Fluids';
+  };
+
+const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      handleInputChange('image', URL.createObjectURL(file));
+    }
+  };
+
+
+const validateForm = (): boolean => {
+    const requiredFields = ['productname', 'brand', 'price', 'quantity'];
+    
+    
+    for (const field of requiredFields) {
+      if (!formData[field as keyof typeof formData]) {
+        alert(`Please fill in the ${field} field`);
+        return false;
+      }
+    }
+    if (formData.quantity < 0) {
+      alert('Quantity cannot be negative');
+      return false;
+    }
+    
+    if (parseFloat(formData.price) <= 0) {
+      alert('Price must be greater than 0');
+      return false;
+    }
+    
+    return true;
+  };
+
+const handleSave = async () => {
+    if (!validateForm()) return;
+    
+  // submission flag removed - UI will close modal on success
+    
+    try {
+      // Prepare the data for API - clean up empty values
+      let productToSave: any = Object.fromEntries(
+        Object.entries(formData).filter(([_, value]) => 
+          value !== '' && value !== null && value !== undefined
+        )
+      );
+      // Coerce numeric fields to numbers to match backend expectations
+      const numericFields = ['quantity', 'minquantity', 'stock', 'discountvalue', 'reviewcount', 'rating'];
+      for (const nf of numericFields) {
+        if (productToSave[nf] !== undefined) {
+          const n = Number(productToSave[nf]);
+          if (!Number.isNaN(n)) productToSave[nf] = n;
+        }
+      }
+      // Ensure price is a trimmed string (backend in GET returns price as string)
+      if (productToSave.price !== undefined) {
+        productToSave.price = String(productToSave.price).trim();
+      }
+
+      // Add default values and normalize field names expected by backend
+      productToSave.rating = productToSave.rating ?? 0;
+      productToSave.reviewcount = productToSave.reviewcount ?? 0;
+      productToSave.availability = productToSave.quantity > productToSave.minquantity 
+        ? 'In Stock' 
+        : productToSave.quantity === 0 
+          ? 'Out of Stock' 
+          : 'Low Stock';
+
+      // Some backends expect camelCase keys (e.g., productName). Ensure we send both forms to be safe.
+      if (productToSave.productname && !productToSave.productName) {
+        productToSave.productName = String(productToSave.productname);
+      }
+      // Also ensure lowercase key exists (some code reads this)
+      if (productToSave.productName && !productToSave.productname) {
+        productToSave.productname = String(productToSave.productName);
+      }
+
+      // Ensure category and price are present with expected key casing
+      if (productToSave.category && typeof productToSave.category !== 'string') {
+        productToSave.category = String(productToSave.category);
+      }
+      if (productToSave.price !== undefined && productToSave.price !== null) {
+        productToSave.price = String(productToSave.price);
+      }
+      
+      // Call your API endpoint - use the correct endpoint
+      const response = await fetch('http://localhost:3000/inventory/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productToSave),
+      });
+      if (response.ok) {
+        const savedProduct = await response.json().catch(() => null);
+        onSave(savedProduct);
+        onClose();
+      } else {
+        // Try to parse JSON message or fallback to text
+        let errorMessage = `Server error: ${response.status}`;
+        try {
+          const errJson = await response.json();
+          // Backend might send { message: '...' } or { error: '...' } or { success: false, message: '...' }
+          errorMessage = errJson.message || errJson.error || (errJson?.detail && JSON.stringify(errJson.detail)) || JSON.stringify(errJson) || errorMessage;
+          console.error('Backend error response (json):', errJson);
+        } catch (e) {
+          const text = await response.text().catch(() => '');
+          if (text) {
+            errorMessage = text;
+            console.error('Backend error response (text):', text);
+          }
+        }
+        // Surface the backend error so you can debug in the browser console and UI
+        console.error('Error saving product:', errorMessage);
+        alert(`Error saving product: ${errorMessage}`);
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      console.error('Error saving product:', error);
+    //   alert(`Error saving product: ${error.message}. Please try again.`);
+    } finally {
+      // no-op: submission state handled by modal lifecycle
+    }
   };
 
   if (!isOpen) return null;
@@ -37,857 +217,1302 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
     switch (activeTab) {
       case 'engine-fluids':
         return (
-          <div className="tab-content">
+        <div className="tab-content">
             <div className="add-product__section">
-            <h3 className="add-product__section-title">Product Information</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Product Name *</label>
-                <input type="text"/>
-            </div>
-            <div className="form-group">
-                <label>Fluid Type *</label>
-                <select><option>Select</option>
-                  <option>Engine Oil</option>
-                  <option>Transmission Fluid</option>
-                  <option>Brake Fluid</option>
-                  <option>Coolant</option>
-                  <option>Power Steering Fluid</option>
-                  <option>Windshield Washer Fluid</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Specification *</label>
-                <input type="text" placeholder='e.g., 5W-30, DOT 4, OAT'/>
-            </div>
-            <div className="form-group">
-                <label>Brand *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Volume *</label>
-                <input type="text" placeholder='e.g., 500ml, 1L, 4L'/>
-            </div>
-            <div className="form-group">
-                <label>Compatibility</label>
-                <input type='text' placeholder='System/vehicle/hydraulic compatibility'/>
-            </div>
-            <div className="form-group">
-                <label>Replacement Cycle</label>
-                <input type='text' placeholder='like per 5000 km or per 6 months'/>
-            </div>
-            <div className="form-group">
-                <label>Type</label>
-                <input type="text" placeholder='e.g., Synthetic oil, Manual Gear Oil' />
-            </div>
-            <div className="form-group">
-                <label>Boiling Point</label>
-                <input type="text"  />
-            </div>
-            <div className="form-group">
-                <label>Barcode Symbology</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group full">
-                <label>Item Barcode</label>
-                <input type="text" />
-            </div>
-            <div className="form-group full">
-                <label>Description</label>
-                <textarea placeholder="Maximum 60 words" rows={3} />
-            </div>
-            </div>
-        </div>
-
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Pricing & Stocks</h3>
-            <div className="form-grid">
-            {/* <div className="form-group">
-                <label>Product Type *</label>
-                <div className="radio-group">
-                <label><input type="radio" name="productType" /> Single Product</label>
-                <label><input type="radio" name="productType" /> Variable Product</label>
+              <h3 className="add-product__section-title">Product Information</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Product Name *</label>
+                  <input 
+                    type="text"
+                    value={formData.productname}
+                    onChange={(e) => handleInputChange('productname', e.target.value)}
+                    required
+                  />
                 </div>
-            </div> */}
-            {/* <div className="form-group">
-            </div> */}
-            <div className="form-group">
-                <label>Quantity *</label>
-                <input type="number" />
+                <div className="form-group">
+                  <label>Fluid Type *</label>
+                  <select
+                    value={formData.subcategory}
+                    onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                    required
+                  >                  
+                    <option value="">Select</option>
+                    <option value="Engine Oil">Engine Oil</option>
+                    <option value="Transmission Fluid">Transmission Fluid</option>
+                    <option value="Brake Fluid">Brake Fluid</option>
+                    <option value="Coolant">Coolant</option>
+                    <option value="Power Steering Fluid">Power Steering Fluid</option>
+                    <option value="Windshield Washer Fluid">Windshield Washer Fluid</option>
+                  </select>
+                </div>
+                {/* <div className="form-group">
+                  <label>Specification</label>
+                  <input 
+                    type="text" 
+                    placeholder='e.g., 5W-30, DOT 4, OAT'
+                    value={formData.specification}
+                    onChange={(e) => handleInputChange('specification', e.target.value)}
+                  />
+                </div> */}
+                <div className="form-group">
+                  <label>Brand *</label>
+                  <input 
+                    type="text" 
+                    value={formData.brand}
+                    onChange={(e) => handleInputChange('brand', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Volume *</label>
+                  <input 
+                    type="text" 
+                    placeholder='e.g., 500ml, 1L, 4L'
+                    value={formData.volume}
+                    onChange={(e) => handleInputChange('volume', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Compatibility</label>
+                  <input 
+                    type='text' 
+                    placeholder='System/vehicle/hydraulic compatibility'
+                    value={formData.compatibility}
+                    onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                  />
+                </div>
+                {/* <div className="form-group">
+                  <label>Replacement Cycle</label>
+                  <input 
+                    type='text' 
+                    placeholder='like per 5000 km or per 6 months'
+                    value={formData.replacementCycle}
+                    onChange={(e) => handleInputChange('replacementCycle', e.target.value)}
+                  />
+                </div> */}
+                <div className="form-group">
+                  <label>Type</label>
+                  <input 
+                    type="text" 
+                    placeholder='e.g., Synthetic oil, Manual Gear Oil'
+                    value={formData.type}
+                    onChange={(e) => handleInputChange('type', e.target.value)}
+                  />
+                </div>
+                <div className="form-group full">
+                  <label>Description</label>
+                  <textarea 
+                    placeholder="Product description" 
+                    rows={3} 
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                  />
+                </div>
+                <div className="form-group full">
+                  <label>Notes</label>
+                  <textarea 
+                    placeholder="Additional notes" 
+                    rows={2} 
+                    value={formData.notes}
+                    onChange={(e) => handleInputChange('notes', e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Price *</label>
-                <input type="text" />
-            </div>
-            {/* <div className="form-group">
-                <label>Tax Type *</label>
-                <select><option>Select</option></select>
-            </div> */}
-            <div className="form-group">
-                <label>Discount Type</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group">
-                <label>Discount Value</label>
-                <input type="number" />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Image</h3>
-            <div className="add-product__image-upload">
-            <label className="image-box">
-                {image ? (
-                <img src={URL.createObjectURL(image)} alt="Product" />
-                ) : (
-                <span>Add Image</span>
-                )}
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
-            </label>
+            {/* Pricing & Stocks Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Custom Fields</h3>
-            <div className="form-grid">
-            {/* <div className="form-group">
-                <label>Warranty *</label>
-                <select><option>Select</option></select>
-            </div> */}
-            <div className="form-group">
-                <label>Manufacturer</label>
-                <input type="text" />
+
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
+                <label className="image-box">
+                  {image ? (
+                    <img src={URL.createObjectURL(image)} alt="Product" />
+                  ) : (
+                    <span>Add Image</span>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </label>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Manufactured Date</label>
-                <input type="date" />
-            </div>
-            <div className="form-group">
-                <label>Expiry On</label>
-                <input type="date" />
-            </div>
+
+
+            <div className="add-product__section">
+                <h3 className="add-product__section-title">Custom Fields</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Warranty</label>
+                        <input type="text" 
+                            value={formData.warranty}
+                            onChange={(e) => handleInputChange('warranty', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufacturer</label>
+                        <input type="text" 
+                            value={formData.manufacturer}
+                            onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufactured Date</label>
+                        <input type="date" 
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Expiry On</label>
+                        <input type="date" 
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
-          </div>
+        
         );
       case 'wear-tear':
          return (
           <div className="tab-content">
             <div className="add-product__section">
-            <h3 className="add-product__section-title">Product Information</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Product Name *</label>
-                <input type="text"/>
+                <h3 className="add-product__section-title">Product Information</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Product Name *</label>
+                        <input type="text"
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Part Type *</label>
+                        <select
+                            value={formData.subcategory}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                            required
+                        > 
+                            <option value="">Select</option>
+                            <option value="Brake Pads">Brake Pads</option>
+                            <option value="Brake Rotors">Brake Rotors</option>
+                            <option value="Clutch Kit">Clutch Kit</option>
+                            <option value="Air Filters">Air Filters</option>
+                            <option value="Cabin Air Filters">Cabin Air Filters</option>
+                            <option value="Engine Air Intake Hoses/Belts">Engine Air Intake Hoses/Belts</option>
+                            <option value="Spark Plugs">Spark Plugs</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Material</label>
+                        <input type="text" placeholder='e.g., Rubber, Ceramic, Organic'
+                            value={formData.material}
+                            onChange={(e) => handleInputChange('material', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Position</label>
+                        <input type="text" placeholder='Front / Rear / Left / Right' 
+                            value={formData.position}
+                            onChange={(e) => handleInputChange('position', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Brand *</label>
+                        <input type="text" 
+                            value={formData.brand}
+                            onChange={(e) => handleInputChange('brand', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Size/Dimension</label>
+                        <input type="text" placeholder=''
+                            value={formData.size}
+                            onChange={(e) => handleInputChange('size', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Compatibility</label>
+                        <input type='text' placeholder='Vehicle Make / Model / Year'
+                            value={formData.compatibility}
+                            onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                        />
+                    </div>
+                    {/* <div className="form-group">
+                        <label>Replacement Interval</label>
+                        <input type='text' placeholder='Time or mileage'
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div> */}
+                    <div className="form-group full">
+                        <label>Notes</label>
+                        <textarea placeholder="Maximum 60 words" rows={3} 
+                            value={formData.notes}
+                            onChange={(e) => handleInputChange('notes', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Part Type *</label>
-                <select><option>Select</option>
-                  <option>Brake Pads</option>
-                  <option>Brake Rotors</option>
-                  <option>Clutch Kit</option>
-                  <option>Air Filters</option>
-                  <option>Cabin Air Filters</option>
-                  <option>Engine Air Intake Hoses/Belts</option>
-                  <option>Spark Plugs</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Material</label>
-                <input type="text" placeholder='e.g., Rubber, Ceramic, Organic'/>
-            </div>
-            <div className="form-group">
-                <label>Position</label>
-                <input type="text" placeholder='Front / Rear / Left / Right' />
-            </div>
-            <div className="form-group">
-                <label>Brand *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Size/Dimension</label>
-                <input type="text" placeholder=''/>
-            </div>
-            <div className="form-group">
-                <label>Compatibility</label>
-                <input type='text' placeholder='Vehicle Make / Model / Year'/>
-            </div>
-            <div className="form-group">
-                <label>Replacement Interval</label>
-                <input type='text' placeholder='Time or mileage'/>
-            </div>
-            <div className="form-group full">
-                <label>Notes</label>
-                <textarea placeholder="Maximum 60 words" rows={3} />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Pricing & Stocks</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Quantity *</label>
-                <input type="number" />
+            {/* Pricing & Stocks Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Price *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Minimum Quantity *</label>
-                <input type="number" />
-            </div>
-            <div className="form-group">
-                <label>Discount Type</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group">
-                <label>Discount Value</label>
-                <input type="number" />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Image</h3>
-            <div className="add-product__image-upload">
-            <label className="image-box">
-                {image ? (
-                <img src={URL.createObjectURL(image)} alt="Product" />
-                ) : (
-                <span>Add Image</span>
-                )}
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
-            </label>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Custom Fields</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Warranty *</label>
-                <select><option>Select</option></select>
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
+                <label className="image-box">
+                  {image ? (
+                    <img src={URL.createObjectURL(image)} alt="Product" />
+                  ) : (
+                    <span>Add Image</span>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </label>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Manufacturer</label>
-                <input type="text" />
+
+
+            <div className="add-product__section">
+                <h3 className="add-product__section-title">Custom Fields</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Warranty</label>
+                        <input type="text" 
+                            value={formData.warranty}
+                            onChange={(e) => handleInputChange('warranty', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufacturer</label>
+                        <input type="text" 
+                            value={formData.manufacturer}
+                            onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufactured Date</label>
+                        <input type="date" 
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Expiry On</label>
+                        <input type="date" 
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Manufactured Date</label>
-                <input type="date" />
-            </div>
-            <div className="form-group">
-                <label>Expiry On</label>
-                <input type="date" />
-            </div>
-            </div>
-        </div>
+
+            
           </div>
         );
       case 'exterior-body':
         return (
-          <div className="tab-content">
+        <div className="tab-content">
             <div className="add-product__section">
-            <h3 className="add-product__section-title">Product Information</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Product Name *</label>
-                <input type="text"/>
+                <h3 className="add-product__section-title">Product Information</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Product Name *</label>
+                        <input type="text"
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Part Type *</label>
+                        <select
+                            value={formData.subcategory}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                            required
+                        >
+                            <option value="">Select</option>
+                            <option value="Bumpers">Bumpers</option>
+                            <option value="Side Mirrors">Side Mirrors</option>
+                            <option value="Grilles">Grilles</option>
+                            <option value="Wipers">Wipers</option>
+                            <option value="Paint & Touch-up Kits">Paint & Touch-up Kits</option>
+                            <option value="Door Handles">Door Handles</option>
+                            <option value="Exterior Lights">Exterior Lights</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Material</label>
+                        <input type="text" placeholder='e.g., Plastic, Steel, Chrome'
+                            value={formData.material}
+                            onChange={(e) => handleInputChange('material', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Position</label>
+                        <input type="text" placeholder='Front / Rear / Left / Right' 
+                            value={formData.position}
+                            onChange={(e) => handleInputChange('position', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Paint/Finish</label>
+                        <input type="text" placeholder='Gloss, Matte, Chrome, Painted/Unpainted' 
+                            value={formData.finish}
+                            onChange={(e) => handleInputChange('finish', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Mounting Features</label>
+                        <input type="text" placeholder='With Fog Cutout, Sensor Slots, Lock Buttons' 
+                            value={formData.mountingfeatures}
+                            onChange={(e) => handleInputChange('mountingfeatures', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Type</label>
+                        <input type="text" placeholder='Heating, Indicator Light, Power Folding' 
+                            value={formData.type}
+                            onChange={(e) => handleInputChange('type', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Color</label>
+                        <input type="text" placeholder='Body-colored or Manufacturer’s paint code' 
+                            value={formData.color}
+                            onChange={(e) => handleInputChange('color', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Brand *</label>
+                        <input type="text" 
+                            value={formData.brand}
+                            onChange={(e) => handleInputChange('brand', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Vehicle Compatibility</label>
+                        <input type='text' placeholder='Vehicle Make / Model / Year'
+                            value={formData.compatibility}
+                            onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type='text' placeholder=''
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group full">
+                        <label>Notes</label>
+                        <textarea placeholder="Maximum 60 words" rows={3} 
+                            value={formData.notes}
+                            onChange={(e) => handleInputChange('notes', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Part Type *</label>
-                <select><option>Select</option>
-                  <option>Bumpers</option>
-                  <option>Side Mirrors</option>
-                  <option>Grilles</option>
-                  <option>Wipers</option>
-                  <option>Paint & Touch-up Kits</option>
-                  <option>Door Handles</option>
-                  <option>Exterior Lights</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Material</label>
-                <input type="text" placeholder='e.g., Plastic, Steel, Chrome'/>
-            </div>
-            <div className="form-group">
-                <label>Position</label>
-                <input type="text" placeholder='Front / Rear / Left / Right' />
-            </div>
-            <div className="form-group">
-                <label>Paint/Finish</label>
-                <input type="text" placeholder='Gloss, Matte, Chrome, Painted/Unpainted' />
-            </div>
-            <div className="form-group">
-                <label>Mounting Features</label>
-                <input type="text" placeholder='With Fog Cutout, Sensor Slots, Lock Buttons' />
-            </div>
-            <div className="form-group">
-                <label>Electronic</label>
-                <input type="text" placeholder='Heating, Indicator Light, Power Folding' />
-            </div>
-            <div className="form-group">
-                <label>Color/Code</label>
-                <input type="text" placeholder='Body-colored or Manufacturer’s paint code' />
-            </div>
-            <div className="form-group">
-                <label>Brand *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Vehicle Compatibility</label>
-                <input type='text' placeholder='Vehicle Make / Model / Year'/>
-            </div>
-            <div className="form-group full">
-                <label>Notes</label>
-                <textarea placeholder="Maximum 60 words" rows={3} />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Pricing & Stocks</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Quantity *</label>
-                <input type="number" />
+            {/* Pricing & Stocks Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Price *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Minimum Quantity *</label>
-                <input type="number" />
-            </div>
-            <div className="form-group">
-                <label>Discount Type</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group">
-                <label>Discount Value</label>
-                <input type="number" />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Image</h3>
-            <div className="add-product__image-upload">
-            <label className="image-box">
-                {image ? (
-                <img src={URL.createObjectURL(image)} alt="Product" />
-                ) : (
-                <span>Add Image</span>
-                )}
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
-            </label>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Custom Fields</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Warranty *</label>
-                <select><option>Select</option></select>
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
+                <label className="image-box">
+                  {image ? (
+                    <img src={URL.createObjectURL(image)} alt="Product" />
+                  ) : (
+                    <span>Add Image</span>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </label>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Manufacturer</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Manufactured Date</label>
-                <input type="date" />
-            </div>
-            <div className="form-group">
-                <label>Expiry On</label>
-                <input type="date" />
-            </div>
+
+
+            <div className="add-product__section">
+                <h3 className="add-product__section-title">Custom Fields</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Warranty</label>
+                        <input type="text" 
+                            value={formData.warranty}
+                            onChange={(e) => handleInputChange('warranty', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufacturer</label>
+                        <input type="text" 
+                            value={formData.manufacturer}
+                            onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufactured Date</label>
+                        <input type="date" 
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Expiry On</label>
+                        <input type="date" 
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
-          </div>
         );
       case 'paints-coatings':
         return (
-          <div className="tab-content">
+        <div className="tab-content">
             <div className="add-product__section">
-            <h3 className="add-product__section-title">Product Information</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Product Name *</label>
-                <input type="text"/>
-            </div>
-            <div className="form-group">
-                <label>Category *</label>
-                <select><option>Select</option>
-                  <option>Touch-Up Paints</option>
-                  <option>Spray Paints</option>
-                  <option>Clear/Top Coats</option>
-                  <option>Primers</option>
-                  <option>Underbody/RustProof Coatings</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Color</label>
-                <input type="text" placeholder='e.g., Silver, Black, Custom (with code)'/>
-            </div>
-            <div className="form-group">
-                <label>Color Code</label>
-                <input type="text" placeholder='e.g., “NH731P” (Honda Black)' />
-            </div>
-            <div className="form-group">
-                <label>Finish</label>
-                <input type="text" placeholder='Gloss, Matte, Satin, Metallic' />
-            </div>
-            <div className="form-group">
-                <label>Type</label>
-                <input type="text" placeholder='Acrylic, Enamel, 1K, 2K, Bitumen-based, etc.' />
-            </div>
-            <div className="form-group">
-                <label>Surface Use</label>
-                <input type="text" placeholder='Plastic, Metal, Underbody' />
-            </div>
-            <div className="form-group">
-                <label>Heat/UV Resistance</label>
-                {/* <input type="text" placeholder='Body-colored or Manufacturer’s paint code' /> */}
-                <div className="radio-group">
-                <label><input type="radio" name="productType" /> Yes</label>
-                <label><input type="radio" name="productType" /> No</label>
+                <h3 className="add-product__section-title">Product Information</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Product Name *</label>
+                            <input type="text"
+                                value={formData.productname}
+                                onChange={(e) => handleInputChange('productname', e.target.value)}
+                                required
+                            />
+                    </div>
+                    <div className="form-group">
+                        <label>Category *</label>
+                        <select
+                            value={formData.subcategory}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                            required
+                        >
+                            <option value="">Select</option>
+                            <option value="Touch-Up Paints">Touch-Up Paints</option>
+                            <option value="Spray Paints">Spray Paints</option>
+                            <option value="Clear/Top Coats">Clear/Top Coats</option>
+                            <option value="Primers">Primers</option>
+                            <option value="Underbody/RustProof Coatings">Underbody/RustProof Coatings</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Color</label>
+                        <input type="text" placeholder='e.g., Silver, Black, Custom'
+                            value={formData.color}
+                            onChange={(e) => handleInputChange('color', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Color Code</label>
+                        <input type="text" placeholder='e.g., “NH731P” (Honda Black)' 
+                            value={formData.colorcode}
+                            onChange={(e) => handleInputChange('colorcode', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Finish</label>
+                        <input type="text" placeholder='Gloss, Matte, Satin, Metallic' 
+                            value={formData.finish}
+                            onChange={(e) => handleInputChange('finish', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Type</label>
+                        <input type="text" placeholder='Acrylic, Enamel, 1K, 2K, Bitumen-based, etc.' 
+                            value={formData.type}
+                            onChange={(e) => handleInputChange('type', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Surface Use</label>
+                        <input type="text" placeholder='Plastic, Metal, Underbody' 
+                            value={formData.surfaceuse}
+                            onChange={(e) => handleInputChange('surfaceuse', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Heat/UV Resistance</label>
+                        <input type="text" placeholder='' 
+                            value={formData.resistance}
+                            onChange={(e) => handleInputChange('resistance', e.target.value)}
+                        />                      
+                    </div>
+                    <div className="form-group">
+                        <label>Dry Time</label>
+                        <input type="text" placeholder='Fast Dry / Regular' 
+                            value={formData.drytime}
+                            onChange={(e) => handleInputChange('drytime', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Volume</label>
+                        <input type="text" placeholder='ml / oz / Litre' 
+                            value={formData.volume}
+                            onChange={(e) => handleInputChange('volume', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Application Method</label>
+                        <input type="text" placeholder='Spray / Brush / Roll-on' 
+                            value={formData.applicationmethod}
+                            onChange={(e) => handleInputChange('applicationmethod', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Brand *</label>
+                        <input type="text" 
+                            value={formData.brand}
+                            onChange={(e) => handleInputChange('brand', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Vehicle Compatibility</label>
+                        <input type='text' placeholder='Vehicle Make / Model / Year'
+                            value={formData.compatibility}
+                            onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type='text' placeholder=''
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group full">
+                        <label>Notes</label>
+                        <textarea placeholder="Maximum 60 words" rows={3} 
+                            value={formData.notes}
+                            onChange={(e) => handleInputChange('notes', e.target.value)}
+                        />
+                    </div>
                 </div>
             </div>
-            <div className="form-group">
-                <label>Dry Time</label>
-                <input type="text" placeholder='Fast Dry / Regular' />
+            {/* Pricing & Stocks Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Volume</label>
-                <input type="text" placeholder='ml / oz / Litre' />
-            </div>
-            <div className="form-group">
-                <label>Application Method</label>
-                <input type="text" placeholder='Spray / Brush / Roll-on' />
-            </div>
-            <div className="form-group">
-                <label>Brand *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Vehicle Compatibility</label>
-                <input type='text' placeholder='Vehicle Make / Model / Year'/>
-            </div>
-            <div className="form-group full">
-                <label>Notes</label>
-                <textarea placeholder="Maximum 60 words" rows={3} />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Pricing & Stocks</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Quantity *</label>
-                <input type="number" />
-            </div>
-            <div className="form-group">
-                <label>Price *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Minimum Quantity *</label>
-                <input type="number" />
-            </div>
-            <div className="form-group">
-                <label>Discount Type</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group">
-                <label>Discount Value</label>
-                <input type="number" />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Image</h3>
-            <div className="add-product__image-upload">
-            <label className="image-box">
-                {image ? (
-                <img src={URL.createObjectURL(image)} alt="Product" />
-                ) : (
-                <span>Add Image</span>
-                )}
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
-            </label>
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
+                <label className="image-box">
+                  {image ? (
+                    <img src={URL.createObjectURL(image)} alt="Product" />
+                  ) : (
+                    <span>Add Image</span>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </label>
+              </div>
             </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Custom Fields</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Warranty</label>
-                <select><option>Select</option></select>
+
+            <div className="add-product__section">
+                <h3 className="add-product__section-title">Custom Fields</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Warranty</label>
+                        <input type="text" 
+                            value={formData.warranty}
+                            onChange={(e) => handleInputChange('warranty', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufacturer</label>
+                        <input type="text" 
+                            value={formData.manufacturer}
+                            onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufactured Date</label>
+                        <input type="date" 
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Expiry On</label>
+                        <input type="date" 
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Manufacturer</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Manufactured Date</label>
-                <input type="date" />
-            </div>
-            <div className="form-group">
-                <label>Expiry On</label>
-                <input type="date" />
-            </div>
-            </div>
-        </div>
+            
           </div>
         );
       case 'engine-drivetrain':
         return (
           <div className="tab-content">
             <div className="add-product__section">
-            <h3 className="add-product__section-title">Product Information</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Product Name *</label>
-                <input type="text"/>
+                <h3 className="add-product__section-title">Product Information</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Product Name *</label>
+                        <input type="text"
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Category *</label>
+                        <select
+                            value={formData.subcategory}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                            required
+                        > 
+                            <option value="">Select</option>
+                            <option value="Engine Components">Engine Components</option>
+                            <option value="Transmission Components">Transmission Components</option>
+                            <option value="Drivetrain & Differential Components">Drivetrain & Differential Components</option>
+                            <option value="Final Drive / Supporting Components">Final Drive / Supporting Components</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Vehicle Compatibility</label>
+                        <input type='text' placeholder='Vehicle Make / Model / Year / Engine Code'
+                            value={formData.compatibility}
+                            onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Transmission Type</label>
+                        <input type="text" placeholder='Manual / Automatic / CVT'
+                            value={formData.type}
+                            onChange={(e) => handleInputChange('type', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Material</label>
+                        <input type="text" placeholder='Steel / Aluminum / Rubber / Composite' 
+                            value={formData.material}
+                            onChange={(e) => handleInputChange('material', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Size / Length / Gear Ratio</label>
+                        <input type="text" placeholder='' 
+                            value={formData.size}
+                            onChange={(e) => handleInputChange('size', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Position</label>
+                        <input type="text" placeholder='Front / Rear / Left / Right' 
+                            value={formData.position}
+                            onChange={(e) => handleInputChange('position', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Brand *</label>
+                        <input type="text" 
+                            value={formData.brand}
+                            onChange={(e) => handleInputChange('brand', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type="text" 
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group full">
+                        <label>Notes</label>
+                        <textarea placeholder="Maximum 60 words" rows={3} 
+                            value={formData.notes}
+                            onChange={(e) => handleInputChange('notes', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Category *</label>
-                <select><option>Select</option>
-                  <option>Engine Components</option>
-                  <option>Transmission Components</option>
-                  <option>Drivetrain & Differential Components</option>
-                  <option>Final Drive / Supporting Components</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Vehicle Compatibility</label>
-                <input type='text' placeholder='Vehicle Make / Model / Year / Engine Code'/>
-            </div>
-            <div className="form-group">
-                <label>Transmission Type</label>
-                <input type="text" placeholder='Manual / Automatic / CVT'/>
-            </div>
-            <div className="form-group">
-                <label>Material</label>
-                <input type="text" placeholder='Steel / Aluminum / Rubber / Composite' />
-            </div>
-            <div className="form-group">
-                <label>Size / Length / Gear Ratio</label>
-                <input type="text" placeholder='' />
-            </div>
-            <div className="form-group">
-                <label>Position</label>
-                <input type="text" placeholder='Front / Rear / Left / Right' />
-            </div>
-            <div className="form-group">
-                <label>Brand *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group full">
-                <label>Notes</label>
-                <textarea placeholder="Maximum 60 words" rows={3} />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Pricing & Stocks</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Quantity *</label>
-                <input type="number" />
+            {/* Pricing & Stocks Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Price *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Minimum Quantity *</label>
-                <input type="number" />
-            </div>
-            <div className="form-group">
-                <label>Discount Type</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group">
-                <label>Discount Value</label>
-                <input type="number" />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Image</h3>
-            <div className="add-product__image-upload">
-            <label className="image-box">
-                {image ? (
-                <img src={URL.createObjectURL(image)} alt="Product" />
-                ) : (
-                <span>Add Image</span>
-                )}
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
-            </label>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Custom Fields</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Warranty</label>
-                <select><option>Select</option></select>
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
+                <label className="image-box">
+                  {image ? (
+                    <img src={URL.createObjectURL(image)} alt="Product" />
+                  ) : (
+                    <span>Add Image</span>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </label>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Manufacturer</label>
-                <input type="text" />
+
+
+            <div className="add-product__section">
+                <h3 className="add-product__section-title">Custom Fields</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Warranty</label>
+                        <input type="text" 
+                            value={formData.warranty}
+                            onChange={(e) => handleInputChange('warranty', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufacturer</label>
+                        <input type="text" 
+                            value={formData.manufacturer}
+                            onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufactured Date</label>
+                        <input type="date" 
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Expiry On</label>
+                        <input type="date" 
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Manufactured Date</label>
-                <input type="date" />
-            </div>
-            <div className="form-group">
-                <label>Expiry On</label>
-                <input type="date" />
-            </div>
-            </div>
-        </div>
           </div>
         );
       case 'electrical':
         return (
           <div className="tab-content">
             <div className="add-product__section">
-            <h3 className="add-product__section-title">Product Information</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Product Name *</label>
-                <input type="text"/>
+                <h3 className="add-product__section-title">Product Information</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Product Name *</label>
+                        <input type="text"
+                            value={formData.productname}
+                                onChange={(e) => handleInputChange('productname', e.target.value)}
+                                required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Category *</label>
+                        <select
+                            value={formData.subcategory}
+                            onChange={(e) => {handleInputChange('subcategory', e.target.value);}}
+                            required
+                        >
+                            <option value="">Select</option>
+                            <option value="Charging & Starting System">Charging & Starting System</option>
+                            <option value="Lighting & Signaling System">Lighting & Signaling System</option>
+                            <option value="Sensors & Modules">Sensors & Modules</option>
+                            <option value="Switches & Controls">Switches & Controls</option>
+                            <option value="Wiring, Fuses & Relays">Wiring, Fuses & Relays</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Vehicle Compatibility</label>
+                        <input type='text' placeholder='Vehicle Make / Model / Year / Engine Code'
+                            value={formData.compatibility}
+                            onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Voltage</label>
+                        <input type="text" placeholder='12V / 24V '
+                            value={formData.voltage}
+                            onChange={(e) => handleInputChange('voltage', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Amp Rating</label>
+                        <input type="text" placeholder='' 
+                            value={formData.amprating}
+                            onChange={(e) => handleInputChange('amprating', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Connector Type / Pin Count</label>
+                        <input type="text" placeholder='' 
+                            value={formData.connectortype}
+                            onChange={(e) => handleInputChange('connectortype', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Position</label>
+                        <input type="text" placeholder='Front / Rear / Left / Right' 
+                            value={formData.position}
+                            onChange={(e) => handleInputChange('position', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Material / Lens Color</label>
+                        <input type="text" placeholder='' 
+                            value={formData.material}
+                            onChange={(e) => handleInputChange('material', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Brand *</label>
+                        <input type="text" 
+                            value={formData.brand}
+                            onChange={(e) => handleInputChange('brand', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type="text" 
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group full">
+                        <label>Notes</label>
+                        <textarea placeholder="Maximum 60 words" rows={3} 
+                            value={formData.notes}
+                            onChange={(e) => handleInputChange('notes', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Category *</label>
-                <select><option>Select</option>
-                  <option>Charging & Starting System</option>
-                  <option>Lighting & Signaling System</option>
-                  <option>Sensors & Modules</option>
-                  <option>Switches & Controls</option>
-                  <option>Wiring, Fuses & Relays</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Vehicle Compatibility</label>
-                <input type='text' placeholder='Vehicle Make / Model / Year / Engine Code'/>
-            </div>
-            <div className="form-group">
-                <label>Voltage</label>
-                <input type="text" placeholder='12V / 24V '/>
-            </div>
-            <div className="form-group">
-                <label>Amp Rating</label>
-                <input type="text" placeholder='' />
-            </div>
-            <div className="form-group">
-                <label>Connector Type / Pin Count</label>
-                <input type="text" placeholder='' />
-            </div>
-            <div className="form-group">
-                <label>Position</label>
-                <input type="text" placeholder='Front / Rear / Left / Right' />
-            </div>
-            <div className="form-group">
-                <label>Material / Lens Color</label>
-                <input type="text" placeholder='' />
-            </div>
-            <div className="form-group">
-                <label>Brand *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group full">
-                <label>Notes</label>
-                <textarea placeholder="Maximum 60 words" rows={3} />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Pricing & Stocks</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Quantity *</label>
-                <input type="number" />
+            {/* Pricing & Stocks Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Price *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Minimum Quantity *</label>
-                <input type="number" />
-            </div>
-            <div className="form-group">
-                <label>Discount Type</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group">
-                <label>Discount Value</label>
-                <input type="number" />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Image</h3>
-            <div className="add-product__image-upload">
-            <label className="image-box">
-                {image ? (
-                <img src={URL.createObjectURL(image)} alt="Product" />
-                ) : (
-                <span>Add Image</span>
-                )}
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
-            </label>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Custom Fields</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Warranty</label>
-                <select><option>Select</option></select>
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
+                <label className="image-box">
+                  {image ? (
+                    <img src={URL.createObjectURL(image)} alt="Product" />
+                  ) : (
+                    <span>Add Image</span>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </label>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Manufacturer</label>
-                <input type="text" />
+
+
+            <div className="add-product__section">
+                <h3 className="add-product__section-title">Custom Fields</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Warranty</label>
+                        <input type="text" 
+                            value={formData.warranty}
+                            onChange={(e) => handleInputChange('warranty', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufacturer</label>
+                        <input type="text" 
+                            value={formData.manufacturer}
+                            onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufactured Date</label>
+                        <input type="date" 
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Expiry On</label>
+                        <input type="date" 
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Manufactured Date</label>
-                <input type="date" />
-            </div>
-            <div className="form-group">
-                <label>Expiry On</label>
-                <input type="date" />
-            </div>
-            </div>
-        </div>
           </div>
         );
       case 'accessories':
         return (
-          <div className="tab-content">
+        <div className="tab-content">
             <div className="add-product__section">
-            <h3 className="add-product__section-title">Product Information</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Product Name *</label>
-                <input type="text"/>
+                <h3 className="add-product__section-title">Product Information</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Product Name *</label>
+                        <input type="text"
+                            value={formData.productname}
+                            onChange={(e) => handleInputChange('productname', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Category *</label>
+                        <select
+                            value={formData.subcategory}
+                            onChange={(e) => {handleInputChange('subcategory', e.target.value); }}
+                            required
+                        >
+                            <option value="">Select</option>
+                            <option value="Interior Accessories">Interior Accessories</option>
+                            <option value="Electronic Add-ons">Electronic Add-ons</option>
+                            <option value="Exterior Accessories">Exterior Accessories</option>
+                            <option value="Performance Add-ons">Performance Add-ons</option>
+                            <option value="Protection & Utility Add-ons">Protection & Utility Add-ons</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Vehicle Compatibility</label>
+                        <input type='text' placeholder='Universal or Make/Model/Year'
+                            value={formData.compatibility}
+                            onChange={(e) => handleInputChange('compatibility', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Material</label>
+                        <input type="text" placeholder='Leather, Polyester, Rubber, Steel, Plastic '
+                            value={formData.material}
+                            onChange={(e) => handleInputChange('material', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Size / Dimensions</label>
+                        <input type="text" placeholder='' 
+                            value={formData.size}
+                            onChange={(e) => handleInputChange('size', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Color / Finish</label>
+                        <input type="text" placeholder='' 
+                            value={formData.finish}
+                            onChange={(e) => handleInputChange('finish', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Brand *</label>
+                        <input type="text" 
+                            value={formData.brand}
+                            onChange={(e) => handleInputChange('brand', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <input type="text" 
+                            value={formData.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group full">
+                        <label>Notes</label>
+                        <textarea placeholder="Maximum 60 words" rows={3} 
+                            value={formData.notes}
+                            onChange={(e) => handleInputChange('notes', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Category *</label>
-                <select><option>Select</option>
-                  <option>Interior Accessories</option>
-                  <option>Electronic Add-ons</option>
-                  <option>Exterior Accessories</option>
-                  <option>Performance Add-ons (Non-Mechanical)</option>
-                  <option>Protection & Utility Add-ons</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Vehicle Compatibility</label>
-                <input type='text' placeholder='Universal or Make/Model/Year'/>
-            </div>
-            <div className="form-group">
-                <label>Material</label>
-                <input type="text" placeholder='Leather, Polyester, Rubber, Steel, Plastic '/>
-            </div>
-            <div className="form-group">
-                <label>Size / Dimensions</label>
-                <input type="text" placeholder='' />
-            </div>
-            <div className="form-group">
-                <label>Color / Finish</label>
-                <input type="text" placeholder='' />
-            </div>
-            <div className="form-group">
-                <label>Brand *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group full">
-                <label>Notes</label>
-                <textarea placeholder="Maximum 60 words" rows={3} />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Pricing & Stocks</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Quantity *</label>
-                <input type="number" />
+           {/* Pricing & Stocks Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Pricing & Stocks</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price *</label>
+                  <input 
+                    type="text" 
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Minimum Quantity *</label>
+                  <input 
+                    type="number" 
+                    value={formData.minquantity}
+                    onChange={(e) => handleInputChange('minquantity', parseInt(e.target.value) || 1)}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Price *</label>
-                <input type="text" />
-            </div>
-            <div className="form-group">
-                <label>Minimum Quantity *</label>
-                <input type="number" />
-            </div>
-            <div className="form-group">
-                <label>Discount Type</label>
-                <select><option>Select</option></select>
-            </div>
-            <div className="form-group">
-                <label>Discount Value</label>
-                <input type="number" />
-            </div>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Image</h3>
-            <div className="add-product__image-upload">
-            <label className="image-box">
-                {image ? (
-                <img src={URL.createObjectURL(image)} alt="Product" />
-                ) : (
-                <span>Add Image</span>
-                )}
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
-            </label>
-            </div>
-        </div>
 
-        <div className="add-product__section">
-            <h3 className="add-product__section-title">Custom Fields</h3>
-            <div className="form-grid">
-            <div className="form-group">
-                <label>Warranty</label>
-                <select><option>Select</option></select>
+            {/* Image Section */}
+            <div className="add-product__section">
+              <h3 className="add-product__section-title">Image</h3>
+              <div className="add-product__image-upload">
+                <label className="image-box">
+                  {image ? (
+                    <img src={URL.createObjectURL(image)} alt="Product" />
+                  ) : (
+                    <span>Add Image</span>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </label>
+              </div>
             </div>
-            <div className="form-group">
-                <label>Manufacturer</label>
-                <input type="text" />
+
+
+            <div className="add-product__section">
+                <h3 className="add-product__section-title">Custom Fields</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>Warranty</label>
+                        <input type="text" 
+                            value={formData.warranty}
+                            onChange={(e) => handleInputChange('warranty', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufacturer</label>
+                        <input type="text" 
+                            value={formData.manufacturer}
+                            onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Manufactured Date</label>
+                        <input type="date" 
+                            value={formData.manufactureddate}
+                            onChange={(e) => handleInputChange('manufactureddate', e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Expiry On</label>
+                        <input type="date" 
+                            value={formData.expirydate}
+                            onChange={(e) => handleInputChange('expirydate', e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-                <label>Manufactured Date</label>
-                <input type="date" />
-            </div>
-            <div className="form-group">
-                <label>Expiry On</label>
-                <input type="date" />
-            </div>
-            </div>
-        </div>
           </div>
         );
       default:
@@ -904,11 +1529,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
             <p>Create a comprehensive product record</p>
           </div>
           <div className="modal-actions">
-            {/* <button className="save-btn" onClick={handleSave}>
-              Save Product
-            </button> */}
             <button className="close-btn" onClick={onClose}>
-              <X size={20} />
+              <X size={20}/>
             </button>
           </div>
         </div>
@@ -970,9 +1592,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave }) 
         </div>
 
         <div className="modal-footer">
-          {/* <button className="cancel-btn" onClick={onClose}>
-            Cancel
-          </button> */}
           <button className="add-btn" onClick={handleSave}>
             Add Product
           </button>
