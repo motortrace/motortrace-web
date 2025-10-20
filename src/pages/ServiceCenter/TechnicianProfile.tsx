@@ -106,7 +106,7 @@ const TechnicianProfile: React.FC = () => {
   const tabs: TabConfig[] = [
     {
       id: 'details',
-      label: 'Details',
+      label: 'Info',
       component: DetailsTab
     },
     {
@@ -178,22 +178,25 @@ const TechnicianProfile: React.FC = () => {
             )}
           </div>
           <div className="technician-info">
-            <h1 className="technician-name">{technician.userProfile.name}</h1>
             <div className="technician-meta">
+              <h1 className="technician-name">{technician.userProfile.name}</h1>
               <span className="badge badge-primary">{technician.specialization || 'Technician'}</span>
-              <span className="employee-id">ID: {technician.employeeId}</span>
+            </div>
+            
+            <div className="technician-meta">
+              <span className="employee-id">Technician ID: {technician.employeeId}</span>
             </div>
           </div>
         </div>
         <div className="header-right">
           <button className="btn-secondary">
             <i className="bx bx-edit"></i>
-            Edit
+            Edit Profile
           </button>
-          <button className="btn-primary">
+          {/* <button className="btn-primary">
             <i className="bx bx-phone"></i>
             Contact
-          </button>
+          </button> */}
         </div>
       </div>
 

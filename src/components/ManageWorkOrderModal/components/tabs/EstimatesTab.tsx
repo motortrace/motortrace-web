@@ -1,6 +1,202 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../hooks/useAuth';
 import type { WorkOrderApproval } from '../../types';
+import ConfirmationDialog from '../../../ConfirmationDialog';
+
+interface EstimateCardProps {
+  estimate: WorkOrderApproval;
+  onViewPdf: () => void;
+  onFinalize?: () => void;
+  onApprove?: () => void;
+  isFinalizing: boolean;
+  isApproving: boolean;
+  getTypeBadge: (type: string) => React.ReactElement;
+  getStatusBadge: (status: string) => React.ReactElement;
+  getProfileName: (approvedBy: any) => string;
+  getProfileImage: (approvedBy: any) => string | null;
+  isProfileAvailable: (approvedBy: any) => boolean;
+}
+
+const EstimateCard: React.FC<EstimateCardProps> = ({
+  estimate,
+  onViewPdf,
+  onFinalize,
+  onApprove,
+  isFinalizing,
+  isApproving,
+  getTypeBadge,
+  getStatusBadge,
+  getProfileName,
+  getProfileImage,
+  isProfileAvailable
+}) => {
+  return (
+    <div className="estimate-card" style={{ 
+      background: '#fff', 
+      borderRadius: 12, 
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+      border: '1px solid #e5e7eb', 
+      overflow: 'hidden',
+      transition: 'all 0.2s ease',
+      cursor: 'pointer'
+    }}
+    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+    onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'}
+    >
+      <div style={{ padding: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {getTypeBadge(estimate.type || 'ESTIMATE')}
+          </div>
+          {getStatusBadge(estimate.status)}
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          {isProfileAvailable(estimate.approvedBy) ? (
+            <>
+              {getProfileImage(estimate.approvedBy) ? (
+                <img
+                  src={getProfileImage(estimate.approvedBy)!}
+                  alt={getProfileName(estimate.approvedBy)}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '2px solid #e5e7eb'
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: 16
+                }}>
+                  {getProfileName(estimate.approvedBy)?.[0] || '?'}
+                </div>
+              )}
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: '#1f2937', marginBottom: 2 }}>
+                  {getProfileName(estimate.approvedBy)}
+                </div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>Created By</div>
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: 14, color: '#6b7280', fontStyle: 'italic' }}>
+              Created By: N/A
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            className="btn btn--primary" 
+            onClick={onViewPdf}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <i className='bx bx-file' style={{ marginRight: 6 }}></i>
+            View PDF
+          </button>
+          {onApprove && (
+            <button 
+              className="btn btn--success" 
+              style={{ 
+                flex: 1, 
+                padding: '10px 16px', 
+                fontSize: 14,
+                fontWeight: 500,
+                borderRadius: 8,
+                background: '#10b981',
+                border: '1px solid #10b981',
+                color: '#fff',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={onApprove}
+              disabled={isApproving}
+              onMouseEnter={(e) => {
+                if (!isApproving) {
+                  e.currentTarget.style.background = '#059669';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isApproving) {
+                  e.currentTarget.style.background = '#10b981';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }
+              }}
+            >
+              {isApproving ? (
+                <>
+                  <i className='bx bx-loader-alt bx-spin' style={{ marginRight: 6 }}></i>
+                  Approving...
+                </>
+              ) : (
+                <>
+                  <i className='bx bx-check' style={{ marginRight: 6 }}></i>
+                  Approve
+                </>
+              )}
+            </button>
+          )}
+          {onFinalize && (
+            <button 
+              className="btn btn--secondary" 
+              style={{ 
+                flex: 1, 
+                padding: '10px 16px', 
+                fontSize: 14,
+                fontWeight: 500,
+                borderRadius: 8,
+                background: '#f8fafc',
+                border: '1px solid #d1d5db',
+                color: '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={onFinalize}
+              disabled={isFinalizing}
+              onMouseEnter={(e) => {
+                if (!isFinalizing) {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isFinalizing) {
+                  e.currentTarget.style.background = '#f8fafc';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }
+              }}
+            >
+              {isFinalizing ? (
+                <>
+                  <i className='bx bx-loader-alt bx-spin' style={{ marginRight: 6 }}></i>
+                  Finalizing...
+                </>
+              ) : (
+                <>
+                  <i className='bx bx-check' style={{ marginRight: 6 }}></i>
+                  Finalize
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface EstimatesTabProps {
   workOrderId: string;
@@ -21,6 +217,11 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
   const [error, setError] = useState('');
   const [creatingEstimate, setCreatingEstimate] = useState(false);
   const [finalizing, setFinalizing] = useState<string | null>(null);
+
+  // Approval confirmation state
+  const [showApprovalConfirm, setShowApprovalConfirm] = useState(false);
+  const [approvalToApprove, setApprovalToApprove] = useState<WorkOrderApproval | null>(null);
+  const [isApproving, setIsApproving] = useState(false);
 
   // Function to fetch estimates (extracted for reuse)
   const fetchEstimates = async () => {
@@ -114,19 +315,6 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
     );
   };
 
-  const getUnavailableBadge = (text: string = 'Not Available') => (
-    <span style={{
-      padding: '4px 8px',
-      borderRadius: '4px',
-      fontSize: '12px',
-      fontWeight: '500',
-      background: '#f3f4f6',
-      color: '#6b7280'
-    }}>
-      {text}
-    </span>
-  );
-
   // Helper functions for profile display
   const getProfileName = (approvedBy: any) => {
     if (!approvedBy) return 'N/A';
@@ -198,6 +386,45 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
     } finally {
       setFinalizing(null);
     }
+  };
+
+  // Function to approve a pending estimate
+  const handleApproveEstimate = async () => {
+    if (!approvalToApprove || !token) return;
+
+    setIsApproving(true);
+    try {
+      const response = await fetch(`http://localhost:3000/work-orders/approvals/${approvalToApprove.id}/approve`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          notes: 'Estimate approved manually'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to approve estimate: ${response.statusText}`);
+      }
+
+      // Refresh the estimates list after approval
+      await fetchEstimates();
+    } catch (err) {
+      console.error('Error approving estimate:', err);
+      setError('Failed to approve estimate');
+    } finally {
+      setIsApproving(false);
+      setShowApprovalConfirm(false);
+      setApprovalToApprove(null);
+    }
+  };
+
+  // Function to handle approval button click
+  const handleApprovalClick = (estimate: WorkOrderApproval) => {
+    setApprovalToApprove(estimate);
+    setShowApprovalConfirm(true);
   };
 
   return (
@@ -273,123 +500,29 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          {/* Estimates Table */}
+          {/* Estimates Cards */}
           {estimateItems.length > 0 && (
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '16px' }}>
                 Estimates
               </h3>
-              <div className="estimates-table-container full-width-table">
-                <table className="estimates-table styled-table" style={{ width: '100%', minWidth: 600, fontSize: 13, borderCollapse: 'collapse', border: '1px solid #e5e7eb', background: '#fff' }}>
-                  <thead>
-                    <tr style={{ background: '#f9fafb' }}>
-                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Type</th>
-                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Approved At</th>
-                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Method</th>
-                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Created By</th>
-                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
-                      <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {estimateItems.map((estimate) => {
-                      return (
-                        <tr key={estimate.id}>
-                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                            {getTypeBadge(estimate.type || 'ESTIMATE')}
-                          </td>
-                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                            {estimate.approvedAt ? new Date(estimate.approvedAt).toLocaleDateString() : getUnavailableBadge('Not Approved')}
-                          </td>
-                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                            {estimate.method ? estimate.method : getUnavailableBadge('No Method')}
-                          </td>
-                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                              {isProfileAvailable(estimate.approvedBy) ? (
-                                <>
-                                  {getProfileImage(estimate.approvedBy) ? (
-                                    <img
-                                      src={getProfileImage(estimate.approvedBy)}
-                                      alt={getProfileName(estimate.approvedBy)}
-                                      style={{
-                                        width: 26,
-                                        height: 26,
-                                        borderRadius: '50%',
-                                        objectFit: 'cover',
-                                        border: '1px solid #e5e7eb'
-                                      }}
-                                    />
-                                  ) : (
-                                    <div style={{
-                                      width: 26,
-                                      height: 26,
-                                      borderRadius: '50%',
-                                      background: '#f3f4f6',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      color: '#6b7280',
-                                      fontWeight: 600,
-                                      fontSize: 13
-                                    }}>
-                                      {getProfileName(estimate.approvedBy)?.[0] || '?'}
-                                    </div>
-                                  )}
-                                  <span style={{ fontWeight: 500 }}>{getProfileName(estimate.approvedBy)}</span>
-                                </>
-                              ) : (
-                                <span style={{
-                                  fontWeight: 500,
-                                  color: '#6b7280',
-                                  fontStyle: 'italic'
-                                }}>
-                                  N/A
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                            {getStatusBadge(estimate.status)}
-                          </td>
-                          <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-                              <button
-                                className="pdf-btn"
-                                title="View PDF"
-                                onClick={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
-                                style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
-                              >
-                                <i className="bx bx-file"></i>
-                              </button>
-
-                              {/* Finalize button: visible when estimate is APPROVED, not finalized, and of type ESTIMATE */}
-                              {(() => {
-                                // Debug logging
-                                console.log('Estimate:', estimate.id, 'Status:', estimate.status, 'isFinal:', estimate.isFinal, 'Type:', estimate.type, 'isServiceAdvisor:', isServiceAdvisor);
-
-                                // Show button when: isServiceAdvisor is true, isFinal is FALSE, status is APPROVED, and it's an ESTIMATE type
-                                if (isServiceAdvisor && estimate.status === 'APPROVED' && estimate.isFinal === false && estimate.type === 'ESTIMATE') {
-                                  return (
-                                    <button
-                                      onClick={() => handleFinalizeEstimate(estimate.id)}
-                                      disabled={finalizing === estimate.id}
-                                      style={{ background: '#0ea5a4', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 10px', fontSize: 13, cursor: 'pointer' }}
-                                      title="Finalize Estimate"
-                                    >
-                                      {finalizing === estimate.id ? 'Finalizing...' : 'Finalize Estimate'}
-                                    </button>
-                                  );
-                                }
-                                return null;
-                              })()}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="estimates-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+                {estimateItems.map((estimate) => (
+                  <EstimateCard
+                    key={estimate.id}
+                    estimate={estimate}
+                    onViewPdf={() => estimate.pdfUrl && window.open(estimate.pdfUrl, '_blank')}
+                    onApprove={estimate.status === 'PENDING' ? () => handleApprovalClick(estimate) : undefined}
+                    onFinalize={isServiceAdvisor && estimate.status === 'APPROVED' && estimate.isFinal === false && estimate.type === 'ESTIMATE' ? () => handleFinalizeEstimate(estimate.id) : undefined}
+                    isApproving={isApproving}
+                    isFinalizing={finalizing === estimate.id}
+                    getTypeBadge={getTypeBadge}
+                    getStatusBadge={getStatusBadge}
+                    getProfileName={getProfileName}
+                    getProfileImage={getProfileImage}
+                    isProfileAvailable={isProfileAvailable}
+                  />
+                ))}
               </div>
             </div>
           )}
@@ -481,6 +614,22 @@ const EstimatesTab: React.FC<EstimatesTabProps> = ({
           )}
         </div>
       )}
+
+      {/* Approval Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showApprovalConfirm}
+        title="Approve Estimate"
+        message={`Are you sure you want to approve this estimate? This action cannot be undone.`}
+        confirmText="Approve"
+        cancelText="Cancel"
+        onConfirm={handleApproveEstimate}
+        onCancel={() => {
+          setShowApprovalConfirm(false);
+          setApprovalToApprove(null);
+        }}
+        loading={isApproving}
+        type="success"
+      />
     </div>
   );
 };

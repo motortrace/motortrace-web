@@ -70,7 +70,9 @@ const DailyCustomersLineChart: React.FC<DailyCustomersLineChartProps> = ({ data 
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                domain={['dataMin - 2', 'dataMax + 2']}
+                domain={[0, 'dataMax + 2']}
+                type="number"
+                tickFormatter={(value) => Math.round(value).toString()}
               />
               <Tooltip content={<CustomTooltip />} />
               <Area

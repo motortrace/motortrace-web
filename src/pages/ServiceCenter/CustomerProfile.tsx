@@ -138,12 +138,12 @@ const CustomerProfile: React.FC = () => {
   const tabs: TabConfig[] = [
     { 
       id: 'details', 
-      label: 'Details',
+      label: 'Info',
       component: DetailsTab
     },
     {
       id: 'appointment',
-      label: 'Appointment',
+      label: 'Appointments',
       component: AppointmentTab
     },
     { 
@@ -213,12 +213,12 @@ const CustomerProfile: React.FC = () => {
         <div className="header-right">
           <button className="btn-secondary">
             <i className="bx bx-edit"></i>
-            Edit
+            Edit Profile
           </button>
-          <button className="btn-primary">
+          {/* <button className="btn-primary">
             <i className="bx bx-envelope"></i>
             Contact
-          </button>
+          </button> */}
         </div>
       </div>
 

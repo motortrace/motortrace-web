@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
 import InspectionsTab from './components/tabs/InspectionsTab';
 import EstimatesTab from './components/tabs/EstimatesTab';
-import PaymentsTab from './components/tabs/PaymentsTab';
 import ServicesTab from './components/tabs/ServicesTab';
 import MiscChargesTab from './components/tabs/MiscChargesTab';
 import AddInspectionModal from './components/modals/AddInspectionModal';
@@ -30,6 +30,7 @@ import '../WorkOrderModal/ManageWorkOrderModal.scss';
  */
 const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClose, workOrder, onUpdate }) => {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Initialize modal hook
@@ -148,7 +149,24 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
               <i className="bx bx-file-blank"></i>
               Publish Inspection Report
             </button> */}
-            {!isServiceAdvisor && workOrder?.status !== 'PAID' && (
+            {workOrder && workOrder.appointmentId && (
+              <button 
+                className="btn btn--secondary" 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px',
+                  backgroundColor: '#3A72ED',
+                  color: '#fff',
+                  borderColor: '#3A72ED'
+                }}
+                onClick={() => navigate(`/manager/appointment-detail/${workOrder.appointmentId}`)}
+              >
+                <i className="bx bx-calendar-event"></i>
+                View Appointment Details
+              </button>
+            )}
+            {/* {!isServiceAdvisor && workOrder?.status !== 'PAID' && (
               <button 
                 className="btn btn--secondary" 
                 style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#3b82f6', color: '#fff', borderColor: '#3b82f6' }}
@@ -157,7 +175,7 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
                 <i className="bx bx-receipt"></i>
                 Generate Invoice
               </button>
-            )}
+            )} */}
             <button className="close-btn" onClick={handleClose} title="Close">
               <i className="bx bx-x"></i>
             </button>
@@ -192,13 +210,6 @@ const ManageWorkOrderModal: React.FC<ManageWorkOrderModalProps> = ({ open, onClo
 
             {activeTab === 'estimates' && (
               <EstimatesTab
-                workOrderId={workOrder.id}
-                isServiceAdvisor={isServiceAdvisor}
-              />
-            )}
-
-            {activeTab === 'payments' && (
-              <PaymentsTab
                 workOrderId={workOrder.id}
                 isServiceAdvisor={isServiceAdvisor}
               />

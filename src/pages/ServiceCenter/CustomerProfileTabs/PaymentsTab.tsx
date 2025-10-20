@@ -20,20 +20,20 @@ const PaymentsTab: React.FC<PaymentsTabProps> = ({ payments }) => {
           <h3>Payment History</h3>
         </div>
         <div className="card-body">
-          <div className="table-responsive">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Amount</th>
-                  <th>Method</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments && payments.length > 0 ? (
-                  payments.map(payment => (
+          {payments && payments.length > 0 ? (
+            <div className="table-responsive">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map(payment => (
                     <tr key={payment.id}>
                       <td>{payment.date}</td>
                       <td>${payment.amount.toFixed(2)}</td>
@@ -49,15 +49,17 @@ const PaymentsTab: React.FC<PaymentsTabProps> = ({ payments }) => {
                         </button>
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="empty-state">No payment history available</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="empty-state">
+              <i className="bx bx-credit-card"></i>
+              <p>No payments made yet</p>
+              <span>This customer hasn't made any payments yet. Payments will appear here once they start making transactions.</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
