@@ -1,185 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
 import Notifications from '../../components/Notifications/Notifications';
 import { useAuth } from '../../hooks/useAuth';
 
-// Work Order Status data
-const workOrderData = [
-  { name: 'Estimate', value: 12, color: '#3B82F6' },
-  { name: 'Approval', value: 8, color: '#F97316' },
-  { name: 'In Progress', value: 15, color: '#8B5CF6' },
-  { name: 'Waiting for Parts', value: 6, color: '#EAB308' },
-  { name: 'Completed', value: 19, color: '#10B981' }
-];
-
-const totalWorkOrders = workOrderData.reduce((sum, item) => sum + item.value, 0);
-
 // Sample assigned appointments data for service advisor
 const assignedAppointments: any[] = [];
 
-// Metric Card Component
+// MetricCard Component
 interface MetricCardProps {
   title: string;
   amount: string;
-  icon?: string;
+  bgColor?: string;
+  textColor?: string;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, amount, icon }) => {
+const MetricCard: React.FC<MetricCardProps> = ({
+  title,
+  amount,
+  bgColor = 'white',
+  textColor = '#1e293b'
+}) => {
   return (
     <div style={{
-      backgroundColor: 'white',
-      padding: '16px',
-      borderRadius: '8px',
-      border: '1px solid #e2e8f0',
-      position: 'relative'
+      backgroundColor: bgColor,
+      padding: '20px',
+      borderRadius: '12px',
+      border: 'none',
+      position: 'relative',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
     }}>
-      {icon && (
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          right: '12px',
-          fontSize: '20px',
-          color: '#64748b'
-        }}>
-          <i className={icon}></i>
-        </div>
-      )}
       <h3 style={{
-        fontSize: '12px',
-        fontWeight: '500',
-        color: '#64748b',
-        margin: '0 0 8px 0'
+        fontSize: '13px',
+        fontWeight: '600',
+        color: textColor,
+        opacity: 0.8,
+        margin: '0 0 12px 0',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px'
       }}>
         {title}
       </h3>
+
       <div style={{
-        fontSize: '22px',
+        fontSize: '32px',
         fontWeight: '700',
-        color: '#1e293b',
+        color: textColor,
         marginBottom: '8px'
       }}>
         {amount}
-      </div>
-    </div>
-  );
-};
-
-// Work Order Status Gauge Component
-const WorkOrderStatusGauge: React.FC = () => {
-  return (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      border: '1px solid #e2e8f0',
-      padding: '20px',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-    }}>
-      <h3 style={{
-        fontSize: '16px',
-        fontWeight: '600',
-        color: '#1e293b',
-        margin: '0 0 20px 0',
-        textAlign: 'center'
-      }}>
-        Work Order Status
-      </h3>
-
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '20px',
-        height: '200px'
-      }}>
-        {/* Gauge Chart */}
-        <div style={{
-          flex: '1',
-          position: 'relative',
-          height: '180px'
-        }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={workOrderData}
-                cx="50%"
-                cy="60%"
-                startAngle={180}
-                endAngle={0}
-                innerRadius={70}
-                outerRadius={100}
-                paddingAngle={1}
-                dataKey="value"
-              >
-                {workOrderData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-
-          {/* Center number positioned BELOW the arc - moved UP closer */}
-          <div style={{
-            position: 'absolute',
-            top: '75%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              fontSize: '32px',
-              fontWeight: '700',
-              color: '#1e293b',
-              lineHeight: '1'
-            }}>
-              {totalWorkOrders}
-            </div>
-            <div style={{
-              fontSize: '12px',
-              color: '#64748b',
-              fontWeight: '500',
-              marginTop: '4px'
-            }}>
-              Total Orders
-            </div>
-          </div>
-        </div>
-
-        {/* Legend positioned to the RIGHT */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          justifyContent: 'center',
-          minWidth: '180px'
-        }}>
-          {workOrderData.map((item, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '13px'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px'
-              }}>
-                <div style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  backgroundColor: item.color
-                }} />
-                <span style={{ color: '#475569', fontWeight: '500' }}>
-                  {item.name}
-                </span>
-              </div>
-              <span style={{ color: '#1e293b', fontWeight: '600' }}>
-                {item.value}
-              </span>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -196,6 +64,25 @@ const ServiceAdvisorDashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const notificationRef = React.useRef<HTMLDivElement>(null);
+  const [dashboardStats, setDashboardStats] = useState<{
+    totalWorkOrdersAssigned: number;
+    completedWorkOrders: number;
+    pendingWorkOrders: number;
+    inProgressWorkOrders: number;
+    totalRevenue: number;
+    unassignedTechniciansList?: Array<{
+      id: string;
+      employeeId: string;
+      name: string;
+      profileImage?: string;
+      specialization: string;
+      lastAssignedDate?: string;
+      lastAssignedType?: string;
+      lastWorkOrderNumber?: string;
+      daysSinceLastAssignment?: number;
+    }>;
+  } | null>(null);
+  const [dashboardStatsLoading, setDashboardStatsLoading] = useState(false);
 
   // Fetch user profile
   const fetchUserProfile = async () => {
@@ -260,10 +147,38 @@ const ServiceAdvisorDashboard = () => {
     }
   };
 
+  // Fetch dashboard statistics
+  const fetchDashboardStats = async () => {
+    if (!token) return;
+
+    setDashboardStatsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/service-advisors/me/dashboard', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setDashboardStats(data.data);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching dashboard stats:', err);
+    } finally {
+      setDashboardStatsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchUserProfile();
       fetchNotifications();
+      fetchDashboardStats();
     }
   }, [token]);
 
@@ -437,51 +352,171 @@ const ServiceAdvisorDashboard = () => {
         </div>
       </div>
 
-      {/* Main Layout - Two Sections */}
+      {/* Top 3 Stat Cards */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '16px',
+        marginBottom: '16px'
+      }}>
+        <MetricCard
+          title="Total Work Orders"
+          amount={dashboardStatsLoading ? 'Loading...' : dashboardStats?.totalWorkOrdersAssigned?.toString() || '0'}
+          bgColor="#dbeafe"
+          textColor="#1e40af"
+        />
+        <MetricCard
+          title="In Progress"
+          amount={dashboardStatsLoading ? 'Loading...' : dashboardStats?.inProgressWorkOrders?.toString() || '0'}
+          bgColor="#fef3c7"
+          textColor="#b45309"
+        />
+        <MetricCard
+          title="Completed"
+          amount={dashboardStatsLoading ? 'Loading...' : dashboardStats?.completedWorkOrders?.toString() || '0'}
+          bgColor="#dcfce7"
+          textColor="#15803d"
+        />
+      </div>
+
+      {/* Calendar and Unassigned Technicians Section */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
         gap: '16px',
-        alignItems: 'start'
+        marginBottom: '24px'
       }}>
-        {/* Left Section */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px'
-        }}>
-          {/* Top 3 Metric Cards */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '16px'
-          }}>
-            <MetricCard
-              title="Today's Appointments"
-              amount="8"
-              icon="bx bx-calendar-check"
-            />
-            <MetricCard
-              title="Pending Confirmations"
-              amount="3"
-              icon="bx bx-time-five"
-            />
-            <MetricCard
-              title="Customer Satisfaction"
-              amount="4.8/5"
-              icon="bx bx-star"
-            />
-          </div>
-
-          {/* Work Order Status Gauge */}
-          <WorkOrderStatusGauge />
+        {/* Calendar */}
+        <div>
+          <MiniCalendar appointments={assignedAppointments} />
         </div>
 
-        {/* Right Section - Calendar */}
+        {/* Unassigned Technicians Table */}
         <div style={{
-          height: '100%'
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden'
         }}>
-          <MiniCalendar appointments={assignedAppointments} />
+          {/* Header */}
+          <div style={{
+            padding: '16px 20px',
+            borderBottom: '1px solid #e2e8f0',
+            backgroundColor: 'white'
+          }}>
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#1e293b',
+              margin: 0
+            }}>
+              Unassigned Technicians
+            </h3>
+          </div>
+
+          {/* Table Content */}
+          <div style={{ padding: '16px 20px', maxHeight: '400px', overflowY: 'auto' }}>
+            {dashboardStatsLoading ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+                Loading...
+              </div>
+            ) : !dashboardStats?.unassignedTechniciansList || dashboardStats.unassignedTechniciansList.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+                <i className="bx bx-user-check" style={{ fontSize: '48px', color: '#d1d5db' }}></i>
+                <p style={{ marginTop: '16px', fontSize: '14px' }}>All technicians are assigned</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {dashboardStats.unassignedTechniciansList.map((tech) => (
+                  <div key={tech.id} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    backgroundColor: '#f9fafb',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                  >
+                    {/* Profile Image */}
+                    {tech.profileImage ? (
+                      <img
+                        src={tech.profileImage}
+                        alt={tech.name}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: '2px solid #e5e7eb'
+                        }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        backgroundColor: '#e0e7ff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#6366f1'
+                      }}>
+                        {tech.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      </div>
+                    )}
+
+                    {/* Technician Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#1e293b',
+                        marginBottom: '2px'
+                      }}>
+                        {tech.name}
+                      </div>
+                      <div style={{
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        marginBottom: '4px'
+                      }}>
+                        {tech.specialization}
+                      </div>
+                      {tech.lastAssignedDate && (
+                        <div style={{
+                          fontSize: '11px',
+                          color: '#9ca3af'
+                        }}>
+                          Last: {tech.lastAssignedType} • {tech.daysSinceLastAssignment} days ago
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Days Badge */}
+                    {tech.daysSinceLastAssignment !== undefined && (
+                      <div style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: tech.daysSinceLastAssignment > 7 ? '#fee2e2' : '#fef3c7',
+                        color: tech.daysSinceLastAssignment > 7 ? '#991b1b' : '#92400e',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {tech.daysSinceLastAssignment}d
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
