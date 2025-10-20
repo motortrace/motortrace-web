@@ -73,7 +73,10 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
     const getStatusBadgeClass = (status: string) => {
         const statusMap: Record<string, string> = {
             PENDING: 'status-badge--pending',
-            ORDERED: 'status-badge--estimated',
+            ESTIMATED: 'status-badge--estimated',
+            APPROVED: 'status-badge--approved',
+            REJECTED: 'status-badge--rejected',
+            ORDERED: 'status-badge--in-progress',
             RECEIVED: 'status-badge--approved',
             INSTALLED: 'status-badge--completed',
             RETURNED: 'status-badge--cancelled',
@@ -135,8 +138,28 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
      * Check if a part can be assigned a technician
      */
     const canAssignTechnician = (part: WorkOrderPart): boolean => {
+        // Can't assign if in PENDING or ESTIMATED status (awaiting approval)
+        if (part.status === 'PENDING' || part.status === 'ESTIMATED') {
+            return false;
+        }
         // Can't assign if already installed
-        return part.status !== 'INSTALLED';
+        if (part.status === 'INSTALLED') {
+            return false;
+        }
+        return true;
+    };
+
+    /**
+     * Get tooltip message for assign button
+     */
+    const getAssignTooltip = (part: WorkOrderPart): string => {
+        if (part.status === 'PENDING' || part.status === 'ESTIMATED') {
+            return 'Cannot assign technician - part is awaiting approval';
+        }
+        if (part.status === 'INSTALLED') {
+            return 'Part already installed';
+        }
+        return 'Assign technician';
     };
 
     if (isLoading) {
@@ -235,7 +258,9 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
                 <button
                     onClick={() => setShowAddPartModal(true)}
                     className="btn btn--primary"
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    disabled={parts.some(p => p.status === 'ESTIMATED')}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: parts.some(p => p.status === 'ESTIMATED') ? 0.6 : 1 }}
+                    title={parts.some(p => p.status === 'ESTIMATED') ? 'Cannot add parts while estimate is pending approval' : 'Add Part'}
                 >
                     <i className="bx bx-plus"></i>
                     Add Part
@@ -342,7 +367,7 @@ const InventoryTab: React.FC<InventoryTabProps> = ({ workOrderId }) => {
                                             transition: 'all 0.2s ease',
                                             opacity: canAssignTechnician(part) ? 1 : 0.6
                                         }}
-                                        title={canAssignTechnician(part) ? 'Assign technician' : 'Part already installed'}
+                                        title={getAssignTooltip(part)}
                                     >
                                         <i className="bx bx-user-plus" style={{ fontSize: '16px' }}></i>
                                     </button>

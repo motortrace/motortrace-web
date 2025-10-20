@@ -351,6 +351,8 @@ export interface InventoryItem {
   isOEM: boolean;
 }
 
+export type PartStatus = 'PENDING' | 'ESTIMATED' | 'APPROVED' | 'REJECTED' | 'ORDERED' | 'RECEIVED' | 'INSTALLED' | 'RETURNED';
+
 export interface WorkOrderPart {
   id: string;
   workOrderId: string;
@@ -360,7 +362,7 @@ export interface WorkOrderPart {
   unitPrice: string;
   subtotal: string;
   source: 'INVENTORY' | 'EXTERNAL';
-  status: 'PENDING' | 'ORDERED' | 'RECEIVED' | 'INSTALLED' | 'RETURNED';
+  status: PartStatus;
   part: InventoryItem;
   installedBy?: {
     id: string;
