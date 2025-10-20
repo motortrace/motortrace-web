@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import WorkOrderStatistics from '../../components/WorkOrderStatistics/WorkOrderStatistics';
 import MiniCalendar from '../../components/MiniCalendar/MiniCalendar';
 import Notifications from '../../components/Notifications/Notifications';
-import ConfirmationDialog from '../../components/ConfirmationDialog';
 import { useAuth } from '../../hooks/useAuth';
 import { useWorkingTechnicians } from '../../hooks/useWorkingTechnicians';
 
@@ -79,8 +78,6 @@ const Dashboard = () => {
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [notificationsError, setNotificationsError] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [confirmMessage, setConfirmMessage] = useState('');
   const [pendingAppointments, setPendingAppointments] = useState(0);
   const [pendingAppointmentsLoading, setPendingAppointmentsLoading] = useState(false);
   const [technicianStats, setTechnicianStats] = useState<{
@@ -785,8 +782,8 @@ const Dashboard = () => {
                           e.currentTarget.style.borderColor = '#e2e8f0';
                         }}
                         onClick={() => {
-                          setConfirmMessage(`Are you sure you want to view details for ${technician.technicianName}?`);
-                          setIsConfirmDialogOpen(true);
+                          // Redirect to technician details page
+                          window.location.href = `http://localhost:5173/manager/technician/${technician.technicianId || 'tech_007'}`;
                         }}
                       >
                         <i className='bx bx-show'></i>
@@ -799,20 +796,6 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-
-      {/* Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={isConfirmDialogOpen}
-        message={confirmMessage}
-        onConfirm={() => {
-          console.log('Confirmed action');
-          setIsConfirmDialogOpen(false);
-        }}
-        onCancel={() => {
-          console.log('Cancelled action');
-          setIsConfirmDialogOpen(false);
-        }}
-      />
     </div>
   );
 };
