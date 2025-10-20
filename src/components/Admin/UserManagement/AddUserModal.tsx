@@ -27,6 +27,7 @@ const initialFormState = {
   role: '',
   department: '',
   totalServices: '',
+  employeeId: '',
   status: 'Active',
   joinDate: new Date().toISOString().slice(0, 10),
 };
@@ -98,6 +99,10 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
         setError('Please fill in all required fields.');
         return;
       }
+      if (userType === 'Service Advisors' && !form.employeeId) {
+        setError('Employee ID is required for Service Advisors.');
+        return;
+      }
     }
     setLoading(true);
     try {
@@ -142,6 +147,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
           role: userType === 'Service Advisors' ? 'Service Advisor' : 'Technician',
           department: form.department,
           totalServices: Number(form.totalServices) || 0,
+          employeeId: userType === 'Service Advisors' ? form.employeeId : undefined,
         };
       }
       await onCreate(payload);
@@ -232,6 +238,9 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
               <input name="password" value={form.password} onChange={handleChange} placeholder="Default Password" style={inputStyle} type="password" />
               {/* Employee Details */}
               <div style={sectionTitleStyle}>Employee Details</div>
+              {userType === 'Service Advisors' && (
+                <input name="employeeId" value={form.employeeId} onChange={handleChange} placeholder="Employee ID" style={inputStyle} />
+              )}
               <select name="department" value={form.department} onChange={handleChange} style={inputStyle}>
                 <option value="">Select Department</option>
                 <option value="Customer Service">Customer Service</option>

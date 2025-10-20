@@ -32,6 +32,9 @@ const Employees: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState('All Statuses');
     const [searchTerm, setSearchTerm] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [serviceAdvisors, setServiceAdvisors] = useState<Employee[]>([]);
+    const [technicians, setTechnicians] = useState<Employee[]>([]);
+    const [loading, setLoading] = useState(false);
 
     // Mapping between URL parameters and display names
     const employeeTypeMap: Record<string, EmployeeType> = {
@@ -50,148 +53,93 @@ const Employees: React.FC = () => {
         if (employeeType && employeeTypeMap[employeeType]) {
             setActiveTab(employeeTypeMap[employeeType]);
         } else {
-            // Default to Service Advisors if no parameter or invalid parameter
             setActiveTab('Service Advisors');
-            // Optionally redirect to the default route
             navigate('/admin/userManagement/employees/serviceAdvisors', { replace: true });
         }
     }, [employeeType, navigate]);
 
-    const serviceAdvisors: Employee[] = [
-        {
-            id: '1',
-            name: 'A. Fernando',
-            email: 'a.fernando@servicecenter.com',
-            phone: '+94 77 123 4567',
-            role: 'Service Advisor',
-            department: 'Customer Service',
-            totalServices: 45,
-            status: 'Available',
-            joinDate: '2023-06-15',
-            bookingsHandled: 156,
-            jobCardsCreated: 89
-        },
-        {
-            id: '2',
-            name: 'M. Perera',
-            email: 'm.perera@servicecenter.com',
-            phone: '+94 71 234 5678',
-            role: 'Service Advisor',
-            department: 'Customer Service',
-            totalServices: 38,
-            status: 'On Work',
-            joinDate: '2023-08-22',
-            bookingsHandled: 142,
-            jobCardsCreated: 67
-        },
-        {
-            id: '3',
-            name: 'S. Silva',
-            email: 's.silva@servicecenter.com',
-            phone: '+94 76 345 6789',
-            role: 'Service Advisor',
-            department: 'Customer Service',
-            totalServices: 52,
-            status: 'Unavailable',
-            joinDate: '2023-05-10',
-            bookingsHandled: 203,
-            jobCardsCreated: 124
-        },
-        {
-            id: '4',
-            name: 'R. Mendis',
-            email: 'r.mendis@servicecenter.com',
-            phone: '+94 78 456 7890',
-            role: 'Service Advisor',
-            department: 'Customer Service',
-            totalServices: 29,
-            status: 'Available',
-            joinDate: '2024-01-15',
-            bookingsHandled: 78,
-            jobCardsCreated: 45
-        },
-        {
-            id: '5',
-            name: 'L. Bandara',
-            email: 'l.bandara@servicecenter.com',
-            phone: '+94 72 567 8901',
-            role: 'Service Advisor',
-            department: 'Customer Service',
-            totalServices: 41,
-            status: 'Suspended',
-            joinDate: '2023-09-03',
-            bookingsHandled: 134,
-            jobCardsCreated: 78
-        }
-    ];
+    // Fetch employees when tab changes or after adding new employee
+    useEffect(() => {
+        fetchEmployees();
+    }, [activeTab]);
 
-    const technicians: Employee[] = [
-        {
-            id: '6',
-            name: 'K. Jayasuriya',
-            email: 'k.jayasuriya@servicecenter.com',
-            phone: '+94 77 678 9012',
-            role: 'Technician',
-            department: 'Mechanical',
-            totalServices: 67,
-            status: 'Available',
-            joinDate: '2023-04-12',
-            specialization: 'Engine Repair',
-            jobsParticipated: 89
-        },
-        {
-            id: '7',
-            name: 'D. Weerasinghe',
-            email: 'd.weerasinghe@servicecenter.com',
-            phone: '+94 71 789 0123',
-            role: 'Technician',
-            department: 'Electrical',
-            totalServices: 58,
-            status: 'On Work',
-            joinDate: '2023-07-08',
-            specialization: 'Electrical Systems',
-            jobsParticipated: 76
-        },
-        {
-            id: '8',
-            name: 'N. Rathnayake',
-            email: 'n.rathnayake@servicecenter.com',
-            phone: '+94 76 890 1234',
-            role: 'Technician',
-            department: 'Mechanical',
-            totalServices: 73,
-            status: 'Available',
-            joinDate: '2023-03-25',
-            specialization: 'Transmission',
-            jobsParticipated: 94
-        },
-        {
-            id: '9',
-            name: 'H. Ekanayake',
-            email: 'h.ekanayake@servicecenter.com',
-            phone: '+94 78 901 2345',
-            role: 'Technician',
-            department: 'Electrical',
-            totalServices: 44,
-            status: 'Resigned',
-            joinDate: '2023-10-18',
-            specialization: 'Diagnostics',
-            jobsParticipated: 58
-        },
-        {
-            id: '10',
-            name: 'P. Wijewardena',
-            email: 'p.wijewardena@servicecenter.com',
-            phone: '+94 72 012 3456',
-            role: 'Technician',
-            department: 'Mechanical',
-            totalServices: 61,
-            status: 'On Work',
-            joinDate: '2023-11-30',
-            specialization: 'Brake Systems',
-            jobsParticipated: 82
+    const fetchEmployees = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            let endpoint = '';
+            if (activeTab === 'Service Advisors') {
+                endpoint = 'http://localhost:3000/service-advisors';
+            } else {
+                endpoint = 'http://localhost:3000/technicians'; // You'll need to create this endpoint
+            }
+
+            const response = await fetch(endpoint, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch employees');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform backend data to frontend Employee format
+                const employees = result.data.map((item: any) => transformBackendToFrontend(item, activeTab));
+
+                if (activeTab === 'Service Advisors') {
+                    setServiceAdvisors(employees);
+                } else {
+                    setTechnicians(employees);
+                }
+            }
+        } catch (error: any) {
+            console.error('Error fetching employees:', error);
+            toast.error('Failed to load employees');
+            // Fallback to empty arrays
+            if (activeTab === 'Service Advisors') {
+                setServiceAdvisors([]);
+            } else {
+                setTechnicians([]);
+            }
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
+
+    // Transform backend data to frontend Employee format
+    const transformBackendToFrontend = (backendData: any, type: EmployeeType): Employee => {
+        const baseEmployee = {
+            id: backendData.id || backendData.userProfileId,
+            name: backendData.userProfile?.name || 'Unknown',
+            email: backendData.userProfile?.email || 'No email',
+            phone: backendData.userProfile?.phone || 'No phone',
+            role: (type === 'Service Advisors' ? 'Service Advisor' : 'Technician') as Employee['role'],
+            department: backendData.department || 'Unassigned',
+            totalServices: backendData._count?.advisorWorkOrders || backendData._count?.jobs || 0,
+            status: 'Available' as Employee['status'], // You'll need to map this from backend status
+            joinDate: backendData.createdAt ? new Date(backendData.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        };
+
+        if (type === 'Service Advisors') {
+            return {
+                ...baseEmployee,
+                bookingsHandled: backendData._count?.assignedAppointments || 0,
+                jobCardsCreated: backendData._count?.advisorWorkOrders || 0,
+            };
+        } else {
+            return {
+                ...baseEmployee,
+                specialization: backendData.specialization || 'General',
+                jobsParticipated: backendData._count?.jobs || 0,
+            };
+        }
+    };
 
     // Pagination state
     const itemsPerPage = 5;
@@ -206,26 +154,55 @@ const Employees: React.FC = () => {
 
     const handleCreateUser = async (newUser: any) => {
         try {
-            const response = await fetch('http://localhost:3000/admin/createEmployee', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userType: activeTab, ...newUser }),
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Failed to create employee');
-            
-            // Add to appropriate list based on role
-            if (newUser.role === 'Service Advisor') {
-                // Update service advisors list
-                toast.success('Service Advisor created successfully!');
-            } else {
-                // Update technicians list
-                toast.success('Technician created successfully!');
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            // Map frontend role to backend role
+            const roleMap: Record<string, string> = {
+                'Service Advisor': 'service_advisor',
+                'Technician': 'technician'
+            };
+
+            const frontendRole = newUser.role as string;
+            const backendRole = roleMap[frontendRole];
+
+            if (!backendRole) {
+                throw new Error(`Invalid role specified: ${frontendRole}`);
             }
-            
+
+            // Prepare payload for staff user creation
+            const staffUserPayload = {
+                email: newUser.email,
+                password: newUser.password,
+                role: backendRole,
+                name: newUser.name,
+                phone: newUser.phone,
+                employeeId: newUser.employeeId
+            };
+
+            const response = await fetch('http://localhost:3000/users/staff', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(staffUserPayload),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || data.error || 'Failed to create staff user');
+            }
+
+            toast.success(`${newUser.role} profile created successfully!`);
             setIsAddModalOpen(false);
+
+            // Refresh the employee list to show the new user
+            fetchEmployees();
+
         } catch (error: any) {
-            toast.error(error.message || 'An error occurred');
+            toast.error(error.message || 'An error occurred while creating the profile');
         }
     };
 
@@ -356,6 +333,7 @@ const Employees: React.FC = () => {
                                 {employeeTypeConfig[employeeType as EmployeeType].icon}
                             </span>
                             {employeeType}
+                            {loading && activeTab === employeeType && ' (Loading...)'}
                         </button>
                     ))}
                 </div>
