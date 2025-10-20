@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../hooks/useAuth';
-import type { WorkOrderService, WorkOrderLaborItem } from '../../types';
+import type { WorkOrderService, WorkOrderLaborItem, ServiceStatus } from '../../types';
 import { getTechnicianDisplayName } from '../../utils/helpers';
 import { useTechnicians } from '../../hooks/useTechnicians';
 import { useToast } from '../../../../hooks/useToast';
+import { workOrderService } from '../../../../services/workOrderService';
 import AssignTechnicianToServiceModal from '../modals/AssignTechnicianToServiceModal';
 import AssignTechnicianToLaborModal from '../modals/AssignTechnicianToLaborModal';
 import AddServiceToWorkOrderModal from '../modals/AddServiceToWorkOrderModal';
@@ -19,6 +20,7 @@ interface ServicesTabProps {
 const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   const { token } = useAuth();
   const [services, setServices] = useState<WorkOrderService[]>([]);
+  const [miscCharges, setMiscCharges] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedServiceIds, setExpandedServiceIds] = useState<Set<string>>(new Set());
@@ -39,6 +41,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   useEffect(() => {
     if (workOrderId && token) {
       fetchServices();
+      fetchMiscCharges();
     }
   }, [workOrderId, token]);
 
@@ -76,6 +79,26 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
   };
 
   /**
+   * Fetch misc charges for the work order
+   */
+  const fetchMiscCharges = async () => {
+    try {
+      const data = await workOrderService.getMiscCharges(workOrderId);
+      // Ensure numeric fields are properly converted
+      const processedData = Array.isArray(data) ? data.map(charge => ({
+        ...charge,
+        unitPrice: Number(charge.unitPrice) || 0,
+        quantity: Number(charge.quantity) || 1,
+        subtotal: Number(charge.subtotal) || 0
+      })) : [];
+      setMiscCharges(processedData);
+    } catch (err) {
+      console.error('Error fetching misc charges:', err);
+      setMiscCharges([]);
+    }
+  };
+
+  /**
    * Toggle service expansion to show/hide labor items
    */
   const toggleServiceExpansion = (serviceId: string) => {
@@ -95,38 +118,15 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
    */
   const getStatusBadgeClass = (status: string) => {
     const statusMap: Record<string, string> = {
-      ESTIMATED: 'status-badge--estimated',
       PENDING: 'status-badge--pending',
+      ESTIMATED: 'status-badge--estimated',
+      APPROVED: 'status-badge--approved',
+      REJECTED: 'status-badge--rejected',
       IN_PROGRESS: 'status-badge--in-progress',
       COMPLETED: 'status-badge--completed',
       CANCELLED: 'status-badge--cancelled',
     };
     return statusMap[status] || 'status-badge--pending';
-  };
-
-  /**
-   * Get approval status badge
-   */
-  const getApprovalBadge = (service: WorkOrderService) => {
-    if (service.customerApproved) {
-      return (
-        <span className="status-badge status-badge--completed">
-          <i className="bx bx-check-circle"></i> Approved
-        </span>
-      );
-    }
-    if (service.customerRejected) {
-      return (
-        <span className="status-badge status-badge--cancelled">
-          <i className="bx bx-x-circle"></i> Rejected
-        </span>
-      );
-    }
-    return (
-      <span className="status-badge status-badge--pending">
-        <i className="bx bx-time-five"></i> Pending Approval
-      </span>
-    );
   };
 
   /**
@@ -154,6 +154,35 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
     }
     // Check if actual time has been logged
     return Boolean(labor.actualMinutes && labor.actualMinutes > 0);
+  };
+
+  /**
+   * Check if a service is locked (cannot be assigned technicians)
+   * Services are locked when they are in PENDING status (awaiting approval)
+   * or when they are in ESTIMATED status (awaiting approval)
+   * or when work has already started
+   */
+  const isServiceLocked = (service: WorkOrderService): boolean => {
+    // Services in PENDING or ESTIMATED status are locked during approval process
+    if (service.status === 'PENDING' || service.status === 'ESTIMATED') {
+      return true;
+    }
+    // Services that have started work are also locked
+    return hasServiceStartedWork(service);
+  };
+
+  /**
+   * Check if a labor item is locked (cannot be assigned technicians)
+   * Labor items are locked when their parent service is in PENDING or ESTIMATED status
+   * or when work has already started on the labor item
+   */
+  const isLaborLocked = (labor: WorkOrderLaborItem, serviceStatus: ServiceStatus): boolean => {
+    // Labor items are locked when the parent service is in PENDING or ESTIMATED status
+    if (serviceStatus === 'PENDING' || serviceStatus === 'ESTIMATED') {
+      return true;
+    }
+    // Labor items that have started work are also locked
+    return hasLaborStartedWork(labor);
   };
 
   /**
@@ -225,6 +254,19 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
     } catch (error) {
       showToast('error', 'Assignment Failed', error instanceof Error ? error.message : 'Failed to assign technician');
       throw error;
+    }
+  };
+
+  /**
+   * Handle service deletion
+   */
+  const handleDeleteService = async (serviceId: string) => {
+    try {
+      await workOrderService.deleteService(serviceId);
+      showToast('success', 'Service Deleted', 'Service has been successfully deleted');
+      await fetchServices(); // Refresh services list
+    } catch (error) {
+      showToast('error', 'Delete Failed', error instanceof Error ? error.message : 'Failed to delete service');
     }
   };
 
@@ -300,7 +342,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
         <div className="services-summary-card" style={{ background: '#f9fafb', borderRadius: 12, padding: '18px 24px', minWidth: 0, boxShadow: '0 1px 4px #0001', border: '1px solid #e5e7eb', width: '100%' }}>
           <div style={{ color: '#6b7280', fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Total Amount</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1f2937' }}>
-            LKR {services.reduce((sum, s) => sum + Number(s.subtotal), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            LKR {(services.reduce((sum, s) => sum + Number(s.subtotal), 0) + miscCharges.reduce((sum, c) => sum + Number(c.subtotal), 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
         </div>
       </div>
@@ -310,7 +352,9 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
         <button
           onClick={() => setShowAddServiceModal(true)}
           className="btn btn--primary"
-          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          disabled={services.some(s => s.status === 'ESTIMATED')}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: services.some(s => s.status === 'ESTIMATED') ? 0.6 : 1 }}
+          title={services.some(s => s.status === 'ESTIMATED') ? 'Cannot add services while estimate is pending approval' : 'Add Service'}
         >
           <i className="bx bx-plus"></i>
           Add Service
@@ -325,8 +369,8 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
               <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Service Description</th>
               <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Subtotal</th>
               <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Status</th>
-              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb' }}>Approval</th>
               <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', width: '150px' }} title="Labor items and assignment">Labor</th>
+              <th style={{ padding: '6px 10px', border: '1px solid #e5e7eb', width: '100px' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -365,31 +409,28 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                       </span>
                     </td>
                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
-                      {getApprovalBadge(service)}
-                    </td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                         {hasLaborItems && (
                           <button
                             onClick={() => handleServiceAssignClick(service)}
-                            disabled={hasServiceStartedWork(service)}
+                            disabled={isServiceLocked(service)}
                             style={{ 
-                              background: hasServiceStartedWork(service) ? '#9ca3af' : '#3b82f6', 
+                              background: isServiceLocked(service) ? '#9ca3af' : '#3b82f6', 
                               color: '#fff', 
                               border: 'none', 
                               borderRadius: 6, 
                               padding: '6px', 
                               fontSize: 16, 
-                              cursor: hasServiceStartedWork(service) ? 'not-allowed' : 'pointer', 
+                              cursor: isServiceLocked(service) ? 'not-allowed' : 'pointer', 
                               display: 'flex', 
                               alignItems: 'center', 
                               justifyContent: 'center', 
                               width: '32px', 
                               height: '32px', 
                               transition: 'all 0.2s ease',
-                              opacity: hasServiceStartedWork(service) ? 0.6 : 1
+                              opacity: isServiceLocked(service) ? 0.6 : 1
                             }}
-                            title={hasServiceStartedWork(service) ? "Cannot assign technician - work has already started" : "Assign technician to all labor items"}
+                            title={isServiceLocked(service) ? ((service.status === 'PENDING' || service.status === 'ESTIMATED') ? "Cannot assign technician - service is awaiting approval" : "Cannot assign technician - work has already started") : "Assign technician to all labor items"}
                           >
                             <i className="bx bx-user-check" style={{ fontSize: '16px' }}></i>
                           </button>
@@ -407,12 +448,23 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                       )}
                       </div>
                     </td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
+                      {(service.status === 'PENDING' || service.status === 'REJECTED') && (
+                        <button
+                          onClick={() => handleDeleteService(service.id)}
+                          style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', transition: 'all 0.2s ease' }}
+                          title="Delete service"
+                        >
+                          <i className="bx bx-trash" style={{ fontSize: '16px' }}></i>
+                        </button>
+                      )}
+                    </td>
                   </tr>
 
                   {/* Expanded Labor Items */}
                   {isExpanded && hasLaborItems && (
                     <tr style={{ backgroundColor: '#f9fafb' }}>
-                      <td colSpan={6} style={{ padding: '0', border: '1px solid #e5e7eb' }}>
+                      <td colSpan={5} style={{ padding: '0', border: '1px solid #e5e7eb' }}>
                         <div style={{ padding: '16px 24px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                             <i className="bx bx-wrench" style={{ fontSize: '16px', color: '#6b7280' }}></i>
@@ -504,24 +556,24 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ workOrderId }) => {
                                     <td style={{ padding: '6px 10px', border: '1px solid #e5e7eb', textAlign: 'center', verticalAlign: 'middle' }}>
                                       <button
                                         onClick={() => handleLaborAssignClick(labor)}
-                                        disabled={hasLaborStartedWork(labor)}
+                                        disabled={isLaborLocked(labor, service.status)}
                                         style={{ 
-                                          background: hasLaborStartedWork(labor) ? '#9ca3af' : '#3b82f6', 
+                                          background: isLaborLocked(labor, service.status) ? '#9ca3af' : '#3b82f6', 
                                           color: '#fff', 
                                           border: 'none', 
                                           borderRadius: 6, 
                                           padding: '6px', 
                                           fontSize: 16, 
-                                          cursor: hasLaborStartedWork(labor) ? 'not-allowed' : 'pointer', 
+                                          cursor: isLaborLocked(labor, service.status) ? 'not-allowed' : 'pointer', 
                                           display: 'flex', 
                                           alignItems: 'center', 
                                           justifyContent: 'center', 
                                           width: '32px', 
                                           height: '32px', 
                                           transition: 'all 0.2s ease',
-                                          opacity: hasLaborStartedWork(labor) ? 0.6 : 1
+                                          opacity: isLaborLocked(labor, service.status) ? 0.6 : 1
                                         }}
-                                        title={hasLaborStartedWork(labor) ? "Cannot assign technician - work has already started" : "Assign technician to this labor item"}
+                                        title={isLaborLocked(labor, service.status) ? ((service.status === 'PENDING' || service.status === 'ESTIMATED') ? "Cannot assign technician - service is awaiting approval" : "Cannot assign technician - work has already started") : "Assign technician to this labor item"}
                                       >
                                         <i className="bx bx-user-plus" style={{ fontSize: '14px' }}></i>
                                       </button>

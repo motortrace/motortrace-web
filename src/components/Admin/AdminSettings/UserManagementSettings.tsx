@@ -1,5 +1,5 @@
 import React from 'react'
-import { Verified, Car, Briefcase } from 'lucide-react'
+import { Verified, Car } from 'lucide-react'
 import Toggle from '../../Toggle/Toggle';
 import "./AdminSettings.scss"
 
@@ -8,8 +8,6 @@ interface UserSettingsProps {
         requireEmailVerification: boolean;
         requirePhoneVerification: boolean;
         allowSocialLogin: boolean;
-        autoApproveServiceCenters: boolean;
-        autoApprovePartsVendors: boolean;
         maxLoginAttempts: number;
         sessionTimeout: number;
         enableTwoFactor: boolean;
@@ -66,38 +64,6 @@ const UserManagementSettings: React.FC<UserSettingsProps> = ({ settings, onSetti
 
             </div>
 
-            <div className="admin-settings">
-
-                <div className="admin-settings__header">
-                    <Briefcase size={20} />
-                    <h4 className="admin-settings__sub-title">
-                        Service Provider Approval
-                    </h4>
-                </div>
-
-                <div className="admin-settings__input-row" >
-                    <div>
-                        <Toggle
-                            enabled={settings.autoApproveServiceCenters}
-                            onChange={(enabled) => handleChange('autoApproveServiceCenters', enabled)}
-                            label="Auto-approve Service Centers"
-                            description="Automatically approve service center registrations"
-                        />
-
-                    </div>
-
-                    <div>
-                        <Toggle
-                            enabled={settings.autoApprovePartsVendors}
-                            onChange={(enabled) => handleChange('autoApprovePartsVendors', enabled)}
-                            label="Auto-approve Parts Vendors"
-                            description="Automatically approve spare parts vendor registrations"
-                        />
-                    </div>
-
-                </div>
-
-            </div>
 
         </div>
     )

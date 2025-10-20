@@ -30,7 +30,6 @@ const Sidebar: React.FC = () => {
     {
       title: 'Manage Offerings',
       items: [
-        { id: 'servicesManagement', label: 'Services', icon: 'bx bx-briefcase-alt', route: '/admin/offeringManagement/services' },
         { id: 'packagesManagement', label: 'Packages', icon: 'bx bx-package', route: '/admin/offeringManagement/packages' }
       ]
     },
@@ -72,7 +71,7 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     // Optionally clear other user/session data here
-    window.location.href = '/admin';
+    window.location.href = '/login';
   };
 
   // Helper function to check if a menu item is active

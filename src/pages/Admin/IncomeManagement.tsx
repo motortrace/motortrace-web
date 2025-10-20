@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TransactionHistory from '../../components/Admin/IncomeManagement/TransactionHistory/TransactionHistory';
+import { getWorkOrders } from '../../utils/workOrdersApi';
 import './IncomeManagement.scss';
 
 export interface Transaction {
@@ -47,7 +48,129 @@ export interface ServiceDetails {
 
 const IncomeManagement: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleStatusChange = (id: string, newStatus: Transaction['paymentStatus']) => {
+    setTransactions(prevTransactions =>
+      prevTransactions.map(transaction =>
+        transaction.id === id
+          ? {
+              ...transaction,
+              paymentStatus: newStatus,
+              // For manual completion, set payment method to cash if not already set
+              paymentMethod: newStatus === 'completed' && !transaction.paymentMethod ? 'cash' : transaction.paymentMethod
+            }
+          : transaction
+      )
+    );
+  };
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true);
+        // Fetch work orders with payments
+        const workOrdersResponse = await getWorkOrders({
+          status: 'COMPLETED'
+        });
+
+        // Transform work orders to transactions format
+        const transformedTransactions: Transaction[] = (workOrdersResponse.data || workOrdersResponse)?.map((workOrder: any) => {
+          const totalPaid = workOrder.payments?.reduce((sum: number, payment: any) => sum + Number(payment.amount), 0) || 0;
+          const totalAmount = Number(workOrder.totalAmount || 0);
+          const advancePaid = workOrder.payments?.filter((p: any) => p.notes?.includes('Advance')).reduce((sum: number, p: any) => sum + Number(p.amount), 0) || 0;
+          const penaltyAmount = workOrder.payments?.filter((p: any) => p.notes?.includes('Penalty')).reduce((sum: number, p: any) => sum + Number(p.amount), 0) || 0;
+          const refundAmount = workOrder.payments?.filter((p: any) => p.status === 'REFUNDED').reduce((sum: number, p: any) => sum + Number(p.amount), 0) || 0;
+
+          return {
+            id: workOrder.workOrderNumber || workOrder.id,
+            customerId: workOrder.customerId,
+            customerName: workOrder.customer?.firstName + ' ' + workOrder.customer?.lastName || 'Unknown Customer',
+            serviceType: workOrder.jobType || 'Service',
+            bookingDate: workOrder.createdAt,
+            completionDate: workOrder.finalizedAt,
+            estimatedCost: Number(workOrder.estimatedTotal || 0),
+            finalCost: totalAmount,
+            advancePaid,
+            penaltyAmount,
+            refundAmount,
+            paymentStatus: totalPaid >= totalAmount ? 'completed' : totalPaid > 0 ? 'pending' : 'pending',
+            paymentMethod: workOrder.payments?.[0]?.method?.toLowerCase().replace('_', '-') || 'cash',
+            paymentCase: advancePaid > 0 ? 'advance-required' : penaltyAmount > 0 ? 'cancelled-with-penalty' : refundAmount > 0 ? 'no-show-no-refund' : 'normal',
+            serviceDetails: workOrder.services ? {
+              mainService: {
+                name: workOrder.services[0]?.description || 'Service',
+                cost: workOrder.services[0]?.unitPrice || 0
+              },
+              subTasks: workOrder.labor?.map((labor: any) => ({
+                id: labor.id,
+                name: labor.description,
+                cost: labor.hours * labor.rate,
+                completed: true
+              })) || [],
+              spareParts: workOrder.parts?.map((part: any) => ({
+                id: part.id,
+                name: part.inventoryItemId, // This might need adjustment based on actual data structure
+                quantity: part.quantity,
+                unitCost: part.unitPrice,
+                totalCost: part.quantity * part.unitPrice,
+                source: part.source?.toLowerCase().replace('_', '-') || 'inventory'
+              })) || [],
+              laborCost: workOrder.labor?.reduce((sum: number, labor: any) => sum + (labor.hours * labor.rate), 0) || 0,
+              taxAmount: workOrder.taxAmount || 0,
+              discountAmount: workOrder.discountAmount || 0
+            } : undefined
+          };
+        }) || [];
+
+        setTransactions(transformedTransactions);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+        // Fallback to mock data if API fails
+        setTransactions([
+          {
+            id: 'TXN-001',
+            customerId: 'CUST-001',
+            customerName: 'John Smith',
+            serviceType: 'Full Car Wash',
+            bookingDate: '2025-01-15',
+            completionDate: '2025-01-15',
+            estimatedCost: 5000,
+            finalCost: 5200,
+            advancePaid: 0,
+            penaltyAmount: 0,
+            refundAmount: 0,
+            paymentStatus: 'completed',
+            paymentMethod: 'card',
+            paymentCase: 'normal',
+            serviceDetails: {
+              mainService: {
+                name: 'Full Car Wash',
+                cost: 3000
+              },
+              subTasks: [
+                { id: 'ST-001', name: 'Exterior Wash', cost: 1500, completed: true },
+                { id: 'ST-002', name: 'Interior Cleaning', cost: 1000, completed: true },
+                { id: 'ST-003', name: 'Wax Application', cost: 500, completed: true }
+              ],
+              spareParts: [
+                { id: 'SP-001', name: 'Car Shampoo', quantity: 1, unitCost: 200, totalCost: 200, source: 'inventory' }
+              ],
+              laborCost: 2000,
+              taxAmount: 520,
+              discountAmount: 0
+            }
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
   // Mock data - in real app, this would come from your backend
   const mockTransactions: Transaction[] = [
     {
@@ -169,7 +292,10 @@ const IncomeManagement: React.FC = () => {
           </div>
         </div> */}
 
-        <TransactionHistory transactions={mockTransactions} />
+        <TransactionHistory
+          transactions={transactions.length > 0 ? transactions : mockTransactions}
+          onStatusChange={handleStatusChange}
+        />
       </div>
     </div>
   );

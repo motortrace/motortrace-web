@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Calendar, TrendingUp, Users, BookOpen, CheckCircle, DollarSign } from 'lucide-react';
 import KPICard from '../../components/Admin/KPICard/KPICard'; // Import the new KPI Card component
 import BookingStatusChart from '../../components/Admin/DashboardCharts/BookingStatusChart';
@@ -26,65 +26,196 @@ interface DashboardData {
   };
 }
 
-// Mock data - replace with actual API calls
-const mockData: Record<TimePeriod, DashboardData> = {
-  today: {
-    newCarUsers: { current: 24, previous: 18, format: 'number' },
-    totalBookings: { current: 16, previous: 20, format: 'number' },
-    completedServices: { current: 7, previous: 8, format: 'number' },
-    totalSales: { current: 34750, previous: 30000, format: 'currency' },
-    bookingStatuses: {
-      upComing: 5,
-      onGoing: 3,
-      completed: 7,
-      cancelled: 1,
-      noShow: 0
+// Real data - fetch from API using existing endpoints
+const fetchDashboardData = async (period: TimePeriod): Promise<DashboardData> => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No authentication token found');
+
+    // Calculate date range based on period
+    const now = new Date();
+    let startDate: Date;
+    let endDate: Date = now;
+
+    switch (period) {
+      case 'today':
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case 'week':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case 'month':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      case 'year':
+        startDate = new Date(now.getFullYear(), 0, 1);
+        break;
     }
-  },
-  week: {
-    newCarUsers: { current: 164, previous: 144, format: 'number' },
-    totalBookings: { current: 130, previous: 120, format: 'number' },
-    completedServices: { current: 99, previous: 89, format: 'number' },
-    totalSales: { current: 280650, previous: 225000, format: 'currency' },
-    bookingStatuses: {
-      upComing: 18,
-      onGoing: 12,
-      completed: 99,
-      cancelled: 8,
-      noShow: 3
+
+    // Fetch customers (new car users)
+    const customersResponse = await fetch('http://localhost:3000/customers', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const customersData = customersResponse.ok ? await customersResponse.json() : { data: [] };
+
+    // Filter customers by join date for the period
+    const newCustomers = customersData.data.filter((customer: any) => {
+      const joinDate = new Date(customer.createdAt);
+      return joinDate >= startDate && joinDate <= endDate;
+    });
+
+    // Fetch work orders for statistics
+    const workOrdersResponse = await fetch(`http://localhost:3000/work-orders?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const workOrdersData = workOrdersResponse.ok ? await workOrdersResponse.json() : { data: [] };
+
+    // Calculate previous period for comparison
+    let prevStartDate: Date;
+    let prevEndDate: Date = startDate;
+
+    switch (period) {
+      case 'today':
+        prevStartDate = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case 'week':
+        prevStartDate = new Date(startDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case 'month':
+        prevStartDate = new Date(startDate.getFullYear(), startDate.getMonth() - 1, 1);
+        prevEndDate = new Date(startDate.getFullYear(), startDate.getMonth(), 0);
+        break;
+      case 'year':
+        prevStartDate = new Date(startDate.getFullYear() - 1, 0, 1);
+        prevEndDate = new Date(startDate.getFullYear() - 1, 11, 31);
+        break;
     }
-  },
-  month: {
-    newCarUsers: { current: 512, previous: 476, format: 'number' },
-    totalBookings: { current: 544, previous: 524, format: 'number' },
-    completedServices: { current: 388, previous: 380, format: 'number' },
-    totalSales: { current: 975625, previous: 954350, format: 'currency' },
-    bookingStatuses: {
-      upComing: 85,
-      onGoing: 45,
-      completed: 388,
-      cancelled: 18,
-      noShow: 8
-    }
-  },
-  year: {
-    newCarUsers: { current: 5011, previous: 3647, format: 'number' },
-    totalBookings: { current: 5596, previous: 4969, format: 'number' },
-    completedServices: { current: 5120, previous: 4896, format: 'number' },
-    totalSales: { current: 11100250, previous: 9960500, format: 'currency' },
-    bookingStatuses: {
-      upComing: 280,
-      onGoing: 156,
-      completed: 5120,
-      cancelled: 32,
-      noShow: 8
-    }
+
+    // Fetch previous period data
+    const prevWorkOrdersResponse = await fetch(`http://localhost:3000/work-orders?startDate=${prevStartDate.toISOString()}&endDate=${prevEndDate.toISOString()}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const prevWorkOrdersData = prevWorkOrdersResponse.ok ? await prevWorkOrdersResponse.json() : { data: [] };
+
+    // Calculate statistics
+    const totalBookings = workOrdersData.data.length;
+    const prevTotalBookings = prevWorkOrdersData.data.length;
+
+    const completedServices = workOrdersData.data.filter((wo: any) => wo.status === 'COMPLETED').length;
+    const prevCompletedServices = prevWorkOrdersData.data.filter((wo: any) => wo.status === 'COMPLETED').length;
+
+    const totalSales = workOrdersData.data
+      .filter((wo: any) => wo.status === 'COMPLETED')
+      .reduce((sum: number, wo: any) => sum + (Number(wo.totalAmount) || 0), 0);
+
+    const prevTotalSales = prevWorkOrdersData.data
+      .filter((wo: any) => wo.status === 'COMPLETED')
+      .reduce((sum: number, wo: any) => sum + (Number(wo.totalAmount) || 0), 0);
+
+    // Calculate booking statuses
+    const bookingStatuses = {
+      upComing: workOrdersData.data.filter((wo: any) => wo.status === 'PENDING').length,
+      onGoing: workOrdersData.data.filter((wo: any) => wo.status === 'IN_PROGRESS').length,
+      completed: completedServices,
+      cancelled: workOrdersData.data.filter((wo: any) => wo.status === 'CANCELLED').length,
+      noShow: workOrdersData.data.filter((wo: any) => wo.status === 'NO_SHOW').length
+    };
+
+    return {
+      newCarUsers: {
+        current: newCustomers.length,
+        previous: 0, // We'll need to implement previous period customer count
+        format: 'number'
+      },
+      totalBookings: {
+        current: totalBookings,
+        previous: prevTotalBookings,
+        format: 'number'
+      },
+      completedServices: {
+        current: completedServices,
+        previous: prevCompletedServices,
+        format: 'number'
+      },
+      totalSales: {
+        current: totalSales,
+        previous: prevTotalSales,
+        format: 'currency'
+      },
+      bookingStatuses
+    };
+
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    // Return mock data as fallback
+    return getMockData(period);
   }
+};
+
+// Mock data fallback
+const getMockData = (period: TimePeriod): DashboardData => {
+  const mockData: Record<TimePeriod, DashboardData> = {
+    today: {
+      newCarUsers: { current: 24, previous: 18, format: 'number' },
+      totalBookings: { current: 16, previous: 20, format: 'number' },
+      completedServices: { current: 7, previous: 8, format: 'number' },
+      totalSales: { current: 34750, previous: 30000, format: 'currency' },
+      bookingStatuses: {
+        upComing: 5,
+        onGoing: 3,
+        completed: 7,
+        cancelled: 1,
+        noShow: 0
+      }
+    },
+    week: {
+      newCarUsers: { current: 164, previous: 144, format: 'number' },
+      totalBookings: { current: 130, previous: 120, format: 'number' },
+      completedServices: { current: 99, previous: 89, format: 'number' },
+      totalSales: { current: 280650, previous: 225000, format: 'currency' },
+      bookingStatuses: {
+        upComing: 18,
+        onGoing: 12,
+        completed: 99,
+        cancelled: 8,
+        noShow: 3
+      }
+    },
+    month: {
+      newCarUsers: { current: 512, previous: 476, format: 'number' },
+      totalBookings: { current: 544, previous: 524, format: 'number' },
+      completedServices: { current: 388, previous: 380, format: 'number' },
+      totalSales: { current: 975625, previous: 954350, format: 'currency' },
+      bookingStatuses: {
+        upComing: 85,
+        onGoing: 45,
+        completed: 388,
+        cancelled: 18,
+        noShow: 8
+      }
+    },
+    year: {
+      newCarUsers: { current: 5011, previous: 3647, format: 'number' },
+      totalBookings: { current: 5596, previous: 4969, format: 'number' },
+      completedServices: { current: 5120, previous: 4896, format: 'number' },
+      totalSales: { current: 11100250, previous: 9960500, format: 'currency' },
+      bookingStatuses: {
+        upComing: 280,
+        onGoing: 156,
+        completed: 5120,
+        cancelled: 32,
+        noShow: 8
+      }
+    }
+  };
+  return mockData[period];
 };
 
 
 const AdminDashboard: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('month');
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const periodLabels: Record<TimePeriod, { current: string; previous: string }> = {
     today: { current: 'Today', previous: 'vs Yesterday' },
@@ -117,7 +248,26 @@ const AdminDashboard: React.FC = () => {
     };
   };
 
-  const currentData = mockData[selectedPeriod];
+  // Load data when period changes
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchDashboardData(selectedPeriod);
+        setDashboardData(data);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+        // Fallback to mock data
+        setDashboardData(getMockData(selectedPeriod));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [selectedPeriod]);
+
+  const currentData = dashboardData || getMockData(selectedPeriod);
 
   const kpiCards = useMemo(() => [
     {
@@ -163,15 +313,32 @@ const AdminDashboard: React.FC = () => {
   ], [currentData.bookingStatuses]);
 
 
+  if (loading) {
+    return (
+      <div className="business-dashboard-container">
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '400px',
+          fontSize: '18px',
+          color: '#64748b'
+        }}>
+          Loading dashboard data...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="business-dashboard-container">
       <div className="business-dashboard-container__header-section">
-        {/* <div className="business-dashboard-container__title-area">
+        <div className="business-dashboard-container__title-area">
           <h1 className="business-dashboard-container__main-title">Dashboard Overview</h1>
           <p className="business-dashboard-container__subtitle-text">
             Track your key performance indicators and business metrics
           </p>
-        </div> */}
+        </div>
 
         <div className="business-dashboard-container__control-panel">
           <div className="dashboard-period-selector">

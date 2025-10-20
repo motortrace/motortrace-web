@@ -312,7 +312,7 @@ const CustomerManagement: React.FC = () => {
                       onMouseLeave={(e) => e.currentTarget.style.background = '#f3f4f6'}
                       title="View Details"
                     >
-                      <i className="bx bx-box" style={{ fontSize: 18, color: '#374151' }}></i>
+                      <i className="bx bx-show" style={{ fontSize: 18, color: '#374151' }}></i>
                     </button>
                   </div>
                 </div>

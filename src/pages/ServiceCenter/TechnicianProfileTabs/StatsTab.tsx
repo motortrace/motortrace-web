@@ -59,10 +59,6 @@ const StatsTab: React.FC<StatsTabProps> = ({ stats }) => {
               <div className="stat-value">{formatHours(stats.last30DaysHours)}</div>
               <div className="stat-label">Hours Worked</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-value">{formatCurrency(stats.last30DaysRevenue)}</div>
-              <div className="stat-label">Revenue Generated</div>
-            </div>
           </div>
         </div>
 

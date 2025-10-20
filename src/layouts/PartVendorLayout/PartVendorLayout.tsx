@@ -6,7 +6,7 @@ import './PartVendorLayout.scss';
 import PartVendorSideBar from '../../components/PartVendorComponents/SideBar/partVendorSidebar';
 import Navbar from '../../components/PartVendorComponents/Navbar/Navbar';
 
-const PartVendorDashboardLayout: React.FC = () => {
+const InventoryManagerLayout: React.FC = () => {
   const location = useLocation();
   return (
     <div className="dashboard-layout">
@@ -21,4 +21,4 @@ const PartVendorDashboardLayout: React.FC = () => {
   );
 };
 
-export default PartVendorDashboardLayout;
+export default InventoryManagerLayout;

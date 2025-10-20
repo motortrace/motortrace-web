@@ -134,7 +134,7 @@ export interface CannedService {
   price: number;
 }
 
-export type ServiceStatus = 'ESTIMATED' | 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type LaborStatus = 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 export interface WorkOrderLaborItem {
   id: string;
@@ -145,7 +145,7 @@ export interface WorkOrderLaborItem {
   technician?: TechnicianProfile | null;
   startTime?: string | null;
   endTime?: string | null;
-  status: ServiceStatus;
+  status: LaborStatus;
   notes?: string | null;
   serviceId: string;
   estimatedMinutes?: number | null;
@@ -163,13 +163,7 @@ export interface WorkOrderService {
   quantity: number;
   unitPrice: number;
   subtotal: number;
-  status: ServiceStatus;
   notes?: string | null;
-  customerApproved: boolean;
-  customerRejected: boolean;
-  approvedAt?: string | null;
-  rejectedAt?: string | null;
-  customerNotes?: string | null;
   createdAt: string;
   updatedAt: string;
   laborItems?: WorkOrderLaborItem[];
@@ -220,6 +214,8 @@ export interface WorkOrderApproval {
   method: string | null;
   notes: string | null;
   customerSignature: string | null;
+  isFinal?: boolean | null;
+  type?: string | null;
   pdfUrl: string | null;
   createdAt: string;
   updatedAt: string;
@@ -228,6 +224,23 @@ export interface WorkOrderApproval {
     name: string;
     profileImage?: string | null;
   } | null;
+}
+
+// ==================== Misc Charges Types ====================
+
+export type MiscChargeCategory = 'DIAGNOSTIC' | 'LABOR' | 'TOWING' | 'STORAGE' | 'DISPOSAL' | 'ENVIRONMENTAL' | 'ADMIN' | 'OTHER';
+
+export interface WorkOrderMiscCharge {
+  id: string;
+  workOrderId: string;
+  category: MiscChargeCategory;
+  description: string;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ==================== Payment Types ====================
@@ -324,4 +337,37 @@ export interface Invoice {
   terms?: string;
   workOrder: InvoiceWorkOrder;
   lineItems: InvoiceLineItem[];
+}
+
+// ==================== Inventory/Parts Types ====================
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  sku: string;
+  partNumber: string;
+  manufacturer?: string;
+  isOEM: boolean;
+}
+
+export type PartStatus = 'ORDERED' | 'RECEIVED' | 'INSTALLED' | 'RETURNED';
+
+export interface WorkOrderPart {
+  id: string;
+  workOrderId: string;
+  inventoryItemId: string;
+  description: string;
+  quantity: number;
+  unitPrice: string;
+  subtotal: string;
+  source: 'INVENTORY' | 'EXTERNAL';
+  status: PartStatus;
+  part: InventoryItem;
+  installedBy?: {
+    id: string;
+    userProfile: {
+      id: string;
+      name: string;
+    };
+  } | null;
 }

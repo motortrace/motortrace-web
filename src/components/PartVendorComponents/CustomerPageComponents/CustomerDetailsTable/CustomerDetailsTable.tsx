@@ -208,9 +208,9 @@ const CustomerDetailsTable: React.FC = () => {
             style={{ cursor: 'pointer' }}
             onClick={() => {
               if (customer.type === 'Customer') {
-                navigate(`/PartVendor/CustomerDetails`);
+                navigate(`/inventorymanager/CustomerDetails`);
               } else if (customer.type === 'Service Center') {
-                navigate(`/PartVendor/ServiceCenterCustomerDetails`);
+                navigate(`/inventorymanager/ServiceCenterCustomerDetails`);
               }
             }}
           >

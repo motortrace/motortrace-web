@@ -2,30 +2,30 @@ import React, { useEffect, useState } from 'react';
 import './EditProduct.scss';
 
 interface PaintsCoatingsProduct {
-  productName: string;
+  productname: string;
   category?: string;
   color?: string;
-  colorCode?: string;
+  colorcode?: string;
   finish: string;
   type?: string;
-  surfaceUse?: string;
+  surfaceuse?: string;
   resistance?: string;
-  dryTime?: string;
+  drytime?: string;
   volume?: string;
-  applicationMethod?: string;
+  applicationmethod?: string;
   brand?: string;
   compatibility?: string;
   description?: string;
   quantity?: number;
   price?: string;
-  minimumQuantity?: number;
-  discountType?: string;
-  discountValue?: number;
+  minimumquantity?: number;
+  discounttype?: string;
+  discountvalue?: number;
   image?: File | string;
   warranty?: string;
   manufacturer?: string;
-  manufacturedDate?: string;
-  expiryDate?: string;
+  manufactureddate?: string;
+  expirydate?: string;
 }
 
 interface EditProductProps {
@@ -70,7 +70,7 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
         <div className="form-grid">
           <div className="form-group">
             <label>Product Name *</label>
-            <input type="text" value={formData.productName} onChange={(e) => handleChange('productName', e.target.value)} />
+            <input type="text" value={formData.productname} onChange={(e) => handleChange('productname', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Category *</label>
@@ -89,7 +89,7 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
           </div>
           <div className="form-group">
             <label>Color Code</label>
-            <input type="text" value={formData.colorCode || ''} onChange={(e) => handleChange('colorCode', e.target.value)} />
+            <input type="text" value={formData.colorcode || ''} onChange={(e) => handleChange('colorcode', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Finish</label>
@@ -101,7 +101,7 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
           </div>
           <div className="form-group">
             <label>Surface Use</label>
-            <input type="text" value={formData.surfaceUse || ''} onChange={(e) => handleChange('surfaceUse', e.target.value)} />
+            <input type="text" value={formData.surfaceuse || ''} onChange={(e) => handleChange('surfaceuse', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Heat / UV Resistance</label>
@@ -109,7 +109,7 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
           </div>
           <div className="form-group">
             <label>Dry Time</label>
-            <input type="text" value={formData.dryTime || ''} onChange={(e) => handleChange('dryTime', e.target.value)} />
+            <input type="text" value={formData.drytime || ''} onChange={(e) => handleChange('drytime', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Volume</label>
@@ -117,7 +117,7 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
           </div>
           <div className="form-group">
             <label>Application Method</label>
-            <input type="text" value={formData.applicationMethod || ''} onChange={(e) => handleChange('applicationMethod', e.target.value)} />
+            <input type="text" value={formData.applicationmethod || ''} onChange={(e) => handleChange('applicationmethod', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Brand *</label>
@@ -147,11 +147,11 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
           </div>
           <div className="form-group">
             <label>Minimum Quantity *</label>
-            <input type="number" value={formData.minimumQuantity || ''} onChange={(e) => handleChange('minimumQuantity', parseInt(e.target.value))} />
+            <input type="number" value={formData.minimumquantity || ''} onChange={(e) => handleChange('minimumquantity', parseInt(e.target.value))} />
           </div>
           <div className="form-group">
             <label>Discount Type</label>
-            <select value={formData.discountType || ''} onChange={(e) => handleChange('discountType', e.target.value)}>
+            <select value={formData.discounttype || ''} onChange={(e) => handleChange('discounttype', e.target.value)}>
               <option value="">Select</option>
               <option value="percentage">Percentage</option>
               <option value="flat">Flat</option>
@@ -159,7 +159,7 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
           </div>
           <div className="form-group">
             <label>Discount Value</label>
-            <input type="number" value={formData.discountValue || ''} onChange={(e) => handleChange('discountValue', parseFloat(e.target.value))} />
+            <input type="number" value={formData.discountvalue || ''} onChange={(e) => handleChange('discountvalue', parseFloat(e.target.value))} />
           </div>
         </div>
       </div>
@@ -192,11 +192,11 @@ const PaintsCoatingsEditForm: React.FC<EditProductProps> = ({ existingData, onSa
           </div>
           <div className="form-group">
             <label>Manufactured Date</label>
-            <input type="date" value={formData.manufacturedDate || ''} onChange={(e) => handleChange('manufacturedDate', e.target.value)} />
+            <input type="date" value={formData.manufactureddate || ''} onChange={(e) => handleChange('manufactureddate', e.target.value)} />
           </div>
           <div className="form-group">
             <label>Expiry On</label>
-            <input type="date" value={formData.expiryDate || ''} onChange={(e) => handleChange('expiryDate', e.target.value)} />
+            <input type="date" value={formData.expirydate || ''} onChange={(e) => handleChange('expirydate', e.target.value)} />
           </div>
         </div>
       </div>

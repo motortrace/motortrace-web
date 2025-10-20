@@ -1,0 +1,21 @@
+// src/pages/ReportsPage.scss
+.reports-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f8fafc;
+  min-height: 100vh;
+
+  .reports-content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .reports-page {
+    padding: 16px;
+  }
+}

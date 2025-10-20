@@ -25,8 +25,7 @@ const initialFormState = {
   totalVehicles: '',
   // Employee fields
   role: '',
-  department: '',
-  totalServices: '',
+  employeeId: '',
   status: 'Active',
   joinDate: new Date().toISOString().slice(0, 10),
 };
@@ -94,8 +93,12 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
         return;
       }
     } else if (userType === 'Service Advisors' || userType === 'Technicians') {
-      if (!form.name || !form.email || !form.phone || !form.password || !form.department) {
+      if (!form.name || !form.email || !form.phone || !form.password) {
         setError('Please fill in all required fields.');
+        return;
+      }
+      if (userType === 'Service Advisors' && !form.employeeId) {
+        setError('Employee ID is required for Service Advisors.');
         return;
       }
     }
@@ -140,10 +143,10 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
           phone: form.phone,
           password: form.password,
           role: userType === 'Service Advisors' ? 'Service Advisor' : 'Technician',
-          department: form.department,
-          totalServices: Number(form.totalServices) || 0,
+          employeeId: userType === 'Service Advisors' ? form.employeeId : undefined,
         };
       }
+      console.log('AddUserModal handleSubmit payload:', payload); // Debug log
       await onCreate(payload);
       setForm(initialFormState);
     } catch (err: any) {
@@ -232,14 +235,9 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, userType, onClose, on
               <input name="password" value={form.password} onChange={handleChange} placeholder="Default Password" style={inputStyle} type="password" />
               {/* Employee Details */}
               <div style={sectionTitleStyle}>Employee Details</div>
-              <select name="department" value={form.department} onChange={handleChange} style={inputStyle}>
-                <option value="">Select Department</option>
-                <option value="Customer Service">Customer Service</option>
-                <option value="Mechanical">Mechanical</option>
-                <option value="Electrical">Electrical</option>
-                <option value="Body Shop">Body Shop</option>
-              </select>
-              <input name="totalServices" value={form.totalServices} onChange={handleChange} placeholder="Total Services (optional)" style={inputStyle} type="number" min={0} />
+              {userType === 'Service Advisors' && (
+                <input name="employeeId" value={form.employeeId} onChange={handleChange} placeholder="Employee ID" style={inputStyle} />
+              )}
               <select name="status" value={form.status} onChange={handleChange} style={inputStyle}>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>

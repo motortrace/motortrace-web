@@ -49,6 +49,36 @@ const WorkOrderCard: React.FC<WorkOrderCardProps> = ({ workOrder, onMove }) => {
     return text.substring(0, maxLength) + '...';
   };
 
+  const getSourceBadge = (source?: string) => {
+    if (!source || (source !== 'APPOINTMENT' && source !== 'WALK_IN')) return null;
+
+    const badgeConfig = {
+      APPOINTMENT: { color: '#10b981', bgColor: '#d1fae5', label: 'Appointment' },
+      WALK_IN: { color: '#f59e0b', bgColor: '#fef3c7', label: 'Walk-in' }
+    };
+
+    const config = badgeConfig[source as keyof typeof badgeConfig];
+
+    return (
+      <span 
+        className="source-badge"
+        style={{
+          color: config.color,
+          backgroundColor: config.bgColor,
+          padding: '2px 6px',
+          borderRadius: '4px',
+          fontSize: '10px',
+          fontWeight: '500',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          marginLeft: '8px'
+        }}
+      >
+        {config.label}
+      </span>
+    );
+  };
+
   return (
     <div 
       className="work-order-card"
@@ -59,6 +89,7 @@ const WorkOrderCard: React.FC<WorkOrderCardProps> = ({ workOrder, onMove }) => {
       <div className="card-header">
         <span className="estimate-number" title={workOrder.title}>
           ({workOrder.estimateNumber}) {truncateTitle(workOrder.title)}
+          {getSourceBadge(workOrder.source)}
         </span>
         <button className="card-menu">
           <i className='bx bx-dots-horizontal-rounded'></i>

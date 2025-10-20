@@ -34,10 +34,10 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
   const tabs: Tab[] = [
     { id: 'overview', label: 'Overview', icon: 'bx-home-circle' },
     { id: 'inspections', label: 'Inspections', icon: 'bx-search-alt' },
-    // Only show Services tab for manager/admin roles, not for service advisors
-    ...(isServiceAdvisor ? [] : [{ id: 'services', label: 'Services', icon: 'bx-wrench' }]),
+    { id: 'services', label: 'Services', icon: 'bx-wrench' },
+    { id: 'inventory', label: 'Inventory', icon: 'bx-package' },
+    { id: 'misc-charges', label: 'Misc Charges', icon: 'bx-plus-circle' },
     { id: 'estimates', label: 'Estimates', icon: 'bx-calculator' },
-    { id: 'payments', label: 'Payments', icon: 'bx-credit-card' },
     { id: 'notes', label: 'Notes', icon: 'bx-note' },
   ];
 

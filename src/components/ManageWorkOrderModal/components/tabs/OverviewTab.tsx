@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { workOrderService } from '../../../../services/workOrderService';
 import { supabase } from '../../../../lib/supabase';
 
@@ -24,6 +24,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [newMessage, setNewMessage] = useState('');
+
+  const chatPollingRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (workOrder?.id) {
@@ -78,6 +80,23 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ workOrder }) => {
       // Cleanup subscription on unmount or workOrder change
       return () => {
         supabase.removeChannel(channel);
+      };
+    }
+  }, [workOrder?.id]);
+
+  // Polling for chat messages as fallback to real-time updates
+  useEffect(() => {
+    if (workOrder?.id) {
+      // Start polling chat messages every 30 seconds
+      chatPollingRef.current = setInterval(() => {
+        fetchMessages();
+      }, 3000); // 30 seconds
+
+      // Cleanup interval on unmount or workOrder change
+      return () => {
+        if (chatPollingRef.current) {
+          clearInterval(chatPollingRef.current);
+        }
       };
     }
   }, [workOrder?.id]);

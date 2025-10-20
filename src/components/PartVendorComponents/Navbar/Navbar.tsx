@@ -41,7 +41,7 @@ const pageInfo: Record<string, { title: string; description: string }> = {
 const Navbar: React.FC = () => {
   const location = useLocation();
   const info = pageInfo[location.pathname] || {
-    title: 'Welcome Kumudu!',
+    title: 'Welcome Inventory Manager!',
     description: 'Select a page to get started',
   };
 
@@ -52,7 +52,7 @@ const Navbar: React.FC = () => {
         <p className="page-description">{info.description}</p>
       </div>
 
-      <div className="navbar-right">
+      {/* <div className="navbar-right">
         <button aria-label="Search" className="icon-btn search-btn">
           <i className="bx bx-search"></i>
         </button>
@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
             <div className="user-email">autopartslanka@gmail.com</div>
           </div>
         </div>
-      </div>
+      </div> */}
     </nav>
   );
 };
