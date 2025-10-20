@@ -19,14 +19,17 @@ const KanbanPage: React.FC = () => {
 
   // Work order creation state
   const { token } = useAuth();
+  const loggedInUser = JSON.parse(localStorage.getItem('user') || 'null');
   const [createWorkOrderModalOpen, setCreateWorkOrderModalOpen] = useState(false);
   const [availableAppointments, setAvailableAppointments] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [customerVehicles, setCustomerVehicles] = useState<any[]>([]);
   const [currentServiceAdvisor, setCurrentServiceAdvisor] = useState<any>(null);
   const [workOrderForm, setWorkOrderForm] = useState({
     customerId: '',
     vehicleId: '',
     appointmentId: '',
-    advisorId: '',
+    advisorId: loggedInUser?.id || '',
     status: 'PENDING',
     jobType: 'REPAIR',
     priority: 'NORMAL',
@@ -42,6 +45,9 @@ const KanbanPage: React.FC = () => {
   });
   const [workOrderLoading, setWorkOrderLoading] = useState(false);
   const [workOrderError, setWorkOrderError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   // Get the base path from current location (e.g., '/serviceadvisor', '/manager', etc.)
   const getBasePath = () => {
@@ -137,14 +143,14 @@ const KanbanPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  // Fetch confirmed appointments without work orders
-  const fetchAvailableAppointments = async () => {
+  // Fetch customers
+  const fetchCustomers = async () => {
     if (!token) {
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:3000/appointments/confirmed-without-work-orders', {
+      const response = await fetch('http://localhost:3000/customers', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -153,22 +159,85 @@ const KanbanPage: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch available appointments: ${response.statusText}`);
+        throw new Error(`Failed to fetch customers: ${response.statusText}`);
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
-        setAvailableAppointments(data.data);
+        setCustomers(data.data);
       }
     } catch (err) {
-      console.error('Error fetching available appointments:', err);
+      console.error('Error fetching customers:', err);
+    }
+  };
+
+  // Fetch customer vehicles
+  const fetchCustomerVehicles = async (customerId: string) => {
+    if (!token || !customerId) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/customers/${customerId}/vehicles`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch customer vehicles: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCustomerVehicles(data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching customer vehicles:', err);
+    }
+  };
+
+  // Fetch appointments
+  const fetchAvailableAppointments = async () => {
+    if (!token) {
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/appointments', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch appointments: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Filter for confirmed appointments without work orders if needed
+        const filteredAppointments = data.data.filter((appointment: any) =>
+          appointment.status === 'CONFIRMED' && !appointment.workOrderId
+        );
+        setAvailableAppointments(filteredAppointments);
+      }
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
     }
   };
 
   const handleCreateWorkOrder = () => {
     setCreateWorkOrderModalOpen(true);
     fetchAvailableAppointments();
+    fetchCustomers();
     setWorkOrderError('');
   };
 
@@ -187,6 +256,7 @@ const KanbanPage: React.FC = () => {
         prices: [],
         serviceNotes: []
       }));
+      setCustomerVehicles([]);
       return;
     }
 
@@ -199,11 +269,27 @@ const KanbanPage: React.FC = () => {
         vehicleId: appointment.vehicleId,
         advisorId: appointment.assignedToId || currentServiceAdvisor?.id || '',
         complaint: appointment.notes || '',
-        cannedServiceIds: appointment.cannedServices?.map(s => s.id) || [],
-        quantities: appointment.cannedServices?.map(s => s.quantity) || [],
-        prices: appointment.cannedServices?.map(s => s.price) || [],
-        serviceNotes: appointment.cannedServices?.map(s => s.notes || '') || []
+        cannedServiceIds: appointment.cannedServices?.map((s: any) => s.id) || [],
+        quantities: appointment.cannedServices?.map((s: any) => s.quantity) || [],
+        prices: appointment.cannedServices?.map((s: any) => s.price) || [],
+        serviceNotes: appointment.cannedServices?.map((s: any) => s.notes || '') || []
       }));
+      // Fetch vehicles for the selected customer
+      fetchCustomerVehicles(appointment.customerId);
+    }
+  };
+
+  const handleCustomerSelect = (customerId: string) => {
+    setWorkOrderForm(prev => ({
+      ...prev,
+      customerId,
+      vehicleId: '',
+      appointmentId: '' // Reset appointment when customer changes
+    }));
+    if (customerId) {
+      fetchCustomerVehicles(customerId);
+    } else {
+      setCustomerVehicles([]);
     }
   };
 
@@ -258,14 +344,14 @@ const KanbanPage: React.FC = () => {
           try {
             const response = await getWorkOrders();
             let allWorkOrders = response.data || response;
-            
+
             // Filter work orders to show only those assigned to current service advisor
             if (currentServiceAdvisor?.id) {
-              allWorkOrders = allWorkOrders.filter((workOrder: WorkOrder) => 
+              allWorkOrders = allWorkOrders.filter((workOrder: WorkOrder) =>
                 workOrder.advisorId === currentServiceAdvisor.id
               );
             }
-            
+
             setWorkOrders(allWorkOrders);
           } catch (err) {
             console.error('Failed to refresh work orders:', err);
@@ -279,7 +365,7 @@ const KanbanPage: React.FC = () => {
           customerId: '',
           vehicleId: '',
           appointmentId: '',
-          advisorId: '',
+          advisorId: loggedInUser?.id || '',
           status: 'PENDING',
           jobType: 'REPAIR',
           priority: 'NORMAL',
@@ -293,13 +379,33 @@ const KanbanPage: React.FC = () => {
           prices: [],
           serviceNotes: []
         });
+
+        // Show success modal and close work order modal
+        setModalMessage('Work order created successfully!');
+        setShowSuccessModal(true);
+        setCreateWorkOrderModalOpen(false); // Close the work order modal
         console.log('Work order created successfully');
       } else {
         throw new Error(result.message || 'Failed to create work order');
       }
     } catch (err) {
       console.error('Error creating work order:', err);
-      setWorkOrderError(err instanceof Error ? err.message : 'Failed to create work order');
+      let errorMessage = 'Failed to create work order';
+
+      if (err instanceof Error) {
+        // Handle specific error cases with user-friendly messages
+        if (err.message.includes('Unique constraint failed on the fields: (`appointmentId`)')) {
+          errorMessage = 'A work order already exists for this appointment. Please select a different appointment or create a manual work order.';
+        } else if (err.message.includes('appointmentId')) {
+          errorMessage = 'This appointment already has a work order associated with it.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+
+      setWorkOrderError(errorMessage);
+      setModalMessage(errorMessage);
+      setShowErrorModal(true);
     } finally {
       setWorkOrderLoading(false);
     }
@@ -308,6 +414,29 @@ const KanbanPage: React.FC = () => {
   const handleModalClose = () => {
     setModalOpen(false);
     setSelectedWorkOrder(null);
+  };
+
+  const handleCreateWorkOrderModalClose = () => {
+    setCreateWorkOrderModalOpen(false);
+    setWorkOrderForm({
+      customerId: '',
+      vehicleId: '',
+      appointmentId: '',
+      advisorId: loggedInUser?.id || '',
+      status: 'PENDING',
+      jobType: 'REPAIR',
+      priority: 'NORMAL',
+      source: 'APPOINTMENT',
+      complaint: '',
+      odometerReading: '',
+      internalNotes: '',
+      customerNotes: '',
+      cannedServiceIds: [] as string[],
+      quantities: [] as number[],
+      prices: [] as number[],
+      serviceNotes: [] as string[]
+    });
+    setWorkOrderError('');
   };
 
   const handleViewHistory = () => {
@@ -379,10 +508,12 @@ const KanbanPage: React.FC = () => {
             <i className="bx bx-history"></i>
             View History
           </button>
-          <button className="action-btn primary" onClick={handleCreateWorkOrder}>
-            <i className="bx bx-plus"></i>
-            Create Work Order
-          </button>
+          {window.location.pathname.includes('/serviceadvisor/workflow') && (
+            <button className="action-btn primary" onClick={handleCreateWorkOrder}>
+              <i className="bx bx-plus"></i>
+              Create Work Order
+            </button>
+          )}
         </div>
       </div>
 
@@ -408,181 +539,279 @@ const KanbanPage: React.FC = () => {
 
       {/* Work Order Creation Modal */}
       {createWorkOrderModalOpen && (
-        <div className="modal-overlay" onClick={() => setCreateWorkOrderModalOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ backgroundColor: 'white', borderRadius: '8px', maxWidth: '800px', width: '90%', maxHeight: '90vh', overflow: 'auto' }}>
-            <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>Create Work Order</h3>
-              <button onClick={() => setCreateWorkOrderModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', padding: '0', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <i className='bx bx-x'></i>
+        <div className="work-order-modal__overlay" onClick={handleCreateWorkOrderModalClose}>
+          <div className="work-order-modal" onClick={e => e.stopPropagation()}>
+            <div className="work-order-modal__header">
+              <div className="work-order-modal__title-wrapper">
+                <h2>Create Work Order</h2>
+                <p className="work-order-modal__subtitle">
+                  Configure a new work order for your service center operations
+                </p>
+              </div>
+              <button
+                className="work-order-modal__close-icon"
+                onClick={handleCreateWorkOrderModalClose}
+                type="button"
+              >
+                ×
               </button>
             </div>
-            <div style={{ padding: '24px' }}>
-              <div style={{ marginBottom: '24px' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '500' }}>Link Appointment</h4>
-                <div style={{ marginBottom: '16px' }}>
-                  <label htmlFor="appointmentSelect" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Select Appointment</label>
-                  <select
-                    id="appointmentSelect"
-                    value={workOrderForm.appointmentId}
-                    onChange={(e) => handleAppointmentSelect(e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                  >
-                    <option value="">Select an appointment to link...</option>
-                    {availableAppointments.map(appointment => (
-                      <option key={appointment.id} value={appointment.id}>
-                        {appointment.customer?.name || appointment.customerId} - {appointment.vehicle ? `${appointment.vehicle.year} ${appointment.vehicle.make} ${appointment.vehicle.model}` : appointment.vehicleId}
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
-                {/* Manual Entry Fields - Show when no appointment selected */}
-                {!workOrderForm.appointmentId && (
-                  <div style={{ marginTop: '16px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                    <h5 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Manual Entry (No Appointment Selected)</h5>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-                      <div>
-                        <label htmlFor="customerId" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500' }}>Customer ID</label>
+            <div className="work-order-modal__body">
+              <form className="work-order-form" onSubmit={(e) => { e.preventDefault(); handleWorkOrderSubmit(); }}>
+                {/* {workOrderError && (
+                  <div className="work-order-form__error">
+                    {workOrderError}
+                  </div>
+                )} */}
+
+                <div className="work-order-form__grid">
+                  <div className="work-order-form__section">
+                    <h3 className="work-order-form__section-title">Link Appointment</h3>
+
+                    <div className="work-order-form__group">
+                      <label htmlFor="appointmentSelect">
+                        Select Appointment
+                      </label>
+                      <select
+                        id="appointmentSelect"
+                        value={workOrderForm.appointmentId}
+                        onChange={(e) => handleAppointmentSelect(e.target.value)}
+                      >
+                        <option value="">Select an appointment to link...</option>
+                        {availableAppointments.map(appointment => (
+                          <option key={appointment.id} value={appointment.id}>
+                            {appointment.customer?.name || appointment.customerId} - {appointment.vehicle ? `${appointment.vehicle.year} ${appointment.vehicle.make} ${appointment.vehicle.model}` : appointment.vehicleId}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Manual Entry Fields - Show when no appointment selected */}
+                    {!workOrderForm.appointmentId && (
+                      <div style={{ marginTop: '24px', padding: '20px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                        <h4 style={{ margin: '0 0 16px 0', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Manual Entry (No Appointment Selected)</h4>
+                        <div className="work-order-form__row work-order-form__row--two-col">
+                          <div className="work-order-form__group">
+                            <label htmlFor="customerId">
+                              Customer <span className="work-order-form__required">*</span>
+                            </label>
+                            <select
+                              id="customerId"
+                              value={workOrderForm.customerId}
+                              onChange={(e) => handleCustomerSelect(e.target.value)}
+                              required
+                            >
+                              <option value="">Select a customer...</option>
+                              {customers.map(customer => (
+                                <option key={customer.id} value={customer.id}>
+                                  {customer.userProfile?.name || 'Unknown'} - {customer.userProfile?.email || 'No email'}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="work-order-form__group">
+                            <label htmlFor="vehicleId">
+                              Vehicle <span className="work-order-form__required">*</span>
+                            </label>
+                            <select
+                              id="vehicleId"
+                              value={workOrderForm.vehicleId}
+                              onChange={(e) => setWorkOrderForm(prev => ({ ...prev, vehicleId: e.target.value }))}
+                              disabled={!workOrderForm.customerId}
+                              required
+                            >
+                              <option value="">
+                                {workOrderForm.customerId ? 'Select a vehicle...' : 'Please select customer first'}
+                              </option>
+                              {customerVehicles.map(vehicle => (
+                                <option key={vehicle.id} value={vehicle.id}>
+                                  {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
+                                </option>
+                              ))}
+                            </select>
+
+                            {/* To store and pass the service advisor id */}
+                            <input
+                              type="hidden"
+                              id="advisorId"
+                              value={workOrderForm.advisorId || currentServiceAdvisor?.id || ''}
+                              disabled
+                              placeholder={currentServiceAdvisor?.id ? `Auto-filled: ${currentServiceAdvisor.id}` : "Enter advisor ID"}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="work-order-form__section">
+                    <h3 className="work-order-form__section-title">Work Order Details</h3>
+
+                    <div className="work-order-form__row work-order-form__row--two-col">
+                      <div className="work-order-form__group">
+                        <label htmlFor="jobType">
+                          Job Type <span className="work-order-form__required">*</span>
+                        </label>
+                        <select
+                          id="jobType"
+                          value={workOrderForm.jobType}
+                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, jobType: e.target.value }))}
+                          required
+                        >
+                          <option value="REPAIR">Repair</option>
+                          <option value="MAINTENANCE">Maintenance</option>
+                          <option value="INSPECTION">Inspection</option>
+                        </select>
+                      </div>
+
+                      <div className="work-order-form__group">
+                        <label htmlFor="priority">
+                          Priority <span className="work-order-form__required">*</span>
+                        </label>
+                        <select
+                          id="priority"
+                          value={workOrderForm.priority}
+                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, priority: e.target.value }))}
+                          required
+                        >
+                          <option value="LOW">Low</option>
+                          <option value="NORMAL">Normal</option>
+                          <option value="HIGH">High</option>
+                          <option value="URGENT">Urgent</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="work-order-form__group">
+                      <label htmlFor="complaint">
+                        Customer Complaint <span className="work-order-form__required">*</span>
+                      </label>
+                      <textarea
+                        id="complaint"
+                        value={workOrderForm.complaint}
+                        onChange={(e) => setWorkOrderForm(prev => ({ ...prev, complaint: e.target.value }))}
+                        placeholder="Describe the customer's complaint..."
+                        required
+                        style={{ resize: 'none' }}
+                      />
+                    </div>
+
+                    <div className="work-order-form__row work-order-form__row--two-col">
+                      <div className="work-order-form__group">
+                        <label htmlFor="odometerReading">
+                          Odometer Reading
+                        </label>
                         <input
-                          type="text"
-                          id="customerId"
-                          value={workOrderForm.customerId}
-                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, customerId: e.target.value }))}
-                          style={{ width: '100%', padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px' }}
-                          placeholder="Enter customer ID"
+                          type="number"
+                          id="odometerReading"
+                          value={workOrderForm.odometerReading}
+                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, odometerReading: e.target.value }))}
+                          placeholder="e.g., 50000"
                         />
                       </div>
-                      <div>
-                        <label htmlFor="vehicleId" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500' }}>Vehicle ID</label>
-                        <input
-                          type="text"
-                          id="vehicleId"
-                          value={workOrderForm.vehicleId}
-                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, vehicleId: e.target.value }))}
-                          style={{ width: '100%', padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px' }}
-                          placeholder="Enter vehicle ID"
+                    </div>
+
+                    <div className="work-order-form__row work-order-form__row--two-col">
+                      <div className="work-order-form__group">
+                        <label htmlFor="internalNotes">
+                          Internal Notes
+                        </label>
+                        <textarea
+                          id="internalNotes"
+                          value={workOrderForm.internalNotes}
+                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, internalNotes: e.target.value }))}
+                          placeholder="Internal notes for technicians..."
+                          style={{ resize: 'none' }}
                         />
                       </div>
-                      <div>
-                        <label htmlFor="advisorId" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500' }}>Advisor ID</label>
-                        <input
-                          type="text"
-                          id="advisorId"
-                          value={workOrderForm.advisorId || currentServiceAdvisor?.id || ''}
-                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, advisorId: e.target.value }))}
-                          style={{ width: '100%', padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px' }}
-                          placeholder={currentServiceAdvisor?.id ? `Auto-filled: ${currentServiceAdvisor.id}` : "Enter advisor ID"}
+
+                      <div className="work-order-form__group">
+                        <label htmlFor="customerNotes">
+                          Customer Notes
+                        </label>
+                        <textarea
+                          id="customerNotes"
+                          value={workOrderForm.customerNotes}
+                          onChange={(e) => setWorkOrderForm(prev => ({ ...prev, customerNotes: e.target.value }))}
+                          placeholder="Notes visible to customer..."
+                          style={{ resize: 'none' }}
                         />
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
+
+                <div className="work-order-form__actions">
+                  <button
+                    type="button"
+                    className="work-order-form__btn work-order-form__btn--secondary"
+                    onClick={handleCreateWorkOrderModalClose}
+                    disabled={workOrderLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="work-order-form__btn work-order-form__btn--primary"
+                    disabled={workOrderLoading || !workOrderForm.customerId || !workOrderForm.vehicleId}
+                  >
+                    {workOrderLoading ? 'Creating...' : 'Create Work Order'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="work-order-modal__overlay" onClick={() => setShowSuccessModal(false)}>
+          <div className="work-order-modal" onClick={e => e.stopPropagation()}>
+            <div className="work-order-modal__header">
+              <div className="work-order-modal__title-wrapper">
+                <h2>Success</h2>
               </div>
-
-              <div style={{ marginBottom: '24px' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '500' }}>Work Order Details</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <label htmlFor="jobType" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Job Type</label>
-                    <select
-                      id="jobType"
-                      value={workOrderForm.jobType}
-                      onChange={(e) => setWorkOrderForm(prev => ({ ...prev, jobType: e.target.value }))}
-                      style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    >
-                      <option value="REPAIR">Repair</option>
-                      <option value="MAINTENANCE">Maintenance</option>
-                      <option value="INSPECTION">Inspection</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="priority" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Priority</label>
-                    <select
-                      id="priority"
-                      value={workOrderForm.priority}
-                      onChange={(e) => setWorkOrderForm(prev => ({ ...prev, priority: e.target.value }))}
-                      style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    >
-                      <option value="LOW">Low</option>
-                      <option value="NORMAL">Normal</option>
-                      <option value="HIGH">High</option>
-                      <option value="URGENT">Urgent</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: '16px' }}>
-                  <label htmlFor="complaint" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Customer Complaint</label>
-                  <textarea
-                    id="complaint"
-                    value={workOrderForm.complaint}
-                    onChange={(e) => setWorkOrderForm(prev => ({ ...prev, complaint: e.target.value }))}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px', minHeight: '80px', resize: 'vertical' }}
-                    placeholder="Describe the customer's complaint..."
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <label htmlFor="odometerReading" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Odometer Reading</label>
-                    <input
-                      type="number"
-                      id="odometerReading"
-                      value={workOrderForm.odometerReading}
-                      onChange={(e) => setWorkOrderForm(prev => ({ ...prev, odometerReading: e.target.value }))}
-                      style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                      placeholder="e.g., 50000"
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <label htmlFor="internalNotes" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Internal Notes</label>
-                    <textarea
-                      id="internalNotes"
-                      value={workOrderForm.internalNotes}
-                      onChange={(e) => setWorkOrderForm(prev => ({ ...prev, internalNotes: e.target.value }))}
-                      style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px', minHeight: '60px', resize: 'vertical' }}
-                      placeholder="Internal notes for technicians..."
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="customerNotes" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Customer Notes</label>
-                    <textarea
-                      id="customerNotes"
-                      value={workOrderForm.customerNotes}
-                      onChange={(e) => setWorkOrderForm(prev => ({ ...prev, customerNotes: e.target.value }))}
-                      style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px', minHeight: '60px', resize: 'vertical' }}
-                      placeholder="Notes visible to customer..."
-                    />
-                  </div>
-                </div>
-
-                {workOrderError && (
-                  <div style={{ color: '#ef4444', marginTop: '16px', padding: '12px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '4px', fontSize: '14px' }}>
-                    {workOrderError}
-                  </div>
-                )}
+              <button
+                className="work-order-modal__close-icon"
+                onClick={() => setShowSuccessModal(false)}
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+            <div className="work-order-modal__body">
+              <div style={{ textAlign: 'center', padding: '20px' }}>
+                <div style={{ fontSize: '48px', color: '#10b981', marginBottom: '16px' }}>✓</div>
+                <p style={{ fontSize: '16px', color: '#374151', margin: 0 }}>{modalMessage}</p>
               </div>
             </div>
-            <div style={{ padding: '16px 24px', borderTop: '1px solid #e5e7eb', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button 
-                onClick={() => setCreateWorkOrderModalOpen(false)}
-                disabled={workOrderLoading}
-                style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white', color: '#374151', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="work-order-modal__overlay" onClick={() => setShowErrorModal(false)}>
+          <div className="work-order-modal" onClick={e => e.stopPropagation()}>
+            <div className="work-order-modal__header">
+              <div className="work-order-modal__title-wrapper">
+                <h2>Error</h2>
+              </div>
+              <button
+                className="work-order-modal__close-icon"
+                onClick={() => setShowErrorModal(false)}
+                type="button"
               >
-                Cancel
+                ×
               </button>
-              <button 
-                onClick={handleWorkOrderSubmit}
-                disabled={workOrderLoading || !workOrderForm.customerId || !workOrderForm.vehicleId}
-                style={{ padding: '8px 16px', border: 'none', borderRadius: '4px', backgroundColor: workOrderLoading || !workOrderForm.customerId || !workOrderForm.vehicleId ? '#9ca3af' : '#3b82f6', color: 'white', fontSize: '14px', fontWeight: '500', cursor: workOrderLoading || !workOrderForm.customerId || !workOrderForm.vehicleId ? 'not-allowed' : 'pointer' }}
-              >
-                {workOrderLoading ? 'Creating...' : 'Create Work Order'}
-              </button>
+            </div>
+            <div className="work-order-modal__body">
+              <div style={{ textAlign: 'center', padding: '20px' }}>
+                <div style={{ fontSize: '48px', color: '#ef4444', marginBottom: '16px' }}>✕</div>
+                <p style={{ fontSize: '16px', color: '#374151', margin: 0 }}>{modalMessage}</p>
+              </div>
             </div>
           </div>
         </div>
