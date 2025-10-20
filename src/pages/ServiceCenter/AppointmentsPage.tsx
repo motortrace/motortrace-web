@@ -157,7 +157,7 @@ const AppointmentsPage = () => {
   const [error, setError] = useState('');
   const [serviceAdvisors, setServiceAdvisors] = useState<ServiceAdvisor[]>([]);
   const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
-  const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
+  const [viewMode, setViewMode] = useState<'incoming' | 'confirmed' | 'calendar'>('incoming');
   
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -287,6 +287,16 @@ const AppointmentsPage = () => {
       fetchServiceAdvisors();
     }
   }, [token, authLoading]);
+
+  // Auto-switch tabs based on status filter
+  useEffect(() => {
+    if (filterStatus === 'PENDING') {
+      setViewMode('incoming');
+    } else if (filterStatus === 'CONFIRMED') {
+      setViewMode('confirmed');
+    }
+    // For other statuses (all, IN_PROGRESS, etc.), keep current tab or switch to calendar if needed
+  }, [filterStatus]);
 
   // Unique filter values
   const uniqueCustomers = [...new Set(appointments.map((a: Appointment) => a.customer?.name || a.customerId))];
@@ -919,13 +929,19 @@ const AppointmentsPage = () => {
       {/* View Toggle Tabs - Moved outside page-header */}
       <div className="view-toggle-container">
         <div className="view-toggle">
-          <button 
-            className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-            onClick={() => setViewMode('table')}
+          <button
+            className={`view-btn ${viewMode === 'incoming' ? 'active' : ''}`}
+            onClick={() => setViewMode('incoming')}
           >
-            <i className='bx bx-table'></i> Table
+            <i className='bx bx-envelope'></i> Incoming Appointment Requests
           </button>
-          <button 
+          <button
+            className={`view-btn ${viewMode === 'confirmed' ? 'active' : ''}`}
+            onClick={() => setViewMode('confirmed')}
+          >
+            <i className='bx bx-check-circle'></i> Confirmed Appointments
+          </button>
+          <button
             className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
             onClick={() => setViewMode('calendar')}
           >
@@ -934,7 +950,7 @@ const AppointmentsPage = () => {
         </div>
       </div>
 
-      {viewMode === 'table' ? (
+      {viewMode === 'incoming' ? (
         <>
           {/* Incoming Appointment Requests */}
           <div className="appointments-section">
@@ -966,7 +982,9 @@ const AppointmentsPage = () => {
               )}
             </div>
           </div>
-
+        </>
+      ) : viewMode === 'confirmed' ? (
+        <>
           {/* Confirmed Appointments */}
           <div className="appointments-section">
             <div className="section-header">
@@ -985,7 +1003,11 @@ const AppointmentsPage = () => {
                   </div>
                   <h4 className="empty-state-title">No Confirmed Appointments</h4>
                   <p className="empty-state-message">
-                    No appointments have been confirmed yet. Confirmed appointments will appear here once they are processed from incoming requests.
+                    {filterStatus === 'all'
+                      ? 'No appointments have been confirmed yet. Confirmed appointments will appear here once they are processed from incoming requests.'
+                      : `No confirmed appointments match the current filters. Try adjusting your search criteria or status filter.`
+                    }
+                    
                   </p>
                 </div>
               ) : (

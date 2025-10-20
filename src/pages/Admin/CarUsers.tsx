@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../../styles/components/SearchBarAndFilters.scss"
 import './UserManagement.scss';
-import { Search, UserPlus, Users } from 'lucide-react';
+import { Search, UserPlus, Users, Plus } from 'lucide-react';
+import AddUserModal from '../../components/Admin/UserManagement/AddUserModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -21,109 +22,64 @@ const CarUsers: React.FC = () => {
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState('All Statuses');
     const [searchTerm, setSearchTerm] = useState('');
+    const [carUsers, setCarUsers] = useState<CarUser[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    const carUsers: CarUser[] = [
-        {
-            id: '1',
-            name: 'K. Gunasekara',
-            email: 'gunasekara.k@email.com',
-            phone: '+94 77 234 5678',
-            totalVehicles: 2,
-            totalBookings: 12,
-            status: 'Active',
-            joinDate: '2024-03-18'
-        },
-        {
-            id: '2',
-            name: 'S. Wijesinghe',
-            email: 's.wijesinghe@email.com',
-            phone: '+94 71 876 5432',
-            totalVehicles: 1,
-            totalBookings: 6,
-            status: 'Active',
-            joinDate: '2024-04-05'
-        },
-        {
-            id: '3',
-            name: 'R. Abeywardena',
-            email: 'abeywardena.r@email.com',
-            phone: '+94 76 345 6789',
-            totalVehicles: 3,
-            totalBookings: 20,
-            status: 'Suspended',
-            joinDate: '2023-11-28'
-        },
-        {
-            id: '4',
-            name: 'D. Herath',
-            email: 'd.herath@email.com',
-            phone: '+94 78 555 1234',
-            totalVehicles: 2,
-            totalBookings: 14,
-            status: 'Active',
-            joinDate: '2024-02-11'
-        },
-        {
-            id: '5',
-            name: 'N. Rathnayake',
-            email: 'n.rathnayake@email.com',
-            phone: '+94 72 654 7890',
-            totalVehicles: 1,
-            totalBookings: 7,
-            status: 'Suspended',
-            joinDate: '2023-10-15'
-        },
-        {
-            id: '6',
-            name: 'H. Peris',
-            email: 'h.peris@email.com',
-            phone: '+94 75 456 7890',
-            totalVehicles: 2,
-            totalBookings: 18,
-            status: 'Active',
-            joinDate: '2024-01-29'
-        },
-        {
-            id: '7',
-            name: 'M. Silva',
-            email: 'm.silva@email.com',
-            phone: '+94 77 321 6549',
-            totalVehicles: 3,
-            totalBookings: 23,
-            status: 'Active',
-            joinDate: '2023-12-20'
-        },
-        {
-            id: '8',
-            name: 'L. Jayasuriya',
-            email: 'l.jayasuriya@email.com',
-            phone: '+94 71 912 3456',
-            totalVehicles: 1,
-            totalBookings: 5,
-            status: 'Suspended',
-            joinDate: '2023-09-12'
-        },
-        {
-            id: '9',
-            name: 'P. Ekanayake',
-            email: 'p.ekanayake@email.com',
-            phone: '+94 76 789 0123',
-            totalVehicles: 2,
-            totalBookings: 16,
-            status: 'Suspended',
-            joinDate: '2023-08-03'
-        },
-        {
-            id: '10',
-            name: 'T. Ranasinghe',
-            email: 't.ranasinghe@email.com',
-            phone: '+94 78 234 5671',
-            totalVehicles: 1,
-            totalBookings: 9,
-            status: 'Active',
-            joinDate: '2024-05-02'
+    // Fetch car users from backend
+    useEffect(() => {
+        fetchCarUsers();
+    }, []);
+
+    const fetchCarUsers = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            const response = await fetch('http://localhost:3000/customers', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch car users');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform backend data to frontend CarUser format
+                const users = result.data.map((item: any) => transformBackendToFrontend(item));
+
+                setCarUsers(users);
+            }
+        } catch (error: any) {
+            console.error('Error fetching car users:', error);
+            toast.error('Failed to load car users');
+            // Fallback to empty array
+            setCarUsers([]);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
+
+    // Transform backend data to frontend CarUser format
+    const transformBackendToFrontend = (backendData: any): CarUser => {
+        return {
+            id: backendData.id || backendData.userProfileId,
+            name: backendData.userProfile?.name || 'Unknown',
+            email: backendData.userProfile?.email || 'No email',
+            phone: backendData.userProfile?.phone || 'No phone',
+            totalVehicles: backendData.vehicles?.length || 0,
+            totalBookings: backendData.appointments?.length || 0,
+            status: 'Active' as CarUser['status'], // You'll need to map this from backend status
+            joinDate: backendData.createdAt ? new Date(backendData.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        };
+    };
+
+    // Removed hardcoded carUsers data - now fetched from backend
 
     // Pagination state
     const itemsPerPage = 5;
@@ -139,8 +95,45 @@ const CarUsers: React.FC = () => {
         toast.info('Status toggle functionality will be implemented');
     };
 
-    const handleOpenAddModal = () => {
-        toast.info('Add Car User functionality will be implemented');
+    const handleOpenAddModal = () => setIsAddModalOpen(true);
+    const handleCloseAddModal = () => setIsAddModalOpen(false);
+
+    const handleCreateUser = async (newUser: any) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            // Prepare payload for customer user creation
+            const customerUserPayload = {
+                email: newUser.email,
+                password: newUser.password,
+                role: 'customer',
+                name: newUser.name,
+                phone: newUser.phone,
+            };
+
+            const response = await fetch('http://localhost:3000/users/customer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(customerUserPayload),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || data.error || 'Failed to create customer user');
+            }
+
+            toast.success('Car User profile created successfully!');
+            // Refresh the car users list to show the new user
+            fetchCarUsers();
+
+        } catch (error: any) {
+            toast.error(error.message || 'An error occurred while creating the profile');
+        }
     };
 
     const renderTableRow = (user: CarUser) => {
@@ -237,6 +230,31 @@ const CarUsers: React.FC = () => {
                             </select>
                         </div>
                     </div>
+                    {/* <button
+                        className="user-management__add-btn"
+                        onClick={handleOpenAddModal}
+                        style={{
+                            background: '#0ea5e9',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontFamily: 'Poppins',
+                            fontWeight: 500,
+                            fontSize: '15px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            marginTop: '0px',
+                            padding: '7.5px 22.5px',
+                            boxSizing: 'border-box',
+                        }}
+                    >
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <Plus size={18} strokeWidth={2} />
+                        </span>
+                        Add New Car User
+                    </button> */}
                 </div>
 
                 <div className="user-management__table">
@@ -287,6 +305,12 @@ const CarUsers: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <AddUserModal
+                open={isAddModalOpen}
+                userType="Car Users"
+                onClose={handleCloseAddModal}
+                onCreate={handleCreateUser}
+            />
             <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );

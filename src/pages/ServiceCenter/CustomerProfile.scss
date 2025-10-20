@@ -5,7 +5,6 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  background: #f8f9fa;
   min-height: 100vh;
 
   // Loading State
@@ -167,56 +166,44 @@
 
   // Tabs Navigation
   &__tabs {
+    display: flex;
     background: white;
     border-radius: 12px;
-    padding: 8px;
-    display: flex;
-    gap: 4px;
+    padding: 4px;
     margin-bottom: 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
+    border: 1px solid #cbd5e1;
 
     .tab {
-      padding: 10px 20px;
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 8px;
       border: none;
       background: transparent;
-      border-radius: 8px;
-      font-family: 'Poppins', sans-serif;
+      color: #64748b;
       font-size: 14px;
       font-weight: 500;
-      color: #6b7280;
       cursor: pointer;
       transition: all 0.2s;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 6px;
       position: relative;
 
       &:hover {
-        background: #f3f4f6;
-        color: #374151;
+        background: #f8fafc;
+        color: #475569;
       }
 
       &.active {
-        background: #4f46e5;
+        background: #2563eb;
         color: white;
-
-        .tab-badge {
-          background: white;
-          color: #4f46e5;
-        }
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
       }
 
       .tab-badge {
         background: #ef4444;
         color: white;
+        font-size: 10px;
+        padding: 2px 6px;
         border-radius: 10px;
-        padding: 2px 8px;
-        font-size: 12px;
-        font-weight: 600;
-        min-width: 20px;
-        text-align: center;
+        margin-left: 8px;
       }
     }
   }
