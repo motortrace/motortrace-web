@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import { cannedServiceService } from '../../services/cannedServiceService';
+import './CreateCannedServiceModal.scss';
 
 interface CreateCannedServiceModalProps {
   isOpen: boolean;
@@ -14,17 +16,17 @@ interface LaborOperation {
 }
 
 enum ServiceVariantLabel {
-  FULL_SYNTHETIC = 'FULL_SYNTHETIC',    // Premium synthetic oil
-  SYNTHETIC_BLEND = 'SYNTHETIC_BLEND',   // Mixed synthetic/conventional oil
-  CONVENTIONAL = 'CONVENTIONAL',      // Standard mineral oil
-  HIGH_MILEAGE = 'HIGH_MILEAGE',      // Oil formulated for high mileage vehicles
-  DIESEL = 'DIESEL',            // Diesel-specific oil
-  ELECTRIC = 'ELECTRIC',          // For electric vehicles
-  HYBRID = 'HYBRID',            // Hybrid vehicle specific
-  SUV = 'SUV',               // SUV-specific service variant
-  TRUCK = 'TRUCK',             // Truck-specific service variant
-  PERFORMANCE = 'PERFORMANCE',       // Performance vehicle variant
-  COMMERCIAL = 'COMMERCIAL'        // Commercial vehicle variant
+  FULL_SYNTHETIC = 'FULL_SYNTHETIC',
+  SYNTHETIC_BLEND = 'SYNTHETIC_BLEND',
+  CONVENTIONAL = 'CONVENTIONAL',
+  HIGH_MILEAGE = 'HIGH_MILEAGE',
+  DIESEL = 'DIESEL',
+  ELECTRIC = 'ELECTRIC',
+  HYBRID = 'HYBRID',
+  SUV = 'SUV',
+  TRUCK = 'TRUCK',
+  PERFORMANCE = 'PERFORMANCE',
+  COMMERCIAL = 'COMMERCIAL'
 }
 
 interface CannedServiceFormData {
@@ -70,8 +72,8 @@ const CreateCannedServiceModal: React.FC<CreateCannedServiceModalProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
 
-  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -95,6 +97,22 @@ const CreateCannedServiceModal: React.FC<CreateCannedServiceModalProps> = ({
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await cannedServiceService.getPackages();
+        const uniqueCategories = [...new Set(data.map((s: any) => s.category).filter(Boolean))];
+        setCategories(uniqueCategories);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      }
+    };
+
+    if (isOpen) {
+      fetchCategories();
+    }
+  }, [isOpen]);
+
   const handleInputChange = (field: keyof CannedServiceFormData, value: any) => {
     setFormData(prev => ({
       ...prev,
@@ -108,7 +126,6 @@ const CreateCannedServiceModal: React.FC<CreateCannedServiceModalProps> = ({
     setError('');
 
     try {
-      // Validate required fields
       if (!formData.code.trim()) {
         throw new Error('Service code is required');
       }
@@ -128,7 +145,6 @@ const CreateCannedServiceModal: React.FC<CreateCannedServiceModalProps> = ({
         throw new Error('Category is required');
       }
 
-      // Prepare data for API
       const submitData = {
         code: formData.code.trim(),
         name: formData.name.trim(),
@@ -166,253 +182,269 @@ const CreateCannedServiceModal: React.FC<CreateCannedServiceModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleBackdropClick} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-      <div className="modal-content" onClick={e => e.stopPropagation()} style={{ backgroundColor: 'white', borderRadius: '8px', maxWidth: '800px', width: '90%', maxHeight: '90vh', overflow: 'auto' }}>
-        <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>Create Canned Service</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', padding: '0', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <i className='bx bx-x'></i>
+    <div className="canned-service-modal__overlay" onClick={handleBackdropClick}>
+      <div className="canned-service-modal" onClick={e => e.stopPropagation()}>
+        <div className="canned-service-modal__header">
+          <div className="canned-service-modal__title-wrapper">
+            <h2>Create Canned Service</h2>
+            <p className="canned-service-modal__subtitle">
+              Configure a new service package for your automotive service offerings
+            </p>
+          </div>
+          <button
+            style={{color: '#fff'}}
+            className="canned-service-modal__close-icon"
+            onClick={onClose}
+            type="button"
+          >
+            X
           </button>
         </div>
-        <div style={{ padding: '24px' }}>
-          <form onSubmit={handleSubmit}>
+
+        <div className="canned-service-modal__body">
+          <form className="canned-service-form" onSubmit={handleSubmit}>
             {error && (
-              <div style={{ color: '#ef4444', marginBottom: '16px', padding: '12px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '4px', fontSize: '14px' }}>
+              <div className="canned-service-form__error">
                 {error}
               </div>
             )}
 
-            <div style={{ marginBottom: '24px' }}>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '500' }}>Basic Information</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                <div>
-                  <label htmlFor="code" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Service Code *</label>
-                  <input
-                    type="text"
-                    id="code"
-                    value={formData.code}
-                    onChange={(e) => handleInputChange('code', e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    placeholder="e.g., OIL_CHANGE_PREMIUM"
+            <div className="canned-service-form__grid">
+              <div className="canned-service-form__section">
+                <h3 className="canned-service-form__section-title">Basic Information</h3>
+
+                <div className="canned-service-form__row canned-service-form__row--two-col">
+                  <div className="canned-service-form__group">
+                    <label htmlFor="code">
+                      Service Code <span className="canned-service-form__required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="code"
+                      value={formData.code}
+                      onChange={(e) => handleInputChange('code', e.target.value)}
+                      placeholder="e.g., OIL_CHANGE_PREMIUM"
+                      required
+                    />
+                  </div>
+
+                  <div className="canned-service-form__group">
+                    <label htmlFor="name">
+                      Service Name <span className="canned-service-form__required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      placeholder="e.g., Premium Full Synthetic Oil Change"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="canned-service-form__group">
+                  <label htmlFor="description">
+                    Description <span className="canned-service-form__required">*</span>
+                  </label>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    placeholder="Provide a detailed description of the service..."
                     required
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="name" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Service Name *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    placeholder="e.g., Premium Full Synthetic Oil Change"
-                    required
-                  />
+                <div style = {{marginTop: '20px'}} className="canned-service-form__row canned-service-form__row--three-col">
+                  <div className="canned-service-form__group">
+                    <label htmlFor="category">
+                      Category <span className="canned-service-form__required">*</span>
+                    </label>
+                    <select
+                      id="category"
+                      value={formData.category}
+                      onChange={(e) => handleInputChange('category', e.target.value)}
+                      required
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="canned-service-form__group">
+                    <label htmlFor="duration">
+                      Duration (minutes) <span className="canned-service-form__required">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="duration"
+                      value={formData.duration || ''}
+                      onChange={(e) => handleInputChange('duration', parseInt(e.target.value) || 0)}
+                      min="1"
+                      placeholder="45"
+                      required
+                    />
+                  </div>
+
+                  <div className="canned-service-form__group">
+                    <label htmlFor="price">
+                      Price (LKR) <span className="canned-service-form__required">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="price"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', e.target.value)}
+                      min="0"
+                      step="0.01"
+                      placeholder="5999.99"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label htmlFor="description" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Description *</label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px', minHeight: '80px', resize: 'vertical' }}
-                  placeholder="Describe the service..."
-                  required
-                />
+              <div className="canned-service-form__section">
+                <h3 className="canned-service-form__section-title">Vehicle Information</h3>
+
+                <div className="canned-service-form__row canned-service-form__row--three-col">
+                  <div className="canned-service-form__group">
+                    <label htmlFor="vehicleType">Vehicle Type</label>
+                    <select
+                      id="vehicleType"
+                      value={formData.vehicleType}
+                      onChange={(e) => handleInputChange('vehicleType', e.target.value)}
+                    >
+                      <option value="">Any Vehicle Type</option>
+                      <option value="Sedan">Sedan</option>
+                      <option value="SUV">SUV</option>
+                      <option value="Truck">Truck</option>
+                      <option value="Van">Van</option>
+                      <option value="Hatchback">Hatchback</option>
+                      <option value="Coupe">Coupe</option>
+                      <option value="Convertible">Convertible</option>
+                      <option value="Wagon">Wagon</option>
+                      <option value="Motorcycle">Motorcycle</option>
+                    </select>
+                  </div>
+
+                  <div className="canned-service-form__group">
+                    <label htmlFor="minVehicleAge">Min Vehicle Age (years)</label>
+                    <input
+                      type="number"
+                      id="minVehicleAge"
+                      value={formData.minVehicleAge || ''}
+                      onChange={(e) => handleInputChange('minVehicleAge', e.target.value ? parseInt(e.target.value) : undefined)}
+                      min="0"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div className="canned-service-form__group">
+                    <label htmlFor="maxVehicleMileage">Max Vehicle Mileage</label>
+                    <input
+                      type="number"
+                      id="maxVehicleMileage"
+                      value={formData.maxVehicleMileage || ''}
+                      onChange={(e) => handleInputChange('maxVehicleMileage', e.target.value ? parseInt(e.target.value) : undefined)}
+                      min="0"
+                      placeholder="150000"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                <div>
-                  <label htmlFor="category" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Category *</label>
+              <div className="canned-service-form__section">
+                <h3 className="canned-service-form__section-title">Variant Information</h3>
+
+                <div className="canned-service-form__group">
+                  <label htmlFor="variantLabel">Variant Label</label>
                   <select
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => handleInputChange('category', e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    required
+                    id="variantLabel"
+                    value={formData.variantLabel || ''}
+                    onChange={(e) => handleInputChange('variantLabel', e.target.value === '' ? undefined : e.target.value as ServiceVariantLabel)}
                   >
-                    <option value="">Select Category</option>
-                    <option value="Maintenance">Maintenance</option>
-                    <option value="Repair">Repair</option>
-                    <option value="Inspection">Inspection</option>
-                    <option value="Diagnostic">Diagnostic</option>
-                    <option value="Customization">Customization</option>
+                    <option value="">Select Variant (Optional)</option>
+                    <option value={ServiceVariantLabel.FULL_SYNTHETIC}>Full Synthetic - Premium synthetic oil</option>
+                    <option value={ServiceVariantLabel.SYNTHETIC_BLEND}>Synthetic Blend - Mixed synthetic/conventional</option>
+                    <option value={ServiceVariantLabel.CONVENTIONAL}>Conventional - Standard mineral oil</option>
+                    <option value={ServiceVariantLabel.HIGH_MILEAGE}>High Mileage - For high mileage vehicles</option>
+                    <option value={ServiceVariantLabel.DIESEL}>Diesel - Diesel-specific oil</option>
+                    <option value={ServiceVariantLabel.ELECTRIC}>Electric - For electric vehicles</option>
+                    <option value={ServiceVariantLabel.HYBRID}>Hybrid - Hybrid vehicle specific</option>
+                    <option value={ServiceVariantLabel.SUV}>SUV - SUV-specific service</option>
+                    <option value={ServiceVariantLabel.TRUCK}>Truck - Truck-specific service</option>
+                    <option value={ServiceVariantLabel.PERFORMANCE}>Performance - Performance vehicle</option>
+                    <option value={ServiceVariantLabel.COMMERCIAL}>Commercial - Commercial vehicle</option>
                   </select>
                 </div>
+              </div>
 
-                <div>
-                  <label htmlFor="duration" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Duration (minutes) *</label>
-                  <input
-                    type="number"
-                    id="duration"
-                    value={formData.duration}
-                    onChange={(e) => handleInputChange('duration', parseInt(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    min="1"
-                    placeholder="45"
-                    required
-                  />
-                </div>
+              <div className="canned-service-form__section">
+                <h3 className="canned-service-form__section-title">Service Options</h3>
 
-                <div>
-                  <label htmlFor="price" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Price (LKR) *</label>
-                  <input
-                    type="number"
-                    id="price"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    min="0"
-                    step="0.01"
-                    placeholder="129.99"
-                    required
-                  />
+                <div className="canned-service-form__checkbox-grid">
+                  <label className="canned-service-form__checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.isAvailable}
+                      onChange={(e) => handleInputChange('isAvailable', e.target.checked)}
+                    />
+                    Service is available
+                  </label>
+
+                  <label className="canned-service-form__checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.hasOptionalParts}
+                      onChange={(e) => handleInputChange('hasOptionalParts', e.target.checked)}
+                    />
+                    Has optional parts
+                  </label>
+
+                  <label className="canned-service-form__checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.hasOptionalLabor}
+                      onChange={(e) => handleInputChange('hasOptionalLabor', e.target.checked)}
+                    />
+                    Has optional labor
+                  </label>
+
+                  <label className="canned-service-form__checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.isArchived}
+                      onChange={(e) => handleInputChange('isArchived', e.target.checked)}
+                    />
+                    Archive this service
+                  </label>
                 </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '500' }}>Vehicle Information</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label htmlFor="vehicleType" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Vehicle Type</label>
-                  <select
-                    id="vehicleType"
-                    value={formData.vehicleType}
-                    onChange={(e) => handleInputChange('vehicleType', e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                  >
-                    <option value="">Any Vehicle Type</option>
-                    <option value="Sedan">Sedan</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Truck">Truck</option>
-                    <option value="Van">Van</option>
-                    <option value="Hatchback">Hatchback</option>
-                    <option value="Coupe">Coupe</option>
-                    <option value="Convertible">Convertible</option>
-                    <option value="Wagon">Wagon</option>
-                    <option value="Motorcycle">Motorcycle</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="minVehicleAge" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Min Vehicle Age (years)</label>
-                  <input
-                    type="number"
-                    id="minVehicleAge"
-                    value={formData.minVehicleAge || ''}
-                    onChange={(e) => handleInputChange('minVehicleAge', e.target.value ? parseInt(e.target.value) : undefined)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    min="0"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="maxVehicleMileage" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Max Vehicle Mileage</label>
-                  <input
-                    type="number"
-                    id="maxVehicleMileage"
-                    value={formData.maxVehicleMileage || ''}
-                    onChange={(e) => handleInputChange('maxVehicleMileage', e.target.value ? parseInt(e.target.value) : undefined)}
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                    min="0"
-                    placeholder="150000"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '500' }}>Service Options</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.isAvailable}
-                    onChange={(e) => handleInputChange('isAvailable', e.target.checked)}
-                    style={{ width: '16px', height: '16px' }}
-                  />
-                  Service is available
-                </label>
-
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.hasOptionalParts}
-                    onChange={(e) => handleInputChange('hasOptionalParts', e.target.checked)}
-                    style={{ width: '16px', height: '16px' }}
-                  />
-                  Has optional parts
-                </label>
-
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.hasOptionalLabor}
-                    onChange={(e) => handleInputChange('hasOptionalLabor', e.target.checked)}
-                    style={{ width: '16px', height: '16px' }}
-                  />
-                  Has optional labor
-                </label>
-
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.isArchived}
-                    onChange={(e) => handleInputChange('isArchived', e.target.checked)}
-                    style={{ width: '16px', height: '16px' }}
-                  />
-                  Archive this service
-                </label>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '500' }}>Variant Information</h4>
-              <div style={{ marginBottom: '16px' }}>
-                <label htmlFor="variantLabel" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Variant Label</label>
-                <select
-                  id="variantLabel"
-                  value={formData.variantLabel || ''}
-                  onChange={(e) => handleInputChange('variantLabel', e.target.value === '' ? undefined : e.target.value as ServiceVariantLabel)}
-                  style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
-                >
-                  <option value="">Select Variant Label (Optional)</option>
-                  <option value={ServiceVariantLabel.FULL_SYNTHETIC}>FULL_SYNTHETIC - Premium synthetic oil</option>
-                  <option value={ServiceVariantLabel.SYNTHETIC_BLEND}>SYNTHETIC_BLEND - Mixed synthetic/conventional oil</option>
-                  <option value={ServiceVariantLabel.CONVENTIONAL}>CONVENTIONAL - Standard mineral oil</option>
-                  <option value={ServiceVariantLabel.HIGH_MILEAGE}>HIGH_MILEAGE - Oil formulated for high mileage vehicles</option>
-                  <option value={ServiceVariantLabel.DIESEL}>DIESEL - Diesel-specific oil</option>
-                  <option value={ServiceVariantLabel.ELECTRIC}>ELECTRIC - For electric vehicles</option>
-                  <option value={ServiceVariantLabel.HYBRID}>HYBRID - Hybrid vehicle specific</option>
-                  <option value={ServiceVariantLabel.SUV}>SUV - SUV-specific service variant</option>
-                  <option value={ServiceVariantLabel.TRUCK}>TRUCK - Truck-specific service variant</option>
-                  <option value={ServiceVariantLabel.PERFORMANCE}>PERFORMANCE - Performance vehicle variant</option>
-                  <option value={ServiceVariantLabel.COMMERCIAL}>COMMERCIAL - Commercial vehicle variant</option>
-                </select>
-              </div>
+            <div className="canned-service-form__actions">
+              <button
+                type="button"
+                className="canned-service-form__btn canned-service-form__btn--secondary"
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="canned-service-form__btn canned-service-form__btn--primary"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Creating...' : 'Create Service'}
+              </button>
             </div>
           </form>
-        </div>
-        <div style={{ padding: '16px 24px', borderTop: '1px solid #e5e7eb', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <button
-            onClick={onClose}
-            disabled={isSubmitting}
-            style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white', color: '#374151', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            style={{ padding: '8px 16px', border: 'none', borderRadius: '4px', backgroundColor: isSubmitting ? '#9ca3af' : '#3b82f6', color: 'white', fontSize: '14px', fontWeight: '500', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
-          >
-            {isSubmitting ? 'Creating...' : 'Create Service'}
-          </button>
         </div>
       </div>
     </div>

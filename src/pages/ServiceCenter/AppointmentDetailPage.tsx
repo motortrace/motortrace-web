@@ -188,6 +188,7 @@ const AppointmentDetailPage = () => {
   // Cancellation state
   const [cancelLoading, setCancelLoading] = useState(false);
   const [cancelError, setCancelError] = useState('');
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   // Service history state
   const [serviceHistory, setServiceHistory] = useState<ServiceHistoryItem[]>([]);
@@ -381,10 +382,6 @@ const AppointmentDetailPage = () => {
       return;
     }
 
-    if (!confirm('Are you sure you want to cancel this appointment?')) {
-      return;
-    }
-
     setCancelLoading(true);
     setCancelError('');
 
@@ -410,6 +407,7 @@ const AppointmentDetailPage = () => {
       if (result.success) {
         // Update the appointment in local state
         setAppointment(prev => prev ? { ...prev, ...result.data } : null);
+        setShowCancelModal(false);
         console.log('Appointment cancelled successfully');
       } else {
         throw new Error(result.message || 'Failed to cancel appointment');
@@ -446,7 +444,7 @@ const AppointmentDetailPage = () => {
       <div className="page-header">
         <div className="header-content">
           <h1 className="page-title">Appointment Details</h1>
-          <p className="page-subtitle">ID: {appointment.id.substring(0, 8)}...</p>
+          <p className="page-subtitle">Appointment ID: {appointment.id}</p>
         </div>
         <div className="header-actions">
           {(appointment.status === 'PENDING' || appointment.status === 'CONFIRMED') && (
@@ -459,8 +457,14 @@ const AppointmentDetailPage = () => {
                 <i className='bx bx-user-plus'></i> Assign Advisor
               </button>
               <button
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color = '';
+                }}
                 className="btn btn--danger"
-                onClick={handleCancel}
+                onClick={() => setShowCancelModal(true)}
                 disabled={cancelLoading}
               >
                 <i className='bx bx-x'></i> {cancelLoading ? 'Cancelling...' : 'Cancel Appointment'}
@@ -507,7 +511,7 @@ const AppointmentDetailPage = () => {
               <div className="info-section">
                 <h4>Assignment Information</h4>
                 {appointment.assignedTo ? (
-                  <div className="advisor-info">
+                  <div className="customer-info">
                     {appointment.assignedTo.profileImage ? (
                       <img
                         src={appointment.assignedTo.profileImage}
@@ -519,14 +523,22 @@ const AppointmentDetailPage = () => {
                         {appointment.assignedTo.name.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <div className="advisor-details">
+                    <div className="customer-info-details">
                       <p><strong>Service Advisor:</strong> {appointment.assignedTo.name}</p>
                       <p><strong>Employee ID:</strong> {appointment.assignedTo.employeeId}</p>
                       {appointment.assignedTo.phone && <p><strong>Phone:</strong> {appointment.assignedTo.phone}</p>}
                     </div>
                   </div>
                 ) : (
-                  <p><em>Not currently assigned</em></p>
+                  <div className="assignment-empty-state">
+                    <div className="empty-state-icon">
+                      <i className='bx bx-user-plus'></i>
+                    </div>
+                    <div className="empty-state-content">
+                      <h5>No Service Advisor Assigned</h5>
+                      <p>This appointment hasn't been assigned to a service advisor yet.</p>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -560,11 +572,52 @@ const AppointmentDetailPage = () => {
               </div>
 
               <div className="info-section">
-                <h4>Appointment Details</h4>
-                <p><strong>Requested At:</strong> {new Date(appointment.requestedAt).toLocaleString()}</p>
-                <p><strong>Scheduled Time:</strong> {appointment.startTime ? new Date(appointment.startTime).toLocaleString() : 'Not scheduled'}</p>
-                <p><strong>Priority:</strong> {getPriorityBadge(appointment.priority)}</p>
-                {appointment.notes && <p><strong>Notes:</strong> {appointment.notes}</p>}
+                <h4>
+                  Date and Time Information
+                </h4>
+                <div className="appointment-details-content">
+                  <div className="detail-item">
+                    <div className="detail-label">
+                      <i className='bx bx-time'></i>
+                      Requested At
+                    </div>
+                    <div className="detail-value">
+                      {new Date(appointment.requestedAt).toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className="detail-item">
+                    <div className="detail-label">
+                      <i className='bx bx-calendar-check'></i>
+                      Scheduled Time
+                    </div>
+                    <div className="detail-value">
+                      {appointment.startTime ? new Date(appointment.startTime).toLocaleString() : 'Not scheduled'}
+                    </div>
+                  </div>
+
+                  <div className="detail-item">
+                    <div className="detail-label">
+                      <i className='bx bx-flag'></i>
+                      Priority
+                    </div>
+                    <div className="detail-value">
+                      {getPriorityBadge(appointment.priority)}
+                    </div>
+                  </div>
+
+                  {appointment.notes && (
+                    <div className="detail-item detail-item--full">
+                      <div className="detail-label">
+                        <i className='bx bx-note'></i>
+                        Notes
+                      </div>
+                      <div className="detail-value detail-value--notes">
+                        {appointment.notes}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -597,7 +650,9 @@ const AppointmentDetailPage = () => {
 
             {/* Service History Section */}
             <div className="service-history-section">
-              <h4>Service History</h4>
+              <h4>
+                Service History
+              </h4>
               {serviceHistoryLoading ? (
                 <div className="loading-history">Loading service history...</div>
               ) : serviceHistoryError ? (
@@ -648,7 +703,15 @@ const AppointmentDetailPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="no-history">No service history found for this customer.</div>
+                <div className="service-history-empty-state">
+                  <div className="empty-state-icon">
+                    <i className='bx bx-history'></i>
+                  </div>
+                  <div className="empty-state-content">
+                    <h5>No Service History Available</h5>
+                    <p>This customer doesn't have any previous service records in our system.</p>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -657,15 +720,15 @@ const AppointmentDetailPage = () => {
 
       {/* Assignment Modal */}
       {assignModalOpen && (
-        <div className="modal-overlay" onClick={() => setAssignModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className="assign-modal-overlay" onClick={() => setAssignModalOpen(false)}>
+          <div className="assign-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="assign-modal-header">
               <h3>Assign Service Advisor</h3>
               <button className="btn-icon" onClick={() => setAssignModalOpen(false)}>
                 <i className='bx bx-x'></i>
               </button>
             </div>
-            <div className="modal-body">
+            <div className="assign-modal-body">
               {!appointment?.startTime ? (
                 <div className="no-schedule-message">
                   <p>Appointment must be scheduled to check advisor availability.</p>
@@ -743,7 +806,7 @@ const AppointmentDetailPage = () => {
                 </div>
               )}
             </div>
-            <div className="modal-footer">
+            <div className="assign-modal-footer">
               <button
                 className="btn btn--secondary"
                 onClick={() => setAssignModalOpen(false)}
@@ -757,6 +820,55 @@ const AppointmentDetailPage = () => {
                 disabled={assignLoading || !selectedAdvisorId}
               >
                 {assignLoading ? 'Assigning...' : 'Assign Advisor'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="cancel-modal-overlay" onClick={() => setShowCancelModal(false)}>
+          <div className="cancel-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="cancel-modal-header">
+              <div className="cancel-modal-icon">
+                <i className='bx bx-x-circle'></i>
+              </div>
+              <h3>Cancel</h3>
+              
+            </div>
+            <div className="cancel-modal-body">
+
+              <p className="modal-description">Are you sure you want to cancel this appointment? <br></br> This action cannot be undone.</p>
+
+              {appointment?.customer?.name && (
+                <div className="appointment-summary">
+                  <p><strong >Customer:</strong> {appointment.customer.name}</p>
+                  {appointment.vehicle && (
+                    <p><strong style={{marginRight: '44px'}}>Vehicle:</strong> {appointment.vehicle.year} {appointment.vehicle.make} {appointment.vehicle.model}</p>
+                  )}
+                  {appointment.startTime && (
+                    <p><strong>Scheduled:</strong> {new Date(appointment.startTime).toLocaleString()}</p>
+                  )}
+                </div>
+              )}
+
+              
+            </div>
+            <div className="cancel-modal-footer">
+              <button
+                className="btn btn--secondary"
+                onClick={() => setShowCancelModal(false)}
+                disabled={cancelLoading}
+              >
+                Keep Appointment
+              </button>
+              <button
+                className="btn btn--danger"
+                onClick={handleCancel}
+                disabled={cancelLoading}
+              >
+                {cancelLoading ? 'Cancelling...' : 'Cancel Appointment'}
               </button>
             </div>
           </div>
