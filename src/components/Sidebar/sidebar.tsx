@@ -81,6 +81,7 @@ const Sidebar: React.FC = () => {
       title: 'Services',
       items: [
         { id: 'services', label: 'Services', icon: 'bx bx-search-alt', route: `${basePath}/services` },
+        { id: 'inventory-items', label: 'Inventory Items', icon: 'bx bx-package', route: `${basePath}/inventory-items` },
       ]
     },
     {

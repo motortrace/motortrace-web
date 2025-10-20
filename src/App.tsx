@@ -11,6 +11,7 @@ import KanbanPage from './pages/ServiceCenter/KanbanPage';
 import TestTablePage from './pages/ServiceCenter/TestTablePage';
 import JobCard from './pages/ServiceCenter/JobCard/JobCard';
 import PartsInventory from './pages/ServiceCenter/Inventory/PartsInventory';
+import InventoryItemsPage from './pages/ServiceCenter/Inventory/InventoryItemsPage';
 import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import PricingPage from './pages/PricingPage/PricingPage';
@@ -133,6 +134,7 @@ function App() {
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<ServicesPage />} />
+          <Route path="inventory-items" element={<InventoryItemsPage />} />
           <Route path="service/:id" element={<ServiceDetailPage />} />
           <Route path="labor-catalog" element={<LaborCatalogPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
@@ -166,6 +168,7 @@ function App() {
           <Route path="inspection-detail/:workOrderId" element={<InspectionDetailPage />} />
           <Route path="timeline-board" element={<TimelineBoardPage />} />
           <Route path="services" element={<ServicesPage />} />
+          <Route path="inventory-items" element={<InventoryItemsPage />} />
           <Route path="service/:id" element={<ServiceDetailPage />} />
           <Route path="labor-catalog" element={<LaborCatalogPage />} />
           <Route path="work-order" element={<WorkOrdersPage />} />
