@@ -339,3 +339,34 @@ export interface Invoice {
   workOrder: InvoiceWorkOrder;
   lineItems: InvoiceLineItem[];
 }
+
+// ==================== Inventory/Parts Types ====================
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  sku: string;
+  partNumber: string;
+  manufacturer?: string;
+  isOEM: boolean;
+}
+
+export interface WorkOrderPart {
+  id: string;
+  workOrderId: string;
+  inventoryItemId: string;
+  description: string;
+  quantity: number;
+  unitPrice: string;
+  subtotal: string;
+  source: 'INVENTORY' | 'EXTERNAL';
+  status: 'PENDING' | 'ORDERED' | 'RECEIVED' | 'INSTALLED' | 'RETURNED';
+  part: InventoryItem;
+  installedBy?: {
+    id: string;
+    userProfile: {
+      id: string;
+      name: string;
+    };
+  } | null;
+}
