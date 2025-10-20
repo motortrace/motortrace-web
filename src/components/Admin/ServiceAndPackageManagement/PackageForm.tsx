@@ -87,7 +87,8 @@ export const PackageForm: React.FC<PackageFormProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="spm-service-form">
+        <div className="spm-modal__body">
+          <form onSubmit={handleSubmit} className="spm-service-form">
           <div className="spm-form-group">
             <label htmlFor="code">
               Package Code *
@@ -225,8 +226,9 @@ export const PackageForm: React.FC<PackageFormProps> = ({
               {pkg ? 'Update Package' : 'Create Package'}
             </button>
           </div>
-        </form>
-      </div>
-    </div>
-  );
+         </form>
+       </div>
+     </div>
+   </div>
+ );
 };

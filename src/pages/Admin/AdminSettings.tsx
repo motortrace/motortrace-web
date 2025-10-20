@@ -6,7 +6,6 @@ import PaymentAndCommissionSettings from '../../components/Admin/AdminSettings/P
 import BookingSettings from '../../components/Admin/AdminSettings/BookingSettings';
 import BookingCancellationSettings from '../../components/Admin/AdminSettings/BookingCancellationSettings';
 import RefundPolicySettings from '../../components/Admin/AdminSettings/RefundPolicySettings';
-import SubscriptionPlanSettings from '../../components/Admin/AdminSettings/SubscriptionPlanSettings';
 
 const AdminSettings = () => {
 
@@ -14,8 +13,6 @@ const AdminSettings = () => {
         requireEmailVerification: true,
         requirePhoneVerification: false,
         allowSocialLogin: true,
-        autoApproveServiceCenters: false,
-        autoApprovePartsVendors: false,
         maxLoginAttempts: 5,
         sessionTimeout: 30,
         enableTwoFactor: false,
@@ -52,7 +49,6 @@ const AdminSettings = () => {
                 onSettingsChange={handleUserSettingsChange}
             />
 
-            <SubscriptionPlanSettings />
 
             <BookingSettings />
 

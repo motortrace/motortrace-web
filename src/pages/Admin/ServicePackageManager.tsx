@@ -1,138 +1,131 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Briefcase, Package2, AlertCircle, AlertTriangle } from 'lucide-react';
-import type { Service, Package, CreateServiceRequest, UpdateServiceRequest, CreatePackageRequest, UpdatePackageRequest } from '../../types/ServicesAndPackages';
-import { useServiceData } from '../../hooks/useServiceData';
-import { ServicesList } from '../../components/Admin/ServiceAndPackageManagement/ServicesList';
-import { PackagesList } from '../../components/Admin/ServiceAndPackageManagement/PackagesList';
-import { ViewModal } from '../../components/Admin/ServiceAndPackageManagement/ViewModal';
-import { ServiceForm } from '../../components/Admin/ServiceAndPackageManagement/ServiceForm';
-import { PackageForm } from '../../components/Admin/ServiceAndPackageManagement/PackageForm';
+import { Package2, AlertCircle, AlertTriangle, Search } from 'lucide-react';
+import { PackageCard } from '../../components/Admin/ServiceAndPackageManagement/PackageCard';
 import './ServiceAndPackageManager.scss';
 
-type ServicePackageType = 'Services' | 'Packages';
+// Modal styles
+const inputStyle: React.CSSProperties = {
+    padding: '10px 12px',
+    border: '2px solid #e5e7eb',
+    borderRadius: 8,
+    fontSize: 15,
+    fontFamily: 'Poppins',
+    outline: 'none',
+    marginBottom: 8,
+};
+
+const buttonStyle: React.CSSProperties = {
+    border: 'none',
+    borderRadius: 8,
+    padding: '10px 20px',
+    fontFamily: 'Poppins',
+    fontWeight: 600,
+    fontSize: 15,
+    cursor: 'pointer',
+};
+
+const labelStyle: React.CSSProperties = {
+    fontFamily: 'Poppins',
+    fontWeight: 600,
+    fontSize: 14,
+    marginBottom: 4,
+    color: '#374151',
+    display: 'block',
+};
+
+const readOnlyValueStyle: React.CSSProperties = {
+    padding: '10px 12px',
+    border: '1px solid #e5e7eb',
+    borderRadius: 6,
+    backgroundColor: '#f9fafb',
+    fontSize: 15,
+    fontFamily: 'Poppins',
+    color: '#374151',
+};
+
+// Define interfaces locally
+interface Package {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    duration: number;
+    isAvailable: boolean;
+    createdAt: string;
+    updatedAt: string;
+    code: string;
+    serviceIds: string[];
+}
+
+interface CreatePackageRequest {
+    name: string;
+    description: string;
+    price: number;
+    duration: number;
+}
+
+interface UpdatePackageRequest {
+    name?: string;
+    description?: string;
+    price?: number;
+    duration?: number;
+    isAvailable?: boolean;
+}
 
 const ServicePackageManager: React.FC = () => {
-    const navigate = useNavigate();
-    const { tabType } = useParams<{ tabType?: string }>();
-    const [activeTab, setActiveTab] = useState<ServicePackageType>('Services');
-    const [viewModal, setViewModal] = useState<{ service?: Service; package?: Package } | null>(null);
-    const [serviceForm, setServiceForm] = useState<{ open: boolean; service?: Service }>({ open: false });
+    const [viewModal, setViewModal] = useState<{ package?: Package } | null>(null);
     const [packageForm, setPackageForm] = useState<{ open: boolean; package?: Package }>({ open: false });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     const [toggleConfirm, setToggleConfirm] = useState<{
-        type: 'service' | 'package';
         id: string;
         name: string;
         currentStatus: boolean;
     } | null>(null);
 
-    const tabTypeMap: Record<string, ServicePackageType> = {
-        'services': 'Services',
-        'packages': 'Packages'
-    };
+    // State for data
+    const [packages, setPackages] = useState<Package[]>([]);
+    const [dataLoading, setDataLoading] = useState(false);
 
-    const urlTypeMap: Record<ServicePackageType, string> = {
-        'Services': 'services',
-        'Packages': 'packages'
-    };
+    // API endpoints
+    const API_BASE = 'http://localhost:3000/canned-services';
 
-    useEffect(() => {
-        if (tabType && tabTypeMap[tabType]) {
-            setActiveTab(tabTypeMap[tabType]);
-        } else {
-            setActiveTab('Services');
-            navigate('/admin/offeringManagement/services', { replace: true });
-        }
-    }, [tabType, navigate]);
-
-    const {
-        services,
-        packages,
-        loading: dataLoading,
-        error: dataError,
-        addService,
-        updateService,
-        deleteService,
-        addPackage,
-        updatePackage,
-        deletePackage,
-        togglePackageAvailability,
-        refreshData
-    } = useServiceData();
-
-    useEffect(() => {
-        if (dataError) {
-            setError(dataError);
-        }
-    }, [dataError]);
-
-    const handleTabChange = (newTab: ServicePackageType) => {
-        setActiveTab(newTab);
-        const urlType = urlTypeMap[newTab];
-        navigate(`/admin/offeringManagement/${urlType}`, { replace: true });
-    };
-
-    const handleAddService = async (data: CreateServiceRequest | UpdateServiceRequest) => {
+    // Fetch packages
+    const fetchPackages = async () => {
         try {
-            setLoading(true);
-            await addService(data as CreateServiceRequest);
-            setServiceForm({ open: false });
-            setError(null);
-        } catch (err: any) {
-            setError(err.message || 'Failed to create service');
-        } finally {
-            setLoading(false);
-        }
-    };
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
 
-    const handleEditService = async (data: CreateServiceRequest | UpdateServiceRequest) => {
-        if (serviceForm.service) {
-            try {
-                setLoading(true);
-                await updateService(serviceForm.service.id, data as UpdateServiceRequest);
-                setServiceForm({ open: false });
-                setError(null);
-            } catch (err: any) {
-                setError(err.message || 'Failed to update service');
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-
-    const handleDeleteService = async (id: string) => {
-        try {
-            setLoading(true);
-            await deleteService(id);
-            setError(null);
-        } catch (err: any) {
-            setError(err.message || 'Failed to delete service');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Separate handler for toggling service availability
-    const handleToggleServiceAvailability = (id: string) => {
-        const service = services.find(s => s.id === id);
-        if (service) {
-            setToggleConfirm({
-                type: 'service',
-                id,
-                name: service.name,
-                currentStatus: service.isActive
+            const response = await fetch(`${API_BASE}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
+
+            if (!response.ok) throw new Error('Failed to fetch packages');
+            const data = await response.json();
+            setPackages(data.data || data);
+        } catch (err) {
+            console.error('Error fetching packages:', err);
+            setError(err instanceof Error ? err.message : 'Failed to fetch packages');
         }
     };
 
+    // Load data on mount
+    useEffect(() => {
+        const loadData = async () => {
+            setDataLoading(true);
+            await fetchPackages();
+            setDataLoading(false);
+        };
+        loadData();
+    }, []);
+
+    // Handler for toggling package availability
     const handleTogglePackageAvailability = (id: string) => {
         const pkg = packages.find(p => p.id === id);
         if (pkg) {
             setToggleConfirm({
-                type: 'package',
                 id,
                 name: pkg.name,
                 currentStatus: pkg.isAvailable
@@ -140,20 +133,77 @@ const ServicePackageManager: React.FC = () => {
         }
     };
 
+    // Package CRUD operations
+    const addPackage = async (data: CreatePackageRequest) => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No authentication token found');
+
+        const response = await fetch(`${API_BASE}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error('Failed to create package');
+        await fetchPackages();
+    };
+
+    const updatePackage = async (id: string, data: UpdatePackageRequest) => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No authentication token found');
+
+        const response = await fetch(`${API_BASE}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error('Failed to update package');
+        await fetchPackages();
+    };
+
+    const deletePackage = async (id: string) => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No authentication token found');
+
+        const response = await fetch(`${API_BASE}/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to delete package');
+        await fetchPackages();
+    };
+
+    const togglePackageAvailability = async (id: string) => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No authentication token found');
+
+        const response = await fetch(`${API_BASE}/${id}/toggle-availability`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to toggle package availability');
+        await fetchPackages();
+    };
+
     const handleConfirmToggle = async () => {
         if (!toggleConfirm) return;
 
         try {
             setLoading(true);
-            if (toggleConfirm.type === 'service') {
-                await updateService(toggleConfirm.id, { isActive: !toggleConfirm.currentStatus });
-            } else {
-                await togglePackageAvailability(toggleConfirm.id); // Make sure this exists in useServiceData
-            }
+            await togglePackageAvailability(toggleConfirm.id);
             setToggleConfirm(null);
             setError(null);
-        } catch (err: any) {
-            setError(err.message || `Failed to toggle ${toggleConfirm.type} availability`);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to toggle package availability');
         } finally {
             setLoading(false);
         }
@@ -165,8 +215,8 @@ const ServicePackageManager: React.FC = () => {
             await addPackage(data as CreatePackageRequest);
             setPackageForm({ open: false });
             setError(null);
-        } catch (err: any) {
-            setError(err.message || 'Failed to create package');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create package');
         } finally {
             setLoading(false);
         }
@@ -179,8 +229,8 @@ const ServicePackageManager: React.FC = () => {
                 await updatePackage(packageForm.package.id, data as UpdatePackageRequest);
                 setPackageForm({ open: false });
                 setError(null);
-            } catch (err: any) {
-                setError(err.message || 'Failed to update package');
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to update package');
             } finally {
                 setLoading(false);
             }
@@ -192,8 +242,8 @@ const ServicePackageManager: React.FC = () => {
             setLoading(true);
             await deletePackage(id);
             setError(null);
-        } catch (err: any) {
-            setError(err.message || 'Failed to delete package');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to delete package');
         } finally {
             setLoading(false);
         }
@@ -202,39 +252,20 @@ const ServicePackageManager: React.FC = () => {
     const handleRefresh = async () => {
         try {
             setLoading(true);
-            await refreshData();
+            await fetchPackages();
             setError(null);
-        } catch (err: any) {
-            setError(err.message || 'Failed to refresh data');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to refresh data');
         } finally {
             setLoading(false);
         }
     };
 
-    const tabConfig = {
-        'Services': {
-            icon: <Briefcase size={18} strokeWidth={1.5} />,
-            data: services,
-            count: services.length
-        },
-        'Packages': {
-            icon: <Package2 size={18} strokeWidth={1.5} />,
-            data: packages,
-            count: packages.length
-        }
-    };
-
-    // Debugging logs
-    useEffect(() => {
-        console.log('Active tab:', activeTab);
-        console.log('Packages count:', packages.length);
-        console.log('Packages data:', packages);
-        console.log('Services count:', services.length);
-        console.log('Services data:', services);
-        console.log('Active tab:', activeTab);
-        console.log('Data loading:', dataLoading);
-        console.log('Error:', error);
-    }, [packages, services, activeTab, dataLoading]);
+    // Filter packages based on search term
+    const filteredPackages = packages.filter(pkg =>
+        pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pkg.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="spm-app">
@@ -242,7 +273,7 @@ const ServicePackageManager: React.FC = () => {
                 <div className="spm-loading-overlay">
                     <div className="spm-loading-spinner">
                         <div className="spm-spinner"></div>
-                        <p>Loading {activeTab.toLowerCase()}...</p>
+                        <p>Loading packages...</p>
                     </div>
                 </div>
             )}
@@ -260,79 +291,307 @@ const ServicePackageManager: React.FC = () => {
 
             <div className="user-management__header">
                 <div className="user-management__tabs">
-                    {Object.keys(tabConfig).map((tabType) => (
-                        <button
-                            key={tabType}
-                            className={`user-management__tab ${activeTab === tabType ? 'user-management__tab--active' : ''}`}
-                            onClick={() => handleTabChange(tabType as ServicePackageType)}
-                        >
-                            <span className="user-management__tab-icon">
-                                {tabConfig[tabType as ServicePackageType].icon}
-                            </span>
-                            <span className="spm-nav-tab__text">
-                                {tabType}
-                            </span>
-                            <span className="spm-nav-tab__count">
-                                ({tabConfig[tabType as ServicePackageType].count})
-                            </span>
-                        </button>
-                    ))}
+                    <button className="user-management__tab user-management__tab--active">
+                        <span className="user-management__tab-icon">
+                            <Package2 size={18} strokeWidth={1.5} />
+                        </span>
+                        <span className="spm-nav-tab__text">
+                            Packages
+                        </span>
+                        <span className="spm-nav-tab__count">
+                            ({filteredPackages.length})
+                        </span>
+                    </button>
                 </div>
 
+                <div className="user-management__actions">
+                    <button
+                        className="user-management__add-btn"
+                        onClick={() => setPackageForm({ open: true })}
+                    >
+                        <Package2 size={16} />
+                        Add New Package
+                    </button>
+                </div>
+            </div>
+
+            <div className="search-bar">
+                <div className="search-content">
+                    <div className="search-input-container">
+                        <Search className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search packages..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
 
             <div className="smp-content">
-                {activeTab === 'Services' && (
-                    <ServicesList
-                        services={services}
-                        loading={loading || dataLoading}
-                        onAddNew={() => setServiceForm({ open: true })}
-                        onView={(service) => setViewModal({ service })}
-                        onEdit={(service) => setServiceForm({ open: true, service })}
-                        onToggleAvailability={handleToggleServiceAvailability}
-                        onDelete={handleDeleteService}
-                    />
-                )}
+                <div className="spm-cards-grid">
+                    {filteredPackages.map((pkg: Package) => {
+                        // Transform our Package to match PackageCard expected format
+                        const transformedPkg = {
+                            ...pkg,
+                            code: pkg.code || `PKG-${pkg.id.slice(-4)}`,
+                            serviceIds: pkg.serviceIds || [],
+                            description: pkg.description || 'No description available',
+                            createdAt: new Date(pkg.createdAt),
+                            updatedAt: new Date(pkg.updatedAt)
+                        };
 
-                {activeTab === 'Packages' && (
-                    <PackagesList
-                        packages={packages}
-                        loading={loading || dataLoading}
-                        services={services}
-                        onAddNew={() => setPackageForm({ open: true })}
-                        onView={(pkg) => setViewModal({ package: pkg })}
-                        onEdit={(pkg) => setPackageForm({ open: true, package: pkg })}
-                        onToggleAvailability={handleTogglePackageAvailability}
-                        onDelete={handleDeletePackage}
-                    />
-                )}
+                        return (
+                            <PackageCard
+                                key={pkg.id}
+                                package={transformedPkg as any}
+                                services={[]} // Empty array since we don't have services in this simple implementation
+                                onView={(pkg: any) => setViewModal({ package: pkg })}
+                                onEdit={(pkg: any) => setPackageForm({ open: true, package: pkg })}
+                                onToggleAvailability={handleTogglePackageAvailability}
+                                onDelete={handleDeletePackage}
+                            />
+                        );
+                    })}
+                </div>
             </div>
 
-            {viewModal && (
-                <ViewModal
-                    service={viewModal.service}
-                    package={viewModal.package}
-                    services={services}
-                    onClose={() => setViewModal(null)}
-                />
-            )}
-
-            {serviceForm.open && (
-                <ServiceForm
-                    service={serviceForm.service}
-                    onClose={() => setServiceForm({ open: false })}
-                    onSubmit={serviceForm.service ? handleEditService : handleAddService}
-                    loading={loading}
-                />
-            )}
-
+            {/* Package form modal - same modal for Add, Edit, and View */}
             {packageForm.open && (
-                <PackageForm
-                    package={packageForm.package}
-                    services={services}
-                    onClose={() => setPackageForm({ open: false })}
-                    onSubmit={packageForm.package ? handleEditPackage : handleAddPackage}
-                />
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    background: 'rgba(0,0,0,0.2)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: 12,
+                        padding: 36,
+                        minWidth: 420,
+                        maxWidth: 520,
+                        width: '100%',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                        maxHeight: '90vh',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                    }}>
+                        <h2 style={{
+                            fontFamily: 'Poppins',
+                            fontWeight: 600,
+                            fontSize: 22,
+                            marginBottom: 18
+                        }}>
+                            {packageForm.package ? 'Edit Package' : 'Add New Package'}
+                        </h2>
+
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            const formData = new FormData(e.target as HTMLFormElement);
+                            const data = {
+                                name: formData.get('name') as string,
+                                description: formData.get('description') as string,
+                                price: parseFloat(formData.get('price') as string),
+                                duration: parseInt(formData.get('duration') as string)
+                            };
+
+                            if (packageForm.package) {
+                                handleEditPackage(data);
+                            } else {
+                                handleAddPackage(data);
+                            }
+                        }} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                            <input
+                                name="name"
+                                defaultValue={packageForm.package?.name || ''}
+                                placeholder="Package Name"
+                                style={inputStyle}
+                                required
+                            />
+                            <textarea
+                                name="description"
+                                defaultValue={packageForm.package?.description || ''}
+                                placeholder="Package Description"
+                                style={{...inputStyle, minHeight: '80px', resize: 'vertical'}}
+                                required
+                            />
+                            <input
+                                name="price"
+                                type="number"
+                                defaultValue={packageForm.package?.price || ''}
+                                placeholder="Price (LKR)"
+                                style={inputStyle}
+                                required
+                                min="0"
+                                step="0.01"
+                            />
+                            <input
+                                name="duration"
+                                type="number"
+                                defaultValue={packageForm.package?.duration || ''}
+                                placeholder="Duration (hours)"
+                                style={inputStyle}
+                                required
+                                min="1"
+                            />
+
+                            <div style={{
+                                display: 'flex',
+                                gap: 12,
+                                marginTop: 18,
+                                justifyContent: 'flex-end'
+                            }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setPackageForm({ open: false })}
+                                    style={{
+                                        ...buttonStyle,
+                                        background: '#f3f4f6',
+                                        color: '#374151'
+                                    }}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    style={{
+                                        ...buttonStyle,
+                                        background: '#0ea5e9',
+                                        color: 'white'
+                                    }}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Saving...' : (packageForm.package ? 'Update Package' : 'Create Package')}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* View modal - read-only */}
+            {viewModal && viewModal.package && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    background: 'rgba(0,0,0,0.2)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: 12,
+                        padding: 36,
+                        minWidth: 420,
+                        maxWidth: 520,
+                        width: '100%',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                        maxHeight: '90vh',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: 18
+                        }}>
+                            <h2 style={{
+                                fontFamily: 'Poppins',
+                                fontWeight: 600,
+                                fontSize: 22,
+                                margin: 0
+                            }}>
+                                View Package
+                            </h2>
+                            <button
+                                onClick={() => setViewModal(null)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: 24,
+                                    cursor: 'pointer',
+                                    color: '#6b7280'
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={labelStyle}>Package Name</label>
+                                <div style={readOnlyValueStyle}>{viewModal.package.name}</div>
+                            </div>
+
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={labelStyle}>Description</label>
+                                <div style={readOnlyValueStyle}>{viewModal.package.description}</div>
+                            </div>
+
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={labelStyle}>Price</label>
+                                <div style={readOnlyValueStyle}>LKR {viewModal.package.price.toLocaleString()}</div>
+                            </div>
+
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={labelStyle}>Duration</label>
+                                <div style={readOnlyValueStyle}>{viewModal.package.duration} hours</div>
+                            </div>
+
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={labelStyle}>Status</label>
+                                <div style={readOnlyValueStyle}>
+                                    <span style={{
+                                        padding: '4px 8px',
+                                        borderRadius: '6px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 500,
+                                        backgroundColor: viewModal.package.isAvailable ? '#ecfdf5' : '#fef2f2',
+                                        color: viewModal.package.isAvailable ? '#065f46' : '#991b1b'
+                                    }}>
+                                        {viewModal.package.isAvailable ? 'Available' : 'Disabled'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style={{
+                                display: 'flex',
+                                gap: 12,
+                                marginTop: 18,
+                                justifyContent: 'flex-end'
+                            }}>
+                                <button
+                                    onClick={() => setViewModal(null)}
+                                    style={{
+                                        ...buttonStyle,
+                                        background: '#f3f4f6',
+                                        color: '#374151'
+                                    }}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
 
 
@@ -345,7 +604,7 @@ const ServicePackageManager: React.FC = () => {
                                 <AlertTriangle size={24} />
                             </div>
                             <h3 className="spm-confirm-title">
-                                {toggleConfirm.currentStatus ? 'Disable' : 'Enable'} {toggleConfirm.type}?
+                                {toggleConfirm.currentStatus ? 'Disable' : 'Enable'} Package?
                             </h3>
                             <p className="spm-confirm-message">
                                 Are you sure you want to {toggleConfirm.currentStatus ? 'disable' : 'enable'} "{toggleConfirm.name}"?

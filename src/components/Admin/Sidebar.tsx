@@ -30,7 +30,6 @@ const Sidebar: React.FC = () => {
     {
       title: 'Manage Offerings',
       items: [
-        { id: 'servicesManagement', label: 'Services', icon: 'bx bx-briefcase-alt', route: '/admin/offeringManagement/services' },
         { id: 'packagesManagement', label: 'Packages', icon: 'bx bx-package', route: '/admin/offeringManagement/packages' }
       ]
     },

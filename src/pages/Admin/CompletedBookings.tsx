@@ -7,6 +7,7 @@ import "../../components/Admin/BookingsTable/BookingsTable.scss"
 
 // Define interface for completed booking list item
 interface CompletedBooking {
+    id: string; // Add work order ID
     bookingId: string;
     customer: string;
     vehicle: string;
@@ -18,6 +19,47 @@ interface CompletedBooking {
     serviceAdvisor: string;
     duration: string; // e.g., "2h 30m"
     rating?: number; // Customer rating 1-5
+}
+
+// Backend work order interface
+interface WorkOrder {
+    id: string;
+    workOrderNumber: string;
+    status: string;
+    jobType: string;
+    priority: string;
+    createdAt: Date;
+    updatedAt: Date;
+    closedAt?: Date;
+    customerId: string; // Add customerId field
+    customer?: {
+        id: string;
+        name: string;
+        email?: string;
+        phone?: string;
+    };
+    vehicle: {
+        id: string;
+        make: string;
+        model: string;
+        year?: number;
+        licensePlate?: string;
+    };
+    serviceAdvisor?: {
+        id: string;
+        userProfile: {
+            name: string;
+        };
+    };
+    invoices?: Array<{
+        totalAmount: number;
+        paidAmount: number;
+        status: string;
+    }>;
+    payments?: Array<{
+        amount: number;
+        status: string;
+    }>;
 }
 
 // Define detailed completed booking interface
@@ -138,107 +180,245 @@ const CompletedBookings: React.FC = () => {
     const [selectedBooking, setSelectedBooking] = useState<CompletedBookingDetails | null>(null);
     const [loadingBookingId, setLoadingBookingId] = useState<string | null>(null);
 
-    // Sample completed bookings data
-    const completedBookings: CompletedBooking[] = [
-        {
-            bookingId: 'BKG-1001',
-            customer: 'Ruwan Perera',
-            vehicle: 'Toyota Aqua 2018',
-            serviceType: 'Full Vehicle Service',
-            completedDate: '2025-08-08',
-            completedTime: '02:30 PM',
-            totalAmount: 16500,
-            paymentStatus: 'paid',
-            serviceAdvisor: 'M. Perera',
-            duration: '2h 45m',
-            rating: 5
-        },
-        {
-            bookingId: 'BKG-1002',
-            customer: 'Shenal Fernando',
-            vehicle: 'Suzuki Alto 2021',
-            serviceType: 'Engine Tune-Up',
-            completedDate: '2025-08-07',
-            completedTime: '11:15 AM',
-            totalAmount: 8500,
-            paymentStatus: 'paid',
-            serviceAdvisor: 'R. Mendis',
-            duration: '2h 15m',
-            rating: 4
-        },
-        {
-            bookingId: 'BKG-1003',
-            customer: 'Nishadi Jayasinghe',
-            vehicle: 'Honda Vezel 2017',
-            serviceType: 'Clutch Replacement',
-            completedDate: '2025-08-06',
-            completedTime: '04:45 PM',
-            totalAmount: 27000,
-            paymentStatus: 'partially-paid',
-            serviceAdvisor: 'A. Fernando',
-            duration: '4h 30m'
-        },
-        {
-            bookingId: 'BKG-1004',
-            customer: 'Kasun Wijeratne',
-            vehicle: 'Nissan Leaf 2020',
-            serviceType: 'Battery Check',
-            completedDate: '2025-08-05',
-            completedTime: '10:30 AM',
-            totalAmount: 3500,
-            paymentStatus: 'paid',
-            serviceAdvisor: 'M. Perera',
-            duration: '1h 15m',
-            rating: 5
-        },
-        {
-            bookingId: 'BKG-1005',
-            customer: 'Tharindu Silva',
-            vehicle: 'Mitsubishi Outlander 2019',
-            serviceType: 'Air Conditioning Service',
-            completedDate: '2025-08-04',
-            completedTime: '01:20 PM',
-            totalAmount: 9200,
-            paymentStatus: 'paid',
-            serviceAdvisor: 'R. Mendis',
-            duration: '1h 45m',
-            rating: 4
-        },
-        {
-            bookingId: 'BKG-1006',
-            customer: 'Sanduni Perera',
-            vehicle: 'Suzuki Wagon R 2020',
-            serviceType: 'Brake System Repair',
-            completedDate: '2025-08-03',
-            completedTime: '03:15 PM',
-            totalAmount: 14800,
-            paymentStatus: 'pending',
-            serviceAdvisor: 'A. Fernando',
-            duration: '3h 20m'
+    // State for fetched data
+    const [completedBookings, setCompletedBookings] = useState<CompletedBooking[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    // Fetch completed work orders from backend
+    useEffect(() => {
+        fetchCompletedBookings();
+    }, []);
+
+    const fetchCompletedBookings = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            const response = await fetch('http://localhost:3000/work-orders?status=COMPLETED', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch completed bookings');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform backend work orders to frontend CompletedBooking format
+                const bookings = await Promise.all(result.data.map((workOrder: WorkOrder) => transformWorkOrderToBooking(workOrder)));
+                setCompletedBookings(bookings);
+            }
+        } catch (error: any) {
+            console.error('Error fetching completed bookings:', error);
+            // Fallback to empty array
+            setCompletedBookings([]);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
+
+    // Transform backend work order to frontend CompletedBooking format
+    const transformWorkOrderToBooking = async (workOrder: WorkOrder): Promise<CompletedBooking> => {
+        // Calculate total amount from invoices
+        const totalAmount = workOrder.invoices?.reduce((sum, invoice) => sum + Number(invoice.totalAmount), 0) || 0;
+
+        // Determine payment status
+        const totalPaid = workOrder.payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
+        let paymentStatus: 'paid' | 'partially-paid' | 'pending';
+        if (totalPaid >= totalAmount) {
+            paymentStatus = 'paid';
+        } else if (totalPaid > 0) {
+            paymentStatus = 'partially-paid';
+        } else {
+            paymentStatus = 'pending';
+        }
+
+        // Get customer name - try from work order first, then fetch from customer endpoint if needed
+        let customerName = workOrder.customer?.name || 'Unknown Customer';
+
+        if (customerName === 'Unknown Customer' && workOrder.customerId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const customerResponse = await fetch(`http://localhost:3000/customers/${workOrder.customerId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.success && customerData.data?.name) {
+                            customerName = customerData.data.name;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch customer name for work order:', workOrder.id, error);
+            }
+        }
+
+        return {
+            id: workOrder.id, // Add work order ID
+            bookingId: workOrder.workOrderNumber,
+            customer: customerName,
+            vehicle: `${workOrder.vehicle?.make || 'Unknown'} ${workOrder.vehicle?.model || 'Model'} ${workOrder.vehicle?.year || ''}`.trim(),
+            serviceType: workOrder.jobType || 'General Service',
+            completedDate: workOrder.closedAt ? new Date(workOrder.closedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            completedTime: workOrder.closedAt ? new Date(workOrder.closedAt).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            }) : 'N/A',
+            totalAmount: totalAmount,
+            paymentStatus: paymentStatus,
+            serviceAdvisor: workOrder.serviceAdvisor?.userProfile?.name || 'Unassigned',
+            duration: 'N/A', // Would need to calculate from service durations
+            rating: undefined // Would need to fetch from feedback/ratings
+        };
+    };
 
     // Function to fetch detailed completed booking data
     const fetchCompletedBookingDetails = async (bookingId: string): Promise<CompletedBookingDetails | null> => {
         setLoadingBookingId(bookingId);
         try {
-            // Replace this with your actual API call
-            // const response = await fetch(`/api/completed-bookings/${bookingId}`);
-            // const bookingDetails = await response.json();
-            // return bookingDetails;
+            // Find the work order from our fetched data first to get the actual ID
+            const workOrder = completedBookings.find(booking => booking.bookingId === bookingId);
+            if (!workOrder) {
+                throw new Error('Work order not found in local data');
+            }
 
-            const details = getMockCompletedBookingDetails(bookingId);
+            // Get the original work order data from backend using the work order ID
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 500));
+            const response = await fetch(`http://localhost:3000/work-orders/${workOrder.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
-            return details;
+            if (!response.ok) {
+                throw new Error('Failed to fetch booking details');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform work order to CompletedBookingDetails format
+                const details = await transformWorkOrderToDetails(result.data);
+                return details;
+            }
+
+            return null;
         } catch (error) {
             console.error('Error fetching completed booking details:', error);
             return null;
         } finally {
             setLoadingBookingId(null);
         }
+    };
+
+    // Transform work order to CompletedBookingDetails format
+    const transformWorkOrderToDetails = async (workOrder: WorkOrder): Promise<CompletedBookingDetails> => {
+        const totalAmount = workOrder.invoices?.reduce((sum, invoice) => sum + Number(invoice.totalAmount), 0) || 0;
+        const totalPaid = workOrder.payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
+
+        // Get customer name - try from work order first, then fetch from customer endpoint if needed
+        let customerName = workOrder.customer?.name || 'Unknown Customer';
+        let customerEmail = workOrder.customer?.email || 'no-email@example.com';
+        let customerPhone = workOrder.customer?.phone || 'N/A';
+
+        if (customerName === 'Unknown Customer' && workOrder.customerId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const customerResponse = await fetch(`http://localhost:3000/customers/${workOrder.customerId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.success && customerData.data?.name) {
+                            customerName = customerData.data.name;
+                            customerEmail = customerData.data.email || 'no-email@example.com';
+                            customerPhone = customerData.data.phone || 'N/A';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch customer details for work order:', workOrder.id, error);
+            }
+        }
+
+        return {
+            id: workOrder.id,
+            bookedDate: new Date(workOrder.createdAt).toISOString(),
+            checkInDate: new Date(workOrder.createdAt).toISOString(),
+            completedDate: workOrder.closedAt ? new Date(workOrder.closedAt).toISOString() : new Date(workOrder.updatedAt || workOrder.createdAt).toISOString(),
+            status: 'Completed',
+            customer: {
+                name: customerName,
+                email: customerEmail,
+                contactNumber: customerPhone
+            },
+            vehicle: {
+                make: workOrder.vehicle?.make || 'Unknown',
+                model: workOrder.vehicle?.model || 'Unknown',
+                year: workOrder.vehicle?.year || 2020,
+                licensePlate: workOrder.vehicle?.licensePlate || 'N/A',
+                mileageAtCheckIn: 0, // Would need to fetch from actual data
+                mileageAtCompletion: 0, // Would need to fetch from actual data
+                fuelLevel: 'Unknown',
+                vehicleConditionNotes: 'Vehicle serviced and returned in good condition'
+            },
+            serviceAdvisor: {
+                technicianId: workOrder.serviceAdvisor?.id || 'N/A',
+                name: workOrder.serviceAdvisor?.userProfile?.name || 'Unassigned',
+                contactNumber: 'N/A' // Would need to fetch from user profile
+            },
+            completedServices: [], // Would need to fetch from services
+            additionalServices: [], // Would need to fetch from additional services
+            payments: {
+                originalEstimatedAmount: totalAmount,
+                additionalServicesAmount: 0,
+                totalAmount: totalAmount,
+                advancePaid: undefined,
+                finalPayment: totalPaid,
+                paymentMethod: 'Cash', // Would need to fetch from payment method
+                paymentStatus: totalPaid >= totalAmount ? 'paid' : totalPaid > 0 ? 'partially-paid' : 'pending',
+                paymentRequired: false,
+                transactionDetails: totalPaid > 0 ? {
+                    transactionId: 'N/A',
+                    paidAt: workOrder.closedAt ? new Date(workOrder.closedAt).toISOString() : undefined
+                } : {}
+            },
+            serviceQuality: {
+                rating: undefined,
+                feedback: undefined,
+                ratedAt: undefined
+            },
+            deliveryDetails: {
+                deliveredAt: workOrder.closedAt ? new Date(workOrder.closedAt).toISOString() : new Date(workOrder.updatedAt || workOrder.createdAt).toISOString(),
+                deliveredTo: workOrder.customer?.name || 'Customer',
+                deliveryNotes: 'Vehicle delivered after service completion'
+            },
+            totalServiceTime: {
+                estimatedMinutes: 120, // Default estimate
+                actualMinutes: 120 // Would need to calculate from actual service times
+            },
+            warranty: {
+                warrantyPeriodDays: 30,
+                warrantyItems: ['Service work performed'],
+                warrantyExpiresAt: workOrder.closedAt ? new Date(new Date(workOrder.closedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString() : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            }
+        };
     };
 
     // Mock function for completed booking details
@@ -573,9 +753,51 @@ const CompletedBookings: React.FC = () => {
                 booking.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 booking.serviceType.toLowerCase().includes(searchTerm.toLowerCase());
 
+            // Filter by period (using completed date)
+            let matchesPeriod = true;
+            if (periodFilter !== 'thisMonth') {
+                const now = new Date();
+                const completedDate = new Date(booking.completedDate);
+
+                let weekStart: Date;
+                let lastMonth: Date;
+                let threeMonthsAgo: Date;
+                let sixMonthsAgo: Date;
+
+                switch (periodFilter) {
+                    case 'today':
+                        matchesPeriod = completedDate.toDateString() === now.toDateString();
+                        break;
+                    case 'thisWeek':
+                        weekStart = new Date(now);
+                        weekStart.setDate(now.getDate() - now.getDay());
+                        weekStart.setHours(0, 0, 0, 0);
+                        matchesPeriod = completedDate >= weekStart;
+                        break;
+                    case 'lastMonth':
+                        lastMonth = new Date(now);
+                        lastMonth.setMonth(now.getMonth() - 1);
+                        matchesPeriod = completedDate.getMonth() === lastMonth.getMonth() &&
+                                       completedDate.getFullYear() === lastMonth.getFullYear();
+                        break;
+                    case 'last3Months':
+                        threeMonthsAgo = new Date(now);
+                        threeMonthsAgo.setMonth(now.getMonth() - 3);
+                        matchesPeriod = completedDate >= threeMonthsAgo;
+                        break;
+                    case 'last6Months':
+                        sixMonthsAgo = new Date(now);
+                        sixMonthsAgo.setMonth(now.getMonth() - 6);
+                        matchesPeriod = completedDate >= sixMonthsAgo;
+                        break;
+                    default:
+                        matchesPeriod = true;
+                }
+            }
+
             const matchesPayment = paymentFilter === 'all' || booking.paymentStatus === paymentFilter;
 
-            return matchesSearch && matchesPayment;
+            return matchesSearch && matchesPeriod && matchesPayment;
         });
     };
 
@@ -691,7 +913,7 @@ const CompletedBookings: React.FC = () => {
 
     return (
         <div style={{ padding: '20px 24px' }}>
-            {/* <div className="user-management__header">
+            <div className="user-management__header">
                 <div className="user-management__tabs">
                     <button className="user-management__tab user-management__tab--active">
                         <span className="user-management__tab-icon">
@@ -700,7 +922,7 @@ const CompletedBookings: React.FC = () => {
                         Completed Bookings ({filteredCompletedBookings.length})
                     </button>
                 </div>
-            </div> */}
+            </div>
 
             <div className="search-bar">
                 <div className="search-content">

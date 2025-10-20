@@ -5,6 +5,46 @@ import '../../layouts/DashboardLayout.scss';
 import "../../styles/components/SearchBarAndFilters.scss"
 import "../../components/Admin/BookingsTable/BookingsTable.scss"
 
+// Backend work order interface
+interface WorkOrder {
+    id: string;
+    workOrderNumber: string;
+    status: string;
+    jobType: string;
+    priority: string;
+    createdAt: Date;
+    updatedAt: Date;
+    customerId: string; // Add customerId field
+    customer?: {
+        id: string;
+        name: string;
+        email?: string;
+        phone?: string;
+    };
+    vehicle: {
+        id: string;
+        make: string;
+        model: string;
+        year?: number;
+        licensePlate?: string;
+    };
+    serviceAdvisor?: {
+        id: string;
+        userProfile: {
+            name: string;
+        };
+    };
+    invoices?: Array<{
+        totalAmount: number;
+        paidAmount: number;
+        status: string;
+    }>;
+    payments?: Array<{
+        amount: number;
+        status: string;
+    }>;
+}
+
 // Define interface for cancelled booking data
 interface CancelledBooking {
     bookingId: string;
@@ -89,8 +129,93 @@ const CancelledBookings: React.FC = () => {
     const [selectedBooking, setSelectedBooking] = useState<CancelledBookingDetails | null>(null);
     const [loadingBookingId, setLoadingBookingId] = useState<string | null>(null);
 
-    // Sample cancelled bookings data
-    const cancelledBookings: CancelledBooking[] = [
+    // State for fetched data
+    const [cancelledBookings, setCancelledBookings] = useState<CancelledBooking[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    // Fetch cancelled work orders from backend
+    useEffect(() => {
+        fetchCancelledBookings();
+    }, []);
+
+    const fetchCancelledBookings = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            const response = await fetch('http://localhost:3000/work-orders?status=CANCELLED', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch cancelled bookings');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform backend work orders to frontend CancelledBooking format
+                const bookings = await Promise.all(result.data.map((workOrder: WorkOrder) => transformWorkOrderToBooking(workOrder)));
+                setCancelledBookings(bookings);
+            }
+        } catch (error: any) {
+            console.error('Error fetching cancelled bookings:', error);
+            // Fallback to sample data
+            setCancelledBookings(fallbackCancelledBookings);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Transform backend work order to frontend CancelledBooking format
+    const transformWorkOrderToBooking = async (workOrder: WorkOrder): Promise<CancelledBooking> => {
+        // Get customer name - try from work order first, then fetch from customer endpoint if needed
+        let customerName = workOrder.customer?.name || 'Unknown Customer';
+
+        if (customerName === 'Unknown Customer' && workOrder.customerId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const customerResponse = await fetch(`http://localhost:3000/customers/${workOrder.customerId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.success && customerData.data?.name) {
+                            customerName = customerData.data.name;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch customer name for work order:', workOrder.id, error);
+            }
+        }
+
+        // Mock data for cancelled booking specific fields
+        const mockCancelledBooking: CancelledBooking = {
+            bookingId: workOrder.workOrderNumber,
+            customer: customerName,
+            vehicle: `${workOrder.vehicle?.make || 'Unknown'} ${workOrder.vehicle?.model || 'Model'} ${workOrder.vehicle?.year || ''}`.trim(),
+            bookedDate: workOrder.createdAt.toISOString().split('T')[0],
+            cancelledDate: workOrder.updatedAt.toISOString().split('T')[0], // Using updatedAt as cancelled date
+            serviceType: workOrder.jobType || 'General Service',
+            cancelledBy: 'Customer', // Mock data - would need to be stored in work order
+            cancellationReason: 'Customer request', // Mock data - would need to be stored in work order
+            customerCancellationHistory: 0, // Mock data - would need to be calculated
+            advanceRequired: false // Mock data - would need to be stored in work order
+        };
+
+        return mockCancelledBooking;
+    };
+
+    // Sample cancelled bookings data (fallback - used when API fails)
+    const fallbackCancelledBookings: CancelledBooking[] = [
         {
             bookingId: 'BKG-1031',
             customer: 'Samantha De Silva',
@@ -378,15 +503,51 @@ const CancelledBookings: React.FC = () => {
                 booking.serviceType.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 booking.cancellationReason.toLowerCase().includes(searchTerm.toLowerCase());
 
-            const matchesCancelledBy = cancelledByFilter === 'all' || 
+            // Filter by period (using cancelled date)
+            let matchesPeriod = true;
+            if (periodFilter !== 'thisMonth') {
+                const now = new Date();
+                const cancelledDate = new Date(booking.cancelledDate);
+
+                let weekStart: Date;
+                let lastMonth: Date;
+                let threeMonthsAgo: Date;
+
+                switch (periodFilter) {
+                    case 'today':
+                        matchesPeriod = cancelledDate.toDateString() === now.toDateString();
+                        break;
+                    case 'thisWeek':
+                        weekStart = new Date(now);
+                        weekStart.setDate(now.getDate() - now.getDay());
+                        weekStart.setHours(0, 0, 0, 0);
+                        matchesPeriod = cancelledDate >= weekStart;
+                        break;
+                    case 'lastMonth':
+                        lastMonth = new Date(now);
+                        lastMonth.setMonth(now.getMonth() - 1);
+                        matchesPeriod = cancelledDate.getMonth() === lastMonth.getMonth() &&
+                                       cancelledDate.getFullYear() === lastMonth.getFullYear();
+                        break;
+                    case 'last3Months':
+                        threeMonthsAgo = new Date(now);
+                        threeMonthsAgo.setMonth(now.getMonth() - 3);
+                        matchesPeriod = cancelledDate >= threeMonthsAgo;
+                        break;
+                    default:
+                        matchesPeriod = true;
+                }
+            }
+
+            const matchesCancelledBy = cancelledByFilter === 'all' ||
                 booking.cancelledBy.toLowerCase() === cancelledByFilter.toLowerCase();
 
-            const matchesCustomerType = customerTypeFilter === 'all' || 
+            const matchesCustomerType = customerTypeFilter === 'all' ||
                 (customerTypeFilter === 'repeat-canceller' && booking.customerCancellationHistory >= 2) ||
                 (customerTypeFilter === 'first-time-canceller' && booking.customerCancellationHistory === 0) ||
                 (customerTypeFilter === 'advance-required' && booking.advanceRequired);
 
-            return matchesSearch && matchesCancelledBy && matchesCustomerType;
+            return matchesSearch && matchesPeriod && matchesCancelledBy && matchesCustomerType;
         });
     };
 
