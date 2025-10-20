@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Search, Building2, Download, Calendar, CreditCard, DollarSign, FileText, Banknote } from 'lucide-react';
+import { Search, Building2, Calendar, CreditCard, DollarSign, FileText, Banknote } from 'lucide-react';
 import type { Transaction } from '../../../../pages/Admin/IncomeManagement';
 import InvoiceModal from '../InvoiceModal/InvoiceModal';
 import './TransactionHistory.scss';
 
 interface TransactionHistoryProps {
   transactions: Transaction[];
+  onStatusChange: (id: string, status: Transaction['paymentStatus']) => void;
 }
 
-const TransactionHistory: React.FC<TransactionHistoryProps> = ({ transactions }) => {
+const TransactionHistory: React.FC<TransactionHistoryProps> = ({ transactions, onStatusChange }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentCaseFilter, setPaymentCaseFilter] = useState<string>('all');
@@ -25,6 +26,30 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ transactions })
     setSelectedTransaction(null);
   };
 
+  const handleStatusChange = (id: string, newStatus: Transaction['paymentStatus']) => {
+    onStatusChange(id, newStatus);
+  };
+
+  const getStatusClass = (status: Transaction['paymentStatus']) => {
+    const statusMap = {
+      completed: 'success',
+      pending: 'warning',
+      cancelled: 'error',
+      'no-show': 'error'
+    };
+    return statusMap[status] || 'default';
+  };
+
+  const getStatusLabel = (status: Transaction['paymentStatus']) => {
+    const labelMap = {
+      completed: 'Completed',
+      pending: 'Pending',
+      cancelled: 'Cancelled',
+      'no-show': 'No Show'
+    };
+    return labelMap[status] || status;
+  };
+
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          transaction.serviceType.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -36,25 +61,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ transactions })
     return matchesSearch && matchesStatus && matchesPaymentCase;
   });
 
-  const getStatusBadge = (status: string) => {
-    const statusMap = {
-      completed: { label: 'Completed', class: 'success' },
-      pending: { label: 'Pending', class: 'warning' },
-      cancelled: { label: 'Cancelled', class: 'error' },
-      'no-show': { label: 'No Show', class: 'error' }
-    };
-    return statusMap[status as keyof typeof statusMap] || { label: status, class: 'default' };
-  };
 
-  const getPaymentCaseBadge = (paymentCase: string) => {
-    const caseMap = {
-      'normal': { label: 'Normal', class: 'success' },
-      'advance-required': { label: 'Advance Required', class: 'primary' },
-      'cancelled-with-penalty': { label: 'Cancelled (Penalty)', class: 'warning' },
-      'no-show-no-refund': { label: 'No Show (No Refund)', class: 'error' }
-    };
-    return caseMap[paymentCase as keyof typeof caseMap] || { label: paymentCase, class: 'default' };
-  };
 
   const getPaymentMethodIcon = (method: string) => {
     switch (method) {
@@ -137,21 +144,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ transactions })
               <th>Customer</th>
               <th>Service</th>
               <th>Booking Date</th>
-              <th>Payment Case</th>
               <th>Status</th>
-              <th>Estimated Cost</th>
               <th>Final Amount</th>
-              <th>Advance</th>
-              <th>Penalty</th>
-              <th>Refund</th>
-              <th>Payment Method</th>
+              <th>Method</th>
               <th>Invoice</th>
             </tr>
           </thead>
           <tbody>
             {filteredTransactions.map((transaction) => {
-              const status = getStatusBadge(transaction.paymentStatus);
-              const paymentCase = getPaymentCaseBadge(transaction.paymentCase);
               
               return (
                 <tr key={transaction.id} className="transaction-row">
@@ -170,33 +170,32 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ transactions })
                     </div>
                   </td>
                   <td>
-                    <span className={`badge badge--${paymentCase.class}`}>
-                      {paymentCase.label}
-                    </span>
+                    {transaction.paymentStatus === 'pending' ? (
+                      <select
+                        value={transaction.paymentStatus}
+                        onChange={(e) => handleStatusChange(transaction.id, e.target.value as Transaction['paymentStatus'])}
+                        className="status-select"
+                        aria-label={`Change status for transaction ${transaction.id}`}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                    ) : (
+                      <span className={`badge badge--${getStatusClass(transaction.paymentStatus)}`}>
+                        {getStatusLabel(transaction.paymentStatus)}
+                      </span>
+                    )}
                   </td>
-                  <td>
-                    <span className={`badge badge--${status.class}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td className="amount">LKR {transaction.estimatedCost.toLocaleString()}</td>
                   <td className="amount final-amount">
                     LKR {transaction.finalCost.toLocaleString()}
                   </td>
-                  <td className="amount">
-                    {transaction.advancePaid > 0 ? `LKR ${transaction.advancePaid.toLocaleString()}` : '-'}
-                  </td>
-                  <td className="amount penalty">
-                    {transaction.penaltyAmount > 0 ? `LKR ${transaction.penaltyAmount.toLocaleString()}` : '-'}
-                  </td>
-                  <td className="amount refund">
-                    {transaction.refundAmount > 0 ? `LKR ${transaction.refundAmount.toLocaleString()}` : '-'}
-                  </td>
                   <td>
-                    <div className="payment-method">
-                      {getPaymentMethodIcon(transaction.paymentMethod)}
-                      {transaction.paymentMethod.replace('-', ' ').toUpperCase()}
-                    </div>
+                    {transaction.paymentStatus !== 'pending' && (
+                      <div className="payment-method">
+                        {getPaymentMethodIcon(transaction.paymentMethod)}
+                        {transaction.paymentMethod.replace('-', ' ').toUpperCase()}
+                      </div>
+                    )}
                   </td>
                   <td>
                     {(transaction.paymentStatus === 'completed' && transaction.serviceDetails) && (

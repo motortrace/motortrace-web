@@ -21,7 +21,7 @@
 
 .business-dashboard-container {
   min-height: 100vh;
-  // background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #ffffff;
   padding: 20px 24px;
   font-family: 'poppins';
 
@@ -304,14 +304,6 @@
 
 // Dark mode support (optional)
 @media (prefers-color-scheme: dark) {
-  .business-dashboard-container {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  }
-
-  .business-dashboard-container__main-title {
-    color: #f8fafc;
-  }
-
   .business-dashboard-container__subtitle-text {
     color: #94a3b8;
   }
@@ -319,10 +311,6 @@
   .dashboard-period-selector {
     background: #1e293b;
     border-color: #334155;
-
-    &:hover {
-      border-color: #3b82f6;
-    }
   }
 
   .dashboard-period-selector__dropdown {

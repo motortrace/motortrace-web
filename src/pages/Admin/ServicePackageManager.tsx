@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Briefcase, Package2, AlertCircle, AlertTriangle } from 'lucide-react';
-import type { Service, Package, CreateServiceRequest, UpdateServiceRequest, CreatePackageRequest, UpdatePackageRequest } from '../../types/ServicesAndPackages';
+import { Package2, AlertCircle, AlertTriangle } from 'lucide-react';
+import type { Package, CreatePackageRequest, UpdatePackageRequest } from '../../types/ServicesAndPackages';
 import { useServiceData } from '../../hooks/useServiceData';
-import { ServicesList } from '../../components/Admin/ServiceAndPackageManagement/ServicesList';
 import { PackagesList } from '../../components/Admin/ServiceAndPackageManagement/PackagesList';
 import { ViewModal } from '../../components/Admin/ServiceAndPackageManagement/ViewModal';
-import { ServiceForm } from '../../components/Admin/ServiceAndPackageManagement/ServiceForm';
 import { PackageForm } from '../../components/Admin/ServiceAndPackageManagement/PackageForm';
 import './ServiceAndPackageManager.scss';
 
-type ServicePackageType = 'Services' | 'Packages';
+type ServicePackageType = 'Packages';
 
 const ServicePackageManager: React.FC = () => {
     const navigate = useNavigate();
     const { tabType } = useParams<{ tabType?: string }>();
-    const [activeTab, setActiveTab] = useState<ServicePackageType>('Services');
-    const [viewModal, setViewModal] = useState<{ service?: Service; package?: Package } | null>(null);
-    const [serviceForm, setServiceForm] = useState<{ open: boolean; service?: Service }>({ open: false });
+    const [activeTab, setActiveTab] = useState<ServicePackageType>('Packages');
+    const [viewModal, setViewModal] = useState<{ package?: Package } | null>(null);
     const [packageForm, setPackageForm] = useState<{ open: boolean; package?: Package }>({ open: false });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -30,12 +27,10 @@ const ServicePackageManager: React.FC = () => {
     } | null>(null);
 
     const tabTypeMap: Record<string, ServicePackageType> = {
-        'services': 'Services',
         'packages': 'Packages'
     };
 
     const urlTypeMap: Record<ServicePackageType, string> = {
-        'Services': 'services',
         'Packages': 'packages'
     };
 
@@ -43,8 +38,8 @@ const ServicePackageManager: React.FC = () => {
         if (tabType && tabTypeMap[tabType]) {
             setActiveTab(tabTypeMap[tabType]);
         } else {
-            setActiveTab('Services');
-            navigate('/admin/offeringManagement/services', { replace: true });
+            setActiveTab('Packages');
+            navigate('/admin/offeringManagement/packages', { replace: true });
         }
     }, [tabType, navigate]);
 
@@ -53,9 +48,6 @@ const ServicePackageManager: React.FC = () => {
         packages,
         loading: dataLoading,
         error: dataError,
-        addService,
-        updateService,
-        deleteService,
         addPackage,
         updatePackage,
         deletePackage,
@@ -75,58 +67,6 @@ const ServicePackageManager: React.FC = () => {
         navigate(`/admin/offeringManagement/${urlType}`, { replace: true });
     };
 
-    const handleAddService = async (data: CreateServiceRequest | UpdateServiceRequest) => {
-        try {
-            setLoading(true);
-            await addService(data as CreateServiceRequest);
-            setServiceForm({ open: false });
-            setError(null);
-        } catch (err: any) {
-            setError(err.message || 'Failed to create service');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleEditService = async (data: CreateServiceRequest | UpdateServiceRequest) => {
-        if (serviceForm.service) {
-            try {
-                setLoading(true);
-                await updateService(serviceForm.service.id, data as UpdateServiceRequest);
-                setServiceForm({ open: false });
-                setError(null);
-            } catch (err: any) {
-                setError(err.message || 'Failed to update service');
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-
-    const handleDeleteService = async (id: string) => {
-        try {
-            setLoading(true);
-            await deleteService(id);
-            setError(null);
-        } catch (err: any) {
-            setError(err.message || 'Failed to delete service');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Separate handler for toggling service availability
-    const handleToggleServiceAvailability = (id: string) => {
-        const service = services.find(s => s.id === id);
-        if (service) {
-            setToggleConfirm({
-                type: 'service',
-                id,
-                name: service.name,
-                currentStatus: service.isActive
-            });
-        }
-    };
 
     const handleTogglePackageAvailability = (id: string) => {
         const pkg = packages.find(p => p.id === id);
@@ -145,11 +85,7 @@ const ServicePackageManager: React.FC = () => {
 
         try {
             setLoading(true);
-            if (toggleConfirm.type === 'service') {
-                await updateService(toggleConfirm.id, { isActive: !toggleConfirm.currentStatus });
-            } else {
-                await togglePackageAvailability(toggleConfirm.id); // Make sure this exists in useServiceData
-            }
+            await togglePackageAvailability(toggleConfirm.id);
             setToggleConfirm(null);
             setError(null);
         } catch (err: any) {
@@ -212,11 +148,6 @@ const ServicePackageManager: React.FC = () => {
     };
 
     const tabConfig = {
-        'Services': {
-            icon: <Briefcase size={18} strokeWidth={1.5} />,
-            data: services,
-            count: services.length
-        },
         'Packages': {
             icon: <Package2 size={18} strokeWidth={1.5} />,
             data: packages,
@@ -282,18 +213,6 @@ const ServicePackageManager: React.FC = () => {
             </div>
 
             <div className="smp-content">
-                {activeTab === 'Services' && (
-                    <ServicesList
-                        services={services}
-                        loading={loading || dataLoading}
-                        onAddNew={() => setServiceForm({ open: true })}
-                        onView={(service) => setViewModal({ service })}
-                        onEdit={(service) => setServiceForm({ open: true, service })}
-                        onToggleAvailability={handleToggleServiceAvailability}
-                        onDelete={handleDeleteService}
-                    />
-                )}
-
                 {activeTab === 'Packages' && (
                     <PackagesList
                         packages={packages}
@@ -310,19 +229,9 @@ const ServicePackageManager: React.FC = () => {
 
             {viewModal && (
                 <ViewModal
-                    service={viewModal.service}
                     package={viewModal.package}
                     services={services}
                     onClose={() => setViewModal(null)}
-                />
-            )}
-
-            {serviceForm.open && (
-                <ServiceForm
-                    service={serviceForm.service}
-                    onClose={() => setServiceForm({ open: false })}
-                    onSubmit={serviceForm.service ? handleEditService : handleAddService}
-                    loading={loading}
                 />
             )}
 

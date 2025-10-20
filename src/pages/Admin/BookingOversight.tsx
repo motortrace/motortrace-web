@@ -6,10 +6,58 @@ import '../../layouts/DashboardLayout.scss';
 import "../../styles/components/SearchBarAndFilters.scss"
 import "../../components/Admin/BookingsTable/BookingsTable.scss"
 
+// Backend work order interface
+interface WorkOrder {
+    id: string;
+    workOrderNumber: string;
+    status: string;
+    jobType: string;
+    priority: string;
+    createdAt: Date;
+    updatedAt: Date;
+    customerId: string; // Add customerId field
+    customer?: {
+        id: string;
+        name: string;
+        email?: string;
+        phone?: string;
+    };
+    vehicle: {
+        id: string;
+        make: string;
+        model: string;
+        year?: number;
+        licensePlate?: string;
+    };
+    serviceAdvisor?: {
+        id: string;
+        userProfile: {
+            name: string;
+        };
+    };
+    appointments?: Array<{
+        id: string;
+        requestedAt: Date;
+        startTime?: Date;
+        endTime?: Date;
+        status: string;
+    }>;
+    invoices?: Array<{
+        totalAmount: number;
+        paidAmount: number;
+        status: string;
+    }>;
+    payments?: Array<{
+        amount: number;
+        status: string;
+    }>;
+}
+
 type BookingType = 'Up Coming' | 'On Going';
 
 // Define interfaces for the booking data
 interface UpcomingBooking {
+    id: string; // WorkOrder id
     bookingId: string;
     checkingDateTime: string;
     customer: string;
@@ -19,6 +67,7 @@ interface UpcomingBooking {
 }
 
 interface OngoingBooking {
+    id: string; // WorkOrder id
     bookingId: string;
     customer: string;
     vehicle: string;
@@ -185,6 +234,11 @@ const BookingOversight: React.FC = () => {
     const [selectedBooking, setSelectedBooking] = useState<UpcomingBookingDetails | OngoingBookingDetails | null>(null);
     const [loadingBookingId, setLoadingBookingId] = useState<string | null>(null);
 
+    // State for fetched data
+    const [upcomingBookings, setUpcomingBookings] = useState<UpcomingBooking[]>([]);
+    const [ongoingBookings, setOngoingBookings] = useState<OngoingBooking[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
     const { bookingType } = useParams<{ bookingType?: string }>();
     const navigate = useNavigate();
 
@@ -208,6 +262,12 @@ const BookingOversight: React.FC = () => {
 
     const [activeTab, setActiveTab] = useState<BookingType>(getInitialTab);
 
+    // Fetch bookings from backend
+    useEffect(() => {
+        fetchUpcomingBookings();
+        fetchOngoingBookings();
+    }, []);
+
     useEffect(() => {
         const newTab = getInitialTab();
         if (newTab !== activeTab) {
@@ -221,9 +281,164 @@ const BookingOversight: React.FC = () => {
         navigate(`/admin/bookingManagement/${urlType}`, { replace: true });
     };
 
-    // Sample data - In real implementation, this would come from an API
-    const upcomingBookings: UpcomingBooking[] = [
+    const fetchUpcomingBookings = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            const response = await fetch('http://localhost:3000/work-orders?status=PENDING', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch upcoming bookings');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform backend work orders to frontend UpcomingBooking format
+                const bookings = await Promise.all(result.data.map((workOrder: WorkOrder) => transformWorkOrderToUpcomingBooking(workOrder)));
+                setUpcomingBookings(bookings);
+            }
+        } catch (error: any) {
+            console.error('Error fetching upcoming bookings:', error);
+            // Fallback to sample data
+            setUpcomingBookings(fallbackUpcomingBookings);
+        }
+    };
+
+    const fetchOngoingBookings = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            const response = await fetch('http://localhost:3000/work-orders?status=IN_PROGRESS', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch ongoing bookings');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform backend work orders to frontend OngoingBooking format
+                const bookings = await Promise.all(result.data.map((workOrder: WorkOrder) => transformWorkOrderToOngoingBooking(workOrder)));
+                setOngoingBookings(bookings);
+            }
+        } catch (error: any) {
+            console.error('Error fetching ongoing bookings:', error);
+            // Fallback to sample data
+            setOngoingBookings(fallbackOngoingBookings);
+        }
+    };
+
+    // Transform backend work order to frontend UpcomingBooking format
+    const transformWorkOrderToUpcomingBooking = async (workOrder: WorkOrder): Promise<UpcomingBooking> => {
+        // Get customer name - try from work order first, then fetch from customer endpoint if needed
+        let customerName = workOrder.customer?.name || 'Unknown Customer';
+
+        if (customerName === 'Unknown Customer' && workOrder.customerId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const customerResponse = await fetch(`http://localhost:3000/customers/${workOrder.customerId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.success && customerData.data?.name) {
+                            customerName = customerData.data.name;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch customer name for work order:', workOrder.id, error);
+            }
+        }
+
+        // Get appointment date/time for checking
+        const appointment = workOrder.appointments?.find(apt => apt.status === 'SCHEDULED' || apt.status === 'CONFIRMED');
+        const checkingDateTime = appointment?.startTime ?
+            new Date(appointment.startTime).toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            }) : 'TBD';
+
+        return {
+            id: workOrder.id,
+            bookingId: workOrder.workOrderNumber,
+            checkingDateTime: checkingDateTime,
+            customer: customerName,
+            vehicle: `${workOrder.vehicle?.make || 'Unknown'} ${workOrder.vehicle?.model || 'Model'} ${workOrder.vehicle?.year || ''}`.trim(),
+            bookedDate: new Date(workOrder.createdAt).toISOString().split('T')[0],
+            serviceType: workOrder.jobType || 'General Service'
+        };
+    };
+
+    // Transform backend work order to frontend OngoingBooking format
+    const transformWorkOrderToOngoingBooking = async (workOrder: WorkOrder): Promise<OngoingBooking> => {
+        // Get customer name - try from work order first, then fetch from customer endpoint if needed
+        let customerName = workOrder.customer?.name || 'Unknown Customer';
+
+        if (customerName === 'Unknown Customer' && workOrder.customerId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const customerResponse = await fetch(`http://localhost:3000/customers/${workOrder.customerId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.success && customerData.data?.name) {
+                            customerName = customerData.data.name;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch customer name for work order:', workOrder.id, error);
+            }
+        }
+
+        // Mock data for ongoing booking specific fields
+        const mockOngoingBooking: OngoingBooking = {
+            id: workOrder.id,
+            bookingId: workOrder.workOrderNumber,
+            customer: customerName,
+            vehicle: `${workOrder.vehicle?.make || 'Unknown'} ${workOrder.vehicle?.model || 'Model'} ${workOrder.vehicle?.year || ''}`.trim(),
+            serviceType: workOrder.jobType || 'General Service',
+            serviceAdvisor: workOrder.serviceAdvisor?.userProfile?.name || 'Unassigned',
+            currentTechnician: 'Technician Name', // Would need to fetch from current assignment
+            currentTask: 'Current Task', // Would need to fetch from current task
+            elapsedTime: '0m', // Would need to calculate
+            estimatedCompletion: 'TBD', // Would need to calculate
+            jobCardStatus: 'in-progress', // Map from work order status
+            checkInDateTime: workOrder.createdAt.toISOString().slice(0, 16).replace('T', ' ') // Format as date time
+        };
+
+        return mockOngoingBooking;
+    };
+
+    // Sample data - In real implementation, this would come from an API (fallback)
+    const fallbackUpcomingBookings: UpcomingBooking[] = [
         {
+            id: 'fallback-1',
             bookingId: 'BKG-1021',
             checkingDateTime: '2025-08-18 09:00 AM',
             customer: 'Ruwan Perera',
@@ -232,6 +447,7 @@ const BookingOversight: React.FC = () => {
             serviceType: 'Full Vehicle Service'
         },
         {
+            id: 'fallback-2',
             bookingId: 'BKG-1022',
             checkingDateTime: '2025-08-20 10:00 AM',
             customer: 'Shenal Fernando',
@@ -240,6 +456,7 @@ const BookingOversight: React.FC = () => {
             serviceType: 'Engine Tune-Up'
         },
         {
+            id: 'fallback-3',
             bookingId: 'BKG-1023',
             checkingDateTime: '2025-08-16 01:00 PM',
             customer: 'Nishadi Jayasinghe',
@@ -248,6 +465,7 @@ const BookingOversight: React.FC = () => {
             serviceType: 'Clutch Replacement'
         },
         {
+            id: 'fallback-4',
             bookingId: 'BKG-1024',
             checkingDateTime: '2025-08-20 01:00 PM',
             customer: 'Kasun Wijeratne',
@@ -256,6 +474,7 @@ const BookingOversight: React.FC = () => {
             serviceType: 'Battery Check'
         },
         {
+            id: 'fallback-5',
             bookingId: 'BKG-1025',
             checkingDateTime: '2025-08-21 10:30 AM',
             customer: 'Tharindu Silva',
@@ -265,8 +484,9 @@ const BookingOversight: React.FC = () => {
         }
     ];
 
-    const ongoingBookings: OngoingBooking[] = [
+    const fallbackOngoingBookings: OngoingBooking[] = [
         {
+            id: 'fallback-ongoing-1',
             bookingId: 'BKG-1011',
             customer: 'Chamath Abeysekara',
             vehicle: 'Toyota Corolla Axio 2016',
@@ -280,6 +500,7 @@ const BookingOversight: React.FC = () => {
             checkInDateTime: '2025-08-09 08:30 AM'
         },
         {
+            id: 'fallback-ongoing-2',
             bookingId: 'BKG-1012',
             customer: 'Nimali Jayawardena',
             vehicle: 'Honda Grace 2018',
@@ -293,6 +514,7 @@ const BookingOversight: React.FC = () => {
             checkInDateTime: '2025-08-09 09:00 AM'
         },
         {
+            id: 'fallback-ongoing-3',
             bookingId: 'BKG-1013',
             customer: 'Sajith Bandara',
             vehicle: 'Nissan X-Trail 2019',
@@ -306,6 +528,7 @@ const BookingOversight: React.FC = () => {
             checkInDateTime: '2025-08-09 10:00 AM'
         },
         {
+            id: 'fallback-ongoing-4',
             bookingId: 'BKG-1014',
             customer: 'Gayan Kumara',
             vehicle: 'Mazda Demio 2015',
@@ -319,6 +542,7 @@ const BookingOversight: React.FC = () => {
             checkInDateTime: '2025-08-09 11:30 AM'
         },
         {
+            id: 'fallback-ongoing-5',
             bookingId: 'BKG-1015',
             customer: 'Sanduni Perera',
             vehicle: 'Suzuki Wagon R 2020',
@@ -334,29 +558,225 @@ const BookingOversight: React.FC = () => {
     ];
 
     // Function to fetch detailed booking data
-    const fetchBookingDetails = async (bookingId: string): Promise<UpcomingBookingDetails | OngoingBookingDetails | null> => {
-        setLoadingBookingId(bookingId);
+    const fetchBookingDetails = async (workOrderId: string): Promise<UpcomingBookingDetails | OngoingBookingDetails | null> => {
+        setLoadingBookingId(workOrderId);
         try {
-            // Replace this with your actual API call
-            // const response = await fetch(`/api/bookings/${bookingId}`);
-            // const bookingDetails = await response.json();
-            // return bookingDetails;
+            // Check if this is fallback data (starts with 'fallback-')
+            if (workOrderId.startsWith('fallback-')) {
+                // Use mock data for fallback entries
+                const details = activeTab === 'Up Coming'
+                    ? getMockUpcomingBookingDetails(workOrderId)
+                    : getMockOngoingBookingDetails(workOrderId);
+                return details;
+            }
 
-            // For now, return mock data based on the booking ID and active tab
-            const details = activeTab === 'Up Coming' 
-                ? getMockUpcomingBookingDetails(bookingId)
-                : getMockOngoingBookingDetails(bookingId);
+            // Find the work order from our fetched data first to get the actual ID
+            const workOrder = [...upcomingBookings, ...ongoingBookings].find(booking => booking.id === workOrderId);
+            if (!workOrder) {
+                throw new Error('Work order not found in local data');
+            }
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Get the original work order data from backend using the work order ID
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
 
-            return details;
+            const response = await fetch(`http://localhost:3000/work-orders/${workOrderId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch booking details');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Transform work order to booking details format
+                const details = activeTab === 'Up Coming'
+                    ? await transformWorkOrderToUpcomingDetails(result.data)
+                    : await transformWorkOrderToOngoingDetails(result.data);
+                return details;
+            }
+
+            return null;
         } catch (error) {
             console.error('Error fetching booking details:', error);
             return null;
         } finally {
             setLoadingBookingId(null);
         }
+    };
+
+    // Transform work order to UpcomingBookingDetails format
+    const transformWorkOrderToUpcomingDetails = async (workOrder: WorkOrder): Promise<UpcomingBookingDetails> => {
+        const totalAmount = workOrder.invoices?.reduce((sum, invoice) => sum + Number(invoice.totalAmount), 0) || 0;
+
+        // Get customer name - try from work order first, then fetch from customer endpoint if needed
+        let customerName = workOrder.customer?.name || 'Unknown Customer';
+        let customerEmail = workOrder.customer?.email || 'no-email@example.com';
+        let customerPhone = workOrder.customer?.phone || 'N/A';
+
+        if (customerName === 'Unknown Customer' && workOrder.customerId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const customerResponse = await fetch(`http://localhost:3000/customers/${workOrder.customerId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.success && customerData.data?.name) {
+                            customerName = customerData.data.name;
+                            customerEmail = customerData.data.email || 'no-email@example.com';
+                            customerPhone = customerData.data.phone || 'N/A';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch customer details for work order:', workOrder.id, error);
+            }
+        }
+
+        // Get appointment date/time for checking
+        const appointment = workOrder.appointments?.find(apt => apt.status === 'SCHEDULED' || apt.status === 'CONFIRMED');
+        const preferredCheckInTime = appointment?.startTime ?
+            new Date(appointment.startTime).toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            }) : 'TBD';
+
+        return {
+            id: workOrder.id,
+            bookedDate: new Date(workOrder.createdAt).toISOString(),
+            status: 'Up Coming',
+            customer: {
+                name: customerName,
+                email: customerEmail,
+                contactNumber: customerPhone
+            },
+            vehicle: {
+                make: workOrder.vehicle?.make || 'Unknown',
+                model: workOrder.vehicle?.model || 'Unknown',
+                year: workOrder.vehicle?.year || 2020,
+                licensePlate: workOrder.vehicle?.licensePlate || 'N/A',
+                estimatedMileage: 0 // Would need to fetch from actual data
+            },
+            bookedServices: [], // Would need to fetch from services
+            payments: {
+                estimatedTotalAmount: totalAmount,
+                advancePaid: undefined,
+                remainingEstimated: undefined,
+                paymentRequired: false,
+                paymentReason: undefined
+            },
+            bookingNotes: 'Vehicle service booking',
+            preferredCheckInTime: preferredCheckInTime,
+            bookingConfirmation: {
+                isConfirmed: true,
+                confirmedAt: new Date(workOrder.createdAt).toISOString(),
+                confirmationMethod: 'email'
+            },
+            customerHistory: {
+                totalBookings: 1,
+                completedBookings: 0,
+                cancelledBookings: 0,
+                noShowCount: 0,
+                riskLevel: 'low'
+            },
+            reminders: {
+                remindersSent: 0,
+                lastReminderSent: undefined,
+                nextReminderScheduled: undefined
+            }
+        };
+    };
+
+    // Transform work order to OngoingBookingDetails format
+    const transformWorkOrderToOngoingDetails = async (workOrder: WorkOrder): Promise<OngoingBookingDetails> => {
+        const totalAmount = workOrder.invoices?.reduce((sum, invoice) => sum + Number(invoice.totalAmount), 0) || 0;
+        const totalPaid = workOrder.payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
+
+        // Get customer name - try from work order first, then fetch from customer endpoint if needed
+        let customerName = workOrder.customer?.name || 'Unknown Customer';
+        let customerEmail = workOrder.customer?.email || 'no-email@example.com';
+        let customerPhone = workOrder.customer?.phone || 'N/A';
+
+        if (customerName === 'Unknown Customer' && workOrder.customerId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const customerResponse = await fetch(`http://localhost:3000/customers/${workOrder.customerId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.success && customerData.data?.name) {
+                            customerName = customerData.data.name;
+                            customerEmail = customerData.data.email || 'no-email@example.com';
+                            customerPhone = customerData.data.phone || 'N/A';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch customer details for work order:', workOrder.id, error);
+            }
+        }
+
+        return {
+            id: workOrder.id,
+            bookedDate: new Date(workOrder.createdAt).toISOString(),
+            checkInDate: new Date(workOrder.createdAt).toISOString(),
+            status: 'On Going',
+            customer: {
+                name: customerName,
+                email: customerEmail,
+                contactNumber: customerPhone
+            },
+            vehicle: {
+                make: workOrder.vehicle?.make || 'Unknown',
+                model: workOrder.vehicle?.model || 'Unknown',
+                year: workOrder.vehicle?.year || 2020,
+                licensePlate: workOrder.vehicle?.licensePlate || 'N/A',
+                mileageAtCheckIn: 0, // Would need to fetch from actual data
+                fuelLevel: 'Unknown',
+                vehicleConditionNotes: 'Vehicle under service'
+            },
+            serviceAdvisor: {
+                technicianId: workOrder.serviceAdvisor?.id || 'N/A',
+                name: workOrder.serviceAdvisor?.userProfile?.name || 'Unassigned',
+                contactNumber: 'N/A' // Would need to fetch from user profile
+            },
+            bookedServices: [], // Would need to fetch from services
+            additionalServices: [], // Would need to fetch from additional services
+            payments: {
+                originalEstimatedAmount: totalAmount,
+                advancePaid: undefined,
+                additionalServicesAmount: 0,
+                totalActualAmount: totalAmount,
+                remainingAmount: totalAmount - totalPaid,
+                paymentRequired: false,
+                paymentReason: undefined
+            },
+            jobCardStatus: 'work-in-progress',
+            estimatedCompletionTime: 'TBD', // Would need to calculate
+            actualProgress: {
+                completedTasks: 0,
+                totalTasks: 1,
+                overallCompletionPercentage: 0
+            }
+        };
     };
 
     // Mock function for upcoming booking details
@@ -695,9 +1115,9 @@ const BookingOversight: React.FC = () => {
     };
 
     // Handle view details click
-    const handleViewDetails = async (bookingId: string) => {
+    const handleViewDetails = async (workOrderId: string) => {
         try {
-            const bookingDetails = await fetchBookingDetails(bookingId);
+            const bookingDetails = await fetchBookingDetails(workOrderId);
             if (bookingDetails) {
                 setSelectedBooking(bookingDetails);
                 setIsPopupOpen(true);
@@ -723,14 +1143,73 @@ const BookingOversight: React.FC = () => {
                 booking.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 booking.serviceType.toLowerCase().includes(searchTerm.toLowerCase());
 
-            // For now, just filter by search term
-            // You can add period and status filtering logic here
-            return matchesSearch;
+            // Filter by period (for ongoing bookings, check checkInDateTime)
+            let matchesPeriod = true;
+            if (periodFilter !== 'today') {
+                const now = new Date();
+                let bookingDate: Date;
+
+                if (activeTab === 'Up Coming') {
+                    // For upcoming bookings, use bookedDate
+                    bookingDate = new Date((booking as UpcomingBooking).bookedDate);
+                } else {
+                    // For ongoing bookings, use checkInDateTime if available
+                    const ongoingBooking = booking as OngoingBooking;
+                    bookingDate = ongoingBooking.checkInDateTime
+                        ? new Date(ongoingBooking.checkInDateTime)
+                        : new Date(); // Default to now if no check-in time
+                }
+
+                let weekStart: Date;
+                let lastMonth: Date;
+
+                switch (periodFilter) {
+                    case 'thisWeek':
+                        weekStart = new Date(now);
+                        weekStart.setDate(now.getDate() - now.getDay());
+                        weekStart.setHours(0, 0, 0, 0);
+                        matchesPeriod = bookingDate >= weekStart;
+                        break;
+                    case 'thisMonth':
+                        matchesPeriod = bookingDate.getMonth() === now.getMonth() &&
+                                       bookingDate.getFullYear() === now.getFullYear();
+                        break;
+                    case 'lastMonth':
+                        lastMonth = new Date(now);
+                        lastMonth.setMonth(now.getMonth() - 1);
+                        matchesPeriod = bookingDate.getMonth() === lastMonth.getMonth() &&
+                                       bookingDate.getFullYear() === lastMonth.getFullYear();
+                        break;
+                    default:
+                        matchesPeriod = true;
+                }
+            }
+
+            // Filter by status (for ongoing bookings)
+            let matchesStatus = true;
+            if (activeTab === 'On Going' && statusFilter !== 'all') {
+                const ongoingBooking = booking as OngoingBooking;
+                switch (statusFilter) {
+                    case 'checked-in':
+                        matchesStatus = ongoingBooking.jobCardStatus === 'in-progress';
+                        break;
+                    case 'in-progress':
+                        matchesStatus = ongoingBooking.jobCardStatus === 'in-progress';
+                        break;
+                    case 'completed':
+                        matchesStatus = ongoingBooking.jobCardStatus === 'completed';
+                        break;
+                    default:
+                        matchesStatus = true;
+                }
+            }
+
+            return matchesSearch && matchesPeriod && matchesStatus;
         });
     };
 
-    const filteredUpcomingBookings = filterBookings(upcomingBookings);
-    const filteredOngoingBookings = filterBookings(ongoingBookings);
+    const filteredUpcomingBookings = filterBookings(upcomingBookings.length > 0 ? upcomingBookings : fallbackUpcomingBookings);
+    const filteredOngoingBookings = filterBookings(ongoingBookings.length > 0 ? ongoingBookings : fallbackOngoingBookings);
 
     const renderUpcomingBookingsTable = () => {
         const bookingsToShow = filteredUpcomingBookings;
@@ -744,7 +1223,6 @@ const BookingOversight: React.FC = () => {
                     <div className="todays-bookings__header-cell">Booked Date</div>
                     <div className="todays-bookings__header-cell">Checking Date & Time</div>
                     <div className="todays-bookings__header-cell">Service Type</div>
-                    <div className="todays-bookings__header-cell">Actions</div>
                 </div>
                 <div className="todays-bookings__table-body">
                     {bookingsToShow.length === 0 ? (
@@ -773,13 +1251,7 @@ const BookingOversight: React.FC = () => {
                                     {booking.serviceType}
                                 </div>
                                 <div className="todays-bookings__cell" data-label="Actions">
-                                    <button
-                                        className="todays-bookings__action-btn"
-                                        onClick={() => handleViewDetails(booking.bookingId)}
-                                        disabled={loadingBookingId === booking.bookingId}
-                                    >
-                                        {loadingBookingId === booking.bookingId ? 'Loading...' : 'View Details'}
-                                    </button>
+                                    {/* No View Details button for upcoming bookings */}
                                 </div>
                             </div>
                         ))
@@ -835,10 +1307,10 @@ const BookingOversight: React.FC = () => {
                                 <div className="todays-bookings__cell" data-label="Actions">
                                     <button
                                         className="todays-bookings__action-btn"
-                                        onClick={() => handleViewDetails(booking.bookingId)}
-                                        disabled={loadingBookingId === booking.bookingId}
+                                        onClick={() => handleViewDetails(booking.id)}
+                                        disabled={loadingBookingId === booking.id}
                                     >
-                                        {loadingBookingId === booking.bookingId ? 'Loading...' : 'View Details'}
+                                        {loadingBookingId === booking.id ? 'Loading...' : 'View Details'}
                                     </button>
                                 </div>
                             </div>

@@ -13,8 +13,6 @@ interface Employee {
     email: string;
     phone: string;
     role: 'Service Advisor' | 'Technician';
-    department: string;
-    totalServices: number;
     status: 'Available' | 'On Work' | 'Unavailable' | 'Suspended' | 'Resigned';
     joinDate: string;
     bookingsHandled?: number;
@@ -116,12 +114,10 @@ const Employees: React.FC = () => {
     const transformBackendToFrontend = (backendData: any, type: EmployeeType): Employee => {
         const baseEmployee = {
             id: backendData.id || backendData.userProfileId,
-            name: backendData.userProfile?.name || 'Unknown',
+            name: backendData.userProfile?.name || backendData.name || 'Unknown',
             email: backendData.userProfile?.email || 'No email',
-            phone: backendData.userProfile?.phone || 'No phone',
+            phone: backendData.userProfile?.phone || backendData.phone || 'No phone',
             role: (type === 'Service Advisors' ? 'Service Advisor' : 'Technician') as Employee['role'],
-            department: backendData.department || 'Unassigned',
-            totalServices: backendData._count?.advisorWorkOrders || backendData._count?.jobs || 0,
             status: 'Available' as Employee['status'], // You'll need to map this from backend status
             joinDate: backendData.createdAt ? new Date(backendData.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         };
@@ -227,12 +223,12 @@ const Employees: React.FC = () => {
         'Service Advisors': {
             icon: <Users size={18} strokeWidth={1.5} />,
             data: serviceAdvisors,
-            headers: ['NAME', 'EMAIL', 'PHONE', 'BOOKINGS HANDLED', 'STATUS', 'ACTIONS']
+            headers: ['NAME', 'PHONE', 'BOOKINGS HANDLED', 'STATUS', 'ACTIONS']
         },
         'Technicians': {
             icon: <Wrench size={18} strokeWidth={1.5} />,
             data: technicians,
-            headers: ['NAME', 'EMAIL', 'PHONE', 'SPECIALIZATION', 'STATUS', 'ACTIONS']
+            headers: ['NAME', 'PHONE', 'SPECIALIZATION', 'STATUS', 'ACTIONS']
         }
     };
 
@@ -241,7 +237,6 @@ const Employees: React.FC = () => {
             return (
                 <>
                     <div className="user-management__cell">{employee.name}</div>
-                    <div className="user-management__cell">{employee.email}</div>
                     <div className="user-management__cell">{employee.phone}</div>
                     <div className="user-management__cell">{employee.bookingsHandled || 0}</div>
                     <div className="user-management__cell">
@@ -271,7 +266,6 @@ const Employees: React.FC = () => {
             return (
                 <>
                     <div className="user-management__cell">{employee.name}</div>
-                    <div className="user-management__cell">{employee.email}</div>
                     <div className="user-management__cell">{employee.phone}</div>
                     <div className="user-management__cell">{employee.specialization || 'N/A'}</div>
                     <div className="user-management__cell">
@@ -304,11 +298,10 @@ const Employees: React.FC = () => {
     const currentData = employeeTypeConfig[activeTab].data;
     const filteredEmployees = currentData.filter(employee => {
         const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             employee.phone.includes(searchTerm);
-        
+                              employee.phone.includes(searchTerm);
+
         const matchesStatus = statusFilter === 'All Statuses' || employee.status === statusFilter;
-        
+
         return matchesSearch && matchesStatus;
     });
 

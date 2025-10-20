@@ -51,8 +51,14 @@ const CarUsers: React.FC = () => {
 
             if (result.success) {
                 // Transform backend data to frontend CarUser format
-                const users = result.data.map((item: any) => transformBackendToFrontend(item));
+                // The email is now included in the joined userProfile data from the backend
+                const users = result.data.map((item: any) => {
+                    console.log('Backend item:', item); // Debug log
+                    console.log('UserProfile data:', item.userProfile); // Debug log
+                    return transformBackendToFrontend(item);
+                });
 
+                console.log('Transformed users:', users); // Debug log
                 setCarUsers(users);
             }
         } catch (error: any) {
@@ -67,17 +73,25 @@ const CarUsers: React.FC = () => {
 
     // Transform backend data to frontend CarUser format
     const transformBackendToFrontend = (backendData: any): CarUser => {
-        return {
+        console.log('Transforming backend data:', backendData); // Debug log
+        console.log('UserProfile in backend data:', backendData.userProfile); // Debug log
+
+        const vehicleCount = backendData.vehicles?.length || 0;
+        const transformed = {
             id: backendData.id || backendData.userProfileId,
-            name: backendData.userProfile?.name || 'Unknown',
-            email: backendData.userProfile?.email || 'No email',
-            phone: backendData.userProfile?.phone || 'No phone',
-            totalVehicles: backendData.vehicles?.length || 0,
+            name: backendData.userProfile?.name || backendData.name || 'Unknown',
+            email: backendData.userProfile?.email || backendData.email || 'No email', // Try both sources
+            phone: backendData.userProfile?.phone || backendData.phone || 'No phone',
+            totalVehicles: vehicleCount === 0 ? 1 : vehicleCount, // Show 1 if 0 vehicles
             totalBookings: backendData.appointments?.length || 0,
             status: 'Active' as CarUser['status'], // You'll need to map this from backend status
             joinDate: backendData.createdAt ? new Date(backendData.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         };
+
+        console.log('Transformed result:', transformed); // Debug log
+        return transformed;
     };
+
 
     // Removed hardcoded carUsers data - now fetched from backend
 
@@ -103,28 +117,27 @@ const CarUsers: React.FC = () => {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('No authentication token found');
 
-            // Prepare payload for customer user creation
-            const customerUserPayload = {
-                email: newUser.email,
-                password: newUser.password,
-                role: 'customer',
+            // Prepare payload for customer creation (without password)
+            const customerPayload = {
                 name: newUser.name,
+                email: newUser.email,
                 phone: newUser.phone,
+                totalVehicles: newUser.totalVehicles && newUser.totalVehicles > 0 ? newUser.totalVehicles : 1, // Set to 1 if 0 or undefined
             };
 
-            const response = await fetch('http://localhost:3000/users/customer', {
+            const response = await fetch('http://localhost:3000/customers/create-without-auth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(customerUserPayload),
+                body: JSON.stringify(customerPayload),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || data.error || 'Failed to create customer user');
+                throw new Error(data.message || data.error || 'Failed to create customer');
             }
 
             toast.success('Car User profile created successfully!');
@@ -191,8 +204,6 @@ const CarUsers: React.FC = () => {
 
     return (
         <div className="user-management">
-            
-
             <div className="user-management__content">
                 <div className="search-bar" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                     <div className="search-content" style={{ flex: 1 }}>
@@ -230,7 +241,7 @@ const CarUsers: React.FC = () => {
                             </select>
                         </div>
                     </div>
-                    {/* <button
+                    <button
                         className="user-management__add-btn"
                         onClick={handleOpenAddModal}
                         style={{
@@ -254,7 +265,7 @@ const CarUsers: React.FC = () => {
                             <Plus size={18} strokeWidth={2} />
                         </span>
                         Add New Car User
-                    </button> */}
+                    </button>
                 </div>
 
                 <div className="user-management__table">
