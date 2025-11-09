@@ -1,55 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import './EditProduct.scss';
-import WearTearPartsEditForm from './WearTearPartsEditForm';
-import ExteriorBodyPartEditForm from './ExteriorBodyPartsEditForm';
-import PaintsCoatingsEditForm from './PaintsCoatingsEditForm';
-import EngineDrivetrainProductEditForm from './EngineDriveTrainEditForm';
-import ElectricalEditForm from './ElectricalEditForm';
-import AccessoriesEditForm from './AccessoriesEditForm';
-
-interface EngineFluidProduct {
-  productName: string;
-  fluidType: string;
-  specification: string;
-  brand: string;
-  volume: string;
-  compatibility?: string;
-  replacementCycle?: string;
-  boilingPoint?: string;
-  description?: string;
-  stock: number;
-  lowStockThreshold: number;
-  price: string;
-  discountType?: string;
-  discountValue?: number;
-  image?: File | string;
-  manufacturer?: string;
-  manufacturedDate?: string;
-  expiryDate?: string;
-}
 
 interface EditProductProps {
-  // category: string;
-  // existingData: EngineFluidProduct;
-  // onSave: (data: EngineFluidProduct) => void;
   category: string;
-  existingData: any;
+  existingData: any; 
   onSave: (data: any) => void;
 }
 
-const EngineFluidsEditForm: React.FC<EditProductProps> = ({ existingData, onSave }) => {
-  const [formData, setFormData] = useState<EngineFluidProduct>(existingData);
+const EditProduct: React.FC<EditProductProps> = ({ category, existingData, onSave }) => {
+  const [formData, setFormData] = useState<any>({});
   const [imagePreview, setImagePreview] = useState<string>('');
 
   useEffect(() => {
     setFormData(existingData);
-    if (existingData.image && typeof existingData.image === 'string') {
+    if (existingData.image) {
       setImagePreview(existingData.image);
     }
   }, [existingData]);
 
-  const handleChange = (field: keyof EngineFluidProduct, value: any) => {
-    setFormData((prev: EngineFluidProduct) => ({ ...prev, [field]: value }));
+  const handleChange = (field: string, value: any) => {
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,144 +30,607 @@ const EngineFluidsEditForm: React.FC<EditProductProps> = ({ existingData, onSave
     }
   };
 
-  const handleSubmit = () => {
-    onSave(formData);
+  const handleSubmit = async () => {
+    try {
+      formData.availability = formData.quantity > formData.minquantity 
+        ? 'In Stock' 
+        : formData.quantity === 0 
+          ? 'Out of Stock' 
+          : 'Low Stock';
+
+      const response = await fetch(`http://localhost:3000/inventory/products/${existingData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          id: existingData.id 
+        }),
+      });
+
+      if (response.ok) {
+        const updatedProduct = await response.json();
+        onSave(updatedProduct);
+      } else {
+        throw new Error('Failed to update product');
+      }
+    } catch (error) {
+      console.error('Error updating product:', error);
+      alert('Error updating product. Please try again.');
+    }
+  };
+
+ 
+  const renderCommonFields = () => (
+    <>
+      <div className="form-group">
+        <label>Product Name *</label>
+        <input 
+          type="text" 
+          value={formData.productname || ''} 
+          onChange={(e) => handleChange('productname', e.target.value)} 
+        />
+      </div>     
+    </>
+  );
+
+  
+  const renderCategorySpecificFields = () => {
+    switch (category) {
+      case 'Engine & Fluids':
+        return (
+          <>
+            <div className="form-group">
+              <label>Fluid Type *</label>
+              <select 
+                value={formData.subcategory || ''} 
+                onChange={(e) => handleChange('subcategory', e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Engine Oil">Engine Oil</option>
+                <option value="Transmission Fluid">Transmission Fluid</option>
+                <option value="Brake Fluid">Brake Fluid</option>
+                <option value="Coolant">Coolant</option>
+                <option value="Power Steering Fluid">Power Steering Fluid</option>
+                <option value="Windshield Washer Fluid">Windshield Washer Fluid</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Type</label>
+              <input 
+                type="text" 
+                placeholder="" 
+                value={formData.type ||  ''} 
+                onChange={(e) => handleChange('type', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Volume</label>
+              <input 
+                type="text" 
+                placeholder="e.g., 1L" 
+                value={formData.volume || ''} 
+                onChange={(e) => handleChange('volume', e.target.value)} 
+              />
+            </div>
+          </>
+        );
+
+      case 'Wear & Tear Parts':
+        return (
+          <>
+            <div className="form-group">
+              <label>Part Type *</label>
+              <select 
+                value={formData.subcategory || ''} 
+                onChange={(e) => handleChange('subcategory', e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Brake Pads">Brake Pads</option>
+                <option value="Brake Rotors">Brake Rotors</option>
+                <option value="Clutch Kit">Clutch Kit</option>
+                <option value="Air Filters">Air Filters</option>
+                <option value="Cabin Air Filters">Cabin Air Filters</option>
+                <option value="Engine Air Intake Hoses/Belts">Engine Air Intake Hoses/Belts</option>
+                <option value="Spark Plugs">Spark Plugs</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Material</label>
+              <input 
+                type="text" 
+                value={formData.material || ''} 
+                onChange={(e) => handleChange('material', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Position</label>
+              <input 
+                type="text" 
+                value={formData.position || ''} 
+                onChange={(e) => handleChange('position', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Dimension</label>
+              <input 
+                type="text" 
+                value={formData.size || ''} 
+                onChange={(e) => handleChange('size', e.target.value)} 
+              />
+            </div>
+          </>
+        );
+
+      case 'Exterior & Body Parts':
+        return (
+          <>
+            <div className="form-group">
+              <label>Part Type *</label>
+              <select 
+                value={formData.subcategory || ''} 
+                onChange={(e) => handleChange('subcategory', e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Bumpers">Bumpers</option>
+                <option value="Side Mirrors">Side Mirrors</option>
+                <option value="Grilles">Grilles</option>
+                <option value="Wipers">Wipers</option>
+                <option value="Paint & Touch-up Kits">Paint & Touch-up Kits</option>
+                <option value="Door Handles">Door Handles</option>
+                <option value="Exterior Lights">Exterior Lights</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Material</label>
+              <input 
+                type="text" 
+                value={formData.material || ''} 
+                onChange={(e) => handleChange('material', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Position</label>
+              <input 
+                type="text" 
+                value={formData.position || ''} 
+                onChange={(e) => handleChange('position', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Paint/Finish</label>
+              <input 
+                type="text" 
+                value={formData.finish || ''} 
+                onChange={(e) => handleChange('finish', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Mounting Features</label>
+              <input 
+                type="text" 
+                value={formData.mountingfeatures || ''} 
+                onChange={(e) => handleChange('mountingfeatures', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Type</label>
+              <input 
+                type="text" 
+                value={formData.type || ''} 
+                onChange={(e) => handleChange('type', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Color</label>
+              <input 
+                type="text" 
+                value={formData.color || ''} 
+                onChange={(e) => handleChange('color', e.target.value)} 
+              />
+            </div>
+          </>
+        );
+
+      case 'Paints & Coatings':
+        return (
+          <>
+            <div className="form-group">
+              <label>Category *</label>
+              <select 
+                value={formData.subcategory || ''} 
+                onChange={(e) => handleChange('subcategory', e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Touch-Up Paints">Touch-Up Paints</option>
+                <option value="Spray Paints">Spray Paints</option>
+                <option value="Clear/Top Coats">Clear/Top Coats</option>
+                <option value="Primers">Primers</option>
+                <option value="Underbody/RustProof Coatings">Underbody/RustProof Coatings</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Volume</label>
+              <input 
+                type="text" 
+                value={formData.volume || ''} 
+                onChange={(e) => handleChange('volume', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Finish</label>
+              <input 
+                type="text" 
+                value={formData.finish || ''} 
+                onChange={(e) => handleChange('finish', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Surface Use</label>
+              <input 
+                type="text" 
+                value={formData.surfaceuse || ''} 
+                onChange={(e) => handleChange('surfaceuse', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Type</label>
+              <input 
+                type="text" 
+                value={formData.type || ''} 
+                onChange={(e) => handleChange('type', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Color</label>
+              <input 
+                type="text" 
+                value={formData.color || ''} 
+                onChange={(e) => handleChange('color', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>ColorCode</label>
+              <input 
+                type="text" 
+                value={formData.colorcode || ''} 
+                onChange={(e) => handleChange('colorcode', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Heat/UV Resistance</label>
+              <input 
+                type="text" 
+                value={formData.resistance || ''} 
+                onChange={(e) => handleChange('resistance', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Dry Time</label>
+              <input 
+                type="text" 
+                value={formData.drytime || ''} 
+                onChange={(e) => handleChange('drytime', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Application Method</label>
+              <input 
+                type="text" 
+                value={formData.applicationmethod || ''} 
+                onChange={(e) => handleChange('applicationmethod', e.target.value)} 
+              />
+            </div>
+          </>
+        );
+
+      case 'Engine & Drivetrain Components':
+        return (
+          <>
+            <div className="form-group">
+              <label>Category *</label>
+              <select 
+                value={formData.subcategory || ''} 
+                onChange={(e) => handleChange('subcategory', e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Engine Components">Engine Components</option>
+                <option value="Transmission Components">Transmission Components</option>
+                <option value="Drivetrain & Differential Components">Drivetrain & Differential Components</option>
+                <option value="Final Drive / Supporting Components">Final Drive / Supporting Components</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Material</label>
+              <input 
+                type="text" 
+                value={formData.material || ''} 
+                onChange={(e) => handleChange('material', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Position</label>
+              <input 
+                type="text" 
+                value={formData.position || ''} 
+                onChange={(e) => handleChange('position', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Size/Length/Gear Ratio</label>
+              <input 
+                type="text" 
+                value={formData.size || ''} 
+                onChange={(e) => handleChange('size', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Transmission Type</label>
+              <input 
+                type="text" 
+                value={formData.type || ''} 
+                onChange={(e) => handleChange('type', e.target.value)} 
+              />
+            </div>
+          </>
+        );
+
+      case 'Electrical Components':
+        return (
+          <>
+            <div className="form-group">
+              <label>Category *</label>
+              <select 
+                value={formData.subcategory || ''} 
+                onChange={(e) => handleChange('subcategory', e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Charging & Starting System">Charging & Starting System</option>
+                <option value="Lighting & Signaling System">Lighting & Signaling System</option>
+                <option value="Sensors & Modules">Sensors & Modules</option>
+                <option value="Switches & Controls">Switches & Controls</option>
+                <option value="Wiring, Fuses & Relays">Wiring, Fuses & Relays</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Material/Lens Color</label>
+              <input 
+                type="text" 
+                value={formData.material || ''} 
+                onChange={(e) => handleChange('material', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Position</label>
+              <input 
+                type="text" 
+                value={formData.position || ''} 
+                onChange={(e) => handleChange('position', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Voltage</label>
+              <input 
+                type="text" 
+                value={formData.voltage || ''} 
+                onChange={(e) => handleChange('voltage', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Amp Rating</label>
+              <input 
+                type="text" 
+                value={formData.amprating || ''} 
+                onChange={(e) => handleChange('amprating', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Connector Type</label>
+              <input 
+                type="text" 
+                value={formData.connectortype || ''} 
+                onChange={(e) => handleChange('connectortype', e.target.value)} 
+              />
+            </div>
+          </>
+        );
+
+      case 'Accessories & Add-ons':
+        return (
+          <>
+            <div className="form-group">
+              <label>Category *</label>
+              <select 
+                value={formData.subcategory || ''} 
+                onChange={(e) => handleChange('subcategory', e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Interior Accessories">Interior Accessories</option>
+                <option value="Electronic Add-ons">Electronic Add-ons</option>
+                <option value="Exterior Accessories">Exterior Accessories</option>
+                <option value="Performance Add-ons">Performance Add-ons</option>
+                <option value="Protection & Utility Add-ons">Protection & Utility Add-ons</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Material</label>
+              <input 
+                type="text" 
+                value={formData.material || ''} 
+                onChange={(e) => handleChange('material', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Dimension</label>
+              <input 
+                type="text" 
+                value={formData.size || ''} 
+                onChange={(e) => handleChange('size', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Color</label>
+              <input 
+                type="text" 
+                value={formData.color || ''} 
+                onChange={(e) => handleChange('color', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Finish</label>
+              <input 
+                type="text" 
+                value={formData.finish || ''} 
+                onChange={(e) => handleChange('finish', e.target.value)} 
+              />
+            </div>
+          </>
+        );
+
+      default:
+        return (
+          <div className="form-group full">
+            <label>Description</label>
+            <textarea 
+              rows={3} 
+              value={formData.description || ''} 
+              onChange={(e) => handleChange('description', e.target.value)} 
+            />
+          </div>
+        );
+    }
   };
 
   return (
     <div className="edit-product">
-      <h2 className="edit-product__title">Edit Product - Engine & Brake Fluids</h2>
+      <h2 className="edit-product__title">Edit {category}</h2>
+      
       <div className="edit-product__section">
         <h3>Product Information</h3>
         <div className="form-grid">
-          <div className="form-group">
-            <label>Product Name *</label>
-            <input type="text" value={formData.productName} onChange={(e) => handleChange('productName', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Fluid Type *</label>
-            <select value={formData.fluidType} onChange={(e) => handleChange('fluidType', e.target.value)}>
-              <option>Select</option>
-              <option>Engine Oil</option>
-              <option>Transmission Fluid</option>
-              <option>Brake Fluid</option>
-              <option>Coolant</option>
-              <option>Power Steering Fluid</option>
-              <option>Windshield Washer Fluid</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Specification *</label>
-            <input type="text" placeholder="e.g., 5W-30, DOT 4" value={formData.specification} onChange={(e) => handleChange('specification', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Brand *</label>
-            <input type="text" value={formData.brand} onChange={(e) => handleChange('brand', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Volume *</label>
-            <input type="text" placeholder="e.g., 1L" value={formData.volume} onChange={(e) => handleChange('volume', e.target.value)} />
-          </div>
+          {renderCommonFields()}
+          {renderCategorySpecificFields()}
           <div className="form-group">
             <label>Compatibility</label>
-            <input type="text" placeholder="System/vehicle" value={formData.compatibility || ''} onChange={(e) => handleChange('compatibility', e.target.value)} />
+            <input 
+              type="text" 
+              value={formData.compatibility || ''} 
+              onChange={(e) => handleChange('compatibility', e.target.value)} 
+            />
           </div>
           <div className="form-group">
-            <label>Replacement Cycle</label>
-            <input type="text" value={formData.replacementCycle || ''} onChange={(e) => handleChange('replacementCycle', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Boiling Point</label>
-            <input type="text" value={formData.boilingPoint || ''} onChange={(e) => handleChange('boilingPoint', e.target.value)} />
+            <label>Brand</label>
+            <input 
+              type="text" 
+              value={formData.brand || ''} 
+              onChange={(e) => handleChange('brand', e.target.value)} 
+            />
           </div>
           <div className="form-group full">
             <label>Description</label>
-            <textarea rows={3} value={formData.description || ''} onChange={(e) => handleChange('description', e.target.value)} />
+            <textarea 
+              rows={3} 
+              value={formData.description || ''} 
+              onChange={(e) => handleChange('description', e.target.value)} 
+            />
+          </div>
+          <div className="form-group full">
+            <label>Notes</label>
+            <textarea 
+              rows={3} 
+              value={formData.notes || ''} 
+              onChange={(e) => handleChange('notes', e.target.value)} 
+            />
           </div>
         </div>
       </div>
-      <div className="edit-product__section">
-        <h3>Pricing & Stock</h3>
-        <div className="form-grid">
-          <div className="form-group">
-            <label>Quantity *</label>
-            <input type="number" value={formData.stock} onChange={(e) => handleChange('stock', parseInt(e.target.value) || 0)} />
-          </div>
-          <div className="form-group">
-            <label>Minimum Stock Level</label>
-            <input type="number" value={formData.lowStockThreshold} onChange={(e) => handleChange('lowStockThreshold', parseInt(e.target.value) || 0)} />
-          </div>
-          <div className="form-group">
-            <label>Price *</label>
-            <input type="text" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Discount Type</label>
-            <select value={formData.discountType || ''} onChange={(e) => handleChange('discountType', e.target.value)}>
-              <option>Select</option>
-              <option>Percentage</option>
-              <option>Flat</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Discount Value</label>
-            <input type="number" value={formData.discountValue || ''} onChange={(e) => handleChange('discountValue', parseFloat(e.target.value) || 0)} />
-          </div>
-        </div>
-      </div>
+
       <div className="edit-product__section">
         <h3>Image</h3>
         <div className="add-product__image-upload">
           <label className="image-box">
-            {imagePreview ? <img src={imagePreview} alt="Product" /> : <span>Add Image</span>}
+            {imagePreview ? <img src={imagePreview} alt="Product" /> : <span>No Image</span>}
             <input type="file" accept="image/*" onChange={handleImageChange} />
           </label>
         </div>
       </div>
+
       <div className="edit-product__section">
-        <h3>Custom Fields</h3>
+        <h3>Pricing & Stocks</h3>
+        <div className="form-grid">
+           <div className="form-group">
+              <label>Price *</label>
+              <input 
+                type="text" 
+                value={formData.price || ''} 
+                onChange={(e) => handleChange('price', e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Stock Quantity</label>
+              <input 
+                type="number" 
+                value={ formData.quantity || 0} 
+                onChange={(e) => handleChange('quantity', parseInt(e.target.value) || 0)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Low Stock Quantity</label>
+              <input 
+                type="number" 
+                value={formData.minquantity || 1} 
+                onChange={(e) => handleChange('minquantity', parseInt(e.target.value) || 1)} 
+              />
+            </div>
+        </div>
+      </div>
+
+      <div className="edit-product__section">
+        <h3>Additional Information</h3>
         <div className="form-grid">
           <div className="form-group">
+            <label>Warranty</label>
+            <input 
+              type="text" 
+              value={formData.warranty || ''} 
+              onChange={(e) => handleChange('warranty', e.target.value)} 
+            />
+          </div>
+          <div className="form-group">
             <label>Manufacturer</label>
-            <input type="text" value={formData.manufacturer || ''} onChange={(e) => handleChange('manufacturer', e.target.value)} />
+            <input 
+              type="text" 
+              value={formData.manufacturer || ''} 
+              onChange={(e) => handleChange('manufacturer', e.target.value)} 
+            />
           </div>
           <div className="form-group">
             <label>Manufactured Date</label>
-            <input type="date" value={formData.manufacturedDate || ''} onChange={(e) => handleChange('manufacturedDate', e.target.value)} />
+            <input 
+              type="date" 
+              value={formData.manufactureddate || ''} 
+              onChange={(e) => handleChange('manufactureddate', e.target.value)} 
+            />
           </div>
           <div className="form-group">
             <label>Expiry Date</label>
-            <input type="date" value={formData.expiryDate || ''} onChange={(e) => handleChange('expiryDate', e.target.value)} />
+            <input 
+              type="date" 
+              value={formData.expirydate || ''} 
+              onChange={(e) => handleChange('expirydate', e.target.value)} 
+            />
           </div>
         </div>
       </div>
+
       <div className="edit-product__footer">
-        <button className="btn save" onClick={handleSubmit}>Save Changes</button>
+        <button className="btn save" onClick={handleSubmit}>
+          Save Changes
+        </button>
       </div>
     </div>
   );
-};
-
-const EditProduct: React.FC<EditProductProps> = ({ category, existingData, onSave }) => {
-  switch (category) {
-    case 'Engine & Fluids':
-      return <EngineFluidsEditForm category={category} existingData={existingData} onSave={onSave} />;
-     case 'Wear & Tear Parts':
-      return <WearTearPartsEditForm category={category} existingData={existingData} onSave={onSave} />;
-    case 'Exterior & Body Parts':
-      return <ExteriorBodyPartEditForm category={category} existingData={existingData} onSave={onSave} />;
-    case 'Paints & Coatings':
-      return <PaintsCoatingsEditForm category={category} existingData={existingData} onSave={onSave} />;
-    case 'Engine & Drivetrain Components':
-      return <EngineDrivetrainProductEditForm category={category} existingData={existingData} onSave={onSave} />;
-    case 'Electrical Components':
-      return <ElectricalEditForm category={category} existingData={existingData} onSave={onSave} />;
-    case 'Accessories & Add-ons':
-      return <AccessoriesEditForm category={category} existingData={existingData} onSave={onSave} />;
-    // Add more cases for other categories and their specific forms
-    default:
-      return <div style={{ padding: 32 }}>Edit form for this category is not implemented yet.</div>;
-  }
 };
 
 export default EditProduct;

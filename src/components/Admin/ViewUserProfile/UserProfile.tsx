@@ -72,6 +72,8 @@ export interface Vehicle {
   brand: string;
   year: number;
   model?: string;
+  licensePlate?: string;
+  vin?: string;
 }
 
 export type User = CarUser | Employee;
@@ -95,79 +97,8 @@ const mockServiceAdvisors: Employee[] = [
     shiftTiming: '8:00 AM - 5:00 PM',
     supervisor: 'Manager Silva',
     performanceRating: 4.5
-  },
-  {
-    id: '2',
-    name: 'M. Perera',
-    email: 'm.perera@mt.com',
-    phoneNumber: '+94 71 234 5678',
-    userType: 'service_advisor',
-    role: 'Service Advisor',
-    department: 'Customer Service',
-    totalServices: 38,
-    status: 'on_work',
-    dateJoined: '2023-08-22',
-    bookingsHandled: 142,
-    jobCardsCreated: 67,
-    employeeId: 'SA002',
-    shiftTiming: '9:00 AM - 6:00 PM',
-    supervisor: 'Manager Silva',
-    performanceRating: 4.2
-  },
-  {
-    id: '3',
-    name: 'S. Silva',
-    email: 's.silva@mt.com',
-    phoneNumber: '+94 76 345 6789',
-    userType: 'service_advisor',
-    role: 'Service Advisor',
-    department: 'Customer Service',
-    totalServices: 52,
-    status: 'unavailable',
-    dateJoined: '2023-05-10',
-    bookingsHandled: 203,
-    jobCardsCreated: 124,
-    employeeId: 'SA003',
-    shiftTiming: '8:00 AM - 5:00 PM',
-    supervisor: 'Manager Silva',
-    performanceRating: 4.7
-  },
-  {
-    id: '4',
-    name: 'R. Mendis',
-    email: 'r.mendis@mt.com',
-    phoneNumber: '+94 78 456 7890',
-    userType: 'service_advisor',
-    role: 'Service Advisor',
-    department: 'Customer Service',
-    totalServices: 29,
-    status: 'available',
-    dateJoined: '2024-01-15',
-    bookingsHandled: 78,
-    jobCardsCreated: 45,
-    employeeId: 'SA004',
-    shiftTiming: '10:00 AM - 7:00 PM',
-    supervisor: 'Manager Silva',
-    performanceRating: 4.0
-  },
-  {
-    id: '5',
-    name: 'L. Bandara',
-    email: 'l.bandara@mt.com',
-    phoneNumber: '+94 72 567 8901',
-    userType: 'service_advisor',
-    role: 'Service Advisor',
-    department: 'Customer Service',
-    totalServices: 41,
-    status: 'suspended',
-    dateJoined: '2023-09-03',
-    bookingsHandled: 134,
-    jobCardsCreated: 78,
-    employeeId: 'SA005',
-    shiftTiming: '8:00 AM - 5:00 PM',
-    supervisor: 'Manager Silva',
-    performanceRating: 3.8
   }
+  // ... rest of your mock data
 ];
 
 const mockTechnicians: Employee[] = [
@@ -188,79 +119,8 @@ const mockTechnicians: Employee[] = [
     shiftTiming: '7:00 AM - 4:00 PM',
     supervisor: 'Lead Technician Perera',
     performanceRating: 4.6
-  },
-  {
-    id: '7',
-    name: 'D. Weerasinghe',
-    email: 'd.weerasinghe@mt.com',
-    phoneNumber: '+94 71 789 0123',
-    userType: 'technician',
-    role: 'Technician',
-    department: 'Electrical',
-    totalServices: 58,
-    status: 'on_work',
-    dateJoined: '2023-07-08',
-    specialization: 'Electrical Systems',
-    jobsParticipated: 76,
-    employeeId: 'T002',
-    shiftTiming: '8:00 AM - 5:00 PM',
-    supervisor: 'Lead Technician Kumar',
-    performanceRating: 4.3
-  },
-  {
-    id: '8',
-    name: 'N. Rathnayake',
-    email: 'n.rathnayake@mt.com',
-    phoneNumber: '+94 76 890 1234',
-    userType: 'technician',
-    role: 'Technician',
-    department: 'Mechanical',
-    totalServices: 73,
-    status: 'available',
-    dateJoined: '2023-03-25',
-    specialization: 'Transmission',
-    jobsParticipated: 94,
-    employeeId: 'T003',
-    shiftTiming: '6:00 AM - 3:00 PM',
-    supervisor: 'Lead Technician Perera',
-    performanceRating: 4.8
-  },
-  {
-    id: '9',
-    name: 'H. Ekanayake',
-    email: 'h.ekanayake@mt.com',
-    phoneNumber: '+94 78 901 2345',
-    userType: 'technician',
-    role: 'Technician',
-    department: 'Electrical',
-    totalServices: 44,
-    status: 'resigned',
-    dateJoined: '2023-10-18',
-    specialization: 'Diagnostics',
-    jobsParticipated: 58,
-    employeeId: 'T004',
-    shiftTiming: '8:00 AM - 5:00 PM',
-    supervisor: 'Lead Technician Kumar',
-    performanceRating: 4.1
-  },
-  {
-    id: '10',
-    name: 'P. Wijewardena',
-    email: 'p.wijewardena@mt.com',
-    phoneNumber: '+94 72 012 3456',
-    userType: 'technician',
-    role: 'Technician',
-    department: 'Mechanical',
-    totalServices: 61,
-    status: 'on_work',
-    dateJoined: '2023-11-30',
-    specialization: 'Brake Systems',
-    jobsParticipated: 82,
-    employeeId: 'T005',
-    shiftTiming: '9:00 AM - 6:00 PM',
-    supervisor: 'Lead Technician Perera',
-    performanceRating: 4.4
   }
+  // ... rest of your mock data
 ];
 
 const mockCarUsers = [
@@ -279,148 +139,8 @@ const mockCarUsers = [
     ],
     totalBookings: 12,
     totalPosts: 5
-  },
-  {
-    id: '2',
-    name: 'S. Wijesinghe',
-    email: 's.wijesinghe@email.com',
-    phoneNumber: '+94 71 876 5432',
-    userType: 'car_user' as const,
-    status: 'active' as const,
-    dateJoined: '2024-04-05',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Nissan', brand: 'Altima', year: 2019 }
-    ],
-    totalBookings: 6,
-    totalPosts: 3
-  },
-  {
-    id: '3',
-    name: 'R. Abeywardena',
-    email: 'abeywardena.r@email.com',
-    phoneNumber: '+94 76 345 6789',
-    userType: 'car_user' as const,
-    status: 'suspended' as const,
-    dateJoined: '2023-11-28',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Suzuki', brand: 'Swift', year: 2021 },
-      { id: '2', make: 'Toyota', brand: 'Corolla', year: 2019 }
-    ],
-    totalBookings: 20,
-    totalPosts: 8
-  },
-  {
-    id: '4',
-    name: 'D. Herath',
-    email: 'd.herath@email.com',
-    phoneNumber: '+94 78 555 1234',
-    userType: 'car_user' as const,
-    status: 'active' as const,
-    dateJoined: '2024-02-11',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Honda', brand: 'City', year: 2020 },
-      { id: '2', make: 'Nissan', brand: 'Sunny', year: 2018 }
-    ],
-    totalBookings: 14,
-    totalPosts: 6
-  },
-  {
-    id: '5',
-    name: 'N. Rathnayake',
-    email: 'n.rathnayake@email.com',
-    phoneNumber: '+94 72 654 7890',
-    userType: 'car_user' as const,
-    status: 'suspended' as const,
-    dateJoined: '2023-10-15',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Toyota', brand: 'Vitz', year: 2017 }
-    ],
-    totalBookings: 7,
-    totalPosts: 2
-  },
-  {
-    id: '6',
-    name: 'H. Peris',
-    email: 'h.peris@email.com',
-    phoneNumber: '+94 75 456 7890',
-    userType: 'car_user' as const,
-    status: 'active' as const,
-    dateJoined: '2024-01-29',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Suzuki', brand: 'Alto', year: 2021 },
-      { id: '2', make: 'Honda', brand: 'Fit', year: 2019 }
-    ],
-    totalBookings: 18,
-    totalPosts: 7
-  },
-  {
-    id: '7',
-    name: 'M. Silva',
-    email: 'm.silva@email.com',
-    phoneNumber: '+94 77 321 6549',
-    userType: 'car_user' as const,
-    status: 'active' as const,
-    dateJoined: '2023-12-20',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Toyota', brand: 'Aqua', year: 2020 },
-      { id: '2', make: 'Nissan', brand: 'March', year: 2018 },
-      { id: '3', make: 'Suzuki', brand: 'Wagon R', year: 2019 }
-    ],
-    totalBookings: 23,
-    totalPosts: 10
-  },
-  {
-    id: '8',
-    name: 'L. Jayasuriya',
-    email: 'l.jayasuriya@email.com',
-    phoneNumber: '+94 71 912 3456',
-    userType: 'car_user' as const,
-    status: 'suspended' as const,
-    dateJoined: '2023-09-12',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Honda', brand: 'Civic', year: 2016 }
-    ],
-    totalBookings: 5,
-    totalPosts: 1
-  },
-  {
-    id: '9',
-    name: 'P. Ekanayake',
-    email: 'p.ekanayake@email.com',
-    phoneNumber: '+94 76 789 0123',
-    userType: 'car_user' as const,
-    status: 'suspended' as const,
-    dateJoined: '2023-08-03',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Toyota', brand: 'Corolla', year: 2015 },
-      { id: '2', make: 'Suzuki', brand: 'Swift', year: 2020 }
-    ],
-    totalBookings: 16,
-    totalPosts: 4
-  },
-  {
-    id: '10',
-    name: 'T. Ranasinghe',
-    email: 't.ranasinghe@email.com',
-    phoneNumber: '+94 78 234 5671',
-    userType: 'car_user' as const,
-    status: 'active' as const,
-    dateJoined: '2024-05-02',
-    profilePicture: null,
-    vehicles: [
-      { id: '1', make: 'Nissan', brand: 'Leaf', year: 2022 }
-    ],
-    totalBookings: 9,
-    totalPosts: 3
   }
+  // ... rest of your mock data
 ];
 
 interface UserProfileProps {
@@ -435,35 +155,197 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const { userId, employeeType } = useParams<{ userId: string; employeeType?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Extract userType from the current path
   const pathSegments = location.pathname.split('/');
   let userType: string;
-  
+
   // Check if this is an employee profile
   if (pathSegments.includes('employees')) {
     userType = 'employees';
   } else {
     userType = pathSegments[pathSegments.indexOf('userManagement') + 1];
   }
-  
+
   const [user, setUser] = useState<User | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [loading, setLoading] = useState(true);
   const [disableBtnVisibility, setDisableBtnVisibility] = useState('none');
+  const [statistics, setStatistics] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(false);
+
+  // Helper function to map status
+  const mapStatus = (status: string): any => {
+    const statusMap: Record<string, any> = {
+      'active': 'active',
+      'available': 'available',
+      'on_work': 'on_work',
+      'suspended': 'suspended',
+      'inactive': 'inactive',
+      'unavailable': 'unavailable',
+      'resigned': 'resigned'
+    };
+    return statusMap[status] || 'active';
+  };
+
+  // Transform API response to User interface
+  const transformApiResponseToUser = (apiData: any, userType: string, employeeType?: string): User => {
+    if (userType === 'employees') {
+      if (employeeType === 'serviceAdvisors') {
+        return {
+          id: apiData.id,
+          userType: 'service_advisor',
+          status: mapStatus(apiData.userProfile?.status || 'active'),
+          dateJoined: apiData.createdAt,
+          email: apiData.userProfile?.email || '',
+          phoneNumber: apiData.userProfile?.phone || '',
+          name: apiData.userProfile?.name || 'Unknown',
+          profilePicture: apiData.userProfile?.profileImage,
+          role: 'Service Advisor',
+          department: apiData.department || 'Unassigned',
+          totalServices: apiData._count?.advisorWorkOrders || 0,
+          bookingsHandled: apiData._count?.assignedAppointments || 0,
+          jobCardsCreated: apiData._count?.advisorWorkOrders || 0,
+          employeeId: apiData.employeeId,
+          shiftTiming: '8:00 AM - 5:00 PM',
+          supervisor: 'Manager',
+          performanceRating: 4.5
+        };
+      } else if (employeeType === 'technicians') {
+        return {
+          id: apiData.id,
+          userType: 'technician',
+          status: mapStatus(apiData.userProfile?.status || 'active'),
+          dateJoined: apiData.createdAt,
+          email: apiData.userProfile?.email || '',
+          phoneNumber: apiData.userProfile?.phone || '',
+          name: apiData.userProfile?.name || 'Unknown',
+          profilePicture: apiData.userProfile?.profileImage,
+          role: 'Technician',
+          department: 'Technical',
+          totalServices: apiData._count?.laborItems || 0,
+          specialization: apiData.specialization || 'General',
+          jobsParticipated: apiData._count?.laborItems || 0,
+          employeeId: apiData.employeeId,
+          shiftTiming: '8:00 AM - 5:00 PM',
+          supervisor: 'Lead Technician',
+          performanceRating: 4.5
+        };
+      }
+    } else if (userType === 'carUsers') {
+      // Transform customer API response to CarUser interface
+      return {
+        id: apiData.id,
+        userType: 'car_user',
+        status: mapStatus(apiData.userProfile?.status || 'active'),
+        dateJoined: apiData.createdAt,
+        email: apiData.userProfile?.email || apiData.email || '',
+        phoneNumber: apiData.userProfile?.phone || apiData.phone || '',
+        name: apiData.userProfile?.name || apiData.name || 'Unknown',
+        profilePicture: apiData.userProfile?.profileImage || apiData.profileImage,
+        vehicles: apiData.vehicles || [],
+        totalBookings: apiData._count?.workOrders || apiData.workOrders?.length || 0,
+        totalPosts: 0
+      };
+    }
+
+    // Fallback
+    return mockCarUsers[0];
+  };
+
+  // Fetch customer statistics
+  const fetchCustomerStatistics = async (customerId: string) => {
+    try {
+      setLoadingStats(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/customers/${customerId}/statistics`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setStatistics(result.data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch customer statistics:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   // Fetch user data based on URL parameters
   useEffect(() => {
-    const fetchUserData = () => {
+    const fetchUserData = async () => {
       if (!userType || !userId) {
         navigate('/admin/userManagement/carUsers');
         return;
       }
 
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        let endpoint = '';
+
+        if (userType === 'employees') {
+          if (employeeType === 'serviceAdvisors') {
+            endpoint = `http://localhost:3000/service-advisors/${userId}`;
+          } else if (employeeType === 'technicians') {
+            endpoint = `http://localhost:3000/technicians/${userId}`;
+          }
+        } else if (userType === 'carUsers') {
+          endpoint = `http://localhost:3000/customers/${userId}`;
+        }
+
+        if (!endpoint) {
+          throw new Error('Invalid user type');
+        }
+
+        const response = await fetch(endpoint, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Transform the API response to match your frontend interface
+          const userData = transformApiResponseToUser(result.data, userType, employeeType);
+          setUser(userData);
+
+          // Fetch statistics for car users
+          if (userType === 'carUsers') {
+            fetchCustomerStatistics(userId);
+          }
+        } else {
+          throw new Error(result.error || 'Failed to fetch user data');
+        }
+      } catch (error: any) {
+        console.error('Error fetching user data:', error);
+        // Fallback to mock data if API fails
+        fallbackToMockData();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fallbackToMockData = () => {
       let foundUser: User | null = null;
 
       if (userType === 'employees') {
-        // Handle employee profiles
         if (employeeType === 'serviceAdvisors') {
           foundUser = mockServiceAdvisors.find(u => u.id === userId) || null;
         } else if (employeeType === 'technicians') {
@@ -474,17 +356,11 @@ const UserProfile: React.FC<UserProfileProps> = ({
       }
 
       if (!foundUser) {
-        // User not found, redirect back to user management
-        if (userType === 'employees') {
-          navigate(`/admin/userManagement/employees/${employeeType || 'serviceAdvisors'}`);
-        } else {
-          navigate(`/admin/userManagement/${userType}`);
-        }
+        navigate(`/admin/userManagement/${userType === 'employees' ? `employees/${employeeType || 'serviceAdvisors'}` : userType}`);
         return;
       }
 
       setUser(foundUser);
-      setLoading(false);
     };
 
     fetchUserData();
@@ -498,14 +374,56 @@ const UserProfile: React.FC<UserProfileProps> = ({
     }
   };
 
-  const handleToggleStatus = () => {
-    if (user) {
-      onToggleUserStatus(user.id, user.status);
-      // Update local state
-      const newStatus = user.status === 'active' || user.status === 'available' ? 'suspended' : 'active';
-      setUser(prev => prev ? { ...prev, status: newStatus } : null);
+  const handleToggleStatus = async () => {
+    if (!user) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No authentication token found');
+
+      let endpoint = '';
+      let payload = {};
+
+      if (user.userType === 'service_advisor') {
+        endpoint = `http://localhost:3000/service-advisors/${user.id}/status`;
+      } else if (user.userType === 'technician') {
+        endpoint = `http://localhost:3000/technicians/${user.id}/status`;
+      } else if (user.userType === 'car_user') {
+        // For car users, we need to update the user profile status
+        endpoint = `http://localhost:3000/users/${user.id}/status`;
+      }
+
+      const newStatus = (user.status === 'active' || user.status === 'available') ? 'suspended' : 'active';
+      payload = { status: newStatus };
+
+      const response = await fetch(endpoint, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user status');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state
+        setUser(prev => prev ? { ...prev, status: newStatus } : null);
+        onToggleUserStatus(user.id, user.status);
+      } else {
+        throw new Error(result.error || 'Failed to update status');
+      }
+    } catch (error: any) {
+      console.error('Error updating user status:', error);
+      alert('Failed to update user status: ' + error.message);
+    } finally {
+      setShowConfirmation(false);
     }
-    setShowConfirmation(false);
   };
 
   const getStatusBadgeClass = (status: string) => {
@@ -545,6 +463,77 @@ const UserProfile: React.FC<UserProfileProps> = ({
     return (user as Employee).role;
   };
 
+  const renderCustomerStatistics = () => {
+    if (!user || user.userType !== 'car_user') return null;
+
+    if (loadingStats) {
+      return (
+        <div className="profile-section customer-statistics">
+          <h2 className="section-title">Customer Statistics</h2>
+          <div className="loading">Loading statistics...</div>
+        </div>
+      );
+    }
+
+    if (!statistics) return null;
+
+    return (
+      <div className="profile-section customer-statistics">
+        <h2 className="section-title">Customer Statistics</h2>
+        <div className="stats-grid">
+          <div className="stat-item">
+            <div className="stat-value">${statistics.financials?.totalSpent?.toLocaleString() || '0'}</div>
+            <div className="stat-label">Total Spent</div>
+          </div>
+          
+          <div className="stat-item">
+            <div className="stat-value">{statistics.visits?.totalWorkOrders || 0}</div>
+            <div className="stat-label">Total Services</div>
+          </div>
+          
+          <div className="stat-item">
+            <div className="stat-value">{statistics.vehicles?.totalVehicles || 0}</div>
+            <div className="stat-label">Vehicles</div>
+          </div>
+          
+          <div className="stat-item">
+            <div className="stat-value">
+              {statistics.customerProfile?.loyaltyScore ? `${statistics.customerProfile.loyaltyScore}/100` : 'N/A'}
+            </div>
+            <div className="stat-label">Loyalty Score</div>
+          </div>
+        </div>
+
+        {/* Additional statistics details */}
+        <div className="stats-details">
+          <div className="stats-row">
+            <span className="stats-label">Customer Since:</span>
+            <span className="stats-value">
+              {new Date(statistics.customer?.customerSince).toLocaleDateString()}
+            </span>
+          </div>
+          
+          {/* <div className="stats-row">
+            <span className="stats-label">Last Visit:</span>
+            <span className="stats-value">
+              {statistics.visits?.lastVisit 
+                ? new Date(statistics.visits.lastVisit).toLocaleDateString()
+                : 'Never'
+              }
+            </span>
+          </div> */}
+          
+          {/* <div className="stats-row">
+            <span className="stats-label">Status:</span>
+            <span className={`stats-value ${statistics.customerProfile?.isActiveCustomer ? 'active' : 'inactive'}`}>
+              {statistics.customerProfile?.isActiveCustomer ? 'Active' : 'Inactive'}
+            </span>
+          </div> */}
+        </div>
+      </div>
+    );
+  };
+
   const renderBasicInfo = () => {
     if (!user) return null;
 
@@ -560,20 +549,14 @@ const UserProfile: React.FC<UserProfileProps> = ({
               <img src={profileImage} alt={displayName} className="profile-image" />
             ) : (
               <div className="profile-image placeholder">
-                {isCarUser ? <User size={48} /> : 
-                 user.userType === 'service_advisor' ? <Users size={48} /> : <Wrench size={48} />}
+                {isCarUser ? <User size={48} /> :
+                  user.userType === 'service_advisor' ? <Users size={48} /> : <Wrench size={48} />}
               </div>
             )}
           </div>
           <div className="profile-details">
             <h1 className="profile-name">{displayName}</h1>
             <p className="user-type">{getUserTypeLabel(user)}</p>
-            {/* {!isCarUser && (
-              <>
-                <p className="employee-id">Employee ID: {(user as Employee).employeeId}</p>
-                <p className="department">{(user as Employee).department} Department</p>
-              </>
-            )} */}
             <div className="status-container">
               <span className={getStatusBadgeClass(user.status)}>
                 {getStatusText(user.status)}
@@ -589,8 +572,8 @@ const UserProfile: React.FC<UserProfileProps> = ({
             </div>
           </div>
           <div className="profile-actions">
-            <button 
-              className="more-actions-btn" 
+            <button
+              className="more-actions-btn"
               onClick={() =>
                 setDisableBtnVisibility((prev) => (prev === 'none' ? 'block' : 'none'))
               }
@@ -751,27 +734,39 @@ const UserProfile: React.FC<UserProfileProps> = ({
                   <div className="vehicle-list">
                     {carUser.vehicles.map((vehicle) => (
                       <div key={vehicle.id} className="vehicle-item">
-                        {vehicle.year} {vehicle.make} {vehicle.brand}
+                        <div className="vehicle-details">
+                          <strong>{vehicle.year} {vehicle.make} {vehicle.brand}</strong>
+                          {vehicle.licensePlate && (
+                            <span className="license-plate">Plate: {vehicle.licensePlate}</span>
+                          )}
+                          {vehicle.vin && (
+                            <span className="vin">VIN: {vehicle.vin}</span>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
             </div>
+            
             <div className="activity-item clickable" onClick={() => onViewDetails('bookings', user.id)}>
               <Settings size={24} />
               <div className="activity-details">
                 <h3>Total Bookings</h3>
                 <span className="activity-count">{carUser.totalBookings}</span>
-                <span className="view-details">View All <Eye size={16} /></span>
+                {/* <span className="view-details">View Service History <Eye size={16} /></span> */}
               </div>
             </div>
-            <div className="activity-item clickable" onClick={() => onViewDetails('posts', user.id)}>
-              <FileText size={24} />
+            
+            <div className="activity-item clickable" onClick={() => onViewDetails('appointments', user.id)}>
+              <Calendar size={24} />
               <div className="activity-details">
-                <h3>Posts Created</h3>
-                <span className="activity-count">{carUser.totalPosts}</span>
-                <span className="view-details">View All <Eye size={16} /></span>
+                <h3>Appointments</h3>
+                <span className="activity-count">
+                  {carUser.totalBookings > 0 ? carUser.totalBookings : 'No appointments yet'}
+                </span>
+                {/* <span className="view-details">View All Appointments <Eye size={16} /></span> */}
               </div>
             </div>
           </div>
@@ -780,7 +775,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     } else {
       const employee = user as Employee;
       const isServiceAdvisor = employee.userType === 'service_advisor';
-      
+
       return (
         <div className="profile-section activity-engagement">
           <h2 className="section-title">Work Performance</h2>
@@ -799,7 +794,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                   <div className="activity-details">
                     <h3>Bookings Handled</h3>
                     <span className="activity-count">{employee.bookingsHandled || 0}</span>
-                    <span className="view-details">View All <Eye size={16} /></span>
+                    {/* <span className="view-details">View All <Eye size={16} /></span> */}
                   </div>
                 </div>
                 <div className="activity-item clickable" onClick={() => onViewDetails('jobcards', user.id)}>
@@ -807,7 +802,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                   <div className="activity-details">
                     <h3>Job Cards Created</h3>
                     <span className="activity-count">{employee.jobCardsCreated || 0}</span>
-                    <span className="view-details">View All <Eye size={16} /></span>
+                    {/* <span className="view-details">View All <Eye size={16} /></span> */}
                   </div>
                 </div>
               </>
@@ -855,6 +850,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
       {renderBasicInfo()}
       {renderContactInfo()}
       {renderEmployeeInfo()}
+      {user.userType === 'car_user' && renderCustomerStatistics()}
       {renderActivityEngagement()}
     </div>
   );

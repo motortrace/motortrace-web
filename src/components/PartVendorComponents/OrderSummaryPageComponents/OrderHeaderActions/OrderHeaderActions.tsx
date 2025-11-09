@@ -21,14 +21,14 @@ const OrderHeaderActions: React.FC<OrderHeaderActionsProps> = ({
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate('/PartVendor/OrderSummary');
+    navigate('/inventorymanager/OrderSummary');
   };
 
   const handleCustomerClick = () => {
     // Replace with the correct dynamic route if needed
     if (!customerName) return;
     const encodedName = encodeURIComponent(customerName);
-    navigate(`/PartVendor/Customers/${encodedName}`);
+    navigate(`/inventorymanager/Customers/${encodedName}`);
   };
 
   return (

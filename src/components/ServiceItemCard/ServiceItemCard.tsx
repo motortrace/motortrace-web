@@ -54,6 +54,37 @@ const getVehicleImage = (vehicle: WorkOrder['vehicle']) => {
   return 'https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg';
 };
 
+const getSourceBadge = (source?: string) => {
+  if (!source || (source !== 'APPOINTMENT' && source !== 'WALK_IN')) return null;
+
+  const badgeConfig = {
+    APPOINTMENT: { color: '#ffffff', bgColor: '#2563EB', label: 'Appointment' },
+    WALK_IN: { color: '#ffffff', bgColor: '#2563EB', label: 'Walk-in' }
+  };
+
+  const config = badgeConfig[source as keyof typeof badgeConfig];
+
+  return (
+    <div 
+      className="source-badge"
+      style={{
+        color: config.color,
+        backgroundColor: config.bgColor,
+        padding: '4px 8px',
+        borderRadius: '6px',
+        fontSize: '11px',
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+        display: 'inline-block',
+        marginTop: '4px'
+      }}
+    >
+      {config.label}
+    </div>
+  );
+};
+
 const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
   serviceItem,
   onMove,
@@ -92,9 +123,14 @@ const ServiceItemCard: React.FC<ServiceItemCardProps> = ({
 
       {/* Card Header */}
       <div className="card-header">
-        <div className="header-left">
+        <div className="work-order-row">
           <span className="work-order-number">#{serviceItem.workOrderNumber}</span>
         </div>
+        {getSourceBadge(serviceItem.source) && (
+          <div className="source-badge-row">
+            {getSourceBadge(serviceItem.source)}
+          </div>
+        )}
       </div>
 
       {/* Card Title (Customer + Vehicle) */}

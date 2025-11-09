@@ -1,5 +1,5 @@
 import DashboardLayout from './layouts/DashboardLayout';
-import PartVendorDashboardLayout from './layouts/PartVendorLayout/PartVendorLayout';
+import InventoryManagerLayout from './layouts/PartVendorLayout/PartVendorLayout';
 
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -33,6 +33,7 @@ import InvoiceDetailPage from './pages/ServiceCenter/InvoiceDetailPage';
 import TechnicianProfile from './pages/ServiceCenter/TechnicianProfile';
 import ServiceDetailPage from './pages/ServiceCenter/ServiceDetailPage';
 import LaborCatalogPage from './pages/ServiceCenter/LaborCatalogPage';
+import SettingsPage from './pages/ServiceCenter/SettingsPage';
 
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout"
@@ -49,7 +50,7 @@ import RevenueAndPayouts from './pages/Admin/RevenueAndPayouts';
 import IncomeManagement from './pages/Admin/IncomeManagement';
 
 
-import PartVendorDashboard from './pages/PartVendor/Dashboard/PartVendorDashboard';
+// PartVendor dashboard removed - ProductList is the default
 import OrderSummary from './pages/PartVendor/OrderPages/OrderSummary';
 import PendingOrderDetailsPage from './pages/PartVendor/OrderPages/PendingOrderDetailsPage';
 import IncomeSummaryPage from './pages/PartVendor/IncomePages/IncomeSummaryPage';
@@ -66,6 +67,8 @@ import ProfilePartVendor from './pages/PartVendor/Profile/Profile';
 import ProductList from './pages/PartVendor/Products/ProductList';
 import CancelledBookings from './pages/Admin/CancelledBookings';
 import ServicePackageManager from './pages/Admin/ServicePackageManager';
+import StockLevel from './pages/PartVendor/StockLevel/StockLevel';
+import IssuanceDetails from './components/PartVendorComponents/Issuance/IssuanceDetails';
 
 
 function NotFoundRedirect() {
@@ -84,6 +87,8 @@ function NotFoundRedirect() {
       navigate('/serviceadvisor/dashboard', { replace: true });
     } else if (user && user.role === 'manager') {
       navigate('/manager/dashboard', { replace: true });
+    } else if (user && user.role === 'inventorymanager') {
+      navigate('/inventorymanager/ProductList', { replace: true });
     } else {
       navigate('/index', { replace: true });
     }
@@ -138,6 +143,7 @@ function App() {
           <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
+          
         </Route>
 
         {/* Manager Dashboard Routes */}
@@ -170,6 +176,7 @@ function App() {
           <Route path="technician/:technicianId" element={<TechnicianProfile />} />
           <Route path="customer" element={<CustomerManagement />} />
           <Route path="customer/:customerId" element={<CustomerProfile />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         <Route path="admin/login" element={<AdminLogin />} />
@@ -215,10 +222,16 @@ function App() {
         <Route path="*" element={<NotFoundRedirect />} />
 
         {/* Part Vendor */}
-        <Route path="/partvendor" element={<PartVendorDashboardLayout />}>
-          <Route index element={<Navigate to="/partvendor/dashboard" replace />} />
-          <Route path="dashboard" element={<PartVendorDashboard />} />
+        <Route path="/inventorymanager" element={
+          <ProtectedRoute allowedRoles={['inventorymanager']}>
+            <InventoryManagerLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="/inventorymanager/ProductList" replace />} />
+          {/* dashboard removed - ProductList is now the default root for PartVendor */}
           <Route path="OrderSummary" element={<OrderSummary />} />
+          {/* <Route path="/inventory/issuance" element={<IssuanceList />} />
+          <Route path="/inventory/issuance/:id" element={<IssuanceDetails />} /> */}
           <Route path="PendingOrderDetails" element={<PendingOrderDetailsPage />} />
           <Route path="IncomeSummary" element={<IncomeSummaryPage />} />
           <Route path="CustomerSummary" element={<CustomerSummaryPage />} />
@@ -232,6 +245,8 @@ function App() {
           <Route path="ProductList" element={<ProductList />} />
           <Route path="AddProduct" element={<AddProduct />} />
           <Route path="ProfilePartVendor" element={<ProfilePartVendor />} />
+          <Route path="StockLevel" element={<StockLevel />} />
+          <Route path="/inventorymanager/issuancedetails/:id" element={<IssuanceDetails />} />
 
         </Route>
       </Routes>

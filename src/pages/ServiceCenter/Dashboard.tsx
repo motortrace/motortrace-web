@@ -9,38 +9,46 @@ import { useWorkingTechnicians } from '../../hooks/useWorkingTechnicians';
 interface MetricCardProps {
   title: string;
   amount: string;
+  bgColor?: string;
+  textColor?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({
   title,
-  amount
+  amount,
+  bgColor = 'white',
+  textColor = '#1e293b'
 }) => {
   return (
     <div style={{
-      backgroundColor: 'white',
-      padding: '16px',
-      borderRadius: '8px',
-      border: '1px solid #e2e8f0',
-      position: 'relative'
+      backgroundColor: bgColor,
+      padding: '20px',
+      borderRadius: '12px',
+      border: 'none',
+      position: 'relative',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
     }}>
       <h3 style={{
-        fontSize: '12px',
-        fontWeight: '500',
-        color: '#64748b',
-        margin: '0 0 8px 0'
+        fontSize: '13px',
+        fontWeight: '600',
+        color: textColor,
+        opacity: 0.8,
+        margin: '0 0 12px 0',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px'
       }}>
         {title}
       </h3>
-      
+
       <div style={{
-        fontSize: '22px',
+        fontSize: '32px',
         fontWeight: '700',
-        color: '#1e293b',
+        color: textColor,
         marginBottom: '8px'
       }}>
         {amount}
       </div>
-      
+
     </div>
   );
 };
@@ -59,7 +67,27 @@ const Dashboard = () => {
   } | null>(null);
   const [generalStatsLoading, setGeneralStatsLoading] = useState(false);
   const [generalStatsError, setGeneralStatsError] = useState('');
+  const [userProfile, setUserProfile] = useState<{
+    name: string;
+    email: string;
+    profileImageUrl?: string;
+  } | null>(null);
+  const [userProfileLoading, setUserProfileLoading] = useState(false);
+  const [userProfileError, setUserProfileError] = useState('');
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsError, setNotificationsError] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
+  const [pendingAppointments, setPendingAppointments] = useState(0);
+  const [pendingAppointmentsLoading, setPendingAppointmentsLoading] = useState(false);
+  const [technicianStats, setTechnicianStats] = useState<{
+    totalTechnicians: number;
+    activeTechnicians: number;
+    availableTechnicians: number;
+  } | null>(null);
+  const [technicianStatsLoading, setTechnicianStatsLoading] = useState(false);
+  const [serviceAdvisorsCount, setServiceAdvisorsCount] = useState(0);
+  const [serviceAdvisorsLoading, setServiceAdvisorsLoading] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -161,10 +189,203 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch user profile
+  const fetchUserProfile = async () => {
+    if (!token) {
+      console.log('No token available for user profile fetch');
+      return;
+    }
+
+    setUserProfileLoading(true);
+    setUserProfileError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user profile: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUserProfile({
+          name: data.data.name,
+          email: data.data.email,
+          profileImageUrl: data.data.profileImage
+        });
+        console.log('User profile loaded:', data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch user profile');
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+      setUserProfileError(err instanceof Error ? err.message : 'Failed to fetch user profile');
+    } finally {
+      setUserProfileLoading(false);
+    }
+  };
+
+  // Fetch notifications
+  const fetchNotifications = async () => {
+    if (!token) {
+      console.log('No token available for notifications fetch');
+      return;
+    }
+
+    setNotificationsLoading(true);
+    setNotificationsError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/notifications?limit=20', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch notifications: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setNotifications(data.data);
+        console.log('Notifications loaded:', data.data.length);
+      } else {
+        throw new Error(data.message || 'Failed to fetch notifications');
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setNotificationsError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
+
+  // Fetch pending appointments count
+  const fetchPendingAppointments = async () => {
+    if (!token) return;
+
+    setPendingAppointmentsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/appointments/pending', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pending appointments: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setPendingAppointments(data.data.length || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching pending appointments:', err);
+    } finally {
+      setPendingAppointmentsLoading(false);
+    }
+  };
+
+  // Fetch technician statistics
+  const fetchTechnicianStats = async () => {
+    if (!token) return;
+
+    setTechnicianStatsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/technicians/statistics', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch technician statistics: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setTechnicianStats(data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching technician statistics:', err);
+    } finally {
+      setTechnicianStatsLoading(false);
+    }
+  };
+
+  // Fetch service advisors count
+  const fetchServiceAdvisorsCount = async () => {
+    if (!token) return;
+
+    setServiceAdvisorsLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/service-advisors/count', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch service advisors count: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setServiceAdvisorsCount(data.data.count || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching service advisors count:', err);
+    } finally {
+      setServiceAdvisorsLoading(false);
+    }
+  };
+
+  const notificationPollingRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (!authLoading && token) {
       fetchAppointments();
       fetchGeneralStats();
+      fetchUserProfile();
+      fetchNotifications();
+      fetchPendingAppointments();
+      fetchTechnicianStats();
+      fetchServiceAdvisorsCount();
+    }
+  }, [token, authLoading]);
+
+  // Polling for notifications only
+  useEffect(() => {
+    if (!authLoading && token) {
+      // Start polling notifications every 30 seconds
+      notificationPollingRef.current = setInterval(() => {
+        fetchNotifications();
+      }, 30000); // 30 seconds
+
+      // Cleanup interval on unmount
+      return () => {
+        if (notificationPollingRef.current) {
+          clearInterval(notificationPollingRef.current);
+        }
+      };
     }
   }, [token, authLoading]);
 
@@ -177,7 +398,7 @@ const Dashboard = () => {
     }}>
       {/* Add Boxicons CSS */}
       <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
-      
+
       {/* Page Header */}
       <div style={{
         display: 'flex',
@@ -195,7 +416,7 @@ const Dashboard = () => {
             color: '#1e293b',
             margin: '0 0 0.25rem 0'
           }}>
-            Manager Dashboard
+            Service Manager Dashboard
           </h1>
           <p style={{
             color: '#64748b',
@@ -226,33 +447,31 @@ const Dashboard = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '20px',
-                position: 'relative',
-                transition: 'all 0.2s',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f8fafc';
-                e.currentTarget.style.borderColor = '#cbd5e1';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
-                e.currentTarget.style.borderColor = '#e2e8f0';
+                position: 'relative'
               }}
             >
               <i className='bx bx-bell'></i>
               {/* Notification Badge */}
               <div style={{
                 position: 'absolute',
-                top: '8px',
-                right: '8px',
-                width: '8px',
-                height: '8px',
+                top: '6px',
+                right: '6px',
+                width: '20px',
+                height: '20px',
                 borderRadius: '50%',
                 backgroundColor: '#ef4444',
-                border: '2px solid white'
-              }} />
+                border: '2px solid white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: 'white'
+              }}>
+                {notifications.filter(n => !n.isRead).length || 0}
+              </div>
             </button>
-            
+
             {/* Notification Dropdown */}
             {showNotifications && (
               <div style={{
@@ -265,11 +484,11 @@ const Dashboard = () => {
                 boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
                 borderRadius: '12px'
               }}>
-                <Notifications />
+                <Notifications notifications={notifications} />
               </div>
             )}
           </div>
-          
+
           {/* Manager Profile */}
           <div style={{
             display: 'flex',
@@ -287,17 +506,21 @@ const Dashboard = () => {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              backgroundColor: '#2563eb',
+              backgroundColor: userProfile?.profileImageUrl ? 'transparent' : '#2563eb',
+              backgroundImage: userProfile?.profileImageUrl ? `url(${userProfile.profileImageUrl})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
               fontSize: '14px',
-              fontWeight: '600'
+              fontWeight: '600',
+              border: userProfile?.profileImageUrl ? '2px solid #e2e8f0' : 'none'
             }}>
-              MS
+              {!userProfile?.profileImageUrl && (userProfileLoading ? '...' : userProfile ? userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'MS')}
             </div>
-            
+
             {/* Profile Info */}
             <div style={{
               display: 'flex',
@@ -310,113 +533,49 @@ const Dashboard = () => {
                 color: '#1e293b',
                 lineHeight: '1.2'
               }}>
-                Michael Smith
+                {userProfileLoading ? 'Loading...' : userProfile?.name || 'Michael Smith'}
               </div>
               <div style={{
                 fontSize: '14px',
                 color: '#64748b',
                 lineHeight: '1.2'
               }}>
-                michael.smith@motortrace.com
+                {userProfileLoading ? 'Loading...' : userProfile?.email || 'michael.smith@motortrace.com'}
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Main Layout - Two Sections */}
+
+      {/* Top 3 Stat Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: '16px',
-        alignItems: 'start'
+        marginBottom: '16px'
       }}>
-        {/* Left Section */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px'
-        }}>
-          {/* Top 3 Metric Cards */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '16px'
-          }}>
-            {generalStatsLoading ? (
-              <>
-                <MetricCard title="Total Customers" amount="Loading..." />
-                <MetricCard title="Total Vehicles" amount="Loading..." />
-                <MetricCard title="Total Technicians" amount="Loading..." />
-              </>
-            ) : generalStatsError ? (
-              <>
-                <MetricCard title="Total Customers" amount="0" />
-                <MetricCard title="Total Vehicles" amount="0" />
-                <MetricCard title="Total Technicians" amount="0" />
-              </>
-            ) : generalStats ? (
-              <>
-                <MetricCard
-                  title="Total Customers"
-                  amount={generalStats.totalCustomers.toString()}
-                />
-                <MetricCard
-                  title="Total Vehicles"
-                  amount={generalStats.totalVehicles.toString()}
-                />
-                <MetricCard
-                  title="Total Technicians"
-                  amount={generalStats.totalTechnicians.toString()}
-                />
-              </>
-            ) : (
-              <>
-                <MetricCard title="Total Customers" amount="--" />
-                <MetricCard title="Total Vehicles" amount="--" />
-                <MetricCard title="Total Technicians" amount="--" />
-              </>
-            )}
-          </div>
-          
-          {/* Work Order Statistics Chart */}
-          <WorkOrderStatistics />
-        </div>
-
-        {/* Right Section - Calendar */}
-        <div style={{
-          height: '100%'
-        }}>
-          {appointmentsLoading ? (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '400px',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0'
-            }}>
-              Loading appointments...
-            </div>
-          ) : appointmentsError ? (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '400px',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0',
-              color: '#ef4444'
-            }}>
-              Error loading appointments: {appointmentsError}
-            </div>
-          ) : (
-            <MiniCalendar appointments={appointments} />
-          )}
-        </div>
+        <MetricCard
+          title="Pending Appointments"
+          amount={pendingAppointmentsLoading ? 'Loading...' : pendingAppointments?.toString() || '0'}
+          bgColor="#dbeafe"
+          textColor="#1e40af"
+        />
+        <MetricCard
+          title="Active Technicians"
+          amount={technicianStatsLoading ? 'Loading...' : technicianStats?.activeTechnicians?.toString() || '0'}
+          bgColor="#dcfce7"
+          textColor="#15803d"
+        />
+        <MetricCard
+          title="Service Advisors"
+          amount={serviceAdvisorsLoading ? 'Loading...' : serviceAdvisorsCount?.toString() || '0'}
+          bgColor="#fef3c7"
+          textColor="#b45309"
+        />
       </div>
+
+      {/* Work Order Statistics Chart */}
+      <WorkOrderStatistics />
 
       {/* Currently Working Technicians Section */}
       <div style={{
@@ -614,15 +773,18 @@ const Dashboard = () => {
                         transition: 'all 0.2s',
                         fontSize: '16px'
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f8fafc';
-                        e.currentTarget.style.borderColor = '#cbd5e1';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white';
-                        e.currentTarget.style.borderColor = '#e2e8f0';
-                      }}
-                      onClick={() => console.log('View technician:', technician.technicianName)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                          e.currentTarget.style.borderColor = '#cbd5e1';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'white';
+                          e.currentTarget.style.borderColor = '#e2e8f0';
+                        }}
+                        onClick={() => {
+                          // Redirect to technician details page
+                          window.location.href = `http://localhost:5173/manager/technician/${technician.technicianId || 'tech_007'}`;
+                        }}
                       >
                         <i className='bx bx-show'></i>
                       </button>

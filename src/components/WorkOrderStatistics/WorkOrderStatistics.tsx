@@ -143,7 +143,9 @@ const WorkOrderStatistics: React.FC = () => {
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                domain={['dataMin - 1', 'dataMax + 1']}
+                domain={[0, 'dataMax + 1']}
+                type="number"
+                tickFormatter={(value) => Math.round(value).toString()}
               />
               <Tooltip content={<CustomTooltip />} />
               <Area

@@ -98,7 +98,14 @@ const Sidebar: React.FC = () => {
     {
       title: 'Spare Parts',
       items: [
-        { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: `${basePath}/inventory` },
+        // Show basic inventory for service advisors, detailed options for managers
+        ...(userRole === 'manager' ? [
+          { id: 'products', label: 'Products', icon: 'bx bx-package', route: `${basePath}/ProductList` },
+          { id: 'stock-level', label: 'Stock Level', icon: 'bx bx-error', route: `${basePath}/StockLevel` },
+          { id: 'orders', label: 'Orders', icon: 'bx bx-shopping-bag', route: `${basePath}/OrderSummary` },
+        ] : [
+          { id: 'inventory', label: 'Inventory', icon: 'bx bx-box', route: `${basePath}/inventory` },
+        ]),
       ]
     },
     {

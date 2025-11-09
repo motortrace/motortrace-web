@@ -22,43 +22,42 @@ const PartVendorSideBar: React.FC = () => {
 
 const menuGroups: MenuGroup[] = [
   {
-    title: 'Overview',
+    title: 'Issuances',
     items: [
-      { id: 'dashboard', label: 'Dashboard', icon: 'bx bx-grid-alt', route: '/PartVendor/dashboard' },
+      { id: 'orders', label: 'Issuance', icon: 'bx bx-shopping-bag', route: '/inventorymanager/OrderSummary' },
+      // { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/inventorymanager/IncomeSummary' },
     ]
   },
-  {
-    title: 'Orders',
-    items: [
-      { id: 'orders', label: 'Orders', icon: 'bx bx-shopping-bag', route: '/PartVendor/OrderSummary' },
-      { id: 'payments', label: 'Payments', icon: 'bx bx-wallet', route: '/PartVendor/IncomeSummary' },
-    ]
-  },
-  {
-    title: 'Reviews',
-    items: [
-      { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/PartVendor/ReviewPage' },
-      // { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/PartVendor/RatingsPage' },
-    ]
-  },
+  // {
+  //   title: 'Reviews',
+  //   items: [
+  //     { id: 'reviews', label: 'Reviews', icon: 'bx bx-message-rounded-dots', route: '/inventorymanager/ReviewPage' },
+  //     // { id: 'ratings', label: 'Ratings', icon: 'bx bx-star', route: '/inventorymanager/RatingsPage' },
+  //   ]
+  // },
   {
     title: 'Inventory',
     items: [
-      { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/PartVendor/ProductList' },
+      { id: 'products', label: 'Products', icon: 'bx bx-package', route: '/inventorymanager/ProductList' },
+      { id: 'stock', label: 'Stock level', icon: 'bx bx-error', route: '/inventorymanager/StockLevel' },
       
     ]
   },
-      {
-      title: 'Customers',
-      items: [
-        { id: 'customer', label: 'Customers', icon: 'bx bx-grid-alt', route: '/PartVendor/CustomerSummary' },
-      ]
-    },
+    //   {
+    //   title: 'Customers',
+    //   items: [
+    //     { id: 'customer', label: 'Customers', icon: 'bx bx-grid-alt', route: '/inventorymanager/CustomerSummary' },
+    //   ]
+    // },
   {
-    title: 'Profile',
+    title: 'Reports',
     items: [
-      { id: 'profile', label: 'Profile', icon: 'bx bx-user', route: '/PartVendor/ProfilePartVendor' },
-      // { id: 'settings', label: 'Settings', icon: 'bx bx-cog', route: '/PartVendor/Settings' },
+      { id: 'reports', label: 'Reports', icon: 'bx bx-bar-chart-alt-2', route: '/inventorymanager/ReportsSummary' },
+    ]
+  },
+  {
+    title: 'Account',
+    items: [
       { id: 'logout', label: 'Log Out', icon: 'bx bx-log-out', route: '/logout' },
     ]
   }

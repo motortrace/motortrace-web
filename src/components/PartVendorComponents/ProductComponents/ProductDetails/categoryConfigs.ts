@@ -2,7 +2,7 @@
 export const categoryConfigs = {
   "Engine & Fluids": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
     { key: "subcategory", label: "Fluid Type" },
     { key: "compatibility", label: "Compatibility" },
     { key: "brand", label: "Brand" },
@@ -11,49 +11,51 @@ export const categoryConfigs = {
   ],
   "Wear & Tear Parts": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
-    { key: "category", label: "Part Category" },
+    { key: "productname", label: "Product Name" },
+    { key: "subcategory", label: "Part Category" },
     { key: "position", label: "Position" },
     { key: "brand", label: "Brand" },
     { key: "compatibility", label: "Compatible Models" }
   ],
   "Exterior & Body Parts": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
+    { key: "productname", label: "Product Name" },
+    { key: "subcategory", label: "Part Category" },
     { key: "position", label: "Position" },
-    { key: "finish", label: "Finish" },
+    // { key: "finish", label: "Finish" },
     { key: "brand", label: "Brand" },
     { key: "compatibility", label: "Compatible Models" }
   ],
   "Paints & Coatings": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Category" },
+    { key: "productname", label: "Product Name" },
+    { key: "subcategory", label: "Category" },
     { key: "color", label: "Color" },
-    { key: "finish", label: "Finish" },
+    
     { key: "type", label: "Type" },
     // { key: "surfaceUse", label: "Surface Use" },
     { key: "brand", label: "Brand" }
   ],
   "Engine & Drivetrain Components": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
-    { key: "category", label: "Category" },
+    { key: "productname", label: "Product Name" },
+    { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "position", label: "Position" },
     { key: "brand", label: "Brand" }
   ],
   "Electrical Components": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
-    { key: "category", label: "Category" },
+    { key: "productname", label: "Product Name" },
+    { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "position", label: "Position" },
     { key: "brand", label: "Brand" }
   ],
   "Accessories & Add-ons": [
     { key: "id", label: "ID" },
-    { key: "productName", label: "Product Name" },
-    { key: "category", label: "Category" },
+    { key: "productname", label: "Product Name" },
+    { key: "subcategory", label: "Category" },
     { key: "compatibility", label: "Compatible Models" },
     { key: "finish", label: "Finish" },
     { key: "brand", label: "Brand" }
