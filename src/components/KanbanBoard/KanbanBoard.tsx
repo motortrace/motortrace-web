@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import KanbanColumn from '../KanbanColumn/KanbanColumn';
 import './KanbanBoard.scss';
 import { type WorkOrder } from '../../utils/workOrdersApi';
@@ -34,44 +34,61 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   columns,
   onCardClick
 }) => {
-  const filterWorkOrders = (items: WorkOrder[], workflowStep: WorkOrder['workflowStep']) => {
-    return items.filter(item => {
-      const matchesStatus = item.workflowStep === workflowStep;
+  // Memoize the search term in lowercase to avoid repeated toLowerCase() calls
+  const searchTermLower = useMemo(() => searchTerm.toLowerCase(), [searchTerm]);
+  const technicianFilterLower = useMemo(() => technicianFilter.toLowerCase(), [technicianFilter]);
+
+  // Memoize filtered work orders grouped by workflowStep
+  const filteredWorkOrdersByStep = useMemo(() => {
+    const result: Record<string, WorkOrder[]> = {};
+    
+    for (const item of workOrders) {
       const customerName = item.customer ? `${item.customer.firstName} ${item.customer.lastName}` : '';
       const vehicleInfo = item.vehicle ? `${item.vehicle.year} ${item.vehicle.make} ${item.vehicle.model}` : '';
       const serviceAdvisorName = item.serviceAdvisor ? `${item.serviceAdvisor.userProfile.firstName} ${item.serviceAdvisor.userProfile.lastName}` : '';
       
       const matchesSearch = searchTerm === '' ||
-        item.workOrderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        vehicleInfo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        serviceAdvisorName.toLowerCase().includes(searchTerm.toLowerCase());
+        item.workOrderNumber.toLowerCase().includes(searchTermLower) ||
+        customerName.toLowerCase().includes(searchTermLower) ||
+        vehicleInfo.toLowerCase().includes(searchTermLower) ||
+        serviceAdvisorName.toLowerCase().includes(searchTermLower);
       
       const matchesPriority = priorityFilter === '' || item.priority === priorityFilter;
-      const matchesTechnician = technicianFilter === '' || serviceAdvisorName.toLowerCase().includes(technicianFilter.toLowerCase());
+      const matchesTechnician = technicianFilter === '' || serviceAdvisorName.toLowerCase().includes(technicianFilterLower);
       
-      return matchesStatus && matchesSearch && matchesPriority && matchesTechnician;
-    });
-  };
+      if (matchesSearch && matchesPriority && matchesTechnician) {
+        const step = item.workflowStep;
+        if (!result[step]) {
+          result[step] = [];
+        }
+        result[step].push(item);
+      }
+    }
+    
+    return result;
+  }, [workOrders, searchTerm, searchTermLower, priorityFilter, technicianFilter, technicianFilterLower]);
 
   return (
     <div className="kanban-board">
       <div className="kanban-columns">
-        {columns.map((column) => (
-          <KanbanColumn
-            key={column.id}
-            title={column.title}
-            color={column.color}
-            count={workOrders.filter(item => item.workflowStep === column.id).length}
-            serviceItems={filterWorkOrders(workOrders, column.id)}
-            onCardMove={onCardMove}
-            columnId={column.id}
-            getTypeIcon={getTypeIcon}
-            getTypeColor={getTypeColor}
-            getPriorityColor={getPriorityColor}
-            onCardClick={onCardClick}
-          />
-        ))}
+        {columns.map((column) => {
+          const columnItems = filteredWorkOrdersByStep[column.id] || [];
+          return (
+            <KanbanColumn
+              key={column.id}
+              title={column.title}
+              color={column.color}
+              count={columnItems.length}
+              serviceItems={columnItems}
+              onCardMove={onCardMove}
+              columnId={column.id}
+              getTypeIcon={getTypeIcon}
+              getTypeColor={getTypeColor}
+              getPriorityColor={getPriorityColor}
+              onCardClick={onCardClick}
+            />
+          );
+        })}
       </div>
     </div>
   );

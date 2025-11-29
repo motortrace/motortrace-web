@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CustomerManagement.scss';
 
@@ -173,8 +173,8 @@ const CustomerManagement: React.FC = () => {
     navigate(`${basePath}/customer/${customerId}`);
   };
 
-  // --- Sorting Logic ---
-  const sortedCustomers = [...customers].sort((a, b) => {
+  // --- Sorting Logic - memoized to avoid recalculation on every render ---
+  const sortedCustomers = useMemo(() => [...customers].sort((a, b) => {
     switch (sortOption) {
       case 'Name (A-Z)':
         return a.name.localeCompare(b.name);
@@ -187,7 +187,7 @@ const CustomerManagement: React.FC = () => {
       default:
         return 0;
     }
-  });
+  }), [customers, sortOption]);
 
   return (
     <div className="customer-management">

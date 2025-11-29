@@ -1,5 +1,5 @@
 // src/hooks/useWorkingTechnicians.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { technicianService } from '../services/technicianService';
 
 export interface WorkingTechnician {
@@ -18,7 +18,7 @@ export const useWorkingTechnicians = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchWorkingTechnicians = async () => {
+  const fetchWorkingTechnicians = useCallback(async () => {
     setLoading(true);
     try {
       const data = await technicianService.getWorkingTechnicians();
@@ -34,11 +34,11 @@ export const useWorkingTechnicians = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWorkingTechnicians();
-  }, []);
+  }, [fetchWorkingTechnicians]);
 
   return {
     technicians,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
@@ -298,23 +298,32 @@ const AppointmentsPage = () => {
     // For other statuses (all, IN_PROGRESS, etc.), keep current tab or switch to calendar if needed
   }, [filterStatus]);
 
-  // Unique filter values
-  const uniqueCustomers = [...new Set(appointments.map((a: Appointment) => a.customer?.name || a.customerId))];
-  const uniqueVehicles = [...new Set(appointments.map((a: Appointment) => a.vehicle?.make ? `${a.vehicle.year} ${a.vehicle.make} ${a.vehicle.model}` : a.vehicleId))];
+  // Unique filter values - memoized to avoid recalculation on every render
+  const uniqueCustomers = useMemo(() =>
+    [...new Set(appointments.map((a: Appointment) => a.customer?.name || a.customerId))],
+    [appointments]
+  );
+  const uniqueVehicles = useMemo(() =>
+    [...new Set(appointments.map((a: Appointment) => a.vehicle?.make ? `${a.vehicle.year} ${a.vehicle.make} ${a.vehicle.model}` : a.vehicleId))],
+    [appointments]
+  );
 
-  // Filtering logic
-  const filteredAppointments = appointments.filter((appointment: Appointment) => {
+  // Memoize search term in lowercase to avoid repeated toLowerCase() calls
+  const searchTermLower = useMemo(() => searchTerm.toLowerCase(), [searchTerm]);
+
+  // Filtering logic - memoized to avoid recalculation on every render
+  const filteredAppointments = useMemo(() => appointments.filter((appointment: Appointment) => {
     const customerName = appointment.customer?.name || appointment.customerId;
     const vehicleName = appointment.vehicle?.make ? `${appointment.vehicle.year} ${appointment.vehicle.make} ${appointment.vehicle.model}` : appointment.vehicleId;
     const notes = appointment.notes || '';
-    const matchesSearch = notes.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicleName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = notes.toLowerCase().includes(searchTermLower) ||
+      customerName.toLowerCase().includes(searchTermLower) ||
+      vehicleName.toLowerCase().includes(searchTermLower);
     const matchesStatus = filterStatus === 'all' || appointment.status === filterStatus;
     const matchesCustomer = filterCustomer === 'all' || customerName === filterCustomer;
     const matchesVehicle = filterVehicle === 'all' || vehicleName === filterVehicle;
     return matchesSearch && matchesStatus && matchesCustomer && matchesVehicle;
-  });
+  }), [appointments, searchTermLower, filterStatus, filterCustomer, filterVehicle]);
 
   const handleConfirm = (id: string) => {
     const appointment = appointments.find((a: Appointment) => a.id === id);
@@ -790,12 +799,18 @@ const AppointmentsPage = () => {
     },
   ];
 
-  // Separate pending and confirmed appointments
-  const pendingAppointments = filteredAppointments.filter(apt => apt.status === 'PENDING');
-  const confirmedAppointments = filteredAppointments.filter(apt => apt.status === 'CONFIRMED');
+  // Separate pending and confirmed appointments - memoized
+  const pendingAppointments = useMemo(() => 
+    filteredAppointments.filter(apt => apt.status === 'PENDING'),
+    [filteredAppointments]
+  );
+  const confirmedAppointments = useMemo(() =>
+    filteredAppointments.filter(apt => apt.status === 'CONFIRMED'),
+    [filteredAppointments]
+  );
 
-  // Map calendar appointments to BigCalendar events
-  const calendarEvents = appointments
+  // Map calendar appointments to BigCalendar events - memoized
+  const calendarEvents = useMemo(() => appointments
     .filter(apt => apt.startTime) // Only show appointments with scheduled times
     .map(apt => ({
       id: apt.id,
@@ -803,7 +818,7 @@ const AppointmentsPage = () => {
       start: new Date(apt.startTime!),
       end: new Date(apt.startTime!), // Assuming no end time, or add duration if available
       resource: apt,
-    }));
+    })), [appointments]);
 
   const handleEventClick = (event: any) => {
     // Calendar event clicked - navigate to appointment detail
