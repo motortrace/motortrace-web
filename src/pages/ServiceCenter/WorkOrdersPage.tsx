@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Table, { type TableColumn } from '../../components/Table/Table';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import './WorkOrdersPage.scss';
@@ -51,23 +51,32 @@ const WorkOrdersPage = () => {
       });
   }, []);
 
-  // Unique filter values
-  const uniqueCustomers = [...new Set(workOrders.map((w: WorkOrder) => w.customer?.firstName ? `${w.customer.firstName} ${w.customer.lastName}` : w.customerId))];
-  const uniqueVehicles = [...new Set(workOrders.map((w: WorkOrder) => w.vehicle?.make ? `${w.vehicle.year} ${w.vehicle.make} ${w.vehicle.model}` : w.vehicleId))];
+  // Unique filter values - memoized to avoid recalculation on every render
+  const uniqueCustomers = useMemo(() => 
+    [...new Set(workOrders.map((w: WorkOrder) => w.customer?.firstName ? `${w.customer.firstName} ${w.customer.lastName}` : w.customerId))],
+    [workOrders]
+  );
+  const uniqueVehicles = useMemo(() =>
+    [...new Set(workOrders.map((w: WorkOrder) => w.vehicle?.make ? `${w.vehicle.year} ${w.vehicle.make} ${w.vehicle.model}` : w.vehicleId))],
+    [workOrders]
+  );
 
-  // Filtering logic
-  const filteredWorkOrders = workOrders.filter((order: WorkOrder) => {
+  // Memoize search term in lowercase to avoid repeated toLowerCase() calls
+  const searchTermLower = useMemo(() => searchTerm.toLowerCase(), [searchTerm]);
+
+  // Filtering logic - memoized to avoid recalculation on every render
+  const filteredWorkOrders = useMemo(() => workOrders.filter((order: WorkOrder) => {
     const customerName = order.customer?.firstName ? `${order.customer.firstName} ${order.customer.lastName}` : order.customerId;
     const vehicleName = order.vehicle?.make ? `${order.vehicle.year} ${order.vehicle.make} ${order.vehicle.model}` : order.vehicleId;
     const title = order.complaint || '';
-    const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicleName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = title.toLowerCase().includes(searchTermLower) ||
+      customerName.toLowerCase().includes(searchTermLower) ||
+      vehicleName.toLowerCase().includes(searchTermLower);
     const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
     const matchesCustomer = filterCustomer === 'all' || customerName === filterCustomer;
     const matchesVehicle = filterVehicle === 'all' || vehicleName === filterVehicle;
     return matchesSearch && matchesStatus && matchesCustomer && matchesVehicle;
-  });
+  }), [workOrders, searchTermLower, filterStatus, filterCustomer, filterVehicle]);
 
   const handleView = (id: string) => {
     const wo = workOrders.find((w: WorkOrder) => w.id === id) || null;

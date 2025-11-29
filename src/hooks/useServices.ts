@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cannedServiceService } from '../services/cannedServiceService';
 import type { Service } from '../types/Service';
 
@@ -7,7 +7,7 @@ export const useServices = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
       const data = await cannedServiceService.getPackages();
@@ -18,20 +18,33 @@ export const useServices = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const toggleAvailability = async (serviceId: string) => {
+  const toggleAvailability = useCallback(async (serviceId: string) => {
+    // Optimistic update - update UI immediately
+    setServices(prev => prev.map(service =>
+      service.id === serviceId
+        ? { ...service, isAvailable: !service.isAvailable }
+        : service
+    ));
+    
     try {
       await cannedServiceService.toggleAvailability(serviceId);
-      await fetchServices(); // Refresh data
+      // No need to refetch, we already updated the UI optimistically
     } catch (err: any) {
+      // Revert optimistic update on error
+      setServices(prev => prev.map(service =>
+        service.id === serviceId
+          ? { ...service, isAvailable: !service.isAvailable }
+          : service
+      ));
       setError(err.message || 'Failed to toggle service availability');
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [fetchServices]);
 
   return {
     services,
