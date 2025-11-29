@@ -47,14 +47,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       const vehicleInfo = item.vehicle ? `${item.vehicle.year} ${item.vehicle.make} ${item.vehicle.model}` : '';
       const serviceAdvisorName = item.serviceAdvisor ? `${item.serviceAdvisor.userProfile.firstName} ${item.serviceAdvisor.userProfile.lastName}` : '';
       
-      const matchesSearch = searchTerm === '' ||
+      const matchesSearch = searchTermLower === '' ||
         item.workOrderNumber.toLowerCase().includes(searchTermLower) ||
         customerName.toLowerCase().includes(searchTermLower) ||
         vehicleInfo.toLowerCase().includes(searchTermLower) ||
         serviceAdvisorName.toLowerCase().includes(searchTermLower);
       
       const matchesPriority = priorityFilter === '' || item.priority === priorityFilter;
-      const matchesTechnician = technicianFilter === '' || serviceAdvisorName.toLowerCase().includes(technicianFilterLower);
+      const matchesTechnician = technicianFilterLower === '' || serviceAdvisorName.toLowerCase().includes(technicianFilterLower);
       
       if (matchesSearch && matchesPriority && matchesTechnician) {
         const step = item.workflowStep;
@@ -66,7 +66,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     }
     
     return result;
-  }, [workOrders, searchTerm, searchTermLower, priorityFilter, technicianFilter, technicianFilterLower]);
+  }, [workOrders, searchTermLower, priorityFilter, technicianFilterLower]);
 
   return (
     <div className="kanban-board">
