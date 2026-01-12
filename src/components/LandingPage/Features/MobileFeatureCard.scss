@@ -1,0 +1,37 @@
+.mobile-feature-card {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    border-radius: 25px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 10px;
+
+    &__image-container img{
+        max-height: 300px;
+        margin-left: 10px;
+        margin-top: 20px;
+    }
+
+    &__headingAndDescription-container{
+        flex: 1;
+        justify-content: space-around;
+        margin: 25px;
+    }
+
+     h3 {
+        font-size: 15px;
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    &__description-container{
+        font-size: 14px;
+        line-height: 1.6;
+        text-align: justify;
+        color: #666;
+    }
+
+
+}

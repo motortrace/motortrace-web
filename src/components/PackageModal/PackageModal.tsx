@@ -6,8 +6,9 @@ interface ServiceItem {
   name: string;
   description: string;
   category: string;
-  laborHours: number;
-  laborCharge: number;
+  laborHours?: number;
+  laborCharge?: number;
+  price?: number;
   isActive: boolean;
 }
 
@@ -18,27 +19,38 @@ interface PackageModalProps {
   onSave: (pkg: any) => void;
 }
 
-const defaultDiscount = { type: 'percent', value: 0 };
+const defaultDiscount: { type: 'percent' | 'fixed'; value: number } = { type: 'percent', value: 0 };
 
 const PackageModal: React.FC<PackageModalProps> = ({
   packageData,
-  individualServices,
+  individualServices = [],
   onClose,
   onSave
 }) => {
-  const [currentPackage, setCurrentPackage] = useState<any | null>(packageData);
+  // Defensive: always use a safe array
+  const safeIndividualServices = Array.isArray(individualServices) ? individualServices : [];
+  // If editing, start in view mode; if creating, start in edit mode
   const [isEditing, setIsEditing] = useState(!packageData);
-  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(packageData?.serviceIds || []);
-  const [discount, setDiscount] = useState<{ type: 'percent' | 'fixed'; value: number }>(packageData?.discount || defaultDiscount);
+  const [currentPackage, setCurrentPackage] = useState<any | null>(packageData || null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(packageData?.serviceIds || (packageData?.services ? packageData.services.map((s: any) => String(s.serviceId || s.service?.id)) : []));
+  const [discount, setDiscount] = useState<{ type: 'percent' | 'fixed'; value: number }>(packageData?.discount || (packageData?.discountType ? { type: packageData.discountType, value: packageData.discountValue } : defaultDiscount));
   const [customTotal, setCustomTotal] = useState<number | null>(packageData?.customTotal || null);
   const [serviceToAdd, setServiceToAdd] = useState<string>('');
 
+  // When packageData changes (e.g. opening for edit), update state
   useEffect(() => {
     if (packageData) {
       setCurrentPackage(packageData);
-      setSelectedServiceIds(packageData.serviceIds || []);
-      setDiscount(packageData.discount || defaultDiscount);
+      setSelectedServiceIds(
+        packageData.serviceIds ||
+        (packageData.services ? packageData.services.map((s: any) => String(s.serviceId || s.service?.id)) : [])
+      );
+      setDiscount(
+        packageData.discount ||
+        (packageData.discountType ? { type: packageData.discountType, value: packageData.discountValue } : defaultDiscount)
+      );
       setCustomTotal(packageData.customTotal || null);
+      setIsEditing(false); // Always start in view mode for edit
     } else {
       setCurrentPackage({
         id: `package-${Date.now()}`,
@@ -53,6 +65,7 @@ const PackageModal: React.FC<PackageModalProps> = ({
       setSelectedServiceIds([]);
       setDiscount(defaultDiscount);
       setCustomTotal(null);
+      setIsEditing(true); // Always start in edit mode for create
     }
   }, [packageData]);
 
@@ -75,8 +88,9 @@ const PackageModal: React.FC<PackageModalProps> = ({
     setSelectedServiceIds(prev => prev.filter(id => id !== serviceId));
   };
 
-  const selectedServices = individualServices.filter(s => selectedServiceIds.includes(s.id));
-  const subtotal = selectedServices.reduce((sum, s) => sum + s.laborCharge, 0);
+  // Use safeIndividualServices instead of individualServices
+  const selectedServices = safeIndividualServices.filter(s => selectedServiceIds.includes(s.id));
+  const subtotal = selectedServices.reduce((sum, s) => sum + (s.laborCharge || s.price || 0), 0);
   const discountAmount = discount.type === 'percent' ? (subtotal * discount.value) / 100 : discount.value;
   const calculatedTotal = Math.max(0, subtotal - discountAmount);
   const displayTotal = customTotal !== null ? customTotal : calculatedTotal;
@@ -194,11 +208,15 @@ const PackageModal: React.FC<PackageModalProps> = ({
                       className="service-select"
                     >
                       <option value="">Select a service to add...</option>
-                      {individualServices
+                      {safeIndividualServices
                         .filter(s => !selectedServiceIds.includes(s.id) && s.isActive)
                         .map(service => (
                           <option key={service.id} value={service.id}>
-                            {service.name} - ${service.laborCharge.toFixed(2)} ({service.laborHours}h)
+                            {service.name} - $
+                            {typeof service.laborCharge === 'number' ? service.laborCharge.toFixed(2)
+                              : typeof service.price === 'number' ? service.price.toFixed(2)
+                              : 'N/A'}
+                            ({typeof service.laborHours === 'number' ? service.laborHours : 0}h)
                           </option>
                         ))}
                     </select>
@@ -247,8 +265,10 @@ const PackageModal: React.FC<PackageModalProps> = ({
                         <td>
                           <span className="service-category">{service.category}</span>
                         </td>
-                        <td>{service.laborHours}</td>
-                        <td>${service.laborCharge.toFixed(2)}</td>
+                        <td>{typeof service.laborHours === 'number' ? service.laborHours : 0}</td>
+                        <td>${typeof service.laborCharge === 'number' ? service.laborCharge.toFixed(2)
+                          : typeof service.price === 'number' ? service.price.toFixed(2)
+                          : 'N/A'}</td>
                         {isEditing && (
                           <td>
                             <button
@@ -281,7 +301,7 @@ const PackageModal: React.FC<PackageModalProps> = ({
                       <div className="discount-inputs">
                         <select 
                           value={discount.type} 
-                          onChange={e => setDiscount(d => ({ ...d, type: e.target.value as 'percent' | 'fixed' }))}
+                          onChange={e => setDiscount(d => ({ ...d, type: e.target.value === 'percent' ? 'percent' : 'fixed' }))}
                           className="discount-type"
                         >
                           <option value="percent">%</option>

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Navbar.scss';
+import { fetchUserStatus } from '../../utils/fetchUserStatus';
 
 const pageInfo: Record<string, { title: string; description: string }> = {
   '/servicecenter/dashboard': {
@@ -83,6 +84,20 @@ const Navbar: React.FC = () => {
     description: 'Select a page to get started',
   };
 
+  const [user, setUser] = useState<{ name?: string; email?: string }>({});
+
+  useEffect(() => {
+    const getUser = async () => {
+      const status = await fetchUserStatus();
+      if (status && status.name && status.email) {
+        setUser({ name: status.name, email: status.email });
+      } else if (status && status.user) {
+        setUser({ name: status.user.name, email: status.user.email });
+      }
+    };
+    getUser();
+  }, []);
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -112,8 +127,8 @@ const Navbar: React.FC = () => {
             className="user-photo"
           />
           <div className="user-info">
-            <div className="user-name">Mag City</div>
-            <div className="user-email">magcity@gmail.com</div>
+            <div className="user-name">{user.name ? user.name : 'Guest User'}</div>
+            <div className="user-email">{user.email ? user.email : 'guest@example.com'}</div>
           </div>
         </div>
       </div>

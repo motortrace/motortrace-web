@@ -1,0 +1,41 @@
+#features{
+    padding-top: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: var(--font-primary);
+}
+
+.service-center-features {
+
+    &__title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: #333;
+        margin-left: 20px;
+    }
+
+    &__btn-container{
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 25px;
+        margin-right: 20px;
+        margin-bottom: 25px;
+
+        Button:hover{
+            background-color: var(--color-info);
+            color: #fff;
+            border: none;
+        }
+    }
+
+}
+
+.feature-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}

@@ -1,0 +1,240 @@
+.pricing-plan {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  .pricing-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+  }
+
+  .billing-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    position: relative;
+
+    span {
+      font-weight: 500;
+      color: #666;
+      transition: color 0.3s ease;
+      position: relative;
+
+      &.active {
+        color: #1a1a1a;
+      }
+
+      .savings {
+        position: absolute;
+        top: -20px;
+        right: -10px;
+        background: #10b981;
+        color: white;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+    }
+
+    .toggle-button {
+      width: 60px;
+      height: 32px;
+      background: #e5e7eb;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.3s ease;
+
+      &.active {
+        background: #3b82f6;
+      }
+
+      .toggle-slider {
+        width: 24px;
+        height: 24px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        transition: transform 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      &.active .toggle-slider {
+        transform: translateX(28px);
+      }
+    }
+  }
+
+  .plan-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &:hover {
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+    }
+
+    .plan-header {
+      margin-bottom: 2rem;
+
+      h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 1rem;
+      }
+
+      .price {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0.25rem;
+
+        .currency {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #666;
+        }
+
+        .amount {
+          font-size: 3rem;
+          font-weight: 700;
+          color: #1a1a1a;
+        }
+
+        .period {
+          font-size: 1.1rem;
+          color: #666;
+        }
+      }
+
+      .savings-badge {
+        position: absolute;
+        top: -12px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+    }
+
+    .plan-features {
+      text-align: left;
+      margin-bottom: 2rem;
+
+      h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 1rem;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+          padding: 0.5rem 0;
+          color: #4b5563;
+          font-size: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+
+    .select-plan-btn {
+      width: 100%;
+      padding: 1rem 2rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover:not(.selected) {
+        background: #2563eb;
+        transform: translateY(-1px);
+      }
+
+      &.selected {
+        background: #10b981;
+        cursor: default;
+      }
+    }
+  }
+
+  .pricing-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+
+    p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .pricing-plan {
+    padding: 1.5rem;
+    margin: 0 1rem;
+
+    .pricing-header h2 {
+      font-size: 1.75rem;
+    }
+
+    .plan-card {
+      padding: 1.5rem;
+
+      .plan-header .price .amount {
+        font-size: 2.5rem;
+      }
+    }
+  }
+} 
